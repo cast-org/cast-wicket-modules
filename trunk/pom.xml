@@ -49,8 +49,8 @@
     <modules>
         <module>cwm-base</module>
         <module>cwm-xml</module>
-<!--
         <module>cwm-components</module>
+<!--
         <module>cwm-data</module>
         <module>cwm-dav</module>
         <module>cwm-glossary</module>
