@@ -33,7 +33,7 @@
     </issueManagement>
     
     <scm>
-        <url>http://code.google.com/p/cwm-drawtool/source</url>
+        <url>http://code.google.com/p/cast-wicket-modules/source</url>
         <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/trunk</connection>
         <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/trunk</developerConnection>
     </scm>
@@ -47,15 +47,16 @@
     </distributionManagement>
     
     <modules>
+        <module>cwm-audioapplet</module>
         <module>cwm-base</module>
-        <module>cwm-xml</module>
         <module>cwm-components</module>
+        <module>cwm-data</module>
         <module>cwm-dav</module>
         <module>cwm-glossary</module>
-<!--
-        <module>cwm-data</module>
-        <module>cwm-indira</module>
         <module>cwm-mediaplayer</module>
+        <module>cwm-xml</module>
+<!--
+        <module>cwm-indira</module>
         <module>cwm-tag</module>
 -->
     </modules>
@@ -101,11 +102,6 @@
             </dependency>
             <dependency>
                 <groupId>org.cast.cwm</groupId>
-                <artifactId>cwm-drawtool</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-glossary</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -130,6 +126,19 @@
                 <version>${project.version}</version>
             </dependency>
             
+            <!-- drawtool has its own Google Code project,
+                 and its own release cycle -->
+            <dependency>
+                <groupId>org.cast.cwm</groupId>
+                <artifactId>cwm-drawtool</artifactId>
+                <version>0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cast</groupId>
+                <artifactId>audioapplet</artifactId>
+                <version>0.2</version>
+            </dependency>
+
             <!-- JAVA -->
             <dependency>
                 <groupId>javax.activation</groupId>
