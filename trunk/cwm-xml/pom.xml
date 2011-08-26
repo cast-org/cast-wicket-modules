@@ -14,10 +14,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.cast.cwm</groupId>
-			<artifactId>cwm-base</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 		</dependency>
@@ -44,6 +40,10 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket</artifactId>
 		</dependency>
 	</dependencies>
 
