@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:wicket="http://wicket.apache.org">
+<head></head>
+<body>
+	<!-- Core Editing Panel -->
+	<wicket:panel>
+		<div wicket:id="editor"></div>
+		<div wicket:id="feedbackPanel" style="color:red"></div>
+		<div wicket:id="deleteModal"></div>
+		<div wicket:id="cancelModal"></div>
+	</wicket:panel>
+	<!-- Fragment for Text Editor -->
+	<wicket:fragment wicket:id="textFragment">
+		<select wicket:id="sentenceStarters"></select>
+		<a href="#" wicket:id="addLink">Add</a>
+		<form wicket:id="form">
+			<div>
+				<textarea wicket:id="message"></textarea>
+			</div>
+		</form>
+		<a href="#" wicket:id="save" class="button standard">Save</a> | 
+		<a href="javascript:void(0);" wicket:id="cancel" class="button standard">Cancel</a> 
+		<wicket:enclosure child="delete"> | 
+			<a href="javascript:void(0);" wicket:id="delete" class="button standard">Delete</a>
+		</wicket:enclosure>
+	</wicket:fragment>
+	<!-- Fragment for Drawing Editor -->
+	<wicket:fragment wicket:id="drawingFragment">
+		<form wicket:id="form">
+			<input type="hidden" wicket:id="svg"></input>
+		</form>
+		<iframe wicket:id="svgeditor" width="550" height="400" scrolling="no"></iframe>
+		<br />
+		<a href="#" wicket:id="save" class="button standard">Save</a> | 
+		<a href="javascript:void(0);" wicket:id="cancel" class="button standard">Cancel</a> 
+		<wicket:enclosure child="delete"> | 
+			<a href="javascript:void(0);" wicket:id="delete" class="button standard">Delete</a>
+		</wicket:enclosure>
+	</wicket:fragment>
+	<!-- Fragment for Audio Editor -->
+	<wicket:fragment wicket:id="audioFragment">
+		<div wicket:id="applet"></div>
+		<a href="javascript:void(0);" wicket:id="save" class="button standard">Save</a> |
+		<a href="javascript:void(0);" wicket:id="cancel" class="button standard">Cancel</a> 
+		<wicket:enclosure child="delete"> | 
+			<a href="javascript:void(0);" wicket:id="delete" class="button standard">Delete</a>
+		</wicket:enclosure>
+	</wicket:fragment>
+	<!-- Fragment for File Uploads -->
+	<wicket:fragment wicket:id="uploadFragment">
+		<form wicket:id="form">
+			<div>
+				<input type="file" wicket:id="fileUploadField" />
+			</div>
+		</form>
+		<a href="#" wicket:id="save" class="button standard">Save</a> | 
+		<a href="javascript:void(0);" wicket:id="cancel" class="button standard">Cancel</a> 
+		<wicket:enclosure child="delete"> | 
+			<a href="javascript:void(0);" wicket:id="delete" class="button standard">Delete</a>
+		</wicket:enclosure>
+	</wicket:fragment>
+	<!-- Fragment for Flash Audio Editor -->
+	<wicket:fragment wicket:id="flashAudio">
+		<form wicket:id="form">
+			<div wicket:id="audioApplet"></div>
+		</form>
+		<a href="#" wicket:id="save" class="button standard">Save</a> | 
+		<a href="javascript:void(0);" wicket:id="cancel" class="button standard">Cancel</a> 
+		<wicket:enclosure child="delete"> | 
+			<a href="javascript:void(0);" wicket:id="delete" class="button standard">Delete</a>
+		</wicket:enclosure>
+	</wicket:fragment>
+	
+	<wicket:fragment wicket:id="svgNotSupportedFragment">
+		<div class="warning" role="alert">
+			<p>
+				Internet Explorer does not support the SVG-based images that are used by this drawing tool.  If you would like to use this feature, please install
+				the <a href="http://www.google.com/chromeframe/eula.html">Google Chrome Frame Plugin</a>.  Once it is installed, restart your browser and you will be 
+				able to use the tool.
+			</p>
+			<a href="javascript:void(0);" wicket:id="close" class="button standard">Close</a>
+		</div>
+	</wicket:fragment>
+</body>
+</html>
