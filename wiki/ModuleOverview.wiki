@@ -2,6 +2,8 @@
 
 This diagram shows the dependencies between the various modules and selected dependencies on third-party libraries.
 
+[http://cast-wicket-modules.googlecode.com/svn/wiki/images/cwm-modules.png]
+
 The blue boxes are CAST modules that are not included in this project.
   * ISI and its Example Application are part of the [[http://code.google.com/p/udl-curriculum-toolkit UDL Curriculum Toolkit], which makes use of all of these modules in a complete webapp.
   * The drawing tool and cwm wrapper for it are available in [http://code.google.com/p/cwm-drawtool the cwm-drawtool Google Code project].
@@ -19,5 +21,3 @@ The orange boxes are the modules that are included in this project:
   * [CwmComponents cwm-components]: miscellaneous useful wicket components
 
 The white boxes are third party dependencies (not exhaustively listed, just the most significant ones).
-
-[http://cast-wicket-modules.googlecode.com/svn/wiki/images/cwm-modules.png]
