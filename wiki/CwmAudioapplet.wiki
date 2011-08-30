@@ -1,0 +1,10 @@
+#summary cwm-audioapplet plays and records audio via a Java applet
+
+= Introduction =
+
+The cwm-audioapplet package contains an HTML user interface and Wicket components to allow web site users to record an audio clip, and play it back.
+
+
+= Details =
+
+TODO
