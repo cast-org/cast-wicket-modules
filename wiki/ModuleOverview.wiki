@@ -5,7 +5,7 @@ This diagram shows the dependencies between the various modules and selected dep
 [http://cast-wicket-modules.googlecode.com/svn/wiki/images/cwm-modules.png]
 
 The blue boxes are CAST modules that are not included in this project.
-  * ISI and its Example Application are part of the [[http://code.google.com/p/udl-curriculum-toolkit UDL Curriculum Toolkit], which makes use of all of these modules in a complete webapp.
+  * ISI and its Example Application are part of the [http://code.google.com/p/udl-curriculum-toolkit UDL Curriculum Toolkit], which makes use of all of these modules in a complete webapp.
   * The drawing tool and cwm wrapper for it are available in [http://code.google.com/p/cwm-drawtool the cwm-drawtool Google Code project].
   * The audio applet will be uploaded once it is a little more complete and stable.
 
