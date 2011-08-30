@@ -1,0 +1,15 @@
+#summary Database structure and Wicket components for tagging
+
+= Introduction =
+
+Includes the database classes and wicket components necessary for basic tagging:
+  * Define taggable objects (can be any database-persisted class)
+  * Add and list tags
+  * Create tag clouds, showing frequency
+
+= Dependencies =
+  * [CwmData cwm-data]
+
+= Details =
+
+*TODO*
