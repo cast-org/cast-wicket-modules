@@ -1,0 +1,12 @@
+#summary Wicket components for including JW Player into your page
+
+= Introduction =
+This is a Wicket wrapper for the [http://www.longtailvideo.com/support/jw-player JW Player] Flash & HTML5 audio and video player.
+
+= Dependencies = 
+
+*TODO*
+
+= Details =
+
+*TODO*
