@@ -104,4 +104,9 @@ public class Event extends PersistedObject {
 			user = loginSession.getUser();
 	}
 	
+	// Not auto-generated in Lombok 0.10.0
+	public boolean hasResponses() {
+		return hasResponses;
+	}
+	
 }
