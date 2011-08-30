@@ -1,0 +1,23 @@
+#summary How the CWM modules fit together
+
+This diagram shows the dependencies between the various modules and selected dependencies on third-party libraries.
+
+The blue boxes are CAST modules that are not included in this project.
+  * ISI and its Example Application are part of the [[http://code.google.com/p/udl-curriculum-toolkit UDL Curriculum Toolkit], which makes use of all of these modules in a complete webapp.
+  * The drawing tool and cwm wrapper for it are available in [http://code.google.com/p/cwm-drawtool the cwm-drawtool Google Code project].
+  * The audio applet will be uploaded once it is a little more complete and stable.
+
+The orange boxes are the modules that are included in this project:
+  * [CwmXml cwm-xml]: use transformed XML content on web pages
+  * [CwmGlossary cwm-glossary]: use an XML file as a glossary
+  * [CwmDav cwm-dav]: use content stored on a WebDAV server
+  * [CwmMediaplayer cwm-mediaplayer]: use the JW Player for video and audio
+  * [CwmData cwm-data]: common database classes and components to manage them
+  * [CwmTag cwm-tag]: support for tagging, built on top of the cwm-data structures
+  * [CwmBase cwm-base]: lightweight dependency with a couple of interfaces to avoid everything having to depend on cwm-data.
+  * [CwmAudioapplet cwm-audioapplet]: Java/Javascript audio recorder for web pages
+  * [CwmComponents cwm-components]: miscellaneous useful wicket components
+
+The white boxes are third party dependencies (not exhaustively listed, just the most significant ones).
+
+[images/cwm-modules.png]
