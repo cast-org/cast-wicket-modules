@@ -20,4 +20,4 @@ The orange boxes are the modules that are included in this project:
 
 The white boxes are third party dependencies (not exhaustively listed, just the most significant ones).
 
-[images/cwm-modules.png]
+[http://cast-wicket-modules.googlecode.com/svn/wiki/images/cwm-modules.png]
