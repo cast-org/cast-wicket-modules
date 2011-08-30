@@ -1,0 +1,19 @@
+#summary cwm-components holds several general-purpose Wicket components
+
+= Introduction =
+
+Components:
+  * !DeployJava: insert a Java applet via [http://java.sun.com/javase/6/docs/technotes/guides/jweb/deployment_advice.html Sun's Deployment Toolkit]
+  * !FileDownloadLink: a link that will download a byte[], for instance to download a file
+  * !ShyLabel: A Label that makes itself invisible whenever it has nothing to say.
+
+Behaviors:
+  * !AttributePrepender: behavior to add additional content to the beginning of an HTML attribute value
+  * !ClassAttributeModifier: behavior to change HTML class attributes
+
+Service:
+  * !JavascriptService: centralize access to common JS libraries (for now, only JQuery)
+
+
+*TODO* This package contains several deprecated classes, needs to be cleaned up. See issue #5
+
