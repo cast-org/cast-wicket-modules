@@ -4,6 +4,9 @@
 
 The cwm-audioapplet package contains an HTML user interface and Wicket components to allow web site users to record an audio clip, and play it back.
 
+= Dependencies =
+  * [CwmComponents cwm-components]
+  * The Audioapplet Java applet (not yet on Google Code)
 
 = Details =
 
