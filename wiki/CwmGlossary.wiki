@@ -1,0 +1,14 @@
+#summary Manage an XML glossary file, and automatically link glossary terms to their definitions
+
+= Introduction =
+
+This module builds upon [CwmXml cwm-xml], interpreting an XML file as a list of glossary terms and their defintions (which can contain any amount or type of content).
+
+The Glossary can be queried, listed, etc.  Also, includes a transformer which takes (XML) text, finds glossary terms that are in it, and marks up the first instance of each term with a link to its definition.  This can be done in a configurable way - eg, the definition could be presented inline, as a tooltip, in a popup window, or in some other way that you devise.
+
+= Dependencies = 
+  * [CwmXml cwm-xml]
+
+= Details =
+
+*TODO*
