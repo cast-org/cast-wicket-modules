@@ -1,4 +1,5 @@
 #summary How the CWM modules fit together
+#labels Featured
 
 This diagram shows the dependencies between the various modules and selected dependencies on third-party libraries.
 
