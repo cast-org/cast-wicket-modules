@@ -1,0 +1,10 @@
+#summary cwm-dav allows for reading content from a WebDAV server
+
+= Introduction =
+
+Defines a !DavResource class, which gives access to files stored on a WebDAV server.  Other classes manage authentication and navigation across directories on the server.
+
+
+= Details =
+
+*TODO*
