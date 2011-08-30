@@ -5,7 +5,7 @@ This is a Wicket wrapper for the [http://www.longtailvideo.com/support/jw-player
 
 = Dependencies = 
 
-*TODO*
+  * [CwmBase cwm-base]
 
 = Details =
 
