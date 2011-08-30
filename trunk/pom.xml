@@ -54,11 +54,8 @@
         <module>cwm-dav</module>
         <module>cwm-glossary</module>
         <module>cwm-mediaplayer</module>
-        <module>cwm-xml</module>
-<!--
-        <module>cwm-indira</module>
         <module>cwm-tag</module>
--->
+        <module>cwm-xml</module>
     </modules>
 
     <repositories>
