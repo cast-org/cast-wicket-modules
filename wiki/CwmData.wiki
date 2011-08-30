@@ -1,0 +1,34 @@
+#summary cwm-data includes a common database structure and associated functionality
+
+= Introduction =
+
+This module includes a database structure useful in particular for educational web applications including data-model classes such as the following:
+  * User - which can have a Role such as student, teacher, researcher, admin
+  * Site & class Period to organize groups of Users
+  * !LoginSession & Event to track usage of the application
+  * Prompt and Response to allow for user input stored in the database
+  * !BinaryFileData for uploaded files, audio recordings, etc.
+
+User responses can be plain text, formatted text, audio, SVG drawing, or uploaded files.
+
+In addition a wide variety of wicket Components are supplied:
+  * Administration pages to create and list users, examine the event log, etc.
+  * Panels to show and edit Responses of all types
+  * Service classes and query builders to manage database objects
+
+= Dependencies =
+  * [CwmBase cwm-base]
+  * [CwmDrawtool cwm-drawtool]
+  * [CwmAudioapplet cwm-audioapplet]
+  * [CwmComponents cwm-components]
+  * Logback
+  * Databinder
+  * Hibernate
+  * PostgreSQL
+  * Visural Wicket
+  * Apache Sanselan
+  * EHCache
+  * Wicketstuff TinyMCE
+= Details =
+
+*TODO*
