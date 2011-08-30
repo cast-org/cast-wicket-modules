@@ -67,6 +67,14 @@
             <id>Lombok</id>
             <url>http://projectlombok.org/mavenrepo</url>
         </repository>
+        <repository>
+        	<id>visural-common</id>
+        	<url>http://visural-common.googlecode.com/svn/trunk/visural-common/maven/</url>
+        </repository>
+        <repository>
+        	<id>visural-wicket</id>
+        	<url>http://visural-wicket.googlecode.com/svn/trunk/visural-wicket/maven/</url>
+        </repository>
     </repositories>
     
     <dependencyManagement>
