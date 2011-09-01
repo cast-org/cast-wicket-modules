@@ -307,8 +307,7 @@
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
                 <artifactId>ehcache-core</artifactId>
-                <version>2.4.2</version>
-                <type>jar</type>
+                <version>2.4.4</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
