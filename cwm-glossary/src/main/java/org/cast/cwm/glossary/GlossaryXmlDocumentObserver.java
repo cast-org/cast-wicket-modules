@@ -105,12 +105,12 @@ public class GlossaryXmlDocumentObserver  implements IDocumentObserver {
 	
 	
 	/**
-	 * Creates a glossary {@link IGlossaryEntry} from an {@link XmlSection}.  In addition, 
-	 * it searches the XML for alternative terms that map to this Entry and
-	 * adds them to the {@link #termMap}.
+	 * Creates a glossary {@link IGlossaryEntry} from an {@link XmlSection}.
+     * In addition, it searches the XML for alternative
+     * terms that map to this Entry and adds them to the {@link #termMap}.
 	 * 
-	 * @param sec
-	 * @return
+	 * @param sec an XMLSection
+	 * @return the created glossary entry, whose class is specified by GlossaryService
 	 */
 	public IModel<? extends IWritableGlossaryEntry> getEntryFromSection(XmlSection sec) {
 
@@ -138,7 +138,7 @@ public class GlossaryXmlDocumentObserver  implements IDocumentObserver {
 				for (int j = 0; j < grandKids.getLength() && !foundShortDef; j++) {
 					Node grandKid = grandKids.item(j);
 					if (grandKid.getNodeName().equalsIgnoreCase("p")) {
-						// FIXME glossary.getShortDefinitions().put(e.getName(), grandKid.getTextContent());
+						e.setShortDef(grandKid.getTextContent());
 						foundShortDef = true;
 					}
 				}
