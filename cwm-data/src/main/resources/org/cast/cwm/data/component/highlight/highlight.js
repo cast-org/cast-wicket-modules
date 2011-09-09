@@ -214,6 +214,7 @@ function changeMode(clicked, id ) {
 	var $controlScope = (id ? $("#" + id) : $("#globalHighlight"));
 	var $highlightScope = (id ? $("#" + id) : $("body"));
 
+	
 	// Turn off Highlighting
 	if (clicked == null || clicked == 'none' || (currentMode == clicked && currentScopeId == id)) {
 		
@@ -233,10 +234,11 @@ function changeMode(clicked, id ) {
         displayHighlightedWords(null);
 
         // Hide any visible Model or hint Highlights and reset the toggle fields
-		toggleModelHighlightDisplay(null, null, false);
-	    $('.highlightHelper').children(".collapseBox").removeClass("expOpen");
-	    $('.highlightHelper').children().find(".collapseBody").hide();
-	    $('.highlightHelper').children().find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+    	toggleModelHighlightDisplay(null, null, false);
+        $('.highlightHelper').children(".collapseBox").removeClass("expOpen");
+        $('.highlightHelper').children().find(".collapseBody").hide();
+        $('.highlightHelper').children().find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+    	
 		
         
 	// Turn on Highlighting
@@ -253,6 +255,11 @@ function changeMode(clicked, id ) {
 
 		// Hide any visible Model or hint Highlights
 		toggleModelHighlightDisplay(null, null, false);
+        // Hide any visible Model or hint Highlights and reset the toggle fields
+    	toggleModelHighlightDisplay(null, null, false);
+        $('.highlightHelper').children(".collapseBox").removeClass("expOpen");
+        $('.highlightHelper').children().find(".collapseBody").hide();
+        $('.highlightHelper').children().find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
     	
 		// Set new mode	
     	currentMode = clicked;
@@ -331,6 +338,19 @@ function toggleModelHighlightDisplay(id, compare, show, modelType) {
 	var currentClass="model";
 	if (modelType=='hint') {
 		currentClass="hint";
+		// collapse the compare box if it is open
+	    if ($("#compareBox").hasClass("expOpen")) {
+		    $("#compareBox").removeClass("expOpen");
+		    $("#compareBox").find(".collapseBody").hide();
+		    $("#compareBox").find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+	    }
+	} else if (modelType=='model') {
+		// collapse the hintbox if it is open
+	    if ($("#hintBox").hasClass("expOpen")) {
+		    $("#hintBox").removeClass("expOpen");
+		    $("#hintBox").find(".collapseBody").hide();
+		    $("#hintBox").find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+	    }
 	}
 
 	// Find scope
@@ -812,11 +832,23 @@ function wasUserHighlighted(elem) {
  * if there are no user highlights for the color specified, 
  * then don't allow compare - popup modal warning
  */
-function showCompareHighlights(highlightColor) {
-	if ($('input.' + highlightColor + 'highlightedWords').attr('value') == '') { 
+function showCompareHighlights(e, highlightColor, node) {
+	// unbind the regular click action for this collapse box
+	if (e != null) e.stopPropagation();
+    $(node).unbind('click');
+    
+    // if there are no user highlights then popup modal
+	if ($('input.' + highlightColor + 'highlightedWords').attr('value') == '') {
 		$('#noHighlightModel').show();
-	} else {
+	} else { 
+        // Rebind collapse box
+        $(node).bind("click", function(event) {
+            toggleChildBox($(node).parents('.collapseBox').eq(0), event);
+        });
+        // click collapse box to hide/display contents
+        toggleChildBox($(node).parents('.collapseBox').eq(0), null);
+
+        // show the comparison highlights
 		toggleModelHighlightDisplay(null, false, null, 'model');
-}
-		
+	}	
 }
