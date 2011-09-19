@@ -77,7 +77,7 @@ public class SvgImageResource extends WebResource {
 			if (needsScaling) {
 				svg = svg.replaceFirst("<svg +width=\"[0-9]*\" +height=\"[0-9]*\"", 
 						"<svg viewBox='0 0 " + SvgEditor.CANVAS_WIDTH + " " + SvgEditor.CANVAS_HEIGHT + "' "
-						+ "width='" + width + "' height='" + height + "'"
+						+ "width='" + width + "' height='" + height + "' "
 						+ "xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
 			} else {
 				svg = svg.replaceFirst("<svg ", "<svg xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
