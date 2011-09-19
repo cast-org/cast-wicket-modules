@@ -21,6 +21,8 @@ package org.cast.cwm.data;
 
 import java.util.Date;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -81,6 +83,22 @@ public class BinaryFileData extends PersistedObject {
 		this.data = data;
 	}
 
+	/**
+	 * Attempts to parse the provided MimeType String and returns whether
+	 * this binary data represents an image.
+	 * @return
+	 */
+	public boolean isImage() {
+		MimeType type;
+		try {
+			type = new MimeType(mimeType);
+		} catch (MimeTypeParseException ex) {
+			ex.printStackTrace();
+			type = new MimeType();
+		}
+		return type.getPrimaryType().equals("image");
+	}
+	
 	/**
 	 * Deprecated Method.  Instead, use {@link UploadedFileResource}.
 	 * 
