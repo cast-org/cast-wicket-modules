@@ -97,6 +97,7 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected String templateURL;
 	@Getter @Setter protected FeedbackPanel feedbackPanel;
 	@Getter @Setter protected boolean deleteVisible = true;
+	@Getter @Setter protected boolean autoSave = true; // Only applies to Text/Drawing
 	
 	private WebMarkupContainer cancelButton;
 	private WebMarkupContainer deleteButton;
@@ -266,26 +267,27 @@ public abstract class ResponseEditor extends Panel {
 			};
 			form.setOutputMarkupId(true);
 			add(form);
-			
-			form.add(new AjaxAutoSavingBehavior(form) {
 
-				private static final long serialVersionUID = 1L;
-				
-				@Override
-				public void renderHead(IHeaderResponse response) {
-					super.renderHead(response);
-					// Ensure TinyMCE saves to form before we check to see if the form changed.
-					if (useWysiwyg)
-						response.renderJavascript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
-				}
-				
-				@Override
-				protected void onAutoSave(AjaxRequestTarget target) {
-					super.onAutoSave(target);
-					ResponseEditor.this.onAutoSave(target);
-				}
-			});
-			
+			if (autoSave) {
+				form.add(new AjaxAutoSavingBehavior(form) {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void renderHead(IHeaderResponse response) {
+						super.renderHead(response);
+						// Ensure TinyMCE saves to form before we check to see if the form changed.
+						if (useWysiwyg)
+							response.renderJavascript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
+					}
+
+					@Override
+					protected void onAutoSave(AjaxRequestTarget target) {
+						super.onAutoSave(target);
+						ResponseEditor.this.onAutoSave(target);
+					}
+				});
+			}
 			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
 
@@ -533,28 +535,30 @@ public abstract class ResponseEditor extends Panel {
 			form.setOutputMarkupId(true);
 			add(form);
 			
-			form.add(new AjaxAutoSavingBehavior(form) {
+			if (autoSave) {
+				form.add(new AjaxAutoSavingBehavior(form) {
 
-				private static final long serialVersionUID = 1L;
+					private static final long serialVersionUID = 1L;
 
-				@Override
-				public void renderHead(IHeaderResponse response) {
-					super.renderHead(response);
-					String script = 
-						"AutoSaver.addOnBeforeSaveCallBack(function() { " +
-						"   $('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString()));" +
-						"});";
-					response.renderJavascript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
-				}
-				
-				@Override
-				protected void onAutoSave(AjaxRequestTarget target) {
-					super.onAutoSave(target);
-					ResponseEditor.this.onAutoSave(target);
-				}
+					@Override
+					public void renderHead(IHeaderResponse response) {
+						super.renderHead(response);
+						String script = 
+							"AutoSaver.addOnBeforeSaveCallBack(function() { " +
+							"   $('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString()));" +
+							"});";
+						response.renderJavascript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
+					}
 
-			});
+					@Override
+					protected void onAutoSave(AjaxRequestTarget target) {
+						super.onAutoSave(target);
+						ResponseEditor.this.onAutoSave(target);
+					}
 
+				});
+			}
+			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
 
 				private static final long serialVersionUID = 1L;
