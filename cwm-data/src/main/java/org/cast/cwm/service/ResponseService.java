@@ -20,6 +20,7 @@
 package org.cast.cwm.service;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import lombok.Getter;
@@ -30,6 +31,7 @@ import net.databinder.models.hib.SortableHibernateProvider;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
@@ -106,9 +108,13 @@ public class ResponseService {
 	 * include responses from ALL users.  The list is sorted by 
 	 * date with the most recent response first.
 	 * 
+	 * Note: Deprecated.  You should really use a ISortableProvider.  See
+	 * {@link #getResponseProviderForPrompt(IModel)}.
+	 * 
 	 * @param p
 	 * @return
 	 */
+	@Deprecated
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p) {
 		return getResponsesForPrompt(p, null);
 	}
@@ -118,10 +124,14 @@ public class ResponseService {
 	 * one such response should exist.  If multiple responses are returned, an exception
 	 * will be thrown.  In such cases, use {@link #getResponsesForPrompt(IModel, IModel)}.
 	 * 
+	 * Note: Deprecated.  You should really use a ISortableProvider.  See
+	 * {@link #getResponseProviderForPrompt(IModel, IModel)}.
+	 * 
 	 * @param p
 	 * @param u
 	 * @return
 	 */
+	@Deprecated
 	public IModel<Response> getResponseForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -133,10 +143,15 @@ public class ResponseService {
 	 * Get a given user's responses for a given prompt, sorted by date
 	 * with the most recent response first.
 	 * 
+	 * Note: Deprecated.  You should really use a ISortableProvider.  See
+	 * {@link #getResponseProviderForPrompt(IModel)}.
+	 * 
+	 * 
 	 * @param p the prompt
 	 * @param u the user
 	 * @return a list of {@link Response} objects
 	 */
+	@Deprecated
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -300,7 +315,69 @@ public class ResponseService {
 		CwmService.get().flushChanges();
 	}
 	
-	
+	/**
+	 * Uses {@link Response#setSortOrder(Integer)} to adjust the location of a 
+	 * {@link Response} in a list of responses for a given {@link Prompt}.  Adjusts
+	 * all affected Response objects whose sortOrder changes.
+	 * 
+	 * Note 1: This method assumes that the response has already been persisted (and therefore attached
+	 * to the prompt).
+	 * 
+	 * Note 2: This method overrides any existing sortOrder values and re-indexes them
+	 * into sequential order.  This erases any drift from 'deleting' Responses, which
+	 * does not cascade to the sortOrder and leaves gaps in the sequence.
+	 * 
+	 * TODO: This has not been extensively tested.
+	 * 
+	 * @param iterator
+	 * @param modelObject
+	 * @param index target index; null value appends to the end
+	 */
+	public void setResponseSortOrder(IModel<? extends Prompt> mPrompt, IModel<Response> mResponse, Integer index) {
+		
+		// DataProvider for Responses for this Prompt.
+		// It is assumed that the target Response is included in this list.
+		ISortableDataProvider<Response> dataProvider = getResponseProviderForPrompt(mPrompt);
+		dataProvider.getSortState().setPropertySortOrder("sortOrder", ISortState.ASCENDING);
+		
+		if (index == null)
+			index = dataProvider.size() - 1;
+		
+		if (index < 0)
+			throw new IllegalArgumentException("Index cannot be negative.");
+		
+		if (index >= (dataProvider.size()))
+			throw new IndexOutOfBoundsException("Index {" + index + "} exceeds the number of Responses {" + dataProvider.size() + "}.");
+		
+		Iterator<? extends Response> iterator = dataProvider.iterator(0, dataProvider.size());
+
+		int iteratorIndex = 0;
+		boolean foundResponse = false;
+
+		while (iterator.hasNext()) {
+			Response r = iterator.next();
+
+			// Reached the target response
+			if (r.equals(mResponse.getObject()))
+				foundResponse = true;
+			
+			// Overwrite sortOrder; making room for insertion if necessary
+			if (iteratorIndex >= index && !foundResponse)
+				r.setSortOrder(iteratorIndex + 1);
+			else
+				r.setSortOrder(iteratorIndex);
+			
+			iteratorIndex++;
+		}
+		
+		if (!foundResponse)
+			throw new IllegalStateException("Unknown behavior - Response was not found in iterator.");
+		
+		mResponse.getObject().setSortOrder(index);
+		
+		CwmService.get().flushChanges();
+		
+	}
 	/**
 	 * Delete a response from the datastore.  This does not actually remove
 	 * any data, but sets {@link Response#setValid(boolean)} to 'false.'
@@ -317,6 +394,9 @@ public class ResponseService {
 				
 		// "Delete" this response
 		r.getObject().setValid(false);
+		
+		// Remove any ordering
+		r.getObject().setSortOrder(null);
 		
 		// Flush changes to datastore
 		CwmService.get().flushChanges();

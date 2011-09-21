@@ -91,6 +91,18 @@ public class Response extends PersistedObject {
 	
 	private Date lastUpdated;
 	
+	/**
+	 * Optional sorting field if a set of responses needs to be
+	 * ordered by something other than date, etc.
+	 * 
+	 * Note: At this time, no guarantee is made regarding uniqueness
+	 * or whether this value is even set.
+	 * 
+	 * Note: Because of "valid" and "invalid" responses, no guarantee
+	 * is made regarding the sequence of numbers.  Values may be skipped.
+	 */
+	private Integer sortOrder;
+	
 	@ManyToOne
 	@Cascade(CascadeType.ALL)
 	private ResponseData responseData; // Latest Response Data
@@ -123,6 +135,9 @@ public class Response extends PersistedObject {
 	 * this {@link Response}.  This Response object will automatically
 	 * point to the new ResponseData object, so calling this method will
 	 * effectively "erase" the previous ResponseData.
+	 * 
+	 * TODO: It would be cool to tie this in with a setText() method so that
+	 * Response would work properly with PropertyModels and Forms.
 	 * 
 	 * @return
 	 */
