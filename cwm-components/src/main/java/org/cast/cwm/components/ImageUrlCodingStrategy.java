@@ -28,7 +28,7 @@ import org.apache.wicket.util.resource.PackageResourceStream;
  * </pre>
  * will refer to an image in that them directory (<code>/mythemedir/img/etc</code>), 
  * rather than Wicket's default of looking for the image relative to the 
- * current HTML markup file.  Any leading ../ notations in the image src are ignored.
+ * current HTML markup file.
  * 
  * @author jbrookover
  *
