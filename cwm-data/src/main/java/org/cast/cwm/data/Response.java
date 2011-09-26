@@ -137,7 +137,11 @@ public class Response extends PersistedObject {
 	 * effectively "erase" the previous ResponseData.
 	 * 
 	 * TODO: It would be cool to tie this in with a setText() method so that
-	 * Response would work properly with PropertyModels and Forms.
+	 * Response would work properly with PropertyModels and Forms.  Perhaps
+	 * a transient ResponseData that is generated once per request and setText(),
+	 * setScore(), etc all use this transient field that is persisted as the
+	 * new ResponseData.  This would allow us to drop all the methods in
+	 * ResponseService.
 	 * 
 	 * @return
 	 */
