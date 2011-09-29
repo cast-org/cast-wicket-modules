@@ -33,7 +33,6 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
-import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -56,7 +55,6 @@ import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.time.Time;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
-import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
@@ -98,6 +96,7 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected FeedbackPanel feedbackPanel;
 	@Getter @Setter protected boolean deleteVisible = true;
 	@Getter @Setter protected boolean autoSave = true; // Only applies to Text/Drawing
+	@Getter @Setter protected boolean debug = false; // Turn on editor debugging? Only applies to Audio.
 	
 	private WebMarkupContainer cancelButton;
 	private WebMarkupContainer deleteButton;
@@ -398,7 +397,7 @@ public abstract class ResponseEditor extends Panel {
 				}
 				
 			};
-			
+			audioApplet.setDebug(debug);
 			add(audioApplet);
 
 			WebMarkupContainer saveLink = audioApplet.generateStandardSaveLink("save");
