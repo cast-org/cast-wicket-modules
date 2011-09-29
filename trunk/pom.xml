@@ -141,7 +141,7 @@
             <dependency>
                 <groupId>org.cast</groupId>
                 <artifactId>audioapplet</artifactId>
-                <version>0.3</version>
+                <version>0.4.1</version>
             </dependency>
 
             <!-- JAVA -->
