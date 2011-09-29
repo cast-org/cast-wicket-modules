@@ -42,6 +42,7 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 	private static final long serialVersionUID = 1L;
 	
 	protected boolean autoPlay = false;
+	protected boolean debug = false;
 	
 	protected DeployJava dj;
 
@@ -83,6 +84,8 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 		dj.addParameter("readOnly", "true");
 		if (autoPlay) 
 			dj.addParameter("autoPlay", "true");
+		if (debug)
+			dj.addParameter("debug", "true");
 		add(dj);
 	}
 	
@@ -217,6 +220,22 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 	public final void setModelObject(byte[] object)
 	{
 		setDefaultModelObject(object);
+	}
+
+	public boolean isAutoPlay() {
+		return autoPlay;
+	}
+
+	public void setAutoPlay(boolean autoPlay) {
+		this.autoPlay = autoPlay;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 }
