@@ -42,6 +42,7 @@ import org.hibernate.criterion.Restrictions;
 @Getter
 @Setter
 
+// TODO: ResponseType should be a set
 public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator, IDetachable {
 
 	private static final long serialVersionUID = 1L;
