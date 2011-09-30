@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.admin;
 
+import net.databinder.models.hib.HibernateObjectModel;
+
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
@@ -46,7 +48,7 @@ public class UserFormPage extends AdminPage {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserFormPage.class);
-	private IModel<User> userModel = new Model<User>(null);
+	private HibernateObjectModel<User> userModel = new HibernateObjectModel<User>(User.class);
 	private IModel<Period> periodModel = new Model<Period>(null);
 	private Role role = null;
 
@@ -55,7 +57,7 @@ public class UserFormPage extends AdminPage {
 		
 		// The user we're editing, if any
 		if (parameters.containsKey("userId"))
-			userModel = UserService.get().getById(parameters.getLong("userId"));
+			userModel = (HibernateObjectModel<User>) UserService.get().getById(parameters.getLong("userId"));
 		// The role of the user to create, if any
 		if (parameters.containsKey("role"))
 			role = Role.forRoleString(parameters.getString("role"));

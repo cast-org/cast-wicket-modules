@@ -26,17 +26,18 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import net.databinder.auth.components.RSAPasswordTextField;
 import net.databinder.auth.valid.EqualPasswordConvertedInputValidator;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -50,7 +51,6 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FormComponentContainer;
-import org.cast.cwm.data.models.UserModel;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
 import org.cast.cwm.service.SiteService;
@@ -79,39 +79,83 @@ public class EditUserPanel extends Panel {
 	 */
 	public EditUserPanel(String id) {
 		super(id);
-		
-		userForm = new UserForm("form");
-		userForm.add(getSubmitButton("submitButton"));
+		addComponents(null);
+	}
+
+	/**
+	 * Construct a panel for editing an existing user.
+	 * 
+	 * TODO: Should allow general IModel<User> instead of HibernateObjectModel,
+	 * but this will require some cascading changes.
+	 * 
+	 * @param id
+	 * @param model
+	 */
+	public EditUserPanel(String id, HibernateObjectModel<User> model) {
+		super(id, model);
+		addComponents(model);
+	}
+	
+	/**
+	 * Add the normal components to this panel.
+	 * @param model Model of the user to edit, if any, otherwise null.
+	 */
+	protected void addComponents(HibernateObjectModel<User> model) {
+		userForm = getUserForm("form", model);
 		add(userForm);
 	}
 	
 	/**
-	 * Construct a panel for editing an existing user.
+	 * Get the Form component for the editing panel.
 	 * @param id
-	 * @param model
+	 * @return
 	 */
-	public EditUserPanel(String id, IModel<User> model) {
-		super(id, model);
+	protected Form<User> getUserForm(String id, HibernateObjectModel<User> model) {
+		UserForm form;
+		if (model!=null)
+			form = new UserForm("form", model);
+		else
+			form = new UserForm("form");
+
+		Component submitComponent = getSubmitComponent("submit");
+		if (submitComponent != null)
+			form.add(submitComponent);
 		
+		Component cancelComponent = getCancelComponent("cancel");
+		if (cancelComponent != null)
+			form.add(cancelComponent);
 		
-		userForm = new UserForm("form", (UserModel) model);
-		userForm.add(getSubmitButton("submitButton"));
-		add(userForm);
+		return form;
 	}
 	
-	protected Button getSubmitButton(String id) {
-		return new Button(id, new AbstractReadOnlyModel<String>() {
-
+	/**
+	 * Returns a link that will be used to submit the form.
+	 * This can be overridden to use a button or other component.
+	 * @param id The wicket ID for the component
+	 * @return a Component, or null if there should be none.
+	 */
+	protected Component getSubmitComponent(String id) {
+		SubmitLink link = new SubmitLink(id);
+		link.add(new Label("operation", new AbstractReadOnlyModel<String>() {
 			private static final long serialVersionUID = 1L;
-
 			@Override
 			public String getObject() {
 				return userForm.getModelObject().isTransient() ? "Create User" : "Update User";
 			}
-			
-		});
+		}));
+		return link;
 	}
 	
+	/**
+	 * Can be used to return a link or other component that will cancel the form.
+	 * By default, there is no such component, so null is returned.
+	 * @param id
+	 * @return
+	 */
+	protected Component getCancelComponent(String id) {
+		// There is no cancel for the form by default.
+		return null;
+	}
 	
 	/**
 	 * Returns the user model that this panel is editing.  This
@@ -165,6 +209,28 @@ public class EditUserPanel extends Panel {
 			component.setRequired(required);
 		return this;
 	}
+	
+	/**
+	 * Actions to take after creation of a new user.
+	 * This might be overridden, for example, to redirect to a different page.
+	 * @param mUser
+	 */
+	protected void onUserCreated(IModel<User> mUser) {
+		if (autoConfirmNewUser)
+			UserService.get().confirmUser(mUser.getObject());
+	}
+	
+	/**
+	 * Actions to take after updating a user.
+	 * By default does nothing.  You could override it to redirect to a new page 
+	 * or display a confirmation message.
+	 * @param mUser
+	 */
+	protected void onUserUpdated(IModel<User> mUser) {
+		// No action by default
+	}
+	
+	
 	
 	/**
 	 * A Hibernate DataForm for modifying or creating a user account.
@@ -318,19 +384,20 @@ public class EditUserPanel extends Panel {
 		
 		@Override
 		protected void onSubmit() {
-			
-			String message = getModelObject().isTransient() ? "Saved." : "Updated.";
-			
+			boolean isNewUser = getModelObject().isTransient();
+
 			// Because we're using funky RSA passwords
 			if (password.getConvertedInput() != null && !password.getConvertedInput().isEmpty())
 				getModelObject().setPassword(password.getConvertedInput());
 			
 			super.onSubmit(); // Commit changes
-			
-			if (autoConfirmNewUser)
-				UserService.get().confirmUser(getModelObject());
-			
-			info("User '" + getModelObject().getUsername() + "' " + message);
+
+			info("User '" + getModelObject().getUsername() + "' " + (isNewUser ? "Saved." : "Updated."));
+
+			if (isNewUser)
+				EditUserPanel.this.onUserCreated(getModel());
+			else
+				EditUserPanel.this.onUserUpdated(getModel());
 		}
 	}
 }
