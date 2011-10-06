@@ -54,6 +54,7 @@
         <module>cwm-dav</module>
         <module>cwm-glossary</module>
         <module>cwm-mediaplayer</module>
+        <module>cwm-search</module>
         <module>cwm-tag</module>
         <module>cwm-xml</module>
     </modules>
@@ -320,6 +321,11 @@
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>3.6.4.Final</version>
                 <type>jar</type>
+            </dependency>
+            <dependency>
+            	<groupId>org.hibernate</groupId>
+            	<artifactId>hibernate-search</artifactId>
+            	<version>3.4.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
