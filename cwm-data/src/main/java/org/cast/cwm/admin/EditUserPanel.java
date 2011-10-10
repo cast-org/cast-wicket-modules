@@ -32,6 +32,7 @@ import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
@@ -59,6 +60,10 @@ import org.cast.cwm.service.UserService;
 /**
  * A panel for editing a user.  
  * 
+ * TODO: Make this a little more AJAX Friendly for subclasses.
+ * TODO: This does not currently work with AJAX
+ * TODO: Can it ever work with AJAX?  Must re-write databinder.
+ * 
  * @author jbrookover
  *
  */
@@ -71,6 +76,13 @@ public class EditUserPanel extends Panel {
 	
 	@Getter @Setter
 	private boolean autoConfirmNewUser = false;
+	
+	/**
+	 * Feedback Panel for form.  Can be obtained by subclasses
+	 * needing to reference it (e.g. for redrawing via Ajax)
+	 */
+	@Getter
+	private FeedbackPanel feedbackPanel;
 	
 	/**
 	 * Construct a panel for creating a new user of the given role.
@@ -131,6 +143,10 @@ public class EditUserPanel extends Panel {
 	/**
 	 * Returns a link that will be used to submit the form.
 	 * This can be overridden to use a button or other component.
+	 * 
+	 * TODO: This "operation" thing is hidden and can cause confusion when subclasses
+	 * override this method.  Should just expect a single Component, which may be a panel/fragment.
+	 * 
 	 * @param id The wicket ID for the component
 	 * @return a Component, or null if there should be none.
 	 */
@@ -153,8 +169,7 @@ public class EditUserPanel extends Panel {
 	 * @return
 	 */
 	protected Component getCancelComponent(String id) {
-		// There is no cancel for the form by default.
-		return null;
+		return new WebMarkupContainer(id).setVisible(false);
 	}
 	
 	/**
@@ -339,6 +354,9 @@ public class EditUserPanel extends Panel {
 			verifyPassword = new RSAPasswordTextField("verifyPassword", new Model<String>(null), this);
 			verifyPassword.setRequired(false); // Does not need an additional error message.
 			
+			// Compensate for Stupid Databinder
+			// add(new AttributeAppender("onsubmit", false, new Model<String>("return true;"), ";"));
+			
 			FormComponentContainer verifyPasswordContainer = new FormComponentContainer("verifyPasswordEnclosure", verifyPassword).setLabel("Verify Password:");
 			components.put("verifyPassword", verifyPasswordContainer);
 			add(verifyPasswordContainer);
@@ -365,7 +383,9 @@ public class EditUserPanel extends Panel {
 			add(periodsContainer);
 			
 			// Feedback for validators
-			add(new FeedbackPanel("feedback"));
+			feedbackPanel = new FeedbackPanel("feedback");
+			feedbackPanel.setOutputMarkupId(true);
+			add(feedbackPanel);
 			
 		}
 
