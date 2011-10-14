@@ -20,16 +20,27 @@ public class FacetInfo implements Serializable {
 	private final String value;
 	
 	// Human-readable version of the name, eg "English Language Arts"
-	private final String valueName;
+	private String valueName;
 	
 	// Count of documents matching this facet, from search
-	private final int count;
+	private int count;
 	
 	// True if this value is currently part of the search
 	private Boolean active;
 	
 	private static final long serialVersionUID = 1L;
-
+	
+	/**
+	 * Construct by specifying all the fields.
+	 */
+	public FacetInfo (String facetName, String value, String valueName, int count, boolean active) {
+		this.facetName = facetName;
+		this.value = value;
+		this.valueName = valueName;
+		this.count = count;
+		this.active = active;
+	}
+	
 	/**
 	 * Construct from a hibernate-search Facet, plus a human-readable label.
 	 * @param facet
