@@ -73,7 +73,8 @@ public class ResponseViewer extends Panel {
 		setOutputMarkupId(true);
 		
 		// Show default "No Response," if necessary.
-		if (model.getObject() == null 
+		if (model == null
+                || model.getObject() == null 
 				|| !model.getObject().isValid() 
 				|| model.getObject().getResponseData() == null) {
 			add(getNoResponseComponent("response"));
