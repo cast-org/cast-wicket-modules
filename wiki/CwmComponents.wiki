@@ -2,18 +2,21 @@
 
 = Introduction =
 
-Components:
-  * !DeployJava: insert a Java applet via [http://java.sun.com/javase/6/docs/technotes/guides/jweb/deployment_advice.html Sun's Deployment Toolkit]
-  * !FileDownloadLink: a link that will download a byte[], for instance to download a file
-  * !ShyLabel: A Label that makes itself invisible whenever it has nothing to say.
+This module includes a set of packages that contains or enhances several Wicket Components.
 
-Behaviors:
-  * !AttributePrepender: behavior to add additional content to the beginning of an HTML attribute value
-  * !ClassAttributeModifier: behavior to change HTML class attributes
+= Details =
 
-Service:
-  * !JavascriptService: centralize access to common JS libraries (for now, only JQuery)
+The component package contains:
+
+    * !AttributePrepender, !ClassAttributeModifier:  enables css classes to be added or removed from an HTML class attribute value.  
+    * !ShyLabel:  makes a Wicket Label component invisible whenever there isn’t any data available.
+    * !CwmPopupSettings:  centralizes popup window settings.  Enables application specific settings for popup windows.  
+    * !FileDownloadLink: creates a download link to a byte array, for instance to download a file.
+    * !ImageUrl Coding Strategy:  determines the correct URL for locating images.  
+    * !DeployJava:  inserts a Java applet via [http://java.sun.com/javase/6/docs/technotes/guides/jweb/deployment_advice.html Sun's Deployment Toolkit].
 
 
-*TODO* This package contains several deprecated classes, needs to be cleaned up. See issue #5
 
+The service package contains:
+
+    * !JavascriptService:  centralizes access to common JS libraries, currently only JQuery.
