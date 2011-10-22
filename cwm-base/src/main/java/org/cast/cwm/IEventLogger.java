@@ -19,6 +19,12 @@
  */
 package org.cast.cwm;
 
+/**
+ * Interface for an object that can be used to log events.
+ *
+ * @author bgoldowsky
+ *
+ */
 public interface IEventLogger {
 
     public void logEvent (String type, String detail, String location);
