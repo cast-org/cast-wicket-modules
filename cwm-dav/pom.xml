@@ -32,6 +32,10 @@
 			<groupId>com.xmlmind</groupId>
 			<artifactId>davclient_util</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.cast.cwm</groupId>
+			<artifactId>cwm-base</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

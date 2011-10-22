@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.WebResource;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IRelativeLinkSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
