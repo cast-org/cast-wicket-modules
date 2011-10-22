@@ -21,13 +21,16 @@ package org.cast.cwm.xml;
 
 import lombok.ToString;
 
+import org.apache.wicket.Resource;
+import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.html.PackageResource;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
+import org.cast.cwm.IRelativeLinkSource;
 
 @ToString
-public class FileResource extends PackageResource {
+public class FileResource extends PackageResource implements IRelativeLinkSource {
 
 	private static final long serialVersionUID = 1L;
 	private File file;
@@ -38,8 +41,32 @@ public class FileResource extends PackageResource {
 	}
 	
 	@Override
-	public IResourceStream getResourceStream() { 
+	public IResourceStream getResourceStream () { 
 		return new FileResourceStream(file);
+	}
+
+	/**
+	 * Return a FileResource at a location relative to this one.
+	 */
+	public FileResource getRelativeResource (String relativePath) {
+		File fullPath = new File(file.getParentFile(), relativePath);
+		return new FileResource(fullPath);
+	}
+	
+	/** Return a ResourceReference to a relatively-addressed item
+	 * 
+	 * @param relativePath path relative to the path of this Resource
+	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
+	 */
+	public ResourceReference getRelativeReference (final String relativePath) {
+		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath();
+		return new ResourceReference(FileResource.class, filePath) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			protected Resource newResource() {
+				return getRelativeResource(relativePath);
+			}
+		};
 	}
 
 }
