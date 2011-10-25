@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.util.time.Time;
-import org.cast.cwm.xml.component.XmlComponent;
+import org.cast.cwm.xml.service.XmlService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -33,7 +33,7 @@ public class EnsureUniqueWicketIds implements IDOMTransformer {
 
 	public Element applyTransform(Element elt, TransformParameters params) {
 		List<String> wicketIds = new ArrayList<String>();
-		NodeList wicketChildren = XmlComponent.getWicketNodes(elt, false);
+		NodeList wicketChildren = XmlService.get().getWicketNodes(elt, false);
 		
 		for (int i=0; i < wicketChildren.getLength(); i++) {
 			Element child = (Element) wicketChildren.item(i);

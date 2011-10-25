@@ -27,6 +27,11 @@ import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -51,6 +56,7 @@ import org.cast.cwm.xml.transform.XslTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
@@ -311,6 +317,35 @@ public class XmlService {
 		((CwmNamespaceContext) getNamespaceContext()).putNamespacePair(prefix, uri);
 	}
 	
+	/**
+	 * Finds wicket nodes for a given element. This method either returns all of the 
+	 * wicket nodes (up and down the DOM) or the first layer of wicket nodes immediately
+	 * below the provided element.
+	 * 
+	 * @param elt the element to search
+	 * @param all true, if searching the entire tree.  false, if just searching for the first wicket children.
+	 * @return
+	 */
+	public NodeList getWicketNodes(Element elt, boolean all) {
+		XPathFactory factory=XPathFactory.newInstance();
+		XPath xPath = factory.newXPath();
+		xPath.setNamespaceContext(getNamespaceContext());
+		XPathExpression xp;
+		NodeList nodes = null;
+	
+		try {
+			if (all)
+				xp = xPath.compile("//*[@wicket:id]");
+			else
+				xp = xPath.compile(".//*[@wicket:id][ancestor::*[@wicket:id][1] = current() or not(ancestor::*[@wicket:id])]");
+			nodes = (NodeList) xp.evaluate(elt, XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		}
+	
+		return nodes;
+	}
+
 	protected static class CwmNamespaceContext implements NamespaceContext, Serializable {
 
 		private static final long serialVersionUID = 1L;
@@ -346,5 +381,9 @@ public class XmlService {
 			log.error("Called unimplemented function getPrefixes");
 			return null;
 		}
+	}
+
+	public static void setInstance(XmlService xmlService) {
+		INSTANCE = xmlService;
 	}
 }
