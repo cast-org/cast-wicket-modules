@@ -26,11 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -120,7 +115,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	 */
 	protected void addDynamicComponents() {
 		Element dom = XmlService.get().getTransformed(getModel(), transformName, transformParameters).getElement();
-		NodeList componentNodes = getWicketNodes(dom, true);
+		NodeList componentNodes = XmlService.get().getWicketNodes(dom, true);
 		Map<Element,Component> componentMap = new HashMap<Element,Component>(); // Mapping of Nodes to Components; used for nesting
 		final Set<String> wicketIds = new HashSet<String>();
 		
@@ -186,6 +181,8 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	}
 	
 	/**
+	 * @deprecated  Use XmlService.get().getWicketNodes(Element elt, boolean all) instead.
+	 * 
 	 * Finds wicket nodes for a given element. This method either returns all of the 
 	 * wicket nodes (up and down the DOM) or the first layer of wicket nodes immediately
 	 * below the provided element.
@@ -194,25 +191,9 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	 * @param all true, if searching the entire tree.  false, if just searching for the first wicket children.
 	 * @return
 	 */
+	@Deprecated()
 	public static NodeList getWicketNodes(Element elt, boolean all) {
-		
-		XPathFactory factory=XPathFactory.newInstance();
-		XPath xPath = factory.newXPath();
-		xPath.setNamespaceContext(XmlService.get().getNamespaceContext());
-		XPathExpression xp;
-		NodeList nodes = null;
-
-		try {
-			if (all)
-				xp = xPath.compile("//*[@wicket:id]");
-			else
-				xp = xPath.compile(".//*[@wicket:id][ancestor::*[@wicket:id][1] = current() or not(ancestor::*[@wicket:id])]");
-			nodes = (NodeList) xp.evaluate(elt, XPathConstants.NODESET);
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-
-		return nodes;
+		return XmlService.get().getWicketNodes(elt, all);
 	}
 
 	/**
@@ -228,7 +209,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 		boolean isContainer = false;
 		
 		// Check to see if this element has any Wicket Children.
-		NodeList childrenComponents = getWicketNodes(elt, false);
+		NodeList childrenComponents = XmlService.get().getWicketNodes(elt, false);
 		if (childrenComponents.getLength() > 0) {
 			isContainer = true;
 		}
