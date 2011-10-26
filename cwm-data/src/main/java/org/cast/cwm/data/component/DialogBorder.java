@@ -66,7 +66,17 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	
 	private static final ResourceReference JS_REFERENCE = new JavascriptResourceReference(DialogBorder.class, "DialogBorder.js");
 	
-	private static boolean logEvents = true;
+	@Getter @Setter
+	private boolean logEvents = true;
+	
+	@Getter @Setter
+	private String eventCode = "dialog:open";
+	
+	@Getter @Setter
+	private String eventDetail;
+	
+	@Getter @Setter
+	private String pageName;
 		
 	@Getter @Setter
 	protected boolean clickBkgToClose = false;
@@ -95,7 +105,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	// Holds application specified styles for this border.
 	private static List<ResourceReference> styleReferences;
 	
-	private AbstractDefaultAjaxBehavior eventBehavior;
+	private AbstractDefaultAjaxBehavior openEventBehavior;
 	
 	
 	/**
@@ -127,20 +137,25 @@ public class DialogBorder extends Border implements IHeaderContributor {
 		
 		addOverlay();
 		
-		eventBehavior = new AbstractDefaultAjaxBehavior() {
+		openEventBehavior = new AbstractDefaultAjaxBehavior() {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			protected void respond(AjaxRequestTarget target) {
-				logEvent(target);
+				logOpenEvent(target);
 			}
 		};
-		add(eventBehavior);
+		add(openEventBehavior);
 	}
 	
-	protected void logEvent(AjaxRequestTarget target) {
-		EventService.get().saveEvent("dialog", "open", null);
+	/**
+	 * Log an event when the dialog is opened.
+	 * 
+	 * @param target
+	 */
+	protected void logOpenEvent(AjaxRequestTarget target) {
+		EventService.get().saveEvent(eventCode, eventDetail, pageName);
 	}
 	
 	
@@ -277,7 +292,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
         result.append(getPositioningString());
         result.append("DialogBorder.focusDialog('" + contentContainer.getMarkupId() + "', " + (storeCallingButton? "true" : "false") + ");");
         if (logEvents)
-        	result.append("wicketAjaxGet('" + eventBehavior.getCallbackUrl() + "');");
+        	result.append("wicketAjaxGet('" + openEventBehavior.getCallbackUrl() + "');");
         return result.toString();	
     }
     
@@ -350,24 +365,6 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 */
 	public static void setStyleReferences(List<ResourceReference> list) {
 		styleReferences = list;
-	}
-	
-	/**
-	 * Should this dialog register an event when opened?
-	 * 
-	 * @param log
-	 */
-	public static void setLogEvents(boolean log) {
-		logEvents = log;
-	}
-	
-	/**
-	 * Will this dialog register events upon being opened?
-	 * 
-	 * @return
-	 */
-	public static boolean isLogEvents() {
-		return logEvents;
 	}
 
 	/**
