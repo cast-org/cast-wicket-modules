@@ -61,6 +61,8 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	private int responseTime = 60 * 4; // Number of seconds after warning before the user is automatically logged out.
 	
 	private AbstractDefaultAjaxBehavior inactiveBehavior;
+	
+	@Getter
 	private DialogBorder dialogBorder;
 	
 	public SessionExpireWarningDialog(String id) {
