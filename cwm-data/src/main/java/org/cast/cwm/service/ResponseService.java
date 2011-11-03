@@ -45,8 +45,11 @@ import org.cast.cwm.data.builders.ResponseCriteriaBuilder;
 import org.cast.cwm.data.models.PromptModel;
 import org.cast.cwm.data.models.ResponseListModel;
 import org.cast.cwm.data.models.ResponseModel;
+import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
 import org.hibernate.Session.LockRequest;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * A Hibernate implementation of the service class used to save/load/modify
@@ -176,6 +179,27 @@ public class ResponseService {
 		c.setPromptModel(p);
 		c.setUserModel(u);
 		return new SortableHibernateProvider<Response>(Response.class, c);
+	}
+	
+	/**
+	 * Get the total number of valid responses for the given prompt.
+	 * If a response type is specified, only responses of that type will be counted.
+	 * If mUser is specified, then only responses by that user will be counted.
+	 * @param mPrompt the prompt for which responses will be counted
+	 * @param type the type of responses to count (null to count all)
+	 * @param mUser the user whose responses will be counted, or null to count all users.
+	 * @return the count
+	 */
+	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, ResponseType type, IModel<? extends User> mUser) {
+		Criteria c = Databinder.getHibernateSession().createCriteria(Response.class);
+		c.add(Restrictions.eq("prompt", mPrompt.getObject()));
+		if (type != null)
+			c.add(Restrictions.eq("type", type));
+		if (mUser != null && mUser.getObject() != null)
+			c.add(Restrictions.eq("user", mUser.getObject()));
+		c.add(Restrictions.eq("valid", true));
+		c.setProjection(Projections.rowCount());
+		return (Long) c.uniqueResult();
 	}
 	
 	/**
