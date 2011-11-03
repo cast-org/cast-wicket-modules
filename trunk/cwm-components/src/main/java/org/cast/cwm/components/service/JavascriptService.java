@@ -37,7 +37,7 @@ public class JavascriptService {
 	
 	private boolean useCDN = true;
 	
-	private String defaultJQueryVersion = "1.5.1"; 
+	private String defaultJQueryVersion = "1.6.4"; 
 	
 	private ResourceReference currentRR = null;
 	

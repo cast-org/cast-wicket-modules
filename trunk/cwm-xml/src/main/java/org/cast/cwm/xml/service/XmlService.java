@@ -275,8 +275,15 @@ public class XmlService {
 		if (trans == null)
 			throw new IllegalArgumentException("Transformer not registered: " + transformName);
 		// Do the transform and cache the result.
-		// TODO: What if mXmlPtr is now pointing to null due to a change in the XML document?
-		TransformResult tr = new TransformResult(trans.applyTransform((Element) mXmlPtr.getObject().getElement().cloneNode(true), params));
+		TransformResult tr;
+		IXmlPointer xmlObj = mXmlPtr.getObject();
+		if (xmlObj != null) {
+			tr= new TransformResult(trans.applyTransform((Element) xmlObj.getElement().cloneNode(true), params));
+		} else {
+			// TODO: What if mXmlPtr is now pointing to null due to a change in the XML document?
+			tr = null;
+			log.warn("XmlPointer points to nothing: {}", xmlObj);
+		}
 		domCache.put(mXmlPtr, transformName, tr, params);
 		return (tr);
 	}
