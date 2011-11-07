@@ -54,6 +54,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.time.Time;
+import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Prompt;
@@ -61,6 +62,7 @@ import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
+import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.drawtool.SvgEditor;
 import org.cast.cwm.service.ResponseService;
@@ -78,6 +80,8 @@ import wicket.contrib.tinymce.settings.TinyMCESettings;
  * a display.
  * 
  * TODO: Does this need to be abstract?
+ * 
+ * TODO: Add response limit options (upload, text length, recording length, etc).
  * 
  * @author jbrookover
  *
@@ -97,6 +101,10 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected boolean deleteVisible = true;
 	@Getter @Setter protected boolean autoSave = true; // Only applies to Text/Drawing
 	@Getter @Setter protected boolean debug = false; // Turn on editor debugging? Only applies to Audio.
+	
+	// TODO: Extend for upload, recording, etc?  Overload?
+	// TODO: Untested with TinyMCE
+	@Getter @Setter protected Integer maxlength; // Maximum Text Length (characters)
 	
 	private WebMarkupContainer cancelButton;
 	private WebMarkupContainer deleteButton;
@@ -312,14 +320,19 @@ public abstract class ResponseEditor extends Panel {
 			add(save);
 			
 			IModel<String> textModel = new Model<String>(((Response) getDefaultModelObject()).getText());
-			Component textArea;
+			TextArea<String> textArea = new TextArea<String>("message", textModel);
 			if (useWysiwyg) {
-				textArea = new TextArea<String>("message", textModel ).setEscapeModelStrings(false).setOutputMarkupId(true);
+				textArea.setEscapeModelStrings(false);
 				textArea.add(new TinyMceBehavior(getTinyMCESettings()));
 				save.add(new TinyMceAjaxSubmitModifier());
-			} else {
-				textArea = new TextArea<String>("message", textModel).setOutputMarkupId(true);
 			}
+
+			// TODO: Untested with TINYMCE!
+			if (maxlength != null) {
+				textArea.add(StringValidator.maximumLength(maxlength));
+				textArea.add(new MaxLengthAttribute(maxlength));
+			}
+
 			textArea.setOutputMarkupId(true);
 			form.add(textArea);
 			
