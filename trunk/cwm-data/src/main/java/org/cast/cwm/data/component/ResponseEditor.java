@@ -340,49 +340,37 @@ public abstract class ResponseEditor extends Panel {
 			 * Sentence Starter Dropdown List
 			 * @see onBeforeRender for choice modifications and visibility.
 			 */
-			add(choiceList = new DropDownChoice<String>("sentenceStarters", new Model<String>("default"), new PropertyModel<List<String>>(ResponseEditor.this, "starters"), new SentenceStarterRenderer()));
+			// TODO there needs to be a label in here attached to this pulldown
+			add(choiceList = new DropDownChoice<String>("sentenceStarters", new Model<String>(null), new PropertyModel<List<String>>(ResponseEditor.this, "starters"), new SentenceStarterRenderer()));
 			choiceList.setOutputMarkupId(true);
-			choiceList.setNullValid(false);	
+			choiceList.setNullValid(true);
 			add(new WebMarkupContainer("addLink").add(new SimpleAttributeModifier("onclick", "tinyMCE.get('" + textArea.getMarkupId() + "').setContent(tinyMCE.get('" + textArea.getMarkupId() + "').getContent() + $('#" + choiceList.getMarkupId(true) + "').val()); return false;")));
 			
 		}
-		
+
 		@Override
 		public void onBeforeRender() {
-			// DropDownChoice cannot have null choice list
-			if (starters == null)
-				starters = new ArrayList<String>();
-			
 			// If there are no starters, make the dropdown/link invisible
-			if (starters.isEmpty()) {
+			if (starters == null || starters.isEmpty()) {
 				choiceList.setVisible(false);
 				get("addLink").setVisible(false);
-			} else if (!starters.contains("default")) {
-				starters.add(0, "default");
 			}
-			
 			super.onBeforeRender();
 		}
-		
-		private class SentenceStarterRenderer implements IChoiceRenderer<String> {
 
+		private class SentenceStarterRenderer implements IChoiceRenderer<String> {
 			private static final long serialVersionUID = 1L;
 
 			public String getDisplayValue(String object) {
-				if ("default".equals(object))
-					return "Choose a sentence starter...";
-				else
-					return object;
+				return object;
 			}
 
 			public String getIdValue(String object, int index) {
-				if ("default".equals(object))
-					return " ";
-				else
-					return object;
+				return object;
 			}
 		}
 	}
+
 	
 	protected class AudioFragment extends Fragment {
 
