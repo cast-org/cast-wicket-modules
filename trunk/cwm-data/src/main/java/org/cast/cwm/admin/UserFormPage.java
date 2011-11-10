@@ -48,7 +48,7 @@ public class UserFormPage extends AdminPage {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserFormPage.class);
-	private HibernateObjectModel<User> userModel = new HibernateObjectModel<User>(User.class);
+	private HibernateObjectModel<User> userModel;
 	private IModel<Period> periodModel = new Model<Period>(null);
 	private Role role = null;
 
@@ -68,7 +68,7 @@ public class UserFormPage extends AdminPage {
 		addBreadcrumbLinks();
 		
 		// Edit an existing user
-		if (userModel.getObject() != null) {
+		if (userModel!= null && userModel.getObject() != null) {
 			add(new EditUserPanel("editUserPanel", userModel));
 			
 		// Edit a new user, setting the Role and Default Period, if necessary
@@ -125,8 +125,12 @@ public class UserFormPage extends AdminPage {
 	}
 	
 	protected void addLoginHistory() {
-		if (userModel.getObject() != null) {
-			LoginData data = UserService.get().getLoginSessions(userModel);
+		LoginData data = null;
+		if  (userModel != null && userModel.getObject() != null && !userModel.getObject().isTransient()) {
+			log.debug("Getting login sessions for {}", userModel);
+			data = UserService.get().getLoginSessions(userModel); 
+		}
+		if (data != null) {
 			add(new Label("logincount", data.getLoginCount().toString()));
 			add(new Label("logindate", data.getLastLogin() == null ? "Never" : data.getLastLogin().toString()));
 		} else {

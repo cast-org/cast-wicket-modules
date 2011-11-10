@@ -84,19 +84,28 @@ public class BinaryFileData extends PersistedObject {
 	}
 
 	/**
-	 * Attempts to parse the provided MimeType String and returns whether
-	 * this binary data represents an image.
-	 * @return
+	 * Attempts to parse the provided MimeType String and returns the primary type
+	 * (eg image, audio, application, ....)
+	 * @return the primary type, or null if it could not be determined.
 	 */
-	public boolean isImage() {
+	public String getPrimaryType() {
 		MimeType type;
 		try {
 			type = new MimeType(mimeType);
 		} catch (MimeTypeParseException ex) {
 			ex.printStackTrace();
-			type = new MimeType();
+			return null;
 		}
-		return type.getPrimaryType().equals("image");
+		return type.getPrimaryType();
+	}
+	
+	/**
+	 * Attempts to parse the provided MimeType String and returns whether
+	 * this binary data represents an image.
+	 * @return
+	 */
+	public boolean isImage() {
+		return getPrimaryType().equals("image");
 	}
 	
 	/**
