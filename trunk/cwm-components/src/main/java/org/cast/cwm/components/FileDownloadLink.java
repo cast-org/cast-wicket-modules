@@ -21,7 +21,9 @@ package org.cast.cwm.components;
 
 import org.apache.wicket.markup.html.DynamicWebResource;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.target.resource.ResourceStreamRequestTarget;
 
 /**
@@ -31,15 +33,31 @@ import org.apache.wicket.request.target.resource.ResourceStreamRequestTarget;
  * @author jbrookover
  *
  */
-public class FileDownloadLink extends Link<byte[]> {
+public class FileDownloadLink extends Link<byte[]> implements IDetachable {
 
 	private static final long serialVersionUID = 1L;
-	private String mimeType;
-	private String fileName;
+	private IModel<String> mMimeType;
+	private IModel<String> mFileName;
 	
 	/**
-	 * Returns a download link to the given data source.  Use this link to download binary data
-	 * from a datastore.
+	 * Construct a download link for the given model, 
+	 * with all parameters as models so that they don't have to be dereferenced
+	 * until the link is actually clicked.
+	 * 
+	 * @param wicketId
+	 * @param mData model of the byte[] that the user will download
+	 * @param mMimeType model of the MIME Type string
+	 * @param mFileName model of the file name of the file.
+	 */
+	public FileDownloadLink (String wicketId, IModel<byte[]> mData, IModel<String> mMimeType, IModel<String> mFileName) {
+		super(wicketId, mData);
+		this.mMimeType = mMimeType;
+		this.mFileName = mFileName;
+		setOutputMarkupId(true);
+	}
+	
+	/**
+	 * Construct a download link for the given object.
 	 * 
 	 * @param id the wicket component id
 	 * @param model the model of the byte[] that the user is downloading
@@ -47,10 +65,7 @@ public class FileDownloadLink extends Link<byte[]> {
 	 * @param fileName the file name to display in the download link (e.g. "dog.png")
 	 */
 	public FileDownloadLink(String id, IModel<byte[]> model, String mimeType, String fileName) {
-		super(id, model);
-		this.mimeType = mimeType;
-		this.fileName = fileName;
-		setOutputMarkupId(true);
+		this(id, model, Model.of(mimeType), Model.of(fileName));
 	}
 
 	@Override
@@ -65,7 +80,7 @@ public class FileDownloadLink extends Link<byte[]> {
 					
 					@Override
 					public String getContentType() {
-						return mimeType;
+						return mMimeType.getObject();
 					}
 					
 					@Override
@@ -75,6 +90,17 @@ public class FileDownloadLink extends Link<byte[]> {
 				};
 			}
 		};
-		getRequestCycle().setRequestTarget(new ResourceStreamRequestTarget(resource.getResourceStream(), fileName));		
+		getRequestCycle().setRequestTarget(new ResourceStreamRequestTarget(resource.getResourceStream(), mFileName.getObject()));		
 	}
+
+	@Override
+	protected void onDetach() {
+		if (mFileName != null)
+			mFileName.detach();
+		if (mMimeType != null)
+			mMimeType.detach();
+		super.onDetach();
+	}
+	
+	
 }
