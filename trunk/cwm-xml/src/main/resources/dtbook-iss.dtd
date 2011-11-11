@@ -46,9 +46,8 @@
 <!ATTLIST annotation left %Length; #IMPLIED>
 <!ATTLIST annotation width %Length; #IMPLIED>
 <!ATTLIST annotation height %Length; #IMPLIED>
-<!ATTLIST annotation icon (true | false) #IMPLIED>
-<!ATTLIST annotation iconImg %URI; #IMPLIED>
-<!ATTLIST annotation iconClass CDATA #IMPLIED>
+<!ATTLIST annotation imgSrc %URI; #IMPLIED>
+<!ATTLIST annotation imgClass CDATA #IMPLIED>
 
 <!ELEMENT response (templates?,fragments?)>
 <!ATTLIST response type (text|image|audio|file) #REQUIRED>
