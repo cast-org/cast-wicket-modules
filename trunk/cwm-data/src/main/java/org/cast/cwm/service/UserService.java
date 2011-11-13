@@ -99,6 +99,11 @@ public class UserService {
 		user.setSecurityToken(null);
 		CwmService.get().flushChanges();
 	}
+	
+	public void generateSecurityToken(IModel<User> mUser) {
+		mUser.getObject().generateSecurityToken();
+		CwmService.get().flushChanges();
+	}
 
 	
 	public IModel<List<User>> getAllUsers() {

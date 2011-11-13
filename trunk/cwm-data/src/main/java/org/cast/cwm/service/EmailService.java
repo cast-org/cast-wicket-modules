@@ -85,7 +85,7 @@ public class EmailService {
 		message.setSubject(substituteVars(subject, substitutionVariables));
 		message.setBody(substituteVars(body, substitutionVariables));
 
-		if (replyToUser.getObject() != null)
+		if (replyToUser != null && replyToUser.getObject() != null)
 			message.setReplyTo(replyToUser.getObject().getEmail());
 		sendMail(message);
 		
