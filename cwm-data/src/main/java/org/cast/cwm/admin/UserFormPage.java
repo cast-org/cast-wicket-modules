@@ -127,7 +127,6 @@ public class UserFormPage extends AdminPage {
 	protected void addLoginHistory() {
 		LoginData data = null;
 		if  (userModel != null && userModel.getObject() != null && !userModel.getObject().isTransient()) {
-			log.debug("Getting login sessions for {}", userModel);
 			data = UserService.get().getLoginSessions(userModel); 
 		}
 		if (data != null) {

@@ -84,18 +84,16 @@ public class SignInFormPanel extends Panel {
 			
 			IModel<User> user = UserService.get().getByUsername(username.getModelObject());
 			
-			if (!user.getObject().isValid()) {
+			if (user!=null && user.getObject()!=null && !user.getObject().isValid()) {
 				error(getLocalizer().getString("accountInvalid", this, "Account not confirmed.  You must confirm your account by clicking on the link in the email we sent you before you can log in."));
 				return;
 			}
 			
 			if (!CwmSession.get().signIn(username.getModelObject(), password.getModelObject())) {
-				log.warn("Login failed, user {}, password {}", username.getModelObject(), password.getModelObject());
+				log.warn("Login failed, username {}", username.getModelObject(), password.getModelObject());
 				error(getLocalizer().getString("signInFailed", this, "Invalid username and/or password."));
 				return;
 			}
-			
-			
 			
 			EventService eventService = EventService.get();
 			eventService.createLoginSession(getRequest());
