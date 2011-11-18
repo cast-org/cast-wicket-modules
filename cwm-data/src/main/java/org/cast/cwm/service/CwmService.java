@@ -74,6 +74,16 @@ public class CwmService {
 	}
 	
 	/**
+	 * Add a {@link PersistedObject} to the datastore.
+	 * Does not take a model as parameter because you usually won't have one for a
+	 * brand new object.
+	 * @param object
+	 */
+	public void save(PersistedObject object) {
+		Databinder.getHibernateSession().save(object);
+	}
+	
+	/**
 	 * Delete a {@link PersistedObject} from the datastore.
 	 * 
 	 * @param objectModel
