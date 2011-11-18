@@ -90,7 +90,7 @@ public class SignInFormPanel extends Panel {
 			}
 			
 			if (!CwmSession.get().signIn(username.getModelObject(), password.getModelObject())) {
-				log.warn("Login failed, username {}", username.getModelObject(), password.getModelObject());
+				log.warn("Login failed, username {}", username.getModelObject());
 				error(getLocalizer().getString("signInFailed", this, "Invalid username and/or password."));
 				return;
 			}
