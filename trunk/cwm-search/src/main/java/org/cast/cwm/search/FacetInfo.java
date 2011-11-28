@@ -23,6 +23,8 @@ import java.io.Serializable;
 
 import lombok.Data;
 
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.hibernate.search.query.facet.Facet;
 
 /**
@@ -42,7 +44,7 @@ public class FacetInfo implements Serializable {
 	private String valueName;
 	
 	// Count of documents matching this facet, from search
-	private int count;
+	private IModel<Integer> mCount;
 	
 	// True if this value is currently part of the search
 	private Boolean active;
@@ -52,12 +54,19 @@ public class FacetInfo implements Serializable {
 	/**
 	 * Construct by specifying all the fields.
 	 */
-	public FacetInfo (String facetName, String value, String valueName, int count, boolean active) {
+	public FacetInfo (String facetName, String value, String valueName, IModel<Integer> mCount, boolean active) {
 		this.facetName = facetName;
 		this.value = value;
 		this.valueName = valueName;
-		this.count = count;
-		this.active = active;
+		this.mCount = mCount;
+		this.active = active;		
+	}
+	
+	/**
+	 * Construct with a literal count, rather than a model.
+	 */
+	public FacetInfo (String facetName, String value, String valueName, int count, boolean active) {
+		this(facetName, value, valueName, Model.of(count), active);
 	}
 	
 	/**
@@ -66,11 +75,15 @@ public class FacetInfo implements Serializable {
 	 * @param valueName
 	 */
 	public FacetInfo (Facet facet, String valueName) {
-		value = facet.getValue();
-		count = facet.getCount();
-		facetName = facet.getFacetingName();
+		this.value = facet.getValue();
+		this.mCount = Model.of(facet.getCount());
+		this.facetName = facet.getFacetingName();
 		this.valueName = valueName;
-		active = false;
+		this.active = false;
+	}
+	
+	public Integer getCount() {
+		return mCount.getObject();
 	}
 	
 	/**
@@ -79,6 +92,12 @@ public class FacetInfo implements Serializable {
 	 * @return
 	 */
 	public String getCountAsString() {
-		return Integer.toString(count);
+		return Integer.toString(mCount.getObject());
 	}
+	
+	public void detach() {
+		if (mCount != null)
+			mCount.detach();
+	}
+
 }

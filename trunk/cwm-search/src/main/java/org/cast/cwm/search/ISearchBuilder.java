@@ -39,6 +39,15 @@ import org.hibernate.search.query.dsl.QueryBuilder;
  *
  */
 public interface ISearchBuilder extends Serializable {
+	
+	/**
+	 * Should return true if the search parameters have been changed since 
+	 * the last time that the build() method was called.  This will
+	 * let the caller know that it needs to call build() again.
+	 * 
+	 * @return true if search terms have changed.
+	 */
+	public abstract boolean isSearchUpdated();
 
 	/**
 	 * This method will be called to create a Query when it is about to be executed.
