@@ -104,8 +104,8 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	 */
 	protected FullTextQuery getQuery() {
 		Session session = Databinder.getHibernateSession();
-		if (query == null || lastSession == null || !session.equals(lastSession )) {
-			log.debug("Rebuilding query");
+		if (query == null || lastSession == null || !session.equals(lastSession)
+				|| builder.isSearchUpdated()) {
 			lastSession = session;
 			FullTextSession fullTextSession = Search.getFullTextSession(session);
 			QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity(resultClass).get();
