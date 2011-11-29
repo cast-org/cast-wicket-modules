@@ -27,9 +27,12 @@ import lombok.Getter;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
@@ -55,6 +58,30 @@ public class ResponseViewer extends Panel {
 	
 	@Getter
 	private final Integer maxHeight;  // marked final because info is used in constructor
+
+	@Getter
+	private PropertyModel<String> mResponseName;
+
+	@Getter
+	private IModel<? extends Response> mResponse;
+
+	@Getter
+	private IModel<MimeType>type;
+	
+	@Override 
+	public void onDetach() {
+		super.onDetach();
+		
+		if (mResponseName != null) {
+			mResponseName.detach();
+		}	
+		if (mResponse != null) {
+			mResponse.detach();
+		}
+		if (type != null) {
+			type.detach();
+		}
+	}
 	
 	public ResponseViewer(String id, final IModel<? extends Response> model) {
 		this(id, model, null, null);
@@ -71,6 +98,7 @@ public class ResponseViewer extends Panel {
 		this.maxWidth = maxWidth;
 		this.maxHeight = maxHeight;
 		setOutputMarkupId(true);
+		this.mResponse = model;
 		
 		// Show default "No Response," if necessary.
 		if (model == null
@@ -146,29 +174,64 @@ public class ResponseViewer extends Panel {
 	public class UploadFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;
-		
-		// FIXME this all has to be modified to work with changeable model.
-		public UploadFragment(String id, IModel<? extends Response> model) {
+
+		@Override public void onBeforeRender() {
+
+			//Download Link
+			FileDownloadLink download = new FileDownloadLink("download", new PropertyModel<byte[]>(getModel().getObject().getResponseData().getBinaryFileData(), "data"), 
+					new Model<String>(type.getObject().toString()), mResponseName);
+
+			download.add(new Label("filename", mResponseName));
+			this.replace(download);
+
+			//Displayed Image			
+			if (getModel().getObject().getResponseData().getBinaryFileData().getPrimaryType().equals("image")) {
+				Image displayImage = ImageService.get().getScaledImageComponent("imageDisplay", new PropertyModel<Long>(mResponse, "responseData.binaryFileData.id").getObject(), maxWidth, maxHeight);
+				this.replace(displayImage);					
+				super.onBeforeRender();				
+			}
+			else {
+				EmptyPanel displayImage = new EmptyPanel("imageDisplay");
+				this.replace(displayImage);					
+				super.onBeforeRender();
+			}			
+			
+			
+		}
+
+					
+		public UploadFragment(String id, final IModel<? extends Response> model) {
 			super(id, "uploadFragment", ResponseViewer.this, model);
-			final BinaryFileData response = model.getObject().getResponseData().getBinaryFileData();
-			add(new Label("filename", response.getName()));
-			MimeType type;
-			try {
-				type = new MimeType(response.getMimeType());
-			} catch (MimeTypeParseException ex) {
-				ex.printStackTrace();
-				type = new MimeType();
-			}
-			if (type.getPrimaryType().equals("image")) {
-				add(ImageService.get().getScaledImageComponent("imageDisplay", response.getId(), maxWidth, maxHeight));
-			} else {
-				add(new WebMarkupContainer("imageDisplay").setVisible(false));
-			}
-			// FIXME make this all based on PropertyModel and the like so that it works when model object is changed.
-			add(new FileDownloadLink("download", new PropertyModel<byte[]>(model, "responseData.binaryFileData.data"), 
-					type.toString(), response.getName()).add(new Label("filename", response.getName())));
-		}		
-	}
+			
+			
+			mResponseName = new PropertyModel<String>(model, "responseData.binaryFileData.name");
+
+			add(new Label("filename", mResponseName));
+
+			type = new Model<MimeType>() {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public MimeType getObject() {					
+					MimeType type;
+					try {				
+						type = new MimeType(new PropertyModel<String>(model, "type").toString());
+					} catch (MimeTypeParseException ex) {
+						ex.printStackTrace();
+						type = new MimeType();
+					}
+					
+					return type;
+				}			
+			};
+			add(new EmptyPanel("download"));
+
+			//during runtime this is replaced in onBeforeRender			
+			add(new EmptyPanel("imageDisplay"));
+		
+		}
+		
+	}		
+
 	
 	protected class SvgNotSupportedFragment extends Fragment {
 
