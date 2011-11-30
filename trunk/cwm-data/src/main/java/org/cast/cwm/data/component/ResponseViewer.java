@@ -65,8 +65,6 @@ public class ResponseViewer extends Panel {
 	@Getter
 	private IModel<? extends Response> mResponse;
 
-	@Getter
-	private IModel<MimeType>type;
 	
 	@Override 
 	public void onDetach() {
@@ -77,9 +75,6 @@ public class ResponseViewer extends Panel {
 		}	
 		if (mResponse != null) {
 			mResponse.detach();
-		}
-		if (type != null) {
-			type.detach();
 		}
 	}
 	
@@ -179,8 +174,9 @@ public class ResponseViewer extends Panel {
 
 			//Download Link
 			FileDownloadLink download = new FileDownloadLink("download", new PropertyModel<byte[]>(getModel().getObject().getResponseData().getBinaryFileData(), "data"), 
-					new Model<String>(type.getObject().toString()), mResponseName);
+					new Model<String>(getModel().getObject().getResponseData().getBinaryFileData().getMimeType()), mResponseName);
 
+			
 			download.add(new Label("filename", mResponseName));
 			this.replace(download);
 
@@ -201,31 +197,13 @@ public class ResponseViewer extends Panel {
 
 					
 		public UploadFragment(String id, final IModel<? extends Response> model) {
-			super(id, "uploadFragment", ResponseViewer.this, model);
-			
-			
-			mResponseName = new PropertyModel<String>(model, "responseData.binaryFileData.name");
 
+			super(id, "uploadFragment", ResponseViewer.this, model);			
+			mResponseName = new PropertyModel<String>(model, "responseData.binaryFileData.name");
 			add(new Label("filename", mResponseName));
 
-			type = new Model<MimeType>() {
-				private static final long serialVersionUID = 1L;
-				@Override
-				public MimeType getObject() {					
-					MimeType type;
-					try {				
-						type = new MimeType(new PropertyModel<String>(model, "type").toString());
-					} catch (MimeTypeParseException ex) {
-						ex.printStackTrace();
-						type = new MimeType();
-					}
-					
-					return type;
-				}			
-			};
-			add(new EmptyPanel("download"));
-
 			//during runtime this is replaced in onBeforeRender			
+			add(new EmptyPanel("download"));
 			add(new EmptyPanel("imageDisplay"));
 		
 		}
