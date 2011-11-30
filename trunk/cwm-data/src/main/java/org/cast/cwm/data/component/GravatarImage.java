@@ -106,9 +106,10 @@ public class GravatarImage extends WebComponent {
 	 * @return
 	 */
 	private String getUrl() {
-		if (getDefaultModelObject() != null && ((User) getDefaultModelObject()).getEmail() != null)
-			return GRAVATAR_URL + md5Hex(((User)getDefaultModelObject()).getEmail()) + ".jpg" + formatUrlParameters();
-		else
+		if (getDefaultModelObject() != null && ((User) getDefaultModelObject()).getEmail() != null) {
+			String url = GRAVATAR_URL + md5Hex(((User)getDefaultModelObject()).getEmail()) + formatUrlParameters();
+			return url;
+		} else
 			return GRAVATAR_URL + formatUrlParameters();
 	}
 
@@ -132,7 +133,7 @@ public class GravatarImage extends WebComponent {
 		try {             
 			MessageDigest md = 
 				MessageDigest.getInstance("MD5");             
-			return hex (md.digest(email.getBytes("CP1252")));         
+			return hex (md.digest(email.getBytes("UTF-8")));         
 		} catch (Exception ex) {
 			/* No Action */
 		}
@@ -142,8 +143,7 @@ public class GravatarImage extends WebComponent {
 	private static String hex(byte[] array) {        
 		StringBuffer sb = new StringBuffer();        
 		for (int i = 0; i < array.length; ++i) {            
-			sb.append(Integer.toHexString((array[i] 
-			                                     & 0xFF) | 0x100).substring(1,3));        
+			sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));        
 		}        
 		return sb.toString();    
 	}
