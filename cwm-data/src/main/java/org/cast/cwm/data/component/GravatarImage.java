@@ -107,7 +107,7 @@ public class GravatarImage extends WebComponent {
 	 */
 	private String getUrl() {
 		if (getDefaultModelObject() != null && ((User) getDefaultModelObject()).getEmail() != null) {
-			String url = GRAVATAR_URL + md5Hex(((User)getDefaultModelObject()).getEmail()) + formatUrlParameters();
+			String url = GRAVATAR_URL + md5Hex(((User)getDefaultModelObject()).getEmail().toLowerCase()) + formatUrlParameters();
 			return url;
 		} else
 			return GRAVATAR_URL + formatUrlParameters();
