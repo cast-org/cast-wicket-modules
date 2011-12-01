@@ -199,6 +199,7 @@ public class ResponseService {
 			c.add(Restrictions.eq("user", mUser.getObject()));
 		c.add(Restrictions.eq("valid", true));
 		c.setProjection(Projections.rowCount());
+		c.setCacheable(true);
 		return (Long) c.uniqueResult();
 	}
 	
