@@ -23,6 +23,7 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -59,6 +60,13 @@ public class ResponseViewer extends Panel {
 	@Getter
 	private final Integer maxHeight;  // marked final because info is used in constructor
 
+	@Getter @Setter
+	private Boolean displayTitle = true;  // marked final because info is used in constructor
+	
+	@Getter @Setter
+	private Boolean displayDownloadLink = true;  // marked final because info is used in constructor
+
+	
 	@Getter
 	private PropertyModel<String> mResponseName;
 
@@ -174,12 +182,16 @@ public class ResponseViewer extends Panel {
 
 			//Download Link
 			FileDownloadLink download = new FileDownloadLink("download", new PropertyModel<byte[]>(getModel().getObject().getResponseData().getBinaryFileData(), "data"), 
-					new Model<String>(getModel().getObject().getResponseData().getBinaryFileData().getMimeType()), mResponseName);
-
-			
+					new Model<String>(getModel().getObject().getResponseData().getBinaryFileData().getMimeType()), mResponseName);			
+			download.setVisible(displayDownloadLink);
 			download.add(new Label("filename", mResponseName));
 			this.replace(download);
 
+			Label fielname = new Label("filename", mResponseName);
+			fielname.setVisible(displayTitle);
+			this.replace(fielname);
+
+			
 			//Displayed Image			
 			if (getModel().getObject().getResponseData().getBinaryFileData().getPrimaryType().equals("image")) {
 				Image displayImage = ImageService.get().getScaledImageComponent("imageDisplay", new PropertyModel<Long>(mResponse, "responseData.binaryFileData.id").getObject(), maxWidth, maxHeight);
@@ -200,9 +212,9 @@ public class ResponseViewer extends Panel {
 
 			super(id, "uploadFragment", ResponseViewer.this, model);			
 			mResponseName = new PropertyModel<String>(model, "responseData.binaryFileData.name");
-			add(new Label("filename", mResponseName));
-
+			
 			//during runtime this is replaced in onBeforeRender			
+			add(new EmptyPanel("filename"));
 			add(new EmptyPanel("download"));
 			add(new EmptyPanel("imageDisplay"));
 		

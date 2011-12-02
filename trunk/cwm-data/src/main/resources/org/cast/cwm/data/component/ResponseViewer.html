@@ -19,9 +19,13 @@
 
 	<!-- File Upload -->
 	<wicket:fragment wicket:id="uploadFragment">
+		<wicket:enclosure child="filename">
 		File: <span wicket:id="filename">example.txt</span><br />
+		</wicket:enclosure>
 		<img wicket:id="imageDisplay" /><br />
+		<wicket:enclosure child="download">
 		Download: <a href="#" wicket:id="download"><span wicket:id="filename">example.txt</span></a><br />
+		</wicket:enclosure>
 	</wicket:fragment>
 	
 	<!-- SVG Drawing -->
