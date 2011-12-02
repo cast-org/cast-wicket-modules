@@ -13,6 +13,7 @@
     <description>Parent project for the CAST Wicket Modules.
     This POM contains basic metadata and dependencies so they are always
     consistent across the various modules.</description>
+    <inceptionYear>2011</inceptionYear>
     
     <organization>
         <name>CAST, Inc.</name>
@@ -137,7 +138,7 @@
             <dependency>
                 <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-drawtool</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>0.8</version>
             </dependency>
             <dependency>
                 <groupId>org.cast</groupId>
@@ -385,7 +386,7 @@
                         <java>SLASHSTAR_STYLE</java>
                     </mapping>
                     <properties>
-                        <year>2011</year>
+                        <year>${project.inceptionYear}</year>
                     </properties>
                 </configuration>
                 <executions>
