@@ -431,7 +431,7 @@ public abstract class ResponseEditor extends Panel {
 			add(form);
 						
 			form.add(new FileUploadField("fileUploadField", new Model<FileUpload>(null)).setRequired(true));
-			form.setMaxSize(Bytes.kilobytes(500));
+			form.setMaxSize(Bytes.megabytes(2));
 			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
 
