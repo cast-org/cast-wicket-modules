@@ -68,7 +68,7 @@ public class TagService implements Serializable {
     /**
      * Configure Hibernate classes.  To be called from Application's 
      * configureHibernate method.
-     * @param ac
+     * @param c the Hibernate configuration
      */
 	public static void configureTagClasses (Configuration c) {
 		c.addAnnotatedClass(Tag.class);
@@ -93,7 +93,7 @@ public class TagService implements Serializable {
     /** List all tags a User has used.
      * The first time this is called for a User, if they have no tags,
 	 * then the default set of tags will be created.
-     * @param User
+     * @param person The user whose tags will be listed
      * @return List of Tags
      */
 	public List<Tag> tagsForUser(User person) {
@@ -176,7 +176,7 @@ public class TagService implements Serializable {
 	 * Get the type code corresponding to a taggable class.
 	 * Takes into account that given class may be a subtype of the registered class.
 	 * Throws IllegalArgumentException if the given class is assignable to any taggable class
-	 * @param class to look up.
+	 * @param clazz The class to look up.
 	 * @return
 	 */
 	public Character getTypeCode (Class<? extends PersistedObject> clazz) {
