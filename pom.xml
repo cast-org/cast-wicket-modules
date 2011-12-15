@@ -395,6 +395,21 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <!-- this will create Javadocs in an "apidocs" directory
+                         that is a sister to the "trunk" directory.
+                         This location works well on Google Code.
+                         Run "mvn javadoc:aggregate" to update. -->
+                    <reportOutputDirectory>${basedir}/..</reportOutputDirectory>
+                    <outputDirectory>${basedir}/..</outputDirectory>
+                    <author>false</author>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
         </plugins>
 
         <extensions>
