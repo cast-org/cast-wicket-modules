@@ -91,7 +91,6 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	/**
 	 * Return the FacetManager object for the current query.
 	 * This can be used to extract facet counts and associated information.
-	 * @return
 	 */
 	public FacetManager getFacetManager() {
 		return getQuery().getFacetManager();
@@ -100,7 +99,6 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	/**
 	 * Return the current Query, from cache or newly built.
 	 * If there are errors in creating the query, null may be returned.
-	 * @return
 	 */
 	protected FullTextQuery getQuery() {
 		Session session = Databinder.getHibernateSession();

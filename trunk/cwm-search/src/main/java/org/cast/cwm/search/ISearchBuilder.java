@@ -54,7 +54,7 @@ public interface ISearchBuilder extends Serializable {
 	 * @param builder the Hibernate Search QueryBuilder object
 	 * @return constructed Query object.
 	 */
-	public abstract Query build(QueryBuilder b);
+	public abstract Query build(QueryBuilder builder);
 
 	/**
 	 * Perform any necessary configuration of the query after it is created.

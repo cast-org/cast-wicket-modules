@@ -89,7 +89,7 @@ public class FacetInfo implements Serializable {
 	/**
 	 * Return the count of matches as a string.
 	 * This is a convenience getter for use in PropertyModels.
-	 * @return
+	 * @return a string representation of the match count.
 	 */
 	public String getCountAsString() {
 		return Integer.toString(mCount.getObject());
