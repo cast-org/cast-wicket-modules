@@ -53,6 +53,7 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	private IModel<User> userModel;
 	private ResponseType responseType;
 	private Integer maxResults;
+	private Integer sortOrder;
 	private Date fromDate;
 	private Date toDate;
 	
@@ -78,6 +79,8 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 			criteria.add(Restrictions.eq("user", userModel.getObject()));
 		if (responseType != null)
 			criteria.add(Restrictions.eq("type", responseType));
+		if (sortOrder != null)
+			criteria.add(Restrictions.eq("sortOrder", sortOrder));
 		if (maxResults != null)
 			criteria.setMaxResults(maxResults);
 		if (fromDate != null && toDate != null && fromDate.before(toDate))
