@@ -159,6 +159,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 		mailHost   = appProperties.getProperty("cwm.mailHost");
 		mailFromAddress = appProperties.getProperty("cwm.mailFromAddress");
 		
+		initResponseTypes();
 		runDatabaseInitializers();
 		configureMountPaths();
 		
@@ -387,7 +388,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 		 * Applet markup is stored using {@link ResponseData#setText(String)}
 		 */
 		legalResponseTypes.put("APPLET", new ResponseType("APPLET", "applet"));
-
 	}
 	
 	public IResponseType getResponseType(String name) {
