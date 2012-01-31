@@ -57,6 +57,7 @@ import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
@@ -93,7 +94,7 @@ public abstract class ResponseEditor extends Panel {
 	
 	@Getter @Setter protected IModel<Prompt> prompt;
 	@Getter @Setter protected String pageName;
-	@Getter @Setter protected ResponseType type;
+	@Getter @Setter protected IResponseType type;
 	@Getter @Setter protected List<String> starters = new ArrayList<String>();
 	@Getter @Setter protected String templateURL;
 	@Getter @Setter protected FeedbackPanel feedbackPanel;
@@ -128,7 +129,7 @@ public abstract class ResponseEditor extends Panel {
 	 * @param id
 	 * @param prompt
 	 */
-	public ResponseEditor(String id, IModel<? extends Prompt> prompt, ResponseType type) {
+	public ResponseEditor(String id, IModel<? extends Prompt> prompt, IResponseType type) {
 		this(id, ResponseService.get().newResponse(CwmSession.get().getUserModel(), type, prompt));
 		newResponse = true;
 	}
@@ -241,21 +242,18 @@ public abstract class ResponseEditor extends Panel {
 	 * @param model
 	 * @param type
 	 */
-	protected WebMarkupContainer getEditorFragment(String id, IModel<Response> model, ResponseType type) {
-		switch(type) {
-		case TEXT:
+	protected WebMarkupContainer getEditorFragment(String id, IModel<Response> model, IResponseType type) {
+		String typeName = type.getName();
+		if (typeName.equals("TEXT"))
 			return (new TextFragment(id, model, false));
-		case HTML:
+		if (typeName.equals("HTML"))
 			return (new TextFragment(id, model, true));
-		case AUDIO:
+		if (typeName.equals("AUDIO"))
 			return (new AudioFragment(id, model));
-		case UPLOAD:
+		if (typeName.equals("UPLOAD"))
 			return (new UploadFragment(id, model));
-		case SVG:
+		if (typeName.equals("SVG"))
 			return (new DrawingFragment(id, model));
-//		case FLASH_AUDIO:
-//			return (new FlashAudioFragment(id, model));
-		}
 		return null;
 	}
 

@@ -100,15 +100,15 @@ public class ResponseMetadata implements Serializable {
 			// FIXME - remove interactive applet?
 			
 			if (type.equals("text"))
-				typeMap.put(ResponseType.HTML.name(), typeMD);
+				typeMap.put("HTML", typeMD);
 			else if (type.equals("image"))
-				typeMap.put(ResponseType.SVG.name(), typeMD);
+				typeMap.put("SVG", typeMD);
 			else if (type.equals("audio"))
-				typeMap.put(ResponseType.AUDIO.name(), typeMD);
+				typeMap.put("AUDIO", typeMD);
 			else if (type.equals("file"))
-				typeMap.put(ResponseType.UPLOAD.name(), typeMD);
+				typeMap.put("UPLOAD", typeMD);
 			else if (type.equals("applet"))
-				typeMap.put(ResponseType.APPLET.name(), typeMD);
+				typeMap.put("APPLET", typeMD);
 			else
 				throw new IllegalArgumentException("Unknown response type in XML: " + type);
 				
@@ -120,8 +120,8 @@ public class ResponseMetadata implements Serializable {
 	 * @param type
 	 * @return the TypeMetadata for the given type.
 	 */
-	public TypeMetadata getType (ResponseType type) {
-		return typeMap.get(type.name());
+	public TypeMetadata getType (IResponseType type) {
+		return typeMap.get(type.getName());
 	}
 	
 	/**
@@ -129,13 +129,13 @@ public class ResponseMetadata implements Serializable {
 	 * @param type
 	 * @return the TypeMetadata for the given type
 	 */
-	public TypeMetadata addType (ResponseType type) {
+	public TypeMetadata addType (IResponseType type) {
 		if (typeMap == null)
 			typeMap = new HashMap<String,TypeMetadata>(4);
 		TypeMetadata typeMetadata = getType(type);
 		if (typeMetadata == null) {
 			typeMetadata = new TypeMetadata();
-			typeMap.put(type.name(), typeMetadata);
+			typeMap.put(type.getName(), typeMetadata);
 		}
 		return typeMetadata;
 	}

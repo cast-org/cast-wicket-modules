@@ -36,6 +36,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.BinaryFileData;
+import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseData;
@@ -98,7 +99,7 @@ public class ResponseService {
 	 * @param prompt
 	 * @return
 	 */
-	public IModel<Response> newResponse (IModel<User> user, ResponseType type, IModel<? extends Prompt> prompt) {
+	public IModel<Response> newResponse (IModel<User> user, IResponseType type, IModel<? extends Prompt> prompt) {
 		Response instance = newResponse();
 		instance.setUser(user.getObject());
 		instance.setType(type);
@@ -190,7 +191,7 @@ public class ResponseService {
 	 * @param mUser the user whose responses will be counted, or null to count all users.
 	 * @return the count
 	 */
-	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, ResponseType type, IModel<? extends User> mUser) {
+	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, IResponseType type, IModel<? extends User> mUser) {
 		Criteria c = Databinder.getHibernateSession().createCriteria(Response.class);
 		c.add(Restrictions.eq("prompt", mPrompt.getObject()));
 		if (type != null)
@@ -210,7 +211,7 @@ public class ResponseService {
 	 * @param type
 	 * @return
 	 */
-	public IModel<Response> getLatestResponseByType(IModel<? extends Prompt> p, ResponseType type) {
+	public IModel<Response> getLatestResponseByType(IModel<? extends Prompt> p, IResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setResponseType(type);
@@ -226,7 +227,7 @@ public class ResponseService {
 	 * @param type
 	 * @return
 	 */
-	public IModel<Response> getLatestResponseByTypeForUser(IModel<? extends Prompt> p, IModel<User> u, ResponseType type) {
+	public IModel<Response> getLatestResponseByTypeForUser(IModel<? extends Prompt> p, IModel<User> u, IResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setResponseType(type);
