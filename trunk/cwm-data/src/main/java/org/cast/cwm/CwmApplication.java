@@ -20,8 +20,11 @@
 package org.cast.cwm;
 
 import java.io.FileInputStream;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import lombok.Getter;
@@ -53,8 +56,9 @@ import org.cast.cwm.admin.SiteInfoPage;
 import org.cast.cwm.admin.SiteListPage;
 import org.cast.cwm.admin.UserFormPage;
 import org.cast.cwm.admin.UserListPage;
+import org.cast.cwm.data.IResponseType;
+import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
-import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
@@ -319,6 +323,87 @@ public abstract class CwmApplication extends AuthDataApplication {
 			}
 		};
 	}
+	
+	
+	// TODO: move these to a separate class, injected via Guice
+	private Map<String,IResponseType> legalResponseTypes = new HashMap<String,IResponseType>();
+	
+	void initResponseTypes() {
+		/**
+		 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
+		 */
+		legalResponseTypes.put("TEXT", new ResponseType("TEXT", "Write")); 
+
+		/**
+		 * Styled HTML text is stored using {@link ResponseData#setText(String)}.
+		 */
+		legalResponseTypes.put("HTML", new ResponseType("HTML", "Write")); 
+		
+		/**
+		 * Binary audio data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
+		 */
+		legalResponseTypes.put("AUDIO", new ResponseType("AUDIO", "Record")); 
+		
+		/**
+		 * SVG markup is stored using {@link ResponseData#setText(String)}
+		 */
+		legalResponseTypes.put("SVG", new ResponseType("SVG", "Draw"));
+		
+		/**
+		 * Binary data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
+		 */
+		legalResponseTypes.put("UPLOAD", new ResponseType("UPLOAD", "Upload"));
+		
+		/**
+		 * Highlight colors and word indexes are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.  
+		 * For example: "R:1,2,3,5,6,7#Y:22,23,25,26"
+		 */
+		legalResponseTypes.put("HIGHLIGHT", new ResponseType("HIGHLIGHT", "Highlight"));
+		
+		/**
+		 * A response to a cloze-type passage (fill in the missing words).  The actual answers
+		 * are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.
+		 */
+		legalResponseTypes.put("CLOZE", new ResponseType("CLOZE", "Cloze Passage")); 
+		
+		/**
+		 * A response to a single-select, multiple choice prompt.  Actual answer stored using {@link ResponseData#setText(String)}.
+		 */
+		legalResponseTypes.put("SINGLE_SELECT", new ResponseType("SINGLE_SELECT", "Multiple Choice"));
+		
+		/**
+		 * A rating (e.g. 1-5).  The value is stored using {@link ResponseData#setScore(int)}
+		 */
+		legalResponseTypes.put("STAR_RATING", new ResponseType("STAR_RATING", "Rate"));
+		
+		/**
+		 * A generic score.  
+		 * 
+		 * TODO: Perhaps this can be used to replace Star Rating and combine Cloze/SingleSelect?
+		 */
+		legalResponseTypes.put("SCORE", new ResponseType("SCORE", "Score"));
+		
+		/**
+		 * Applet markup is stored using {@link ResponseData#setText(String)}
+		 */
+		legalResponseTypes.put("APPLET", new ResponseType("APPLET", "applet"));
+
+	}
+	
+	public IResponseType getResponseType(String name) {
+		return legalResponseTypes.get(name);
+	}
+	
+	public Collection<IResponseType> getLegalResposeTypes() {
+		return legalResponseTypes.values();
+	}
+	
+	
+//	public Component getReponseViewer (org.cast.cwm.data.Response r) {
+//		if (r.getType().equals(.r..r.))
+//			return ResponseViewer.class;
+//	}
+	
 	
 	/**
 	 * Override this method to display a custom page when an exception is thrown.

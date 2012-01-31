@@ -85,7 +85,7 @@ public class Response extends PersistedObject {
 	private User user;
 	
 	@Enumerated(EnumType.STRING)
-	private ResponseType type;
+	private IResponseType type;
 	
 	private Date createDate;
 	
@@ -123,7 +123,7 @@ public class Response extends PersistedObject {
 	
 	public Response() { /* No Arg Constructor for DataStore */ }
 	
-	public Response(User author, ResponseType t, Prompt p) {
+	public Response(User author, IResponseType t, Prompt p) {
 		this.user = author;
 		this.type = t;
 		this.prompt = p;

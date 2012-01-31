@@ -32,8 +32,8 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
-import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -51,7 +51,7 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	
 	private IModel<? extends Prompt> promptModel;
 	private IModel<User> userModel;
-	private ResponseType responseType;
+	private IResponseType responseType;
 	private Integer maxResults;
 	private Integer sortOrder;
 	private Date fromDate;

@@ -47,7 +47,9 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
@@ -116,7 +118,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	 * If a ResponseType is listed in this array, a link to create a response
 	 * of that type will not be displayed.
 	 */
-	private Set<ResponseType> disabled = new HashSet<ResponseType>();
+	private Set<IResponseType> disabled = new HashSet<IResponseType>();
 	
 	private List<String> sentenceStarters = new ArrayList<String>();
 	
@@ -175,10 +177,11 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		add(controlPanel);
 		
 		// Links for creating a new response
-		controlPanel.add(new NewResponseLink("xmlText", ResponseType.HTML));
-		controlPanel.add(new NewResponseLink("audio", ResponseType.AUDIO));
-		controlPanel.add(new NewResponseLink("upload", ResponseType.UPLOAD));
-		controlPanel.add(new NewResponseLink("draw", ResponseType.SVG));
+		CwmApplication app = CwmApplication.get();
+		controlPanel.add(new NewResponseLink("xmlText", app.getResponseType("HTML")));
+		controlPanel.add(new NewResponseLink("audio", app.getResponseType("AUDIO")));
+		controlPanel.add(new NewResponseLink("upload", app.getResponseType("UPLOAD")));
+		controlPanel.add(new NewResponseLink("draw", app.getResponseType("SVG")));
 				
 		// Placeholder for a new response editor
 		add(new WebMarkupContainer(NEW_RESPONSE_ID).setOutputMarkupPlaceholderTag(true).setVisible(false));
@@ -256,7 +259,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	protected class NewResponseLink extends AjaxFallbackLink<Void> {
 
 		private static final long serialVersionUID = 1L;
-		private ResponseType type;
+		private IResponseType type;
 
 		/**
 		 * Represents a link that will open an editor of the given type.
@@ -264,7 +267,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		 * @param id
 		 * @param type
 		 */
-		public NewResponseLink(String id, ResponseType type) {
+		public NewResponseLink(String id, IResponseType type) {
 			super(id);
 			this.type = type;
 		}
@@ -295,17 +298,12 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			};
 			editor.setPageName(pageName);
 			
-			switch (type) { 
-			case HTML:
+			if (type.getName().equals("HTML")) {
 				if (!sentenceStarters.isEmpty())
 					editor.setStarters(sentenceStarters);
-				break;
-			case SVG:
+			} else if (type.getName().equals("SVG")) {
 				if (!stampURLs.isEmpty())
 					editor.setStarters(stampURLs);
-				break;
-			default:
-				break;
 			}
 			
 			BasicResponseArea.this.replace(editor);
@@ -373,17 +371,13 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			};
 			editor.setPageName(pageName);
 			
-			switch (getModelObject().getType()) { 
-			case HTML:
+			String type = getModelObject().getType().getName(); 
+			if (type.equals("HTML")) {
 				if (!sentenceStarters.isEmpty())
 					editor.setStarters(sentenceStarters);
-				break;
-			case SVG:
+			} else if (type.equals("SVG")) {
 				if (!stampURLs.isEmpty())
 					editor.setStarters(stampURLs);
-				break;
-			default:
-				break;
 			}
 			
 			getParent().replace(editor);
@@ -428,15 +422,15 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		});
 	}
 	
-	public BasicResponseArea setDisabled(ResponseType... types) {
-		for(ResponseType type : types) {
+	public BasicResponseArea setDisabled(IResponseType... types) {
+		for(IResponseType type : types) {
 			disabled.add(type);
 		}
 		return this;
 	}
 	
 	public BasicResponseArea setAllDisabled() {
-		for(ResponseType type : ResponseType.values()) {
+		for(IResponseType type : CwmApplication.get().getLegalResposeTypes()) {
 			disabled.add(type);
 		}
 		return this;

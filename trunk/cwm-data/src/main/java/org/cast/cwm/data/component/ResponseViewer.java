@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
@@ -38,8 +39,13 @@ import org.apache.wicket.model.PropertyModel;
 import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
 import org.cast.cwm.data.BinaryFileData;
+import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
+import org.cast.cwm.data.component.ResponseEditor.AudioFragment;
+import org.cast.cwm.data.component.ResponseEditor.DrawingFragment;
+import org.cast.cwm.data.component.ResponseEditor.TextFragment;
+import org.cast.cwm.data.component.ResponseEditor.UploadFragment;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.service.ImageService;
 
@@ -113,25 +119,25 @@ public class ResponseViewer extends Panel {
 		}
 
 		// Show appropriate fragment depending on ResponseType
-		switch (model.getObject().getType()) {
-			case TEXT:
-			case HTML:
-				add(new TextFragment("response", model));
-				break;
-			case AUDIO:
-				add(new AudioFragment("response", model));
-				break;
-			case UPLOAD:
-				add(new UploadFragment("response", model));
-				break;
-			case SVG:
-				add(new DrawingFragment("response", model));
-				break;
-			default:
-				add(new Label("response", "[[Cannot Display Response Type: " + model.getObject().getType() + "]]"));
-		}
+		add(getViewerFragment("response", model, model.getObject().getType()));
+		
 	}
-	
+
+	protected Component getViewerFragment(String id, IModel<? extends Response> model, IResponseType type) {
+		String typeName = type.getName();
+		if (typeName.equals("TEXT"))
+			return (new TextFragment(id, model));
+		if (typeName.equals("HTML"))
+			return (new TextFragment(id, model));
+		if (typeName.equals("AUDIO"))
+			return (new AudioFragment(id, model));
+		if (typeName.equals("UPLOAD"))
+			return (new UploadFragment(id, model));
+		if (typeName.equals("SVG"))
+			return (new DrawingFragment(id, model));
+		return new Label(id, "[[Cannot Display Response Type: " + typeName + "]]");
+	}
+
 	public class TextFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;
