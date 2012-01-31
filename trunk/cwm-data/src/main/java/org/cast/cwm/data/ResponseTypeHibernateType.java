@@ -14,8 +14,8 @@ public class ResponseTypeHibernateType implements UserType {
 
 	public int[] sqlTypes() {
 		return new int[] {		
-				StringType.INSTANCE.sqlType();
-		}
+				StringType.INSTANCE.sqlType()
+		};
 	}
 
 	public Class returnedClass() {
@@ -39,35 +39,34 @@ public class ResponseTypeHibernateType implements UserType {
 
 	public void nullSafeSet(PreparedStatement st, Object value, int index)
 			throws HibernateException, SQLException {
-		
-
+		if (value == null) {
+			StringType.INSTANCE.set(st, null, index);
+		} else {
+			IResponseType rt = (IResponseType) value;
+			StringType.INSTANCE.set(st, rt.getName(), index);
+		}
 	}
 
 	public Object deepCopy(Object value) throws HibernateException {
-		// TODO Auto-generated method stub
-		return null;
+		return value;
 	}
 
 	public boolean isMutable() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public Serializable disassemble(Object value) throws HibernateException {
-		// TODO Auto-generated method stub
-		return null;
+		return (IResponseType)value;
 	}
 
 	public Object assemble(Serializable cached, Object owner)
 			throws HibernateException {
-		// TODO Auto-generated method stub
-		return null;
+		return cached;
 	}
 
 	public Object replace(Object original, Object target, Object owner)
 			throws HibernateException {
-		// TODO Auto-generated method stub
-		return null;
+		return original;
 	}
 
 }
