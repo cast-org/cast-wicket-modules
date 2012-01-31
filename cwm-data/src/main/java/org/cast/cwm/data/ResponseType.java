@@ -93,7 +93,12 @@ public enum ResponseType {
 	 * 
 	 * TODO: Perhaps this can be used to replace Star Rating and combine Cloze/SingleSelect?
 	 */
-	SCORE("Score");
+	SCORE("Score"),
+	
+	/**
+	 * Applet markup is stored using {@link ResponseData#setText(String)}
+	 */
+	APPLET("applet");
 	
 	private String display;
 	

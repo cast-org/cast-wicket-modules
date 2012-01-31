@@ -97,6 +97,8 @@ public class ResponseMetadata implements Serializable {
 			for (int j=0; j<starters.getLength(); j++)
 				typeMD.fragments.add(starters.item(j).getTextContent().trim());
 			
+			// FIXME - remove interactive applet?
+			
 			if (type.equals("text"))
 				typeMap.put(ResponseType.HTML.name(), typeMD);
 			else if (type.equals("image"))
@@ -105,6 +107,8 @@ public class ResponseMetadata implements Serializable {
 				typeMap.put(ResponseType.AUDIO.name(), typeMD);
 			else if (type.equals("file"))
 				typeMap.put(ResponseType.UPLOAD.name(), typeMD);
+			else if (type.equals("applet"))
+				typeMap.put(ResponseType.APPLET.name(), typeMD);
 			else
 				throw new IllegalArgumentException("Unknown response type in XML: " + type);
 				
