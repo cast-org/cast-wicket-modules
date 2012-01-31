@@ -89,7 +89,6 @@ import wicket.contrib.tinymce.settings.TinyMCESettings;
 public abstract class ResponseEditor extends Panel {
 
 	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(ResponseEditor.class);
 	
 	@Getter @Setter protected IModel<Prompt> prompt;
@@ -98,10 +97,12 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected List<String> starters = new ArrayList<String>();
 	@Getter @Setter protected String templateURL;
 	@Getter @Setter protected FeedbackPanel feedbackPanel;
+	@Getter @Setter protected boolean cancelVisible = true;
+	@Getter @Setter protected boolean saveVisible = true;
 	@Getter @Setter protected boolean deleteVisible = true;
 	@Getter @Setter protected boolean autoSave = true; // Only applies to Text/Drawing
 	@Getter @Setter protected boolean debug = false; // Turn on editor debugging? Only applies to Audio.
-	
+
 	// TODO: Extend for upload, recording, etc?  Overload?
 	// TODO: Untested with TinyMCE
 	@Getter @Setter protected Integer maxlength; // Maximum Text Length (characters)
@@ -115,6 +116,11 @@ public abstract class ResponseEditor extends Panel {
 	 */
 	private static TinyMCESettings defaultTinyMCESettings;
 
+	// Used to determine the original response for cancel and delete purposes
+	@Getter @Setter protected IModel<Response> mOriginalResponse;
+	@Getter @Setter protected boolean newResponse = false;
+	@Getter @Setter protected boolean hasAutoSaved = false;
+
 	/**
 	 * Creates a panel with no existing data, attached to the given prompt.
 	 * Used for creating a new response.
@@ -124,6 +130,7 @@ public abstract class ResponseEditor extends Panel {
 	 */
 	public ResponseEditor(String id, IModel<? extends Prompt> prompt, ResponseType type) {
 		this(id, ResponseService.get().newResponse(CwmSession.get().getUserModel(), type, prompt));
+		newResponse = true;
 	}
 	
 	/**
@@ -137,6 +144,7 @@ public abstract class ResponseEditor extends Panel {
 		super(id, model);
 		this.prompt = new PropertyModel<Prompt>(model, "prompt");
 		this.type = model.getObject().getType();
+		mOriginalResponse = model;
 		setOutputMarkupPlaceholderTag(true);
 	}
 		
@@ -163,24 +171,39 @@ public abstract class ResponseEditor extends Panel {
 		// Cancel Button/Dialog
 		// TODO: Make this 'indicating', probably doesn't need to block because it already does.
 		AjaxCancelChangesDialog cancelDialog = new AjaxCancelChangesDialog("cancelModal") {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			protected void onCancel(AjaxRequestTarget target) {
+				if (newResponse) {
+					// cancel a new response - remove that response
+					ResponseService.get().deleteResponse(getModel());
+					setModelObject(null);
+				} else if (hasAutoSaved){
+					log.debug("CANCEL EDITS ON EXISTING RESPONSE");
+					// FIXME:  Need to implement a transaction rollback here - ldm
+					// if you have already autosaved and then the user cancels - restore the original response
+					hasAutoSaved = false;
+				}
 				target.addComponent(feedbackPanel);
 				ResponseEditor.this.onCancel(target);
 			}
 		};
 		add(cancelDialog);
-		cancelButton = new WebMarkupContainer("cancel");
+		cancelButton = new WebMarkupContainer("cancel")  {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isVisible() {
+				return cancelVisible;
+			}
+		};
 		cancelButton.add(cancelDialog.getClickToOpenBehavior()).setOutputMarkupId(true);
 		editor.add(cancelButton);
 		
 		// Delete Button/Dialog
 		// TODO: Make this 'indicating', probably doesn't need to block because it already does.
 		AjaxDeletePersistedObjectDialog<Response> deleteDialog = new AjaxDeletePersistedObjectDialog<Response>("deleteModal", getModel()) {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -189,21 +212,17 @@ public abstract class ResponseEditor extends Panel {
 				setModelObject(null);
 				target.addComponent(feedbackPanel);
 				onDelete(target);				
-			}
-			
+			}			
 		};		
 		deleteDialog.setObjectName("response");
-		
 		add(deleteDialog);
 		deleteButton = new WebMarkupContainer("delete") {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public boolean isVisible() {
 				return !getModelObject().isTransient() && deleteVisible;
 			}
-
 		};
 		deleteButton.add(deleteDialog.getDialogBorder().getClickToOpenBehavior()).setOutputMarkupId(true);
 		editor.add(deleteButton);
@@ -291,6 +310,7 @@ public abstract class ResponseEditor extends Panel {
 					@Override
 					protected void onAutoSave(AjaxRequestTarget target) {
 						super.onAutoSave(target);
+						hasAutoSaved = true;
 						ResponseEditor.this.onAutoSave(target);
 					}
 				});
@@ -303,7 +323,10 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 					target.addComponent(feedbackPanel);
-					onSave(target);	
+					onSave(target);
+					// set new response flag and reset the new baseline response
+					newResponse = false;
+					mOriginalResponse = (IModel<Response>) getModel();
 				}
 				
 				@Override
@@ -316,6 +339,10 @@ public abstract class ResponseEditor extends Panel {
 					return Arrays.asList(this, cancelButton, deleteButton);
 				}
 
+				@Override
+				public boolean isVisible() {
+					return saveVisible;
+				}				
 			};
 			add(save);
 			
@@ -423,7 +450,9 @@ public abstract class ResponseEditor extends Panel {
 					super.onSubmit();
 					
 					FileUpload fileUpload = ((FileUploadField) this.get("fileUploadField")).getFileUpload();
-					ResponseService.get().saveBinaryResponse(getModel(), fileUpload.getBytes(), fileUpload.getContentType(), fileUpload.getClientFileName(), pageName);
+					if (fileUpload != null) {
+						ResponseService.get().saveBinaryResponse(getModel(), fileUpload.getBytes(), fileUpload.getContentType(), fileUpload.getClientFileName(), pageName);
+					}
 				}
 			};
 			form.setOutputMarkupId(true);
@@ -553,6 +582,7 @@ public abstract class ResponseEditor extends Panel {
 					@Override
 					protected void onAutoSave(AjaxRequestTarget target) {
 						super.onAutoSave(target);
+						hasAutoSaved = true;
 						ResponseEditor.this.onAutoSave(target);
 					}
 
@@ -592,6 +622,11 @@ public abstract class ResponseEditor extends Panel {
 				protected Collection<? extends Component> getComponents() {
 					return Arrays.asList(this, cancelButton, deleteButton);
 				}
+
+				@Override
+				public boolean isVisible() {
+					return saveVisible;
+				}				
 			};
 			add(save);
 		}
@@ -746,6 +781,8 @@ public abstract class ResponseEditor extends Panel {
 	@Override
 	protected void onDetach() {
 		prompt.detach();
+		if (mOriginalResponse != null)
+			mOriginalResponse.detach();
 		super.onDetach();
 	}
 }
