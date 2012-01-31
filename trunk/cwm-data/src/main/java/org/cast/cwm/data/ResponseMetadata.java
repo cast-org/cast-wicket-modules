@@ -27,6 +27,7 @@ import java.util.Map;
 
 import lombok.Data;
 
+import org.cast.cwm.CwmApplication;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -125,6 +126,15 @@ public class ResponseMetadata implements Serializable {
 	}
 	
 	/**
+	 * Get TypeMetadata for the named response type.
+	 * @param typeName
+	 * @return the TypeMetadata for the given type.
+	 */
+	public TypeMetadata getType (String typeName) {
+		return typeMap.get(typeName);
+	}
+	
+	/**
 	 * Make sure the given ResponseType is included in this metadata object, and return it.
 	 * @param type
 	 * @return the TypeMetadata for the given type
@@ -138,6 +148,16 @@ public class ResponseMetadata implements Serializable {
 			typeMap.put(type.getName(), typeMetadata);
 		}
 		return typeMetadata;
+	}
+	
+	/**
+	 * Make sure the reponse type with the given name is included in this metadata object,
+	 * and return it.
+	 * @param typeName
+	 * @return the TypeMetadata for the given type
+	 */
+	public TypeMetadata addType (String typeName) {
+		return addType (CwmApplication.get().getResponseType(typeName));
 	}
 	
 	@Data
