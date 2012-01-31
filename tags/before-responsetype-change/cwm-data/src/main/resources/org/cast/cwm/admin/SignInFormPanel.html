@@ -1,0 +1,22 @@
+<wicket:panel>
+<form wicket:id="form">
+	 <div wicket:id="feedback" class="errorBox">errors go here</div>
+	 <div class="registerRow">
+	    <label wicket:id="usernameLabel">User Name:</label>
+	    <div wicket:id="usernameBorder" class="inputItem">
+	       <input wicket:id="username" type="text" name="username" id="username" value="" />
+	    </div>
+	 </div>
+	 <div class="registerRow">
+	    <label wicket:id="passwordLabel">Password:</label>
+		<div wicket:id="passwordBorder" class="inputItem">
+		   <input wicket:id="password" type="password" name="password" id="password" value="" />
+		</div>
+	 </div>
+	 <div class="registerRow submit">
+		 <div class="inputItem">
+	        <input type="submit" class="button standard" value="Sign In" />
+	     </div>
+	 </div>
+</form>
+</wicket:panel>
