@@ -1,6 +1,8 @@
 package org.cast.cwm.data;
 
-public interface IResponseType {
+import java.io.Serializable;
+
+public interface IResponseType extends Serializable {
 
 	public String getName();
 	

@@ -24,8 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -48,6 +46,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.Type;
 
 /**
  * <p>
@@ -84,7 +83,7 @@ public class Response extends PersistedObject {
 	@ManyToOne(optional=false)
 	private User user;
 	
-	@Enumerated(EnumType.STRING)
+	@Type(type="org.cast.cwm.data.ResponseTypeHibernateType")
 	private IResponseType type;
 	
 	private Date createDate;

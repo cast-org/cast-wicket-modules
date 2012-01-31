@@ -44,6 +44,8 @@ public class ResponseType implements IResponseType {
 	@Getter
 	private String display;
 	
+	private static final long serialVersionUID = 1L;
+
 	public ResponseType(String name, String display) {
 		this.name = name;
 		this.display = display;
