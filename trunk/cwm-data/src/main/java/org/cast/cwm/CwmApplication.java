@@ -387,7 +387,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 		/**
 		 * Applet markup is stored using {@link ResponseData#setText(String)}
 		 */
-		legalResponseTypes.put("APPLET", new ResponseType("APPLET", "applet"));
+		legalResponseTypes.put("APPLET", new ResponseType("APPLET", "Applet"));
 	}
 	
 	public IResponseType getResponseType(String name) {

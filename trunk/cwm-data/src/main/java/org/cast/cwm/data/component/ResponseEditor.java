@@ -60,7 +60,6 @@ import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
@@ -553,6 +552,7 @@ public abstract class ResponseEditor extends Panel {
 					super.onSubmit();
 					String svg = this.get("svg").getDefaultModelObjectAsString();
 					svg = svg.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"");
+					log.debug("SAVING THE SVG VALUE: {}", svg);
 					ResponseService.get().saveSVGResponse(getModel(), svg, pageName);
 				}
 			};
