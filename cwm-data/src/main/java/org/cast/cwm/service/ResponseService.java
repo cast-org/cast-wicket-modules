@@ -40,7 +40,6 @@ import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseData;
-import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.ResponseCriteriaBuilder;
 import org.cast.cwm.data.models.PromptModel;

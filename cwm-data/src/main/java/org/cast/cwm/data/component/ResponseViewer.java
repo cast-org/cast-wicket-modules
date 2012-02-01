@@ -19,15 +19,10 @@
  */
 package org.cast.cwm.data.component;
 
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
-
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
@@ -38,14 +33,9 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
-import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
-import org.cast.cwm.data.component.ResponseEditor.AudioFragment;
-import org.cast.cwm.data.component.ResponseEditor.DrawingFragment;
-import org.cast.cwm.data.component.ResponseEditor.TextFragment;
-import org.cast.cwm.data.component.ResponseEditor.UploadFragment;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.service.ImageService;
 
