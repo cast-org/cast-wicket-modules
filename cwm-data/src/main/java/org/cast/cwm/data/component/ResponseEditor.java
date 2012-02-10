@@ -551,8 +551,7 @@ public abstract class ResponseEditor extends Panel {
 				public void onSubmit() {
 					super.onSubmit();
 					String svg = this.get("svg").getDefaultModelObjectAsString();
-					svg = svg.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"");
-					log.debug("SAVING THE SVG VALUE: {}", svg);
+					svg = svg.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"").replaceAll("[\\r\\n\\f]", "> ");
 					ResponseService.get().saveSVGResponse(getModel(), svg, pageName);
 				}
 			};
