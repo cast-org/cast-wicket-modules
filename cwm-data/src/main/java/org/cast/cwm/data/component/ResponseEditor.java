@@ -19,8 +19,13 @@
  */
 package org.cast.cwm.data.component;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,11 +35,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
+import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -100,11 +107,10 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected boolean cancelVisible = true;
 	@Getter @Setter protected boolean saveVisible = true;
 	@Getter @Setter protected boolean deleteVisible = true;
-	@Getter @Setter protected boolean autoSave = true; // Only applies to Text/Drawing
+	@Getter @Setter protected boolean autoSave = true; // Only applies to Text/Drawing/Table
 	@Getter @Setter protected boolean debug = false; // Turn on editor debugging? Only applies to Audio.
 
-	// TODO: Extend for upload, recording, etc?  Overload?
-	// TODO: Untested with TinyMCE
+	// TODO: Untested with TinyMCE, Extend for upload, recording, etc?  Overload?
 	@Getter @Setter protected Integer maxlength; // Maximum Text Length (characters)
 	
 	private WebMarkupContainer cancelButton;
@@ -131,6 +137,7 @@ public abstract class ResponseEditor extends Panel {
 	public ResponseEditor(String id, IModel<? extends Prompt> prompt, IResponseType type) {
 		this(id, ResponseService.get().newResponse(CwmSession.get().getUserModel(), type, prompt));
 		newResponse = true;
+		log.debug("ADDING NEW RESPONSE");
 	}
 	
 	/**
@@ -253,6 +260,8 @@ public abstract class ResponseEditor extends Panel {
 			return (new UploadFragment(id, model));
 		if (typeName.equals("SVG"))
 			return (new DrawingFragment(id, model));
+		if (typeName.equals("TABLE"))
+			return (new TableFragment(id, model));
 		return null;
 	}
 
@@ -392,6 +401,162 @@ public abstract class ResponseEditor extends Panel {
 			public String getIdValue(String object, int index) {
 				return object;
 			}
+		}
+	}
+
+	
+	/**
+	 * This fragment is used to add a Table Response
+	 */
+	protected class TableFragment extends Fragment implements IHeaderContributor {
+		private static final long serialVersionUID = 1L;
+		private String tableMarkupId, textAreaMarkupId; // used by the js
+
+		public TableFragment(String id, IModel<Response> model) {
+			super(id, "tableFragment", ResponseEditor.this, model);
+			
+			// Form for Sending/Receiving the table content to/from the database
+			Form<Response> form = new Form<Response>("form", model) {
+				private static final long serialVersionUID = 1L;
+				
+				@Override
+				public void onSubmit() {
+					super.onSubmit();
+					// get the value of the table content from the model and save it as a text response
+					String tableContent = this.get("tableContent").getDefaultModelObjectAsString();
+					log.debug("SAVING THIS TABLECONTENT {}", tableContent);
+					ResponseService.get().saveTextResponse(getModel(), tableContent, pageName);
+				}
+			};
+			form.setOutputMarkupId(true);
+			add(form);
+
+			// if this is a new table and there is an authored table, set the text model to the content of that file here
+			// TODO: What do we want to do if there is no authored file should the default values
+			// be loaded here or in the js - right now this is set to an empty string
+			IModel<String> newTextModel = new Model<String>("");
+			if (templateURL != null && newResponse) {
+				URL url = null;
+				try {
+					url = new URI(RequestUtils.toAbsolutePath(templateURL)).toURL();
+				} catch (MalformedURLException e) {
+					log.equals("There is a problem with the Authored Data file for this Table");
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
+					log.equals("There is a problem with the Authored Data file for this Table");
+					e.printStackTrace();
+				}
+				newTextModel = new Model<String>(getUrlContents(url));
+				log.debug("THE AUTHORED TEXT MODEL IS {}", newTextModel.getObject());
+			} 
+
+			// populate the textarea with what is in the db if it exists, 
+			// otherwise what is in the authored file, otherwise empty
+			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
+			TextArea<String> textArea = new TextArea<String>("tableContent", textModel);
+			// TODO: Change this textarea to hidden in final implementation 
+			//HiddenField<String> textArea = new HiddenField<String>("tableContent",textModel);
+			textArea.setOutputMarkupId(true);
+			textArea.setEscapeModelStrings(false);
+			textAreaMarkupId = textArea.getMarkupId();
+			form.add(textArea);
+			log.debug("THE MARKUP ID OF THE TEXTAREA IS {}", textAreaMarkupId);			
+			
+			// add the table so that we can uniquely identify this table by its markup id
+			WebMarkupContainer tableContainer = new WebMarkupContainer("gridTable");
+			add (tableContainer);
+			tableContainer.setOutputMarkupId(true);
+			tableMarkupId = tableContainer.getMarkupId();
+			log.debug("THE MARKUP ID OF THE TABLE IS {}", tableMarkupId);
+
+			if (autoSave) {
+				form.add(new AjaxAutoSavingBehavior(form) {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void renderHead(IHeaderResponse response) {
+						super.renderHead(response);
+						// Ensure grid saves to text area of form before we check to see if the form changed.
+						// Autosave will then submit the form to store the text area back to the db
+						String jsString = new String("cwmExportGrid(" + "\"" + tableMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
+						response.renderJavascript(script, "interactiveAutosave");					
+					}
+
+					@Override
+					protected void onAutoSave(AjaxRequestTarget target) {
+						super.onAutoSave(target);
+						hasAutoSaved = true;
+						ResponseEditor.this.onAutoSave(target);
+					}
+				});
+			}
+			
+			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected IAjaxCallDecorator getAjaxCallDecorator() {
+					return new DisablingAjaxCallDecorator(getComponents()) {
+						private static final long serialVersionUID = 1L;
+
+						@Override
+						// this is what needs to be called right before the submit - send the grid value to the hidden text field
+						public CharSequence decorateScript(CharSequence script) {
+							String jsString = new String("cwmExportGrid(" + "\"" + tableMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+							return jsString + super.decorateScript(script);
+						}
+					};
+				}
+
+				@Override
+				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+					target.addComponent(feedbackPanel);
+					onSave(target);
+					// set new response flag and reset the new baseline response
+					newResponse = false;
+					mOriginalResponse = (IModel<Response>) getModel();
+				}
+				
+				@Override
+				protected void onError(AjaxRequestTarget target, Form<?> form) {
+					target.addComponent(feedbackPanel);
+				}
+
+				@Override
+				protected Collection<? extends Component> getComponents() {
+					return Arrays.asList(this, cancelButton, deleteButton);
+				}
+
+				@Override
+				public boolean isVisible() {
+					return saveVisible;
+				}				
+			};
+			add(save);			
+		}
+
+		@Override
+		public void onBeforeRender() {
+			super.onBeforeRender();
+		}
+
+		public void renderHead(IHeaderResponse response) {
+			// FIXME - all the css/js is under the example/theme directory but this should
+			// all be moved under cwm-data once it is finalized
+			// Not sure if we should load all this js here.  We might want to move it to the html
+			// load the relevant js and css needed here (themeroller, jqrid, etc)
+			response.renderCSSReference(new ResourceReference("/js/jqgrid/jquery-ui-1.8.17/css/custom-theme/jquery-ui-1.8.17.custom.css"));
+			response.renderCSSReference(new ResourceReference("/js/jqgrid/css/ui.jqgrid.css"));
+			response.renderJavascriptReference(new ResourceReference("/js/jqgrid/i18n/grid.locale-en.js"));
+			response.renderOnLoadJavascript("jQuery.jgrid.no_legacy_api = false;");
+			response.renderJavascriptReference(new ResourceReference("/js/jqgrid/jquery.jqGrid.min.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/jqgrid/jquery.jqGrid.cwm.js"));
+
+			// once the text for the grid is available in the hidden text field make this js call 
+			String jsString = new String("cwmImportGrid(" + "\"" + tableMarkupId + "\", \"" + textAreaMarkupId + "\");");
+			log.debug("SENDING JS TO BUILD GRID {}", jsString);
+			response.renderOnDomReadyJavascript(jsString);
 		}
 	}
 
@@ -782,4 +947,32 @@ public abstract class ResponseEditor extends Panel {
 			mOriginalResponse.detach();
 		super.onDetach();
 	}
+	
+	
+	// TODO: move this into its own class, or do we have this defined somewhere? - ldm
+	public static String getUrlContents(URL url) {
+		log.debug("THE  DATA FILE NAME IS {}", url);
+		StringBuffer stringBuffer = new StringBuffer();
+
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(url.openStream()));
+		} catch (IOException e) {
+			log.error("There is a problem opening the Authored Data file for this Table");
+			e.printStackTrace();
+		}
+
+		String inputLine;
+		try {
+			while ((inputLine = in.readLine()) != null) 
+				stringBuffer.append(inputLine);
+			in.close();
+		} catch (IOException e) {
+			log.error("There is a problem reading the Authored Data file for this Table");
+			e.printStackTrace();
+		}
+		
+		return stringBuffer.toString();		
+	}
+
 }

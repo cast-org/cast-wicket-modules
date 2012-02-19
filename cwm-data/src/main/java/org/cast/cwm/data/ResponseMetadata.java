@@ -74,7 +74,7 @@ public class ResponseMetadata implements Serializable {
 		// TODO Consider extracting attributes class, title
 		// TODO Consider extracting elements prompt, annotation, select, select1, clozepassage
 			
-		typeMap = new HashMap<String,TypeMetadata>(4);
+		typeMap = new HashMap<String,TypeMetadata>(6);
 		
 		NodeList resplist = elt.getElementsByTagNameNS(elt.getNamespaceURI(), "response");
 		for (int i=0; i<resplist.getLength(); i++) {
@@ -88,18 +88,18 @@ public class ResponseMetadata implements Serializable {
 			
 			// TODO consider extracting attributes width, height
 			
-			typeMD.templates = new ArrayList<String>(4);
+			typeMD.templates = new ArrayList<String>(6);
 			NodeList templates = relt.getElementsByTagNameNS(elt.getNamespaceURI(), "template");
 			for (int j=0; j<templates.getLength(); j++)
 				typeMD.templates.add(templates.item(j).getTextContent().trim());
 
-			typeMD.fragments = new ArrayList<String>(4);
+			typeMD.fragments = new ArrayList<String>(6);
 			NodeList starters = relt.getElementsByTagNameNS(elt.getNamespaceURI(), "fragment");
 			for (int j=0; j<starters.getLength(); j++)
 				typeMD.fragments.add(starters.item(j).getTextContent().trim());
 			
 			// FIXME - remove interactive applet?
-			
+			// determine a way for this to be set to the default response types set by the application  - ldm			
 			if (type.equals("text"))
 				typeMap.put("HTML", typeMD);
 			else if (type.equals("image"))
@@ -108,11 +108,12 @@ public class ResponseMetadata implements Serializable {
 				typeMap.put("AUDIO", typeMD);
 			else if (type.equals("file"))
 				typeMap.put("UPLOAD", typeMD);
+			else if (type.equals("table"))
+				typeMap.put("TABLE", typeMD);
 			else if (type.equals("applet"))
 				typeMap.put("APPLET", typeMD);
 			else
-				throw new IllegalArgumentException("Unknown response type in XML: " + type);
-				
+				throw new IllegalArgumentException("Unknown response type in XML: " + type);				
 		}
 	}
 	

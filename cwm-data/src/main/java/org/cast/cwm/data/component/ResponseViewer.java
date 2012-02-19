@@ -23,8 +23,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.internal.HtmlHeaderContainer;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -125,6 +127,8 @@ public class ResponseViewer extends Panel {
 			return (new UploadFragment(id, model));
 		if (typeName.equals("SVG"))
 			return (new DrawingFragment(id, model));
+		if (typeName.equals("TABLE"))
+			return (new TableFragment(id, model));
 		return new Label(id, "[[Cannot Display Response Type: " + typeName + "]]");
 	}
 
@@ -137,7 +141,32 @@ public class ResponseViewer extends Panel {
 			add(new Label("text", new PropertyModel<String>(model, "text")).setEscapeModelStrings(false));
 		}
 	}
-	
+
+	public class TableFragment extends Fragment {
+		private static final long serialVersionUID = 1L;
+		private String tableMarkupId, textAreaMarkupId; // used by the js
+		
+		public TableFragment(String id, IModel<? extends Response> model) {
+			super(id, "tableFragment", ResponseViewer.this, model);
+			// add a hidden form field or call a new panel for this table
+			// TODO: Change this to hidden textarea in final implementation 
+			//HiddenField<String> textArea = new HiddenField<String>("stateText",textModel);
+			add(new Label("text", new PropertyModel<String>(model, "text")));
+
+			// add the table so that we can uniquely identify this table by its markup id
+			WebMarkupContainer tableContainer = new WebMarkupContainer("gridTable");
+			add (tableContainer);
+			tableContainer.setOutputMarkupId(true);
+			tableMarkupId = tableContainer.getMarkupId();
+		}
+
+		@Override
+		public void renderHead(HtmlHeaderContainer container) {
+			// TODO Add all the js and css to setup the grid - see TableFragment in ResponseEditor
+			super.renderHead(container);
+		}
+	}
+
 	public class DrawingFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;
