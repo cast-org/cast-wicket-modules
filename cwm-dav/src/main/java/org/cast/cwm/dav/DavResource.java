@@ -141,7 +141,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 			// Odd situation -- last modified time reported the same, but size has changed.
 			// XDR actually gets into this state if updates have been stored without creating a new "version"
 			// Update our information on modification time so that the webapp can see the changes immediately.
-			log.info("File size changed: setting current time as last modification");
+			log.debug("File size changed: setting current time as last modification");
 			fileSize = newFileSize;
 			lastModified = Time.now();
 			// serverLastModified left as is, so that we can continue to recognize further stealthy updates.
@@ -172,7 +172,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		PropertyList[] props = null;
 		try {
 			props = getClient().propfind(filePath, interestingProperties, 0);
-			log.info("PROPFIND on {}", filePath);
+			log.debug("PROPFIND on {}", filePath);
 		} catch (DAVException e) {
 			// There is one error type that we can actually handle: a 404 indicating the object was not found.
 			if (e.errors[0].statusCode == 404)
