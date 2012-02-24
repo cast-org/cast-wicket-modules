@@ -35,6 +35,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
@@ -410,7 +411,9 @@ public abstract class ResponseEditor extends Panel {
 	 */
 	protected class TableFragment extends Fragment implements IHeaderContributor {
 		private static final long serialVersionUID = 1L;
-		private String tableMarkupId, textAreaMarkupId; // used by the js
+		private String divMarkupId, textAreaMarkupId; // used by the js
+		private URL defaultTableUrl = null;
+
 
 		public TableFragment(String id, IModel<Response> model) {
 			super(id, "tableFragment", ResponseEditor.this, model);
@@ -431,28 +434,40 @@ public abstract class ResponseEditor extends Panel {
 			form.setOutputMarkupId(true);
 			add(form);
 
-			// if this is a new table and there is an authored table, set the text model to the content of that file here
-			// TODO: What do we want to do if there is no authored file should the default values
-			// be loaded here or in the js - right now this is set to an empty string
+			// if this is a new table and there is an authored table, set the text model to the content of that file
+			// or the default table file
 			IModel<String> newTextModel = new Model<String>("");
-			if (templateURL != null && newResponse) {
-				URL url = null;
-				try {
-					url = new URI(RequestUtils.toAbsolutePath(templateURL)).toURL();
-				} catch (MalformedURLException e) {
-					log.equals("There is a problem with the Authored Data file for this Table");
-					e.printStackTrace();
-				} catch (URISyntaxException e) {
-					log.equals("There is a problem with the Authored Data file for this Table");
-					e.printStackTrace();
-				}
-				newTextModel = new Model<String>(getUrlContents(url));
-				log.debug("THE AUTHORED TEXT MODEL IS {}", newTextModel.getObject());
-			} 
 
-			// populate the textarea with what is in the db if it exists, 
-			// otherwise what is in the authored file, otherwise empty
+			if (newResponse) {
+				if (templateURL != null) {
+					try {
+						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(templateURL)).toURL();
+					} catch (MalformedURLException e) {
+						log.equals("There is a problem with the Authored Data file for this Table");
+						e.printStackTrace();
+					} catch (URISyntaxException e) {
+						log.equals("There is a problem with the Authored Data file for this Table");
+						e.printStackTrace();
+					}
+				} else { //new response with no authored default
+					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference("/js/data/grid.json"));
+					try {
+						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(defaultTableUrlString)).toURL();
+					} catch (MalformedURLException e) {
+						log.equals("There is a problem with the Default Data file for this Table");
+						e.printStackTrace();
+					} catch (URISyntaxException e) {
+						log.equals("There is a problem with the Default Data file for this Table");
+						e.printStackTrace();
+					}
+					log.debug("THIS IS THE url for the Default RESOURCE REFERENCE {}", defaultTableUrl);
+				}
+				newTextModel = new Model<String>(getUrlContents(defaultTableUrl));
+				log.debug("THE AUTHORED TEXT MODEL IS {}", newTextModel.getObject());
+			}
+
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
+
 			TextArea<String> textArea = new TextArea<String>("tableContent", textModel);
 			// TODO: Change this textarea to hidden in final implementation 
 			//HiddenField<String> textArea = new HiddenField<String>("tableContent",textModel);
@@ -463,11 +478,11 @@ public abstract class ResponseEditor extends Panel {
 			log.debug("THE MARKUP ID OF THE TEXTAREA IS {}", textAreaMarkupId);			
 			
 			// add the table so that we can uniquely identify this table by its markup id
-			WebMarkupContainer tableContainer = new WebMarkupContainer("gridTable");
+			WebMarkupContainer tableContainer = new WebMarkupContainer("gridDiv");
 			add (tableContainer);
 			tableContainer.setOutputMarkupId(true);
-			tableMarkupId = tableContainer.getMarkupId();
-			log.debug("THE MARKUP ID OF THE TABLE IS {}", tableMarkupId);
+			divMarkupId = tableContainer.getMarkupId();
+			log.debug("THE MARKUP ID OF THE TABLE IS {}", divMarkupId);
 
 			if (autoSave) {
 				form.add(new AjaxAutoSavingBehavior(form) {
@@ -478,7 +493,8 @@ public abstract class ResponseEditor extends Panel {
 						super.renderHead(response);
 						// Ensure grid saves to text area of form before we check to see if the form changed.
 						// Autosave will then submit the form to store the text area back to the db
-						String jsString = new String("cwmExportGrid(" + "\"" + tableMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+//						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\' + , \'"  + defaultTableUrl + "\' + readOnly);");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
 						response.renderJavascript(script, "interactiveAutosave");					
 					}
@@ -503,7 +519,7 @@ public abstract class ResponseEditor extends Panel {
 						@Override
 						// this is what needs to be called right before the submit - send the grid value to the hidden text field
 						public CharSequence decorateScript(CharSequence script) {
-							String jsString = new String("cwmExportGrid(" + "\"" + tableMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+							String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\');");
 							return jsString + super.decorateScript(script);
 						}
 					};
@@ -545,21 +561,24 @@ public abstract class ResponseEditor extends Panel {
 			// FIXME - all the css/js is under the example/theme directory but this should
 			// all be moved under cwm-data once it is finalized
 			// Not sure if we should load all this js here.  We might want to move it to the html
-			// load the relevant js and css needed here (themeroller, jqrid, etc)
-			response.renderCSSReference(new ResourceReference("/js/jqgrid/jquery-ui-1.8.17/css/custom-theme/jquery-ui-1.8.17.custom.css"));
-			response.renderCSSReference(new ResourceReference("/js/jqgrid/css/ui.jqgrid.css"));
-			response.renderJavascriptReference(new ResourceReference("/js/jqgrid/i18n/grid.locale-en.js"));
-			response.renderOnLoadJavascript("jQuery.jgrid.no_legacy_api = false;");
-			response.renderJavascriptReference(new ResourceReference("/js/jqgrid/jquery.jqGrid.min.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/jqgrid/jquery.jqGrid.cwm.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_renderers.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_charts.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_editors.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_validators.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_utils.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/Editablegrid_cast.js"));
+
+			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
-			String jsString = new String("cwmImportGrid(" + "\"" + tableMarkupId + "\", \"" + textAreaMarkupId + "\");");
+			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"  + textAreaMarkupId + "\',  \'"  + defaultTableUrl + "\', 'true');");
 			log.debug("SENDING JS TO BUILD GRID {}", jsString);
 			response.renderOnDomReadyJavascript(jsString);
 		}
 	}
 
+		
 	
 	protected class AudioFragment extends Fragment {
 
