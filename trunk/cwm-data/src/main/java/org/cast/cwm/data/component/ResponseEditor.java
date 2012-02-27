@@ -56,6 +56,8 @@ import org.apache.wicket.markup.html.link.InlineFrame;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -434,8 +436,8 @@ public abstract class ResponseEditor extends Panel {
 			form.setOutputMarkupId(true);
 			add(form);
 
-			// if this is a new table and there is an authored table, set the text model to the content of that file
-			// or the default table file
+			// if this is a new table and there is an authored table, set the url to the content of that file
+			// or the default table file, otherwise, a url needs to be built from the text in the response
 			IModel<String> newTextModel = new Model<String>("");
 
 			if (newResponse) {
@@ -464,6 +466,9 @@ public abstract class ResponseEditor extends Panel {
 				}
 				newTextModel = new Model<String>(getUrlContents(defaultTableUrl));
 				log.debug("THE AUTHORED TEXT MODEL IS {}", newTextModel.getObject());
+			} else {
+				// editing an existing response
+				
 			}
 
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
@@ -681,34 +686,11 @@ public abstract class ResponseEditor extends Panel {
 			WebMarkupContainer svgNotSupported = new WebMarkupContainer("svgNotSupported");
 			svgNotSupported.setVisible(false);
 			add(svgNotSupported);
-			
-			String baseSvg = model.getObject().getText();
-			
-			// Create 'empty' SVG
-			if (baseSvg == null) {
-				
-				baseSvg = "<svg width=\"" + SvgEditor.CANVAS_WIDTH + "\" height=\"" + SvgEditor.CANVAS_HEIGHT + "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
-				if (templateURL != null) {
-					String url;
-					try {
-						url = new URI(RequestUtils.toAbsolutePath(templateURL)).getPath();
-					} catch (URISyntaxException e) {
-						throw new IllegalArgumentException(e);
-					}
-
-					baseSvg = baseSvg.concat("<g display=\"inline\"><title>Template</title>");
-					baseSvg = baseSvg.concat("<image x=\"0\" y=\"0\" width=\"" + SvgEditor.CANVAS_WIDTH + "\" height=\"" + SvgEditor.CANVAS_HEIGHT + "\" id=\"svg_1\" xlink:href=\"" + url + "\" />");
-					baseSvg = baseSvg.concat("</g>");
-				}
-				
-				baseSvg = baseSvg.concat("<g display=\"inline\"><title>Layer 1</title></g>");
-				baseSvg = baseSvg.concat("</svg>");
-			}
-			
+						
 			SvgEditor svgEditor = new SvgEditor();
 			svgEditor.addExtension(new SvgUploadExtensionImpl(getModel()));
 			
-			svgEditor.setSvg(baseSvg);
+			svgEditor.setMSvg(new DefaultSvgModel(model));
 			// Transform drawing starters into absolute URLs so that they work both in editor and viewer,
 			// which have different base hrefs.
 			if (starters != null) {
@@ -994,4 +976,47 @@ public abstract class ResponseEditor extends Panel {
 		return stringBuffer.toString();		
 	}
 
+	public class DefaultSvgModel extends AbstractReadOnlyModel<String> implements IDetachable {
+		private static final long serialVersionUID = 1L;
+		private IModel<Response> model;
+
+		public DefaultSvgModel (IModel<Response> model) {
+			this.model = model;			
+		}		
+		
+		@Override
+		public String getObject() {
+			
+			String baseSvg = model.getObject().getText();
+
+			// Create 'empty' SVG
+			if (baseSvg == null) {
+				
+				baseSvg = "<svg width=\"" + SvgEditor.CANVAS_WIDTH + "\" height=\"" + SvgEditor.CANVAS_HEIGHT + "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
+				if (templateURL != null) {
+					String url;
+					try {
+						url = new URI(RequestUtils.toAbsolutePath(templateURL)).getPath();
+					} catch (URISyntaxException e) {
+						throw new IllegalArgumentException(e);
+					}
+
+					baseSvg = baseSvg.concat("<g display=\"inline\"><title>Template</title>");
+					baseSvg = baseSvg.concat("<image x=\"0\" y=\"0\" width=\"" + SvgEditor.CANVAS_WIDTH + "\" height=\"" + SvgEditor.CANVAS_HEIGHT + "\" id=\"svg_1\" xlink:href=\"" + url + "\" />");
+					baseSvg = baseSvg.concat("</g>");
+				}
+				
+				baseSvg = baseSvg.concat("<g display=\"inline\"><title>Layer 1</title></g>");
+				baseSvg = baseSvg.concat("</svg>");
+			}
+ 			return baseSvg;
+		}
+
+		@Override
+		public void detach() {
+			if (model != null)
+				model.detach();
+			super.detach();
+		}		
+	}
 }
