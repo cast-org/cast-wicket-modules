@@ -125,16 +125,14 @@ public class ResponseService {
 	/**
 	 * Get a single response by a given user for a given prompt.  This assumes that only
 	 * one such response should exist.  If multiple responses are returned, an exception
-	 * will be thrown.  In such cases, use {@link #getResponsesForPrompt(IModel, IModel)}.
-	 * 
-	 * Note: Deprecated.  You should really use a ISortableProvider.  See
+	 * will be thrown.  In such cases, use {@link #getResponsesForPrompt(IModel, IModel)},
+	 * or preferably, ISortableProvider.  See
 	 * {@link #getResponseProviderForPrompt(IModel, IModel)}.
 	 * 
 	 * @param p
 	 * @param u
 	 * @return
 	 */
-	@Deprecated
 	public IModel<Response> getResponseForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
