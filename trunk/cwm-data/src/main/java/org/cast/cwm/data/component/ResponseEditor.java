@@ -426,6 +426,8 @@ public abstract class ResponseEditor extends Panel {
 			// Form for sending updated table content to the database
 			Form<Response> form = new Form<Response>("form", model) {
 				private static final long serialVersionUID = 1L;
+
+				
 				
 				@Override
 				public void onSubmit() {
@@ -485,6 +487,30 @@ public abstract class ResponseEditor extends Panel {
 			add (tableContainer);
 			tableContainer.setOutputMarkupId(true);
 			divMarkupId = tableContainer.getMarkupId();
+
+			if (autoSave) {
+				form.add(new AjaxAutoSavingBehavior(form) {
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void renderHead(IHeaderResponse response) {
+						super.renderHead(response);
+						// Ensure grid saves to text area of form before we check to see if the form changed.
+						// Autosave will then submit the form to store the text area back to the db
+//						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\' + , \'"  + defaultTableUrl + "\', true);");
+						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
+						response.renderJavascript(script, "interactiveAutosave");					
+					}
+
+					@Override
+					protected void onAutoSave(AjaxRequestTarget target) {
+						super.onAutoSave(target);
+						hasAutoSaved = true;
+						ResponseEditor.this.onAutoSave(target);
+					}
+				});
+			}
 
 //			if (autoSave) {
 //				form.add(new AjaxAutoSavingBehavior(form) {
