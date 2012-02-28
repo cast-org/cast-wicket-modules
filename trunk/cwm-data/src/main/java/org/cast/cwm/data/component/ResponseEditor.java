@@ -428,9 +428,11 @@ public abstract class ResponseEditor extends Panel {
 				public void onSubmit() {
 					super.onSubmit();
 					// get the value of the table content from the model and save it as a text response
-					String tableContent = this.get("tableContent").getDefaultModelObjectAsString();
-					log.debug("SAVING THIS TABLECONTENT {}", tableContent);
-					ResponseService.get().saveTextResponse(getModel(), tableContent, pageName);
+					 String tableContent = this.get("tableContent").getDefaultModelObjectAsString();
+					 log.debug("SAVING THIS TABLECONTENT {}", tableContent);
+					 ResponseService.get().saveTextResponse(getModel(), tableContent, pageName);
+					
+					
 				}
 			};
 			form.setOutputMarkupId(true);
@@ -524,7 +526,7 @@ public abstract class ResponseEditor extends Panel {
 						@Override
 						// this is what needs to be called right before the submit - send the grid value to the hidden text field
 						public CharSequence decorateScript(CharSequence script) {
-							String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\');");
+							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\");");
 							return jsString + super.decorateScript(script);
 						}
 					};
@@ -577,7 +579,7 @@ public abstract class ResponseEditor extends Panel {
 			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
-			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"  + textAreaMarkupId + "\',  \'"  + defaultTableUrl + "\', 'true');");
+			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"  + textAreaMarkupId + "\',  \'"  + defaultTableUrl + "\', 'false');");
 			log.debug("SENDING JS TO BUILD GRID {}", jsString);
 			response.renderOnDomReadyJavascript(jsString);
 		}
