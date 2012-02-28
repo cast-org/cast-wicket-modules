@@ -19,14 +19,21 @@
  */
 package org.cast.cwm.data.component;
 
+import java.io.PrintStream;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.IRequestTarget;
+import org.apache.wicket.RequestCycle;
+import org.apache.wicket.ResourceReference;
+import org.apache.wicket.behavior.AbstractAjaxBehavior;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.internal.HtmlHeaderContainer;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -40,6 +47,8 @@ import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.service.ImageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple panel for viewing a response.
@@ -50,6 +59,7 @@ import org.cast.cwm.service.ImageService;
  */
 public class ResponseViewer extends Panel {
 
+	private static final Logger log = LoggerFactory.getLogger(ResponseViewer.class);
 	private static final long serialVersionUID = 1L;
 	
 	@Getter
@@ -142,31 +152,80 @@ public class ResponseViewer extends Panel {
 		}
 	}
 
-	public class TableFragment extends Fragment {
+	public class TableFragment extends Fragment implements IHeaderContributor {
 		private static final long serialVersionUID = 1L;
-		private String tableMarkupId, textAreaMarkupId; // used by the js
+		protected String divMarkupId; // used by the js
+		protected CharSequence tableUrl;
 		
 		public TableFragment(String id, IModel<? extends Response> model) {
 			super(id, "tableFragment", ResponseViewer.this, model);
-			// add a hidden form field or call a new panel for this table
-			// TODO: Change this to hidden textarea in final implementation 
-			//HiddenField<String> textArea = new HiddenField<String>("stateText",textModel);
-			add(new Label("text", new PropertyModel<String>(model, "text")));
 
-			// add the table so that we can uniquely identify this table by its markup id
-			WebMarkupContainer tableContainer = new WebMarkupContainer("gridTable");
+			// add the div for the table so that we can uniquely identify this table by its markup id
+			WebMarkupContainer tableContainer = new WebMarkupContainer("gridDiv");
 			add (tableContainer);
 			tableContainer.setOutputMarkupId(true);
-			tableMarkupId = tableContainer.getMarkupId();
+			divMarkupId = tableContainer.getMarkupId();
+			log.debug("THE MARKUP ID OF THE TABLE DIV IS {}", divMarkupId);			
 		}
 
+		// The URL from which the table data can be loaded.
+		protected CharSequence getDataUrl() {
+			TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
+			add(loadBehavior);
+			return (loadBehavior.getCallbackUrl());				
+		}
+
+		// this behavior enables the data stored in the database to be streamed via a url
+		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
+			private static final long serialVersionUID = 1L;
+
+			public void onRequest() {
+				RequestCycle.get().setRequestTarget(new IRequestTarget() {
+
+					public void detach(RequestCycle requestCycle) { }
+					public void respond(RequestCycle requestCycle) {
+						try {
+							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
+							ps.print(getModel().getObject().getText());
+							ps.flush();
+							ps.close();
+						}
+						catch(Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		}
+		
 		@Override
-		public void renderHead(HtmlHeaderContainer container) {
-			// TODO Add all the js and css to setup the grid - see TableFragment in ResponseEditor
-			super.renderHead(container);
+		public void onBeforeRender() {
+			tableUrl = getDataUrl();
+			super.onBeforeRender();
+		}
+
+		public void renderHead(IHeaderResponse response) {
+			// FIXME - all the css/js is under the example/theme directory but this should
+			// all be moved under cwm-data once it is finalized
+			// Not sure if we should load all this js here.  We might want to move it to the html
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_renderers.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_charts.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_editors.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_validators.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_utils.js"));
+			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/Editablegrid_cast.js"));
+
+			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
+
+			// once the text for the grid is available in the hidden text field make this js call 
+			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
+			log.debug("SENDING JS TO BUILD GRID {}", jsString);
+			response.renderOnDomReadyJavascript(jsString);			
 		}
 	}
 
+	
 	public class DrawingFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;

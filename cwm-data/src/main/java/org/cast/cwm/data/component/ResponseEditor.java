@@ -22,6 +22,7 @@ package org.cast.cwm.data.component;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,11 +36,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.IRequestTarget;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.IHeaderContributor;
@@ -409,18 +412,18 @@ public abstract class ResponseEditor extends Panel {
 
 	
 	/**
-	 * This fragment is used to add a Table Response
+	 * This fragment adds a Table Response
 	 */
 	protected class TableFragment extends Fragment implements IHeaderContributor {
 		private static final long serialVersionUID = 1L;
-		private String divMarkupId, textAreaMarkupId; // used by the js
-		private URL defaultTableUrl = null;
-
+		protected String divMarkupId, textAreaMarkupId; // used by the js
+		protected URL defaultTableUrl = null;
+		protected CharSequence tableUrl;
 
 		public TableFragment(String id, IModel<Response> model) {
 			super(id, "tableFragment", ResponseEditor.this, model);
 			
-			// Form for Sending/Receiving the table content to/from the database
+			// Form for sending updated table content to the database
 			Form<Response> form = new Form<Response>("form", model) {
 				private static final long serialVersionUID = 1L;
 				
@@ -428,11 +431,9 @@ public abstract class ResponseEditor extends Panel {
 				public void onSubmit() {
 					super.onSubmit();
 					// get the value of the table content from the model and save it as a text response
-					 String tableContent = this.get("tableContent").getDefaultModelObjectAsString();
-					 log.debug("SAVING THIS TABLECONTENT {}", tableContent);
-					 ResponseService.get().saveTextResponse(getModel(), tableContent, pageName);
-					
-					
+					String tableContent = this.get("tableContent").getDefaultModelObjectAsString();
+					ResponseService.get().saveTextResponse(getModel(), tableContent, pageName);
+					newResponse = false;
 				}
 			};
 			form.setOutputMarkupId(true);
@@ -468,52 +469,45 @@ public abstract class ResponseEditor extends Panel {
 				}
 				newTextModel = new Model<String>(getUrlContents(defaultTableUrl));
 				log.debug("THE AUTHORED TEXT MODEL IS {}", newTextModel.getObject());
-			} else {
-				// editing an existing response
-				
-			}
-
+			} 
+			
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 
 			TextArea<String> textArea = new TextArea<String>("tableContent", textModel);
-			// TODO: Change this textarea to hidden in final implementation 
-			//HiddenField<String> textArea = new HiddenField<String>("tableContent",textModel);
+//			HiddenField<String> textArea = new HiddenField<String>("tableContent", textModel);
 			textArea.setOutputMarkupId(true);
 			textArea.setEscapeModelStrings(false);
 			textAreaMarkupId = textArea.getMarkupId();
 			form.add(textArea);
-			log.debug("THE MARKUP ID OF THE TEXTAREA IS {}", textAreaMarkupId);			
 			
-			// add the table so that we can uniquely identify this table by its markup id
+			// add the div for the table so that we can uniquely identify this table by its markup id
 			WebMarkupContainer tableContainer = new WebMarkupContainer("gridDiv");
 			add (tableContainer);
 			tableContainer.setOutputMarkupId(true);
 			divMarkupId = tableContainer.getMarkupId();
-			log.debug("THE MARKUP ID OF THE TABLE IS {}", divMarkupId);
 
-			if (autoSave) {
-				form.add(new AjaxAutoSavingBehavior(form) {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void renderHead(IHeaderResponse response) {
-						super.renderHead(response);
-						// Ensure grid saves to text area of form before we check to see if the form changed.
-						// Autosave will then submit the form to store the text area back to the db
-//						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\');");
-						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\' + , \'"  + defaultTableUrl + "\' + readOnly);");
-						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-						response.renderJavascript(script, "interactiveAutosave");					
-					}
-
-					@Override
-					protected void onAutoSave(AjaxRequestTarget target) {
-						super.onAutoSave(target);
-						hasAutoSaved = true;
-						ResponseEditor.this.onAutoSave(target);
-					}
-				});
-			}
+//			if (autoSave) {
+//				form.add(new AjaxAutoSavingBehavior(form) {
+//					private static final long serialVersionUID = 1L;
+//
+//					@Override
+//					public void renderHead(IHeaderResponse response) {
+//						super.renderHead(response);
+//						// Ensure table saves to text area of form before we check to see if the form changed.
+//						// Autosave will then submit the form to store the text area back to the db
+//						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\");");
+//						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
+//						response.renderJavascript(script, "interactiveAutosave");					
+//					}
+//
+//					@Override
+//					protected void onAutoSave(AjaxRequestTarget target) {
+//						super.onAutoSave(target);
+//						hasAutoSaved = true;
+//						ResponseEditor.this.onAutoSave(target);
+//					}
+//				});
+//			}
 			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
 				private static final long serialVersionUID = 1L;
@@ -524,7 +518,7 @@ public abstract class ResponseEditor extends Panel {
 						private static final long serialVersionUID = 1L;
 
 						@Override
-						// this is what needs to be called right before the submit - send the grid value to the hidden text field
+						// this is what needs to be called right before the submit - send the table value to the hidden text field
 						public CharSequence decorateScript(CharSequence script) {
 							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\");");
 							return jsString + super.decorateScript(script);
@@ -559,8 +553,70 @@ public abstract class ResponseEditor extends Panel {
 			add(save);			
 		}
 
+		/**
+		 * The URL from which the initial table data can be loaded.
+		 * @return the URL
+		 */
+		protected CharSequence getDataUrl() {
+			if (newResponse) {
+				if (templateURL != null) {
+					try {
+						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(templateURL)).toURL();
+					} catch (MalformedURLException e) {
+						log.equals("There is a problem with the Authored Data file for this Table");
+						e.printStackTrace();
+					} catch (URISyntaxException e) {
+						log.equals("There is a problem with the Authored Data file for this Table");
+						e.printStackTrace();
+					}
+				} else { //new response with no authored default
+					// TODO add this default info to the properties file so that it can be overwritten
+					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference("/js/data/grid.json"));
+					try {
+						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(defaultTableUrlString)).toURL();
+					} catch (MalformedURLException e) {
+						log.equals("There is a problem with the Default Data file for this Table");
+						e.printStackTrace();
+					} catch (URISyntaxException e) {
+						log.equals("There is a problem with the Default Data file for this Table");
+						e.printStackTrace();
+					}
+				}
+			} else {
+				TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
+				ResponseEditor.TableFragment.this.add(loadBehavior);
+				return (loadBehavior.getCallbackUrl());				
+			}
+			return defaultTableUrl.toString();
+		}
+		
+		
+		// this enables the data stored in the database to be streamed via a url
+		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
+			private static final long serialVersionUID = 1L;
+
+			public void onRequest() {
+				RequestCycle.get().setRequestTarget(new IRequestTarget() {
+
+					public void detach(RequestCycle requestCycle) { }
+					public void respond(RequestCycle requestCycle) {
+						try {
+							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
+							ps.print(getModel().getObject().getText());
+							ps.flush();
+							ps.close();
+						}
+						catch(Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});
+			}
+		}
+
 		@Override
 		public void onBeforeRender() {
+			tableUrl = getDataUrl();
 			super.onBeforeRender();
 		}
 
@@ -579,7 +635,7 @@ public abstract class ResponseEditor extends Panel {
 			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
-			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"  + textAreaMarkupId + "\',  \'"  + defaultTableUrl + "\', 'false');");
+			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', 'false');");
 			log.debug("SENDING JS TO BUILD GRID {}", jsString);
 			response.renderOnDomReadyJavascript(jsString);
 		}
