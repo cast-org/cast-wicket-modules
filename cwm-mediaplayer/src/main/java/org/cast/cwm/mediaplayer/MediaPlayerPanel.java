@@ -67,6 +67,7 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	protected String previewHRef = null;
 	protected String skinHRef = null;
 	protected String captionHRef = null;
+	protected String audioDescriptionHRef = null;
 	protected boolean autostart = false;
 	protected String fallbackText = "Click to watch video";
 	protected String downloadText = "Download video";
@@ -121,6 +122,8 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	@Override
 	public String getFlashVars() {
 		StringBuffer fv = new StringBuffer("");
+		StringBuffer plugins = new StringBuffer("");
+		
 		if (!Strings.isEmpty(super.getFlashVars()))
 			fv.append(super.getFlashVars() + "&");
 		fv.append("useExternalInterface=true&");
@@ -132,8 +135,17 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 			fv.append("skin=" + skinHRef + "&");
 		if (autostart)
 			fv.append("autostart=true&");
-		if (captionHRef != null)
-			fv.append("plugins=captions-1&captions.back=true&captions.file=" + captionHRef + "&");
+		if (captionHRef != null) {
+			plugins.append("captions-2,");
+			fv.append("captions.back=true&captions.file=" + captionHRef + "&");
+		}
+		if (audioDescriptionHRef != null) {
+			plugins.append("audiodescription-2,");
+			fv.append("audiodescription.state=false&audiodescription.ducking=true&audiodescription.file=" + audioDescriptionHRef + "&");
+			// For testing purposes, you can add "audiodescription.debug=true" to the above
+		}
+		if (plugins.length() > 0)
+			fv.append("plugins=").append(plugins).append("&");
 		fv.append("id=" + containerId + "-flash&");	//needed for playerReady() 
 		return fv.toString();
 	}
@@ -292,6 +304,14 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	
 	public void setCaptionHRef (String captionHRef) {
 		this.captionHRef = toSiteAbsolutePath(captionHRef);
+	}
+
+	public void setAudioDescriptionFile (ResourceReference audioDescriptionResourceRef) {
+		this.audioDescriptionHRef = toSiteAbsolutePath(audioDescriptionResourceRef);
+	}
+	
+	public void setAudioDescriptionHRef (String audioDescriptionHRef) {
+		this.audioDescriptionHRef = toSiteAbsolutePath(audioDescriptionHRef);
 	}
 
 	public boolean isShowDownloadLink() {
