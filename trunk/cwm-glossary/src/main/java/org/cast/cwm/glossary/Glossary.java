@@ -33,6 +33,8 @@ import lombok.Setter;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * This class encapsulates the notion of a Glossary.
@@ -46,7 +48,8 @@ import org.apache.wicket.util.string.Strings;
  */
 public class Glossary {
 
-	private static final long serialVersionUID = 1L;
+	@SuppressWarnings("unused")
+	final private static Logger log = LoggerFactory.getLogger(GlossaryXmlDocumentObserver.class);
 	
 	/** Language of this glossary (in the future, use this to set alphabet, sorting rules, etc) */
 	@Getter @Setter
@@ -102,7 +105,8 @@ public class Glossary {
 		char firstChar = normalizeFirstChar(entry.getHeadword().charAt(0));
 		if (!mapFirstCharToIds.containsKey(firstChar))
 			mapFirstCharToIds.put(firstChar, new ArrayList<String>());
-		mapFirstCharToIds.get(firstChar).add(entry.getIdentifier());
+		if (!mapFirstCharToIds.containsValue(id))
+			mapFirstCharToIds.get(firstChar).add(entry.getIdentifier());
 		Collections.sort(mapFirstCharToIds.get(firstChar), new GlossaryIdentifierComparator());
 	}
 
