@@ -423,11 +423,48 @@ public abstract class ResponseEditor extends Panel {
 		public TableFragment(String id, IModel<Response> model) {
 			super(id, "tableFragment", ResponseEditor.this, model);
 			
+			WebMarkupContainer addRow = new WebMarkupContainer("addRow")  {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isVisible() {
+					return cancelVisible;
+				}
+			};
+			add(addRow);
+			WebMarkupContainer removeRow = new WebMarkupContainer("removeRow")  {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isVisible() {
+					return cancelVisible;
+				}
+			};
+			add(removeRow);
+			WebMarkupContainer addColumn = new WebMarkupContainer("addColumn")  {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isVisible() {
+					return cancelVisible;
+				}
+			};
+			add(addColumn);
+			WebMarkupContainer removeColumn = new WebMarkupContainer("removeColumn")  {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public boolean isVisible() {
+					return cancelVisible;
+				}
+			};
+			add(removeColumn);
+			
+			
+			
 			// Form for sending updated table content to the database
 			Form<Response> form = new Form<Response>("form", model) {
 				private static final long serialVersionUID = 1L;
-
-				
 				
 				@Override
 				public void onSubmit() {
@@ -440,7 +477,10 @@ public abstract class ResponseEditor extends Panel {
 			};
 			form.setOutputMarkupId(true);
 			add(form);
+			
+			
 
+			
 			// if this is a new table and there is an authored table, set the url to the content of that file
 			// or the default table file, otherwise, a url needs to be built from the text in the response
 			IModel<String> newTextModel = new Model<String>("");
@@ -475,9 +515,10 @@ public abstract class ResponseEditor extends Panel {
 			
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 
-			TextArea<String> textArea = new TextArea<String>("tableContent", textModel);
+			HiddenField<String> textArea = new HiddenField<String>("tableContent", textModel);
 //			HiddenField<String> textArea = new HiddenField<String>("tableContent", textModel);
 			textArea.setOutputMarkupId(true);
+			textArea.setOutputMarkupPlaceholderTag(true);
 			textArea.setEscapeModelStrings(false);
 			textAreaMarkupId = textArea.getMarkupId();
 			form.add(textArea);
@@ -497,8 +538,7 @@ public abstract class ResponseEditor extends Panel {
 						super.renderHead(response);
 						// Ensure grid saves to text area of form before we check to see if the form changed.
 						// Autosave will then submit the form to store the text area back to the db
-//						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\');");
-						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\' + , \'"  + defaultTableUrl + "\', true);");
+						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\' , \'"  + defaultTableUrl + "\', true);");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
 						response.renderJavascript(script, "interactiveAutosave");					
 					}
