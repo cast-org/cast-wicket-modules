@@ -20,6 +20,7 @@
 package org.cast.cwm.xml.service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -84,6 +85,13 @@ public class XmlService {
 	@Getter
 	protected Map<String,IDOMTransformer> transformers = new HashMap<String,IDOMTransformer>();
 	
+	/**
+	 * Tracks all known transformer directories.  The order of these directories determines the 
+	 * search order.  In general, load any custom directories first.
+	 */
+	@Getter @Setter
+	protected List<String> transformerDirectories = new ArrayList<String>();
+
 	/**
 	 * Class of XmlSection object that will be created by all methods in this module.
 	 */
@@ -205,7 +213,53 @@ public class XmlService {
 			resources[i] = new FileResource(dependentFiles[i]);
 		return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds, resources);
 	}
-	
+
+
+	/**
+	 * Create and load a transformer based on the given XSL File.
+	 * If second argument is true, then a secondary transformation will be chained on, which makes
+	 * sure that all wicket:id attributes (likely created by the XSL) are made unique. 
+	 * @param name
+	 * @param xslFile
+	 * @param forceUniqueWicketIds
+	 * @return the transformer
+	 */
+	public IDOMTransformer loadXSLTransformer (String name, String xslFile, boolean forceUniqueWicketIds, String... dependentFiles) {
+		Resource[] resources = new Resource[dependentFiles.length];
+		for (int i=0; i<dependentFiles.length; i++)
+			resources[i] = new FileResource(new File(dependentFiles[i]));
+		return loadXSLTransformer(name, new FileResource(new File(xslFile)), forceUniqueWicketIds, resources);
+	}
+
+	/**
+	 * Create and load a transformer based on the given XSL File.
+	 * If second argument is true, then a secondary transformation will be chained on, which makes
+	 * sure that all wicket:id attributes (likely created by the XSL) are made unique. 
+	 * @param name
+	 * @param xslFileName - this is either a fully qualified file name or just the file name itself
+	 * @param forceUniqueWicketIds
+	 * @return the transformer
+	 */
+	public IDOMTransformer loadXSLTransformer (String name, String xslFileName, boolean forceUniqueWicketIds) {
+		
+		// determine if the full path was passed
+		File xslFile = new File(xslFileName);
+		if (xslFile.exists())
+			return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
+
+		// loop through the directories setup by the app to find the transformation file	
+		for (String directory : getTransformerDirectories()) {
+			xslFile = new File(directory, xslFileName);
+			if (xslFile.exists()) {
+				return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
+			}
+		}
+
+		log.error("There was a problem finding the xsl file named: {}", xslFileName);
+		return null;
+	}
+
+
 	/**
 	 * Create and load a transformer based on the given Resource, which should point to an XSL document.
 	 * If second argument is true, then a secondary transformation will be chained on, which makes
