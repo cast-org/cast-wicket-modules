@@ -105,8 +105,8 @@ public class Glossary {
 		char firstChar = normalizeFirstChar(entry.getHeadword().charAt(0));
 		if (!mapFirstCharToIds.containsKey(firstChar))
 			mapFirstCharToIds.put(firstChar, new ArrayList<String>());
-		if (!mapFirstCharToIds.containsValue(id))
-			mapFirstCharToIds.get(firstChar).add(entry.getIdentifier());
+		if (!mapFirstCharToIds.get(firstChar).contains(id))
+			mapFirstCharToIds.get(firstChar).add(id);
 		Collections.sort(mapFirstCharToIds.get(firstChar), new GlossaryIdentifierComparator());
 	}
 
