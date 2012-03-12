@@ -1140,6 +1140,8 @@ public abstract class ResponseEditor extends Panel {
 		public void detach() {
 			if (model != null)
 				model.detach();
+			if (prompt != null)
+				prompt.detach();
 			super.detach();
 		}		
 	}
