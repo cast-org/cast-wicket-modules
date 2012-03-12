@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.IResponseType;
+import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseData;
@@ -165,6 +166,13 @@ public class ResponseService {
 		c.setPromptModel(p);
 		c.setFromDate(from);
 		c.setToDate(to);
+		return new ResponseListModel(c);
+	}
+	
+	public IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p, IModel<Period> period) {
+		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
+		c.setPromptModel(p);
+		c.setPeriodModel(period);
 		return new ResponseListModel(c);
 	}
 	

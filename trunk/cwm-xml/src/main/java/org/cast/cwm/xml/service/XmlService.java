@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.xml.service;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,6 +159,48 @@ public class XmlService {
 	}
 	
 	/**
+	 * Find a file, either by absolute pathname or relative to one of the defined transfomerDirectories.
+	 * 
+	 * @param xslFileName
+	 * @return a File, or null if not found.
+	 */
+	public File findXslFile (String xslFileName) {
+		File xslFile = new File(xslFileName);
+		
+		// Is filename absolute?
+		if (xslFile.isAbsolute()) {
+			if (xslFile.exists())
+				return xslFile;
+			log.error("XSL File not found: {}", xslFileName);
+			return null;
+		}
+
+		// loop through the directories setup by the app to find the transformation file	
+		for (String directory : getTransformerDirectories()) {
+			xslFile = new File(directory, xslFileName);
+			if (xslFile.exists())
+				return xslFile;
+		}
+		
+		log.error("XSL file \"{}\" not found; looked in directories: {}", xslFileName, getTransformerDirectories());
+		return null;
+	}
+
+	/**
+	 * Find a file, either by absolute pathname or relative to one of the defined transfomerDirectories,
+	 * and return as a FileResource. Will throw an error if file is not found.
+	 * 
+	 * @param xslFileName
+	 * @return a FileResource, or null if not found.
+	 */
+	public FileResource findXslResource (String xslFileName) {
+		File file = findXslFile(xslFileName);
+		if (file == null)
+			throw new IllegalArgumentException("XSL file " + xslFileName + " not found.");
+		return new FileResource(file);
+	}
+	
+	/**
 	 * Load an XML document from a File and register it by name with this object.  
 	 * @see {@link #loadXmlDocument(String, Resource)}
 	 * @param name name for this XML document (must be globally unique)
@@ -241,22 +284,8 @@ public class XmlService {
 	 * @return the transformer
 	 */
 	public IDOMTransformer loadXSLTransformer (String name, String xslFileName, boolean forceUniqueWicketIds) {
-		
-		// determine if the full path was passed
-		File xslFile = new File(xslFileName);
-		if (xslFile.exists())
-			return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
-
-		// loop through the directories setup by the app to find the transformation file	
-		for (String directory : getTransformerDirectories()) {
-			xslFile = new File(directory, xslFileName);
-			if (xslFile.exists()) {
-				return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
-			}
-		}
-
-		log.error("There was a problem finding the xsl file named: {}", xslFileName);
-		return null;
+		File xslFile = findXslFile(xslFileName);
+		return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
 	}
 
 
