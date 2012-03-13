@@ -59,7 +59,7 @@ public class GlossaryXmlDocumentObserver  implements IDocumentObserver {
 	 * called when the Glossary object is created or the XML is modified.
 	 */
 	public void xmlUpdated(XmlDocument doc) {
-		glossary.setLanguage(doc.getDocument().getDocumentElement().getAttribute("xml:lang"));
+		glossary.setLanguage(doc.getDocument().getDocumentElement().getAttributeNS(null, "xml:lang"));
 		createEntriesFromXmlSections(doc.getTocSection().getChildren());
 	}
 	
@@ -116,7 +116,7 @@ public class GlossaryXmlDocumentObserver  implements IDocumentObserver {
 
 		IModel<? extends IWritableGlossaryEntry> eModel = GlossaryService.get().newEntryModel();
 		IWritableGlossaryEntry e = eModel.getObject();
-		e.setIdentifier(sec.getElement().getAttribute(ID_ATTRIBUTE));
+		e.setIdentifier(sec.getElement().getAttributeNS(null, ID_ATTRIBUTE));
 		e.setXmlPointer(new XmlSectionModel(sec));
 		
 		sec.getElement().normalize();
