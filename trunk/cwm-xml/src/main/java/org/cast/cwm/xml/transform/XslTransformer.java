@@ -87,7 +87,7 @@ public class XslTransformer implements IDOMTransformer {
 	 */
 	public Element applyTransform(Element element, TransformParameters params) {
 		DOMResult res = new DOMResult();
-		log.debug("Running XSLT {} on {}", xslFile, element.getAttribute("id"));
+		log.debug("Running XSLT {} on {}", xslFile, element.getAttributeNS(null, "id"));
 		try {
 			Source eSource = new DOMSource(element);
 			Transformer transformer = getTransformer();
