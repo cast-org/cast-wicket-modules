@@ -144,8 +144,12 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 			fv.append("audiodescription.state=false&audiodescription.ducking=true&audiodescription.file=" + audioDescriptionHRef + "&");
 			// For testing purposes, you can add "audiodescription.debug=true" to the above
 		}
-		if (plugins.length() > 0)
+		if (plugins.length() > 0) {
+			// Avoid trailing comma
+			if (plugins.charAt(plugins.length()-1) == ',')
+				plugins.deleteCharAt(plugins.length()-1);
 			fv.append("plugins=").append(plugins).append("&");
+		}
 		fv.append("id=" + containerId + "-flash&");	//needed for playerReady() 
 		return fv.toString();
 	}
