@@ -51,7 +51,9 @@ public class UploadedFileResource extends DynamicWebResource {
 	 */
 	public UploadedFileResource() {
 		super();
-		setCacheable(true);
+		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
+		// date, before the session context has been set up, and this database session can remain unclosed.
+		// setCacheable(true);
 	}
 	
 	@Override
