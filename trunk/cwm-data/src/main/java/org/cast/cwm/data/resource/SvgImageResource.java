@@ -50,7 +50,9 @@ public class SvgImageResource extends DynamicWebResource {
 
 	public SvgImageResource() {
 		super();
-		setCacheable(true);
+		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
+		// date, before the session context has been set up, and this database session can remain unclosed.
+		//setCacheable(true);
 	}
 	
 	@Override
@@ -69,10 +71,28 @@ public class SvgImageResource extends DynamicWebResource {
 		
 		Integer width = getParameters().getAsInteger("width", SvgEditor.CANVAS_WIDTH);
 		Integer height = getParameters().getAsInteger("height", SvgEditor.CANVAS_HEIGHT);
+		boolean needsScaling = (width < SvgEditor.CANVAS_WIDTH || height < SvgEditor.CANVAS_HEIGHT);
 
 		log.debug("Getting SVG data for {} at width {}", id, width);
-
-		return new SvgResourceState(id, Time.valueOf(rd.getCreateDate()), width, height);
+		String svg = rd.getText();
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<?xml version='1.0' encoding='UTF-8' ?>");
+		// TODO: Should this be "StartsWith" ?
+		if (svg == null || !svg.contains("<svg")) {
+			buffer.append("<svg width='" + width + "' height='" + height + "' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'><g><title>Blank Image</title></g></svg>");
+		} else {
+			if (needsScaling) {
+				svg = svg.replaceFirst("<svg +width=\"[0-9]*\" +height=\"[0-9]*\"", 
+						"<svg viewBox='0 0 " + SvgEditor.CANVAS_WIDTH + " " + SvgEditor.CANVAS_HEIGHT + "' "
+						+ "width='" + width + "' height='" + height + "' "
+						+ "xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
+			} else {
+				svg = svg.replaceFirst("<svg ", "<svg xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
+			}
+			buffer.append(svg);
+		}
+		
+		return new SvgResourceState(Time.valueOf(rd.getCreateDate()), buffer.toString().getBytes());
 	}
 
 	public static void mount(WebApplication app) {
@@ -91,17 +111,12 @@ public class SvgImageResource extends DynamicWebResource {
 	
 	
 	protected class SvgResourceState extends ResourceState {
-		
-		private int width;
-		private int height;
-		private Long id;
 		private Time createDate;
+		private byte[] svgData;
 
-		protected SvgResourceState (Long id, Time createDate, int width, int height) {
-			this.id = id;
+		protected SvgResourceState (Time createDate, byte[] svgData) {
 			this.createDate = createDate;
-			this.width = width;
-			this.height = height;
+			this.svgData = svgData;
 		}
 
 		@Override
@@ -111,30 +126,7 @@ public class SvgImageResource extends DynamicWebResource {
 
 		@Override
 		public byte[] getData() { 
-			boolean needsScaling = (width < SvgEditor.CANVAS_WIDTH || height < SvgEditor.CANVAS_HEIGHT);
-
-			// Get actual drawing
-			ResponseData rd = CwmService.get().getById(ResponseData.class, id).getObject();
-			String svg = rd.getText();
-			// Generate Resource from Drawing/Dimensions
-			StringBuffer buffer = new StringBuffer();
-			buffer.append("<?xml version='1.0' encoding='UTF-8' ?>");
-
-			// TODO: Should this be "StartsWith" ?
-			if (svg == null || !svg.contains("<svg")) {
-				buffer.append("<svg width='" + width + "' height='" + height + "' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'><g><title>Blank Image</title></g></svg>");
-			} else {
-				if (needsScaling) {
-					svg = svg.replaceFirst("<svg +width=\"[0-9]*\" +height=\"[0-9]*\"", 
-							"<svg viewBox='0 0 " + SvgEditor.CANVAS_WIDTH + " " + SvgEditor.CANVAS_HEIGHT + "' "
-							+ "width='" + width + "' height='" + height + "' "
-							+ "xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
-				} else {
-					svg = svg.replaceFirst("<svg ", "<svg xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
-				}
-				buffer.append(svg);
-			}
-			return buffer.toString().getBytes();
+			return svgData;
 		}
 		
 		@Override
