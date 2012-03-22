@@ -43,12 +43,11 @@ import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.service.HighlightService;
-import org.cast.cwm.service.ResponseService;
 import org.cast.cwm.service.HighlightService.HighlightType;
+import org.cast.cwm.service.ResponseService;
 
 /**
  * A panel that outputs several hidden input fields for each registered highlighter.  These
