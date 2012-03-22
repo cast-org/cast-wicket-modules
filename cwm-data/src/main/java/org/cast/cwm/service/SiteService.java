@@ -35,10 +35,14 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.CachingCriteriaBuilder;
+import org.cast.cwm.data.builders.PeriodCriteriaBuilder;
 import org.cast.cwm.data.component.HibernateEditPeriodForm;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
+/**
+ * General Service Class for both Sites and Periods  
+ */
 public class SiteService {
 
 	protected static SiteService instance = new SiteService();
@@ -57,6 +61,9 @@ public class SiteService {
 		SiteService.instance = instance;
 	}
 	
+	
+	// Site specific methods
+	
 	/**
 	 * Create a new instance of the specified Site class.
 	 * @return
@@ -64,18 +71,6 @@ public class SiteService {
 	public final Site newSite() {
 		try {
 			return siteClass.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException (e);
-		}	
-	}
-
-	/**
-	 * Create a new instance of the specified Period class.
-	 * @return
-	 */
-	public final Period newPeriod() {
-		try {
-			return periodClass.newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException (e);
 		}	
@@ -100,6 +95,21 @@ public class SiteService {
 		return new HibernateObjectModel<Site>((Site)criteria.uniqueResult());
 	}
 	
+
+	// Period specific methods
+	
+	/**
+	 * Create a new instance of the specified Period class.
+	 * @return
+	 */
+	public final Period newPeriod() {
+		try {
+			return periodClass.newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException (e);
+		}	
+	}
+
 	public IModel<List<Period>> listPeriods() {
 		return new HibernateListModel<Period>(Period.class);
 	}
@@ -139,6 +149,16 @@ public class SiteService {
 		Databinder.getHibernateSession().delete(p);
 		
 		CwmService.get().flushChanges();
+	}
+
+	/**
+	 * Get the period by name - this assumes the name is unique
+	 */
+	public IModel<Period> getPeriodByName(String name) {
+		PeriodCriteriaBuilder pcb = new PeriodCriteriaBuilder();
+		pcb.setName(name);
+		pcb.setMaxResults(1);
+		return new HibernateObjectModel<Period>(periodClass, pcb);
 	}
 
 }
