@@ -63,11 +63,11 @@ public class ResponseMetadata implements Serializable {
 		if (!elt.getLocalName().equals("responsegroup"))
 			throw new IllegalArgumentException("ResponseMetadata must be initialized with a responsegroup node");
 		
-		id = elt.getAttribute("id");
+		id = elt.getAttributeNS(null, "id");
 		
 		if (elt.hasAttribute("group")) {
-			if (!elt.getAttribute("group").trim().isEmpty())
-				collection = elt.getAttribute("group").trim();
+			if (!elt.getAttributeNS(null, "group").trim().isEmpty())
+				collection = elt.getAttributeNS(null, "group").trim();
 		}
 		
 		// TODO Consider extracting attributes class, title
@@ -78,11 +78,11 @@ public class ResponseMetadata implements Serializable {
 		NodeList resplist = elt.getElementsByTagNameNS(elt.getNamespaceURI(), "response");
 		for (int i=0; i<resplist.getLength(); i++) {
 			Element relt = (Element) resplist.item(i);
-			String type = relt.getAttribute("type");
+			String type = relt.getAttributeNS(null, "type");
 
 			TypeMetadata typeMD = new TypeMetadata();
 			
-			if (relt.getAttribute("preferred").equalsIgnoreCase("true"))
+			if (relt.getAttributeNS(null, "preferred").equalsIgnoreCase("true"))
 				typeMD.preferred = true;
 			
 			// TODO consider extracting attributes width, height

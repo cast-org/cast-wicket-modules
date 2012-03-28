@@ -315,7 +315,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	
 	protected int getWidth(Element elt, int defaultValue) {
 		try {
-			return Integer.valueOf(elt.getAttribute("width"));
+			return Integer.valueOf(elt.getAttributeNS(null, "width"));
 		} catch (NumberFormatException e) {
 			return defaultValue;
 		}
@@ -323,7 +323,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	
 	protected int getHeight(Element elt, int defaultValue) {
 		try {
-			return Integer.valueOf(elt.getAttribute("height"));
+			return Integer.valueOf(elt.getAttributeNS(null, "height"));
 		} catch (NumberFormatException e) {
 			return defaultValue;
 		}

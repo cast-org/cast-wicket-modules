@@ -159,7 +159,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 		for (int i=0; i<nl.getLength(); i++) {
 			Element pnote = (Element) nl.item(i);
 			if (pnote.hasAttribute("imgref")) {
-				String imgref = pnote.getAttribute("imgref");
+				String imgref = pnote.getAttributeNS(null, "imgref");
 				XmlSection ldSec = new XmlSection();
 				ldSec.init(root.getXmlDocument(), root, imgref, pnote, "Image Description");
 				longDescMap.put(imgref, ldSec);
@@ -208,7 +208,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 		
 		// Look for class attribute
 		if (elt.hasAttribute("class"))
-			section.setClassName(elt.getAttribute("class"));
+			section.setClassName(elt.getAttributeNS(null, "class"));
 		
 		// Set the order of this section in this document
 		section.setSortOrder(elementCounter++);
@@ -250,7 +250,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 		for (int i=0; i<nl.getLength(); i++) {
 			Element child = (Element) nl.item(i);
 			// Make sure all elements we work with have IDs; generate if necessary
-			String id = child.getAttribute("id");
+			String id = child.getAttributeNS(null, "id");
 			if (id == null || id.equals("")) {
 				id = IDGENERATORSTRING + String.valueOf(idSerial++);
 				child.setAttribute("id", id);

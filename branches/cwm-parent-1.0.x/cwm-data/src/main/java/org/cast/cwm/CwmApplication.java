@@ -253,7 +253,8 @@ public abstract class CwmApplication extends AuthDataApplication {
 	
 	@Override
 	protected void configureHibernate(AnnotationConfiguration ac) {
-		super.configureHibernate(ac);
+		// We don't actually want the defaults that Databinder sets.
+		// super.configureHibernate(ac);
 		Configuration c = ac;
 		
 		String configFile = appProperties.getProperty("cwm.hibernateConfig");

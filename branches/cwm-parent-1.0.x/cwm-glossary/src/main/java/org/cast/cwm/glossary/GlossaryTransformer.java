@@ -169,7 +169,7 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 				} else if(child.getNodeType() == Node.ELEMENT_NODE) {
 					Element childe = (Element)child;
 					if (!glosswordBlockingElements.contains(childe.getLocalName())
-						&& !glosswordBlockingClasses.contains(childe.getAttribute("class"))) {
+						&& !glosswordBlockingClasses.contains(childe.getAttributeNS(null, "class"))) {
 						glosswordsToLinks(childe);
 					}
 				}
