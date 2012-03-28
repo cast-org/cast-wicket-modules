@@ -52,7 +52,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(SessionExpireWarningDialog.class);
 	
-	public static final ResourceReference JAVASCRIPT_REFERENCE = new ResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningBehavior.js");
+	public static final ResourceReference JAVASCRIPT_REFERENCE = new ResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
 	
 	@Getter
 	private int warningTime = 60 * 5; // Number of seconds before session expires that the user receives a warning.
@@ -91,6 +91,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 				container.get("closeWindowLink").setVisible(false);
 			}
 		};
+		dialogBorder.setLogEvents(false); // Don't log opening of this dialog, or the AJAX activity will prevent logout indefinitely.
 		dialogBorder.setZIndex(6000); // This should appear above other dialogs, which default to 5500
 		dialogBorder.setMoveContainer(this); // Move entire Panel to end of page.
 		add(dialogBorder);
@@ -187,7 +188,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	 * &#64;Override
 	 * public AjaxRequestTarget newAjaxRequestTarget(final Page page) {
 	 *     AjaxRequestTarget target = new AjaxRequestTarget(page);
-	 *     target.appendJavascript(SessionExpireWarningBehavior.getResetJavascript());
+	 *     target.appendJavascript(SessionExpireWarningDialog.getResetJavascript());
 	 *     return target;
 	 * }
 	 * </pre>
