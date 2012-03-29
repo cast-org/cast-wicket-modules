@@ -32,9 +32,9 @@
     </issueManagement>
     
     <scm>
-        <url>http://code.google.com/p/cast-wicket-modules/source/tags/cwm-parent-1.0</url>
-        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.0</connection>
-        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.0</developerConnection>
+        <url>http://code.google.com/p/cast-wicket-modules/source/branches/cwm-parent-1.0.x</url>
+        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/branches/cwm-parent-1.0.x</connection>
+        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/branches/cwm-parent-1.0.x</developerConnection>
     </scm>
     
     <distributionManagement>
