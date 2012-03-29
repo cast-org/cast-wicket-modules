@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.dav;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -78,6 +79,8 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		super();
 		this.clientName = clientName;
 		this.path = path;
+		if (!path.startsWith(File.pathSeparator))
+			throw new IllegalArgumentException("DAV Resource path name must be absolute; provided path was " + path);
 	}
 
 	@Override
