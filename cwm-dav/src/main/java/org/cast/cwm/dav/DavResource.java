@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.dav;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -79,8 +78,6 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		super();
 		this.clientName = clientName;
 		this.path = path;
-		if (!path.startsWith(File.pathSeparator))
-			throw new IllegalArgumentException("DAV Resource path name must be absolute; provided path was " + path);
 	}
 
 	@Override
@@ -108,7 +105,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
 	public ResourceReference getRelativeReference (final String relativePath) {
-		String childPath = path.substring(1, path.lastIndexOf('/')+1) + relativePath;
+		String childPath = path.substring(0, path.lastIndexOf('/')+1) + relativePath;
 		return new ResourceReference (DavResource.class, childPath) {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -144,7 +141,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 			// Odd situation -- last modified time reported the same, but size has changed.
 			// XDR actually gets into this state if updates have been stored without creating a new "version"
 			// Update our information on modification time so that the webapp can see the changes immediately.
-			log.debug("File size changed: setting current time as last modification");
+			log.info("File size changed: setting current time as last modification");
 			fileSize = newFileSize;
 			lastModified = Time.now();
 			// serverLastModified left as is, so that we can continue to recognize further stealthy updates.
@@ -175,7 +172,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		PropertyList[] props = null;
 		try {
 			props = getClient().propfind(filePath, interestingProperties, 0);
-			log.debug("PROPFIND on {}", filePath);
+			log.info("PROPFIND on {}", filePath);
 		} catch (DAVException e) {
 			// There is one error type that we can actually handle: a 404 indicating the object was not found.
 			if (e.errors[0].statusCode == 404)

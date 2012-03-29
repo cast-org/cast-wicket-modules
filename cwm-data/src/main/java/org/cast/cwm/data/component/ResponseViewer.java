@@ -19,18 +19,13 @@
  */
 package org.cast.cwm.data.component;
 
-import java.io.PrintStream;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.IRequestTarget;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.behavior.AbstractAjaxBehavior;
-import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
@@ -42,13 +37,11 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
-import org.cast.cwm.data.IResponseType;
+import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.service.ImageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A simple panel for viewing a response.
@@ -59,7 +52,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ResponseViewer extends Panel {
 
-	private static final Logger log = LoggerFactory.getLogger(ResponseViewer.class);
 	private static final long serialVersionUID = 1L;
 	
 	@Getter
@@ -121,27 +113,25 @@ public class ResponseViewer extends Panel {
 		}
 
 		// Show appropriate fragment depending on ResponseType
-		add(getViewerFragment("response", model, model.getObject().getType()));
-		
+		switch (model.getObject().getType()) {
+			case TEXT:
+			case HTML:
+				add(new TextFragment("response", model));
+				break;
+			case AUDIO:
+				add(new AudioFragment("response", model));
+				break;
+			case UPLOAD:
+				add(new UploadFragment("response", model));
+				break;
+			case SVG:
+				add(new DrawingFragment("response", model));
+				break;
+			default:
+				add(new Label("response", "[[Cannot Display Response Type: " + model.getObject().getType() + "]]"));
+		}
 	}
-
-	protected Component getViewerFragment(String id, IModel<? extends Response> model, IResponseType type) {
-		String typeName = type.getName();
-		if (typeName.equals("TEXT"))
-			return (new TextFragment(id, model));
-		if (typeName.equals("HTML"))
-			return (new TextFragment(id, model));
-		if (typeName.equals("AUDIO"))
-			return (new AudioFragment(id, model));
-		if (typeName.equals("UPLOAD"))
-			return (new UploadFragment(id, model));
-		if (typeName.equals("SVG"))
-			return (new DrawingFragment(id, model));
-		if (typeName.equals("TABLE"))
-			return (new TableFragment(id, model));
-		return new Label(id, "[[Cannot Display Response Type: " + typeName + "]]");
-	}
-
+	
 	public class TextFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;
@@ -151,80 +141,6 @@ public class ResponseViewer extends Panel {
 			add(new Label("text", new PropertyModel<String>(model, "text")).setEscapeModelStrings(false));
 		}
 	}
-
-	public class TableFragment extends Fragment implements IHeaderContributor {
-		private static final long serialVersionUID = 1L;
-		protected String divMarkupId; // used by the js
-		protected CharSequence tableUrl;
-		
-		public TableFragment(String id, IModel<? extends Response> model) {
-			super(id, "tableFragment", ResponseViewer.this, model);
-
-			// add the div for the table so that we can uniquely identify this table by its markup id
-			WebMarkupContainer tableContainer = new WebMarkupContainer("gridDiv");
-			add (tableContainer);
-			tableContainer.setOutputMarkupId(true);
-			divMarkupId = tableContainer.getMarkupId();
-			log.debug("THE MARKUP ID OF THE TABLE DIV IS {}", divMarkupId);			
-		}
-
-		// The URL from which the table data can be loaded.
-		protected CharSequence getDataUrl() {
-			TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
-			add(loadBehavior);
-			return (loadBehavior.getCallbackUrl());				
-		}
-
-		// this behavior enables the data stored in the database to be streamed via a url
-		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
-			private static final long serialVersionUID = 1L;
-
-			public void onRequest() {
-				RequestCycle.get().setRequestTarget(new IRequestTarget() {
-
-					public void detach(RequestCycle requestCycle) { }
-					public void respond(RequestCycle requestCycle) {
-						try {
-							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
-							ps.print(getModel().getObject().getText());
-							ps.flush();
-							ps.close();
-						}
-						catch(Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-		}
-		
-		@Override
-		public void onBeforeRender() {
-			tableUrl = getDataUrl();
-			super.onBeforeRender();
-		}
-
-		public void renderHead(IHeaderResponse response) {
-			// FIXME - all the css/js is under the example/theme directory but this should
-			// all be moved under cwm-data once it is finalized
-			// Not sure if we should load all this js here.  We might want to move it to the html
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_renderers.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_charts.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_editors.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_validators.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_utils.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/Editablegrid_cast.js"));
-
-			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
-
-			// once the text for the grid is available in the hidden text field make this js call 
-			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
-			log.debug("SENDING JS TO BUILD GRID {}", jsString);
-			response.renderOnDomReadyJavascript(jsString);			
-		}
-	}
-
 	
 	public class DrawingFragment extends Fragment {
 

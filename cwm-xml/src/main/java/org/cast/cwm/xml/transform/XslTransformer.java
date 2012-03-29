@@ -20,8 +20,8 @@
 package org.cast.cwm.xml.transform;
 
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -97,7 +97,6 @@ public class XslTransformer implements IDOMTransformer {
 					if (par.getValue() != null)
 						transformer.setParameter(par.getKey(), par.getValue());
 			transformer.transform(eSource, res);
-			
 			return ((Document) res.getNode()).getDocumentElement();
 		} catch (Exception e) {
 			throw new RuntimeException("XSL transform failed", e);
@@ -141,11 +140,9 @@ public class XslTransformer implements IDOMTransformer {
 		return xslTemplates;
 	}
 	
-	private Transformer getTransformer() throws TransformerConfigurationException, ResourceStreamNotFoundException, 
-			TransformerFactoryConfigurationError {
-		Templates templates = getXslTemplates();
-		Transformer transformer = templates.newTransformer();
-		return transformer;
+	private Transformer getTransformer() 
+	  throws TransformerConfigurationException, ResourceStreamNotFoundException, TransformerFactoryConfigurationError {
+		return getXslTemplates().newTransformer();
 	}
 
 	/** 
@@ -164,17 +161,17 @@ public class XslTransformer implements IDOMTransformer {
 		// Setup a transformer
 		IResourceStream resourceStream = xslFile.getResourceStream();
 		Source xslSource = new StreamSource(resourceStream.getInputStream());
-
 		// We want to tell the parser the real file name of the XSL resource, so that it can 
 		// follow relative filenames to any other XSL that may be included or imported.
-		// The URIResolver will look for the resources in the directories setup in xmlService transformerDirectories 
+		// TODO is there a more general way to do this?
 		if (resourceStream instanceof FileResourceStream)
 			xslSource.setSystemId(((FileResourceStream)resourceStream).getFile().getAbsolutePath());
+		xslTemplates = TransformerFactory.newInstance().newTemplates(xslSource);
 
-		TransformerFactory tf = TransformerFactory.newInstance();
-		tf.setURIResolver(new TransformContextURIResolver());
-		xslTemplates = tf.newTemplates(xslSource);
-
+		// TODO do we still want this?
+//		if (observers != null)
+//			for (IDocumentObserver obs : observers)
+//				obs.xslUpdated(this);
 	}
 	
 }

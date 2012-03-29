@@ -40,28 +40,23 @@
 <!-- Prompt is the question to which the user is responding. -->
 <!ELEMENT prompt (p|list|div|blockquote|poem|linegroup|table|line|prodnote)+>
 
-<!-- The Response element holds information about a particular type of 
-     response that is expected within a response area.  
-     The usual type values are "text", "image", "audio", and "upload",
-     but applications can add their own additional ones.
-     One or more responses within the group can be marked as "preferred",
-     which gives it application-defined special status (eg, a special icon).
+<!-- Free-response options are text, image, audio, upload.
+     One or more of these types can be marked as "preferred".
  -->
 <!ELEMENT response (templates?,fragments?)>
-<!ATTLIST response type NMTOKEN #REQUIRED>
+<!ATTLIST response type (text|image|audio|file) #REQUIRED>
 <!ATTLIST response height CDATA #IMPLIED>
 <!ATTLIST response width CDATA #IMPLIED>
 <!ATTLIST response preferred (true|false) #IMPLIED>
 
 <!-- Free responses can have templates, which are base content that
-     the user edits or adds to.  In most cases the content of this element is a filename. -->
+     the user edits or adds to -->
 <!ELEMENT templates (template*)>
 <!ELEMENT template (#PCDATA)>
 
 <!-- Free responses can also have fragments, which are small pieces
      of text that users can incorporate into their responses (eg
-     sentence-starters for text; stamps for drawings.  May be literal text or
-     a filename for non-text types. -->
+     sentence-starters for text; stamps for drawings -->
 <!ELEMENT fragments (fragment*)>
 <!ELEMENT fragment (#PCDATA)>
 

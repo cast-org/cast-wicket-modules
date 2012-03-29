@@ -59,7 +59,7 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
 	public ResourceReference getRelativeReference (final String relativePath) {
-		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
+		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath();
 		return new ResourceReference(FileResource.class, filePath) {
 			private static final long serialVersionUID = 1L;
 			@Override

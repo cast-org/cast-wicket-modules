@@ -19,9 +19,6 @@
  */
 package org.cast.cwm.data;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
 /**
  * <p>
  * The type of content that a {@link Response} object represents and, therefore, a 
@@ -35,19 +32,72 @@ import lombok.Getter;
  * @author jbrookover
  *
  */
-@EqualsAndHashCode
-public class ResponseType implements IResponseType {
+public enum ResponseType {
+	
+	/**
+	 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
+	 */
+	TEXT("Write"), 
 
-	@Getter
-	private String name;
-
-	@Getter
+	/**
+	 * Styled HTML text is stored using {@link ResponseData#setText(String)}.
+	 */
+	HTML("Write"), 
+	
+	/**
+	 * Binary audio data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
+	 */
+	AUDIO("Record"), 
+	
+	/**
+	 * SVG markup is stored using {@link ResponseData#setText(String)}
+	 */
+	SVG("Draw"),
+	
+	/**
+	 * Binary data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
+	 */
+	UPLOAD("Upload"),
+	
+	/**
+	 * Highlight colors and word indexes are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.  
+	 * For example: "R:1,2,3,5,6,7#Y:22,23,25,26"
+	 */
+	HIGHLIGHT("Highlight"),
+	
+	/**
+	 * A response to a cloze-type passage (fill in the missing words).  The actual answers
+	 * are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.
+	 */
+	CLOZE("Cloze Passage"), 
+	
+	/**
+	 * A response to a single-select, multiple choice prompt.  Actual answer stored using {@link ResponseData#setText(String)}.
+	 */
+	SINGLE_SELECT("Multiple Choice"),
+	
+	/**
+	 * Audio recorded via Flash and stored on an external server.  The URL to the Audio
+	 * location is stored using {@link ResponseData#setText(String)}.
+	 */
+	@Deprecated
+	FLASH_AUDIO(null),
+	
+	/**
+	 * A rating (e.g. 1-5).  The value is stored using {@link ResponseData#setScore(int)}
+	 */
+	STAR_RATING("Rate"),
+	
+	/**
+	 * A generic score.  
+	 * 
+	 * TODO: Perhaps this can be used to replace Star Rating and combine Cloze/SingleSelect?
+	 */
+	SCORE("Score");
+	
 	private String display;
 	
-	private static final long serialVersionUID = 1L;
-
-	public ResponseType(String name, String display) {
-		this.name = name;
+	private ResponseType(String display) {
 		this.display = display;
 	}
 	

@@ -27,7 +27,6 @@ import java.util.Map;
 
 import lombok.Data;
 
-import org.cast.cwm.CwmApplication;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -74,7 +73,7 @@ public class ResponseMetadata implements Serializable {
 		// TODO Consider extracting attributes class, title
 		// TODO Consider extracting elements prompt, annotation, select, select1, clozepassage
 			
-		typeMap = new HashMap<String,TypeMetadata>(6);
+		typeMap = new HashMap<String,TypeMetadata>(4);
 		
 		NodeList resplist = elt.getElementsByTagNameNS(elt.getNamespaceURI(), "response");
 		for (int i=0; i<resplist.getLength(); i++) {
@@ -88,32 +87,27 @@ public class ResponseMetadata implements Serializable {
 			
 			// TODO consider extracting attributes width, height
 			
-			typeMD.templates = new ArrayList<String>(6);
+			typeMD.templates = new ArrayList<String>(4);
 			NodeList templates = relt.getElementsByTagNameNS(elt.getNamespaceURI(), "template");
 			for (int j=0; j<templates.getLength(); j++)
 				typeMD.templates.add(templates.item(j).getTextContent().trim());
 
-			typeMD.fragments = new ArrayList<String>(6);
+			typeMD.fragments = new ArrayList<String>(4);
 			NodeList starters = relt.getElementsByTagNameNS(elt.getNamespaceURI(), "fragment");
 			for (int j=0; j<starters.getLength(); j++)
 				typeMD.fragments.add(starters.item(j).getTextContent().trim());
 			
-			// FIXME - remove interactive applet?
-			// determine a way for this to be set to the default response types set by the application  - ldm			
 			if (type.equals("text"))
-				typeMap.put("HTML", typeMD);
+				typeMap.put(ResponseType.HTML.name(), typeMD);
 			else if (type.equals("image"))
-				typeMap.put("SVG", typeMD);
+				typeMap.put(ResponseType.SVG.name(), typeMD);
 			else if (type.equals("audio"))
-				typeMap.put("AUDIO", typeMD);
+				typeMap.put(ResponseType.AUDIO.name(), typeMD);
 			else if (type.equals("file"))
-				typeMap.put("UPLOAD", typeMD);
-			else if (type.equals("table"))
-				typeMap.put("TABLE", typeMD);
-			else if (type.equals("applet"))
-				typeMap.put("APPLET", typeMD);
+				typeMap.put(ResponseType.UPLOAD.name(), typeMD);
 			else
-				throw new IllegalArgumentException("Unknown response type in XML: " + type);				
+				throw new IllegalArgumentException("Unknown response type in XML: " + type);
+				
 		}
 	}
 	
@@ -122,17 +116,8 @@ public class ResponseMetadata implements Serializable {
 	 * @param type
 	 * @return the TypeMetadata for the given type.
 	 */
-	public TypeMetadata getType (IResponseType type) {
-		return typeMap.get(type.getName());
-	}
-	
-	/**
-	 * Get TypeMetadata for the named response type.
-	 * @param typeName
-	 * @return the TypeMetadata for the given type.
-	 */
-	public TypeMetadata getType (String typeName) {
-		return typeMap.get(typeName);
+	public TypeMetadata getType (ResponseType type) {
+		return typeMap.get(type.name());
 	}
 	
 	/**
@@ -140,25 +125,15 @@ public class ResponseMetadata implements Serializable {
 	 * @param type
 	 * @return the TypeMetadata for the given type
 	 */
-	public TypeMetadata addType (IResponseType type) {
+	public TypeMetadata addType (ResponseType type) {
 		if (typeMap == null)
 			typeMap = new HashMap<String,TypeMetadata>(4);
 		TypeMetadata typeMetadata = getType(type);
 		if (typeMetadata == null) {
 			typeMetadata = new TypeMetadata();
-			typeMap.put(type.getName(), typeMetadata);
+			typeMap.put(type.name(), typeMetadata);
 		}
 		return typeMetadata;
-	}
-	
-	/**
-	 * Make sure the reponse type with the given name is included in this metadata object,
-	 * and return it.
-	 * @param typeName
-	 * @return the TypeMetadata for the given type
-	 */
-	public TypeMetadata addType (String typeName) {
-		return addType (CwmApplication.get().getResponseType(typeName));
 	}
 	
 	@Data

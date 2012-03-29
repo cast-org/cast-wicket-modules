@@ -19,9 +19,7 @@
  */
 package org.cast.cwm.xml.service;
 
-import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -86,13 +84,6 @@ public class XmlService {
 	@Getter
 	protected Map<String,IDOMTransformer> transformers = new HashMap<String,IDOMTransformer>();
 	
-	/**
-	 * Tracks all known transformer directories.  The order of these directories determines the 
-	 * search order.  In general, load any custom directories first.
-	 */
-	@Getter @Setter
-	protected List<String> transformerDirectories = new ArrayList<String>();
-
 	/**
 	 * Class of XmlSection object that will be created by all methods in this module.
 	 */
@@ -159,48 +150,6 @@ public class XmlService {
 	}
 	
 	/**
-	 * Find a file, either by absolute pathname or relative to one of the defined transfomerDirectories.
-	 * 
-	 * @param xslFileName
-	 * @return a File, or null if not found.
-	 */
-	public File findXslFile (String xslFileName) {
-		File xslFile = new File(xslFileName);
-		
-		// Is filename absolute?
-		if (xslFile.isAbsolute()) {
-			if (xslFile.exists())
-				return xslFile;
-			log.error("XSL File not found: {}", xslFileName);
-			return null;
-		}
-
-		// loop through the directories setup by the app to find the transformation file	
-		for (String directory : getTransformerDirectories()) {
-			xslFile = new File(directory, xslFileName);
-			if (xslFile.exists())
-				return xslFile;
-		}
-		
-		log.error("XSL file \"{}\" not found; looked in directories: {}", xslFileName, getTransformerDirectories());
-		return null;
-	}
-
-	/**
-	 * Find a file, either by absolute pathname or relative to one of the defined transfomerDirectories,
-	 * and return as a FileResource. Will throw an error if file is not found.
-	 * 
-	 * @param xslFileName
-	 * @return a FileResource, or null if not found.
-	 */
-	public FileResource findXslResource (String xslFileName) {
-		File file = findXslFile(xslFileName);
-		if (file == null)
-			throw new IllegalArgumentException("XSL file " + xslFileName + " not found.");
-		return new FileResource(file);
-	}
-	
-	/**
 	 * Load an XML document from a File and register it by name with this object.  
 	 * @see {@link #loadXmlDocument(String, Resource)}
 	 * @param name name for this XML document (must be globally unique)
@@ -256,39 +205,7 @@ public class XmlService {
 			resources[i] = new FileResource(dependentFiles[i]);
 		return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds, resources);
 	}
-
-
-	/**
-	 * Create and load a transformer based on the given XSL File.
-	 * If second argument is true, then a secondary transformation will be chained on, which makes
-	 * sure that all wicket:id attributes (likely created by the XSL) are made unique. 
-	 * @param name
-	 * @param xslFile
-	 * @param forceUniqueWicketIds
-	 * @return the transformer
-	 */
-	public IDOMTransformer loadXSLTransformer (String name, String xslFile, boolean forceUniqueWicketIds, String... dependentFiles) {
-		Resource[] resources = new Resource[dependentFiles.length];
-		for (int i=0; i<dependentFiles.length; i++)
-			resources[i] = new FileResource(new File(dependentFiles[i]));
-		return loadXSLTransformer(name, new FileResource(new File(xslFile)), forceUniqueWicketIds, resources);
-	}
-
-	/**
-	 * Create and load a transformer based on the given XSL File.
-	 * If second argument is true, then a secondary transformation will be chained on, which makes
-	 * sure that all wicket:id attributes (likely created by the XSL) are made unique. 
-	 * @param name
-	 * @param xslFileName - this is either a fully qualified file name or just the file name itself
-	 * @param forceUniqueWicketIds
-	 * @return the transformer
-	 */
-	public IDOMTransformer loadXSLTransformer (String name, String xslFileName, boolean forceUniqueWicketIds) {
-		File xslFile = findXslFile(xslFileName);
-		return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
-	}
-
-
+	
 	/**
 	 * Create and load a transformer based on the given Resource, which should point to an XSL document.
 	 * If second argument is true, then a secondary transformation will be chained on, which makes

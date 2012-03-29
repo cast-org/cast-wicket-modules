@@ -32,9 +32,8 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
-import org.cast.cwm.data.IResponseType;
-import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Prompt;
+import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -52,10 +51,8 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	
 	private IModel<? extends Prompt> promptModel;
 	private IModel<User> userModel;
-	private IModel<Period> periodModel;
-	private IResponseType responseType;
+	private ResponseType responseType;
 	private Integer maxResults;
-	private Integer sortOrder;
 	private Date fromDate;
 	private Date toDate;
 	
@@ -79,16 +76,12 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 			criteria.add(Restrictions.eq("prompt", promptModel.getObject()));
 		if (userModel != null && userModel.getObject() != null)
 			criteria.add(Restrictions.eq("user", userModel.getObject()));
-		if (periodModel != null && periodModel.getObject() != null)
-			criteria.createAlias("user", "user").createAlias("user.periods", "p" ).add(Restrictions.eq("p.id", periodModel.getObject().getId()));
 		if (responseType != null)
 			criteria.add(Restrictions.eq("type", responseType));
-		if (sortOrder != null)
-			criteria.add(Restrictions.eq("sortOrder", sortOrder));
 		if (maxResults != null)
 			criteria.setMaxResults(maxResults);
 		if (fromDate != null && toDate != null && fromDate.before(toDate))
-			criteria.add(Restrictions.between("lastUpdated", fromDate, toDate));		
+			criteria.add(Restrictions.between("lastUpdated", fromDate, toDate));
 		criteria.add(Restrictions.eq("valid", true));
 		criteria.setCacheable(true);
 	}
@@ -103,7 +96,5 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 			promptModel.detach();
 		if (userModel != null)
 			userModel.detach();
-		if (periodModel != null)
-			periodModel.detach();
 	}
 }

@@ -36,11 +36,10 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.data.IResponseType;
-import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseData;
+import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.ResponseCriteriaBuilder;
 import org.cast.cwm.data.models.PromptModel;
@@ -99,7 +98,7 @@ public class ResponseService {
 	 * @param prompt
 	 * @return
 	 */
-	public IModel<Response> newResponse (IModel<User> user, IResponseType type, IModel<? extends Prompt> prompt) {
+	public IModel<Response> newResponse (IModel<User> user, ResponseType type, IModel<? extends Prompt> prompt) {
 		Response instance = newResponse();
 		instance.setUser(user.getObject());
 		instance.setType(type);
@@ -126,14 +125,16 @@ public class ResponseService {
 	/**
 	 * Get a single response by a given user for a given prompt.  This assumes that only
 	 * one such response should exist.  If multiple responses are returned, an exception
-	 * will be thrown.  In such cases, use {@link #getResponsesForPrompt(IModel, IModel)},
-	 * or preferably, ISortableProvider.  See
+	 * will be thrown.  In such cases, use {@link #getResponsesForPrompt(IModel, IModel)}.
+	 * 
+	 * Note: Deprecated.  You should really use a ISortableProvider.  See
 	 * {@link #getResponseProviderForPrompt(IModel, IModel)}.
 	 * 
 	 * @param p
 	 * @param u
 	 * @return
 	 */
+	@Deprecated
 	public IModel<Response> getResponseForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -169,13 +170,6 @@ public class ResponseService {
 		return new ResponseListModel(c);
 	}
 	
-	public IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p, IModel<Period> period) {
-		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
-		c.setPromptModel(p);
-		c.setPeriodModel(period);
-		return new ResponseListModel(c);
-	}
-	
 	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p) {
 		return getResponseProviderForPrompt(p, null);
 	}
@@ -196,7 +190,7 @@ public class ResponseService {
 	 * @param mUser the user whose responses will be counted, or null to count all users.
 	 * @return the count
 	 */
-	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, IResponseType type, IModel<? extends User> mUser) {
+	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, ResponseType type, IModel<? extends User> mUser) {
 		Criteria c = Databinder.getHibernateSession().createCriteria(Response.class);
 		c.add(Restrictions.eq("prompt", mPrompt.getObject()));
 		if (type != null)
@@ -216,7 +210,7 @@ public class ResponseService {
 	 * @param type
 	 * @return
 	 */
-	public IModel<Response> getLatestResponseByType(IModel<? extends Prompt> p, IResponseType type) {
+	public IModel<Response> getLatestResponseByType(IModel<? extends Prompt> p, ResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setResponseType(type);
@@ -232,7 +226,7 @@ public class ResponseService {
 	 * @param type
 	 * @return
 	 */
-	public IModel<Response> getLatestResponseByTypeForUser(IModel<? extends Prompt> p, IModel<User> u, IResponseType type) {
+	public IModel<Response> getLatestResponseByTypeForUser(IModel<? extends Prompt> p, IModel<User> u, ResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setResponseType(type);

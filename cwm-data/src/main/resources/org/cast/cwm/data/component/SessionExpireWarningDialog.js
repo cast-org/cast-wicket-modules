@@ -1,5 +1,5 @@
 /**
- * Javascript to accompany SessionExpireWarningDialog.java
+ * Javascript to accompany SessionExpireWarningBehavior.java
  * 
  */
 var SessionExpireWarning = {
@@ -80,7 +80,7 @@ var SessionExpireWarning = {
 		} else {
 			alert("Warning: Your login session is about to expire.");
 		}
-		SessionExpireWarning.log("Setting inactive timer to " + SessionExpireWarning.responseTime);
+		
 		if (SessionExpireWarning.responseTime > 0 && typeof SessionExpireWarning.inactiveFunction == 'function' ) {
 				SessionExpireWarning.inactiveEvent = setTimeout(SessionExpireWarning.inactiveFunction, SessionExpireWarning.responseTime);
 		}
@@ -92,8 +92,8 @@ var SessionExpireWarning = {
 	 * @param {Object} val
 	 */
 	log: function(val) {
-		if (SessionExpireWarning.DEBUG && window.console && window.console.log)
-			window.console.log(val);
+		if (SessionExpireWarning.DEBUG && window.console && window.console.firebug)
+			console.log(val);
 	}
 };
 

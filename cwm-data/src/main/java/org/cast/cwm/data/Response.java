@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -46,7 +48,6 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Type;
 
 /**
  * <p>
@@ -83,32 +84,12 @@ public class Response extends PersistedObject {
 	@ManyToOne(optional=false)
 	private User user;
 	
-	@Type(type="org.cast.cwm.data.ResponseTypeHibernateType")
-	private IResponseType type;
+	@Enumerated(EnumType.STRING)
+	private ResponseType type;
 	
 	private Date createDate;
 	
 	private Date lastUpdated;
-	
-	/**
-	 * Score recorded for this response, if appropriate.
-	 * For single-select multiple choice, this is "1" if a correct answer has been made at any time.
-	 * For other responses, it is "1" if the most recent teacher scoring was "Got it".
-	 */
-	private Integer score;
-	
-	/**
-	 * Number of tries, up to the one recorded as the score for this response.
-	 * Eg, tries==1 for a multiple choice that was answered correctly the very first time.
-	 */
-	private Integer tries;
-	
-	/**
-	 * Total points available - the scale for the score.
-	 * This is 1 for multiple choice and scored free responses;
-	 * will get other possible values as more response types are added.
-	 */
-	private Integer total;
 	
 	/**
 	 * Optional sorting field if a set of responses needs to be
@@ -142,7 +123,7 @@ public class Response extends PersistedObject {
 	
 	public Response() { /* No Arg Constructor for DataStore */ }
 	
-	public Response(User author, IResponseType t, Prompt p) {
+	public Response(User author, ResponseType t, Prompt p) {
 		this.user = author;
 		this.type = t;
 		this.prompt = p;
@@ -171,51 +152,21 @@ public class Response extends PersistedObject {
 	}
 	
 	/**
-	 * Return true if this Response is "correct".
-	 * A response is considered correct if it is scored, and its score is equal to the total points available.
-	 * @return true if correct
-	 */
-	public boolean isCorrect() {
-		return score!=null && total!=null && score.equals(total);
-	}
-	
-	/**
-	 * Returns a string like "2nd try" based on the {@link tries} field.
-	 * @return string value, or empty string if tries is null.
-	 */
-	public String getTriesOrdinal() {
-		if (tries == null)
-			return "";
-		return String.format("%d%s try", tries, ordinalSuffix(tries));
-	}
-	
-	/**
-	 * Get response text - fall-through to ResponseData  
+	 * Fall-through methods to ResponseData  
 	 */
 	public String getText() {
 		return getResponseData() == null ? null : getResponseData().getText();
 	}
 	
-	/**
-	  * Produces an ordinal "th" suffix string for given number.
-	  * @param number value you want the ordinal suffix for:
-	  * @return corresponding ordinal suffix, i.e. "st", "nd", "rd", or "th"
-	  * 
-	  * From http://mindprod.com/jgloss/ordinal.html
-	  */
-	String ordinalSuffix (int value) {
-		value = Math.abs( value );
-		final int lastDigit = value % 10;
-		final int last2Digits = value % 100;
-		switch (lastDigit) {
-		case 1 :
-			return  last2Digits == 11 ? "th" : "st";
-		case 2:
-			return  last2Digits == 12 ? "th" : "nd";
-		case 3:
-			return  last2Digits == 13 ? "th" : "rd";
-		default:
-			return "th";
-		}
+	public int getScore() {
+		return getResponseData() == null ? 0 : getResponseData().getScore();
+	}
+	
+	public int getAttempted() {
+		return getResponseData() == null ? 0 : getResponseData().getAttempted();
+	}
+	
+	public int getTotal() {
+		return getResponseData() == null ? 1 : getResponseData().getTotal();
 	}
 }

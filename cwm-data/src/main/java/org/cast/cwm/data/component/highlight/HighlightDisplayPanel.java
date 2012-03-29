@@ -39,15 +39,15 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
+import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.service.HighlightService;
-import org.cast.cwm.service.HighlightService.HighlightType;
 import org.cast.cwm.service.ResponseService;
+import org.cast.cwm.service.HighlightService.HighlightType;
 
 /**
  * A panel that outputs several hidden input fields for each registered highlighter.  These
@@ -101,7 +101,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 			
 			// If there are no existing highlights, create new Response
 			if (getModelObject() == null)
-				setModel(ResponseService.get().newResponse(mUser, CwmApplication.get().getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
+				setModel(ResponseService.get().newResponse(mUser, ResponseType.HIGHLIGHT, (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
 			
 			highlights = HighlightService.get().decodeHighlights(model.getObject() == null ? "" : model.getObject().getResponseData().getText());
 			
