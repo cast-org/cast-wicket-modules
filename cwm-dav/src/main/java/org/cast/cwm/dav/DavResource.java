@@ -105,7 +105,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
 	public ResourceReference getRelativeReference (final String relativePath) {
-		String childPath = path.substring(0, path.lastIndexOf('/')+1) + relativePath;
+		String childPath = path.substring(1, path.lastIndexOf('/')+1) + relativePath;
 		return new ResourceReference (DavResource.class, childPath) {
 			private static final long serialVersionUID = 1L;
 			@Override
