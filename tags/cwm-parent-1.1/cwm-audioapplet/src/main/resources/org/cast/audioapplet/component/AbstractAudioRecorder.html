@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Audio Applet Mockup</title>
+<link type="text/css" rel="stylesheet" media="screen" href="./audio_applet.css" />
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+<script type="text/javascript" src="./audio_applet.js"></script>
+</head>
+
+<body>
+<h1>Audio Applet Mockup</h1>
+<wicket:panel>
+<div class="audio_applet audio_applet_record">
+    <div class="status">Loading...</div>
+    <div class="indicator indicator_busy"><div class="mask"></div></div>
+    <div class="actions">
+        <a wicket:id="recordButton" href="javascript:void(0);" class="first record"><span>Record</span></a>
+        <a wicket:id="playButton" href="javascript:void(0);" class="play"><span>Play</span></a>
+        <a wicket:id="pauseButton" href="javascript:void(0);" class="pause"><span>Pause</span></a>
+        <a wicket:id="stopButton" href="javascript:void(0);" class="stop"><span>Stop</span></a>
+    </div>
+</div>
+<span class="savePercentageComplete"></span>
+<div wicket:id="audioapplet"></div>
+
+</wicket:panel>
+</body>
+
+</html>
