@@ -31,19 +31,16 @@ import org.apache.wicket.ResourceReference;
 import org.apache.wicket.SharedResources;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.PackageResource;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.util.string.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** A Panel to display a Flash media player.
+/** A Panel to display a Flash media player or rollover to an html5 media player
  * 
  * The Flash parameters set are appropriate for the JWPlayer 
  * (See http://www.longtailvideo.com/players/jw-flv-player/)
@@ -58,26 +55,33 @@ import org.slf4j.LoggerFactory;
  * @author Boris Goldowsky
  *
  */
-public class MediaPlayerPanel extends FlashAppletPanel {
+public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 
 	protected static final long serialVersionUID = 1L;
 	
-	protected boolean showDownloadLink = false;
+	protected int width;
+	protected int height;
+	protected String markupId;
 	protected String videoHRef = null;
 	protected String previewHRef = null;
-	protected String skinHRef = null;
 	protected String captionHRef = null;
 	protected String audioDescriptionHRef = null;
+	protected String skinHRef = null;
+	protected CharSequence sourceHRef;
 	protected boolean autostart = false;
+	protected boolean showDownloadLink = false;
+	protected boolean useOnPlay = false;
+	protected boolean fullScreen = false;
 	protected String fallbackText = "Click to watch video";
 	protected String downloadText = "Download video";
 	protected AbstractDefaultAjaxBehavior playResponse;
-	protected boolean useOnPlay = false;
+	
+	protected boolean useLevels = false;
 	
 	protected static Resource playerResource = null;
 	protected static boolean playerResourceStored = false; // has it been stored as a SharedResource?
 	
-	private final static Logger log = LoggerFactory.getLogger(FlashAppletPanel.class);
+	private final static Logger log = LoggerFactory.getLogger(MediaPlayerPanel.class);
 	
 	public MediaPlayerPanel(String id, ResourceReference video, int width, int height) {
 		this(id, "", width, height);
@@ -87,11 +91,14 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	}
 
 	public MediaPlayerPanel(String id, String videoHRef, int width, int height) {
-		super(id, width, height);
-		this.setFullScreen(true);
-		this.setWmode(WMODE_OPAQUE);
+		super(id);
 		this.videoHRef = isExternal(videoHRef) ? videoHRef : toSiteAbsolutePath(videoHRef);
-		addComponents();
+		this.skinHRef = toSiteAbsolutePath(new ResourceReference(MediaPlayerPanel.class, "skins/five/five.xml"));
+		this.width = width;
+		this.height = height;
+		setOutputMarkupId(true);
+		markupId = getMarkupId();
+		addComponents();		
 	}
 	
 	@Override
@@ -100,7 +107,7 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 		
 		if (playerResource == null) {
 			// Set default player if none other was set
-			playerResource = PackageResource.get(MediaPlayerPanel.class, "jwplayer.swf");
+			playerResource = PackageResource.get(MediaPlayerPanel.class, "player.swf");
 		}
 		
 		// Save player as an application shared resource, 
@@ -114,49 +121,13 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	}
 
 	
-	@Override
-	public CharSequence getAppletHref() {
+	public CharSequence getSourceHRef() {
 		return urlFor(new ResourceReference(MediaPlayerPanel.class, "player"));
 	}
 	
-	@Override
-	public String getFlashVars() {
-		StringBuffer fv = new StringBuffer("");
-		StringBuffer plugins = new StringBuffer("");
-		
-		if (!Strings.isEmpty(super.getFlashVars()))
-			fv.append(super.getFlashVars() + "&");
-		fv.append("useExternalInterface=true&");
-		if (!Strings.isEmpty(videoHRef))
-			fv.append("file=" + videoHRef + "&");
-		if (!Strings.isEmpty(previewHRef))
-			fv.append("image=" + previewHRef + "&");
-		if (!Strings.isEmpty(skinHRef))
-			fv.append("skin=" + skinHRef + "&");
-		if (autostart)
-			fv.append("autostart=true&");
-		if (captionHRef != null) {
-			plugins.append("captions-2,");
-			fv.append("captions.back=true&captions.file=" + captionHRef + "&");
-		}
-		if (audioDescriptionHRef != null) {
-			plugins.append("audiodescription-2,");
-			fv.append("audiodescription.state=false&audiodescription.ducking=true&audiodescription.file=" + audioDescriptionHRef + "&");
-			// For testing purposes, you can add "audiodescription.debug=true" to the above
-		}
-		if (plugins.length() > 0) {
-			// Avoid trailing comma
-			if (plugins.charAt(plugins.length()-1) == ',')
-				plugins.deleteCharAt(plugins.length()-1);
-			fv.append("plugins=").append(plugins).append("&");
-		}
-		fv.append("id=" + containerId + "-flash&");	//needed for playerReady() 
-		return fv.toString();
-	}
 
 	// Note Flash seems to expect filenames relative to the Flash applet, not relative to the current page.
-	// So the relative path generated by urlFor is not going to work.
-	
+	// So the relative path generated by urlFor is not going to work.	
 	protected String toSiteAbsolutePath(String p) {
 		try {
 			String path = URLEncoder.encode(p != null ? p : "", "UTF-8");
@@ -180,6 +151,7 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 		}
 		return toSiteAbsolutePath(url.toString());
 	}
+
 	
 	// TODO: This is a cheap way of determining whether a source file is external.  We should probabl do something better.
 	protected boolean isExternal(String url) {
@@ -188,30 +160,31 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	
 	protected void addComponents() {
 
-		WebMarkupContainer player = new WebMarkupContainer("spaceholder");
-		add(player);
-		player.setOutputMarkupId(true);
-		containerId = player.getMarkupId();
+		// this is not currently used - may want to use for ipad/ipod download link
+//		WebMarkupContainer player = new WebMarkupContainer("spaceholder");
+//		add(player);
+//		player.setOutputMarkupId(true);
+//		markupId = player.getMarkupId();
 		
-		ExternalLink fallbackLink = new ExternalLink("failureLink", new PropertyModel<String>(this, "videoHRef"));
-		player.add(fallbackLink);
-		fallbackLink.add(new Label("text", new PropertyModel<String>(this, "fallbackText")));
-		
-		WebMarkupContainer dl = new WebMarkupContainer("download") {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isVisible() {
-				return isShowDownloadLink();
-			}
-		};
-		add(dl);
-		ExternalLink link = new ExternalLink("link", new PropertyModel<String>(this, "videoHRef"));
-		dl.add(link);
-
-		// Button to download the video
-		link.add(new Image("button", new ResourceReference(MediaPlayerPanel.class, "download_arrow.png")));
-		link.add(new Label("text", new PropertyModel<String>(this, "downloadText")));
+//		ExternalLink fallbackLink = new ExternalLink("failureLink", new PropertyModel<String>(this, "videoHRef"));
+//		player.add(fallbackLink);
+//		fallbackLink.add(new Label("text", new PropertyModel<String>(this, "fallbackText")));
+//		
+//		WebMarkupContainer dl = new WebMarkupContainer("download") {
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public boolean isVisible() {
+//				return isShowDownloadLink();
+//			}
+//		};
+//		add(dl);
+//		ExternalLink link = new ExternalLink("link", new PropertyModel<String>(this, "videoHRef"));
+//		dl.add(link);
+//
+//		// Button to download the video
+//		link.add(new Image("button", new ResourceReference(MediaPlayerPanel.class, "download_arrow.png")));
+//		link.add(new Label("text", new PropertyModel<String>(this, "downloadText")));
 		
 		playResponse = new AbstractDefaultAjaxBehavior() {
 			private static final long serialVersionUID = 1L;
@@ -227,39 +200,73 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	}
 
 	public void renderHead(IHeaderResponse r) {
-		if (useOnPlay) {
-			String javascript = 
-				"\nvar playing = false;\n" + 
-				"var url='" + playResponse.getCallbackUrl(false) + "';\n" +
-				"var player;\n\n" +
 
-				"function onPlay (obj) {\n" +
-				"     playing = !playing;\n" +
-				"     var status;\n" +
-				"     if(player.getConfig().state == 'IDLE') {\n" +
-				"          status = 'play';\n" +
-				"     } else if (player.getConfig().state == 'PAUSED') {\n" +
-				"          status = 'resume';\n" +
-				"     } else if (player.getConfig().state == 'PLAYING') {\n"+
-				"          status = 'pause';\n" +
-				"     } else if (player.getConfig().state == 'COMPLETED') {\n" +
-				"          status = 'replay';\n" +
-				"     }\n" +
-				"     var wcall = wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
-				"}\n\n" +
+		r.renderJavascriptReference(new ResourceReference(MediaPlayerPanel.class, "jwplayer.js"));
 
-				"function playerReady(obj) {\n\n" +
-				"     var id = obj['id'];\n" +
-				// The FlastTag generator uses <object id=...> for IE and <embed name=...> for Others
-				"     player = $('object[id=' + id + '], embed[name=' + id + ']').get(0);\n" +
-				"     player.addViewListener('PLAY', 'onPlay');\n" +
-				"}\n";
+		StringBuffer jsString = new StringBuffer();
+		jsString.append("jwplayer(" + "\"" + getMarkupId() + "\").setup({" +
+				"flashplayer: " + "\"" + getSourceHRef() + "\", " +
+				"file: " + "\"" + getVideoHRef() +"\", " +
+				"height: " + String.valueOf(getHeight()) + ", " +
+				"width: " + String.valueOf(getWidth()));
 
-			r.renderJavascript(javascript, "VideoPlayer");
+		if (!Strings.isEmpty(previewHRef))
+			jsString.append(", " + "image: " + "\"" + previewHRef +  "\"");
+		
+		if (!Strings.isEmpty(skinHRef))
+			jsString.append(", " + "skin: " + "\"" + skinHRef +  "\"");
+
+		// if you want to change the order jwplayer uses
+		//jsString.append(",  \'modes\': [ {type: \'html5\'}, {type: \'flash\', src: \'" + getSourceHRef() + "\'}, {type: \'download\'} ] ");
+		
+		// add the plugins section
+		if (!Strings.isEmpty(captionHRef) | !Strings.isEmpty(audioDescriptionHRef)) {
+			jsString.append(", " + "plugins: { ");
+
+			if (!Strings.isEmpty(captionHRef))
+				jsString.append("\"captions-2\": {file: " + "\"" + captionHRef +  "\"}");
+			
+			if (!Strings.isEmpty(audioDescriptionHRef)) {
+				if (!Strings.isEmpty(captionHRef))
+					jsString.append(", ");
+				jsString.append("\"audiodescription-2\": {file: " + "\"" + audioDescriptionHRef +  "\"}");
+			}
+
+			jsString.append("}");
 		}
-		super.renderHead(r);
+
+		jsString.append("});");
+		r.renderOnDomReadyJavascript(jsString.toString());
+		
+		if (useOnPlay) {
+			r.renderOnDomReadyJavascript(getEventScript());
+		}
 	}
 	
+	protected String getEventScript() {
+		String jsString = 
+				"	var url=\'" + playResponse.getCallbackUrl(false) + "\';\n" +
+				"   var status;\n" +
+				"	jwplayer(" + "\"" + getMarkupId() + "\").onPlay(function() {" +
+				"      if (status == 'paused') {\n " +
+				"			status = 'resume'; } " +
+				"	   else {" +
+				"      		status = 'play';\n };" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
+				" 	});\n" +
+
+				"	jwplayer(" + "\"" + getMarkupId() + "\").onPause(function() {" +
+				"      status = 'paused';\n "  +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
+				" 	});\n" +
+
+				"	jwplayer(" + "\"" + getMarkupId() + "\").onComplete(function() {" +
+				"      status = 'completed';\n "  +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
+				" 	});\n";
+		return jsString;		
+	}
+
 	/**
 	 * Called when the video is played/paused by the user.  By default does nothing.
 	 * 
@@ -270,6 +277,30 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	public void onPlay(String status) {
 	}
 		
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public boolean isFullScreen() {
+		return fullScreen;
+	}
+
+	public void setFullScreen(boolean fullScreen) {
+		this.fullScreen = fullScreen;
+	}
+
 	public String getVideoHRef() {
 		return videoHRef;
 	}
@@ -368,5 +399,4 @@ public class MediaPlayerPanel extends FlashAppletPanel {
 	public void setUseOnPlay(boolean useOnPlay) {
 		this.useOnPlay = useOnPlay;
 	}
-
 }
