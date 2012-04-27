@@ -70,6 +70,26 @@
 			<a href="javascript:void(0);" wicket:id="delete" class="button standard">Delete</a>
 		</wicket:enclosure>
 	</wicket:fragment>
+	<!-- Fragment for table fragment -->
+	<wicket:fragment wicket:id="tableFragment">	
+        <div class="dataTableEdit">
+			<div wicket:id="gridDiv" class="gridDiv"></div>
+			<a href="javascript:void(0)" wicket:id="addColumn" class="button addColumn"><img src="img/icons/add.png" width="12" height="12" alt="add column" /></a>
+			<a href="javascript:void(0)" wicket:id="removeColumn" class="button delColumn"><img src="img/icons/delete.png" width="12" height="12" alt="remove column" /></a>
+			<a href="javascript:void(0)" wicket:id="addRow" class="button addRow"><img src="img/icons/add.png" width="12" height="12" alt="add row" /></a>		
+			<a href="javascript:void(0)" wicket:id="removeRow" class="button delRow"><img src="img/icons/delete.png" width="12" height="12" alt="remove row" /></a>
+		</div>		
+		<form wicket:id="form" class="autosave">
+ 			<input type="hidden" wicket:id="tableContent"></input>
+			<div wicket:id="titleFragment"></div>
+		</form>
+		<p class="autosave_info responseTime">Not Saved</p>
+		<p class="responseActions">
+			<a href="javascript:void(0)" wicket:id="save" class="button">Save</a>
+			<a href="javascript:void(0)" wicket:id="cancel" class="button">Cancel</a>
+			<a href="javascript:void(0)" wicket:id="delete" class="button deletebutton">Delete</a>
+		</p>
+	</wicket:fragment>
 	
 	<wicket:fragment wicket:id="svgNotSupportedFragment">
 		<div class="warning" role="alert">
