@@ -42,6 +42,7 @@ import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
@@ -132,6 +133,7 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected IModel<Response> mOriginalResponse;
 	@Getter @Setter protected boolean newResponse = false;
 	@Getter @Setter protected boolean hasAutoSaved = false;
+
 
 	/**
 	 * Creates a panel with no existing data, attached to the given prompt.
@@ -416,51 +418,13 @@ public abstract class ResponseEditor extends Panel {
 	 */
 	protected class TableFragment extends Fragment implements IHeaderContributor {
 		private static final long serialVersionUID = 1L;
+		
 		protected String divMarkupId, textAreaMarkupId; // used by the js
 		protected URL defaultTableUrl = null;
 		protected CharSequence tableUrl;
 
 		public TableFragment(String id, IModel<Response> model) {
 			super(id, "tableFragment", ResponseEditor.this, model);
-			
-			WebMarkupContainer addRow = new WebMarkupContainer("addRow")  {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public boolean isVisible() {
-					return cancelVisible;
-				}
-			};
-			add(addRow);
-			WebMarkupContainer removeRow = new WebMarkupContainer("removeRow")  {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public boolean isVisible() {
-					return cancelVisible;
-				}
-			};
-			add(removeRow);
-			WebMarkupContainer addColumn = new WebMarkupContainer("addColumn")  {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public boolean isVisible() {
-					return cancelVisible;
-				}
-			};
-			add(addColumn);
-			WebMarkupContainer removeColumn = new WebMarkupContainer("removeColumn")  {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public boolean isVisible() {
-					return cancelVisible;
-				}
-			};
-			add(removeColumn);
-			
-			
 			
 			// Form for sending updated table content to the database
 			Form<Response> form = new Form<Response>("form", model) {
@@ -478,11 +442,9 @@ public abstract class ResponseEditor extends Panel {
 			form.setOutputMarkupId(true);
 			add(form);
 			
-			
-
-			
 			// if this is a new table and there is an authored table, set the url to the content of that file
 			// or the default table file, otherwise, a url needs to be built from the text in the response
+			// override templateURL value if you want a different default
 			IModel<String> newTextModel = new Model<String>("");
 
 			if (newResponse) {
@@ -497,7 +459,7 @@ public abstract class ResponseEditor extends Panel {
 						e.printStackTrace();
 					}
 				} else { //new response with no authored default
-					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference("/js/data/grid.json"));
+					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json"));
 					try {
 						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(defaultTableUrlString)).toURL();
 					} catch (MalformedURLException e) {
@@ -507,16 +469,14 @@ public abstract class ResponseEditor extends Panel {
 						log.equals("There is a problem with the Default Data file for this Table");
 						e.printStackTrace();
 					}
-					log.debug("THIS IS THE url for the Default RESOURCE REFERENCE {}", defaultTableUrl);
 				}
 				newTextModel = new Model<String>(getUrlContents(defaultTableUrl));
-				log.debug("THE AUTHORED TEXT MODEL IS {}", newTextModel.getObject());
+				//log.debug("THE TABLE TEXT IS {}", newTextModel.getObject());
 			} 
 			
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 
 			HiddenField<String> textArea = new HiddenField<String>("tableContent", textModel);
-//			HiddenField<String> textArea = new HiddenField<String>("tableContent", textModel);
 			textArea.setOutputMarkupId(true);
 			textArea.setOutputMarkupPlaceholderTag(true);
 			textArea.setEscapeModelStrings(false);
@@ -538,9 +498,9 @@ public abstract class ResponseEditor extends Panel {
 						super.renderHead(response);
 						// Ensure grid saves to text area of form before we check to see if the form changed.
 						// Autosave will then submit the form to store the text area back to the db
-						String jsString = new String("cwmExportGrid(" + "\"" + divMarkupId + "\", \'"  + textAreaMarkupId + "\' , \'"  + defaultTableUrl + "\', true);");
+						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-						response.renderJavascript(script, "interactiveAutosave");					
+						response.renderJavascript(script, "interactiveAutosave-" + textAreaMarkupId);					
 					}
 
 					@Override
@@ -551,29 +511,6 @@ public abstract class ResponseEditor extends Panel {
 					}
 				});
 			}
-
-//			if (autoSave) {
-//				form.add(new AjaxAutoSavingBehavior(form) {
-//					private static final long serialVersionUID = 1L;
-//
-//					@Override
-//					public void renderHead(IHeaderResponse response) {
-//						super.renderHead(response);
-//						// Ensure table saves to text area of form before we check to see if the form changed.
-//						// Autosave will then submit the form to store the text area back to the db
-//						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\");");
-//						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-//						response.renderJavascript(script, "interactiveAutosave");					
-//					}
-//
-//					@Override
-//					protected void onAutoSave(AjaxRequestTarget target) {
-//						super.onAutoSave(target);
-//						hasAutoSaved = true;
-//						ResponseEditor.this.onAutoSave(target);
-//					}
-//				});
-//			}
 			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
 				private static final long serialVersionUID = 1L;
@@ -586,7 +523,7 @@ public abstract class ResponseEditor extends Panel {
 						@Override
 						// this is what needs to be called right before the submit - send the table value to the hidden text field
 						public CharSequence decorateScript(CharSequence script) {
-							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\");");
+							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
 							return jsString + super.decorateScript(script);
 						}
 					};
@@ -617,6 +554,72 @@ public abstract class ResponseEditor extends Panel {
 				}				
 			};
 			add(save);			
+
+		
+			AjaxLink<Void> addRow = new AjaxLink<Void>("addRow") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(AjaxRequestTarget target) {
+					String jsString = new String("cwmAddRow(" + "\"" +  divMarkupId + "\");");
+					target.appendJavascript(jsString);					
+				}
+
+				@Override
+				protected void onBeforeRender() {
+					this.setVisible(cancelVisible);
+					super.onBeforeRender();
+				}
+			};
+			add(addRow);
+			AjaxLink<Void> removeRow = new AjaxLink<Void>("removeRow") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(AjaxRequestTarget target) {
+					String jsString = new String("cwmRemoveRow(" + "\"" +  divMarkupId + "\");");
+					target.appendJavascript(jsString);					
+				}
+
+				@Override
+				protected void onBeforeRender() {
+					this.setVisible(cancelVisible);
+					super.onBeforeRender();
+				}
+			};
+			add(removeRow);
+			AjaxLink<Void> addColumn = new AjaxLink<Void>("addColumn") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(AjaxRequestTarget target) {
+					String jsString = new String("cwmAddColumn(" + "\"" +  divMarkupId + "\");");
+					target.appendJavascript(jsString);					
+				}
+
+				@Override
+				protected void onBeforeRender() {
+					this.setVisible(cancelVisible);
+					super.onBeforeRender();
+				}
+			};
+			add(addColumn);
+			AjaxLink<Void> removeColumn = new AjaxLink<Void>("removeColumn") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(AjaxRequestTarget target) {
+					String jsString = new String("cwmRemoveColumn(" + "\"" +  divMarkupId + "\");");
+					target.appendJavascript(jsString);					
+				}
+
+				@Override
+				protected void onBeforeRender() {
+					this.setVisible(cancelVisible);
+					super.onBeforeRender();
+				}
+			};
+			add(removeColumn);
 		}
 
 		/**
@@ -625,37 +628,13 @@ public abstract class ResponseEditor extends Panel {
 		 */
 		protected CharSequence getDataUrl() {
 			if (newResponse) {
-				if (templateURL != null) {
-					try {
-						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(templateURL)).toURL();
-					} catch (MalformedURLException e) {
-						log.equals("There is a problem with the Authored Data file for this Table");
-						e.printStackTrace();
-					} catch (URISyntaxException e) {
-						log.equals("There is a problem with the Authored Data file for this Table");
-						e.printStackTrace();
-					}
-				} else { //new response with no authored default
-					// TODO add this default info to the properties file so that it can be overwritten
-					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference("/js/data/grid.json"));
-					try {
-						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(defaultTableUrlString)).toURL();
-					} catch (MalformedURLException e) {
-						log.equals("There is a problem with the Default Data file for this Table");
-						e.printStackTrace();
-					} catch (URISyntaxException e) {
-						log.equals("There is a problem with the Default Data file for this Table");
-						e.printStackTrace();
-					}
-				}
+				return defaultTableUrl.toString();  // either authored or default
 			} else {
 				TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
 				ResponseEditor.TableFragment.this.add(loadBehavior);
 				return (loadBehavior.getCallbackUrl());				
 			}
-			return defaultTableUrl.toString();
-		}
-		
+		}		
 		
 		// this enables the data stored in the database to be streamed via a url
 		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
@@ -686,19 +665,14 @@ public abstract class ResponseEditor extends Panel {
 			super.onBeforeRender();
 		}
 
-		public void renderHead(IHeaderResponse response) {
-			// FIXME - all the css/js is under the example/theme directory but this should
-			// all be moved under cwm-data once it is finalized
-			// Not sure if we should load all this js here.  We might want to move it to the html
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_renderers.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_charts.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_editors.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_validators.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_utils.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/Editablegrid_cast.js"));
+		public void renderHead(IHeaderResponse response) {		
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
 
-			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
+			response.renderCSSReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', 'false');");
@@ -1076,14 +1050,13 @@ public abstract class ResponseEditor extends Panel {
 	
 	// TODO: move this into its own class, or do we have this defined somewhere? - ldm
 	public static String getUrlContents(URL url) {
-		log.debug("THE  DATA FILE NAME IS {}", url);
 		StringBuffer stringBuffer = new StringBuffer();
 
 		BufferedReader in = null;
 		try {
 			in = new BufferedReader(new InputStreamReader(url.openStream()));
 		} catch (IOException e) {
-			log.error("There is a problem opening the Authored Data file for this Table");
+			log.error("There is a problem opening the Data file for this Table");
 			e.printStackTrace();
 		}
 
@@ -1093,7 +1066,7 @@ public abstract class ResponseEditor extends Panel {
 				stringBuffer.append(inputLine);
 			in.close();
 		} catch (IOException e) {
-			log.error("There is a problem reading the Authored Data file for this Table");
+			log.error("There is a problem reading the Data file for this Table");
 			e.printStackTrace();
 		}
 		

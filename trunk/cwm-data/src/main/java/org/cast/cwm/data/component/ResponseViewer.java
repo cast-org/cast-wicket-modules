@@ -165,13 +165,12 @@ public class ResponseViewer extends Panel {
 			add (tableContainer);
 			tableContainer.setOutputMarkupId(true);
 			divMarkupId = tableContainer.getMarkupId();
-			log.debug("THE MARKUP ID OF THE TABLE DIV IS {}", divMarkupId);			
 		}
 
 		// The URL from which the table data can be loaded.
 		protected CharSequence getDataUrl() {
 			TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
-			add(loadBehavior);
+			ResponseViewer.TableFragment.this.add(loadBehavior);
 			return (loadBehavior.getCallbackUrl());				
 		}
 
@@ -205,22 +204,16 @@ public class ResponseViewer extends Panel {
 		}
 
 		public void renderHead(IHeaderResponse response) {
-			// FIXME - all the css/js is under the example/theme directory but this should
-			// all be moved under cwm-data once it is finalized
-			// Not sure if we should load all this js here.  We might want to move it to the html
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_renderers.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_charts.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_editors.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_validators.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/editablegrid_utils.js"));
-			response.renderJavascriptReference(new ResourceReference("/js/editablegrid/Editablegrid_cast.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
+			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
 
-			response.renderCSSReference(new ResourceReference("/js/editablegrid/editablegrid.css"));
+			response.renderCSSReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
-			log.debug("SENDING JS TO BUILD GRID {}", jsString);
 			response.renderOnDomReadyJavascript(jsString);			
 		}
 	}
