@@ -64,6 +64,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private String subjectId;
 	private IModel<Period> period;
 	private ISortState sortState = new SingleSortState();
+	private boolean cacheResults = true;
 	
 	public UserCriteriaBuilder() {
 		// By default, sort by username
@@ -102,7 +103,8 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 			criteria.add(Restrictions.eq("firstName", firstName).ignoreCase());
 		if (lastName != null)
 			criteria.add(Restrictions.eq("lastName", lastName).ignoreCase());
-		criteria.setCacheable(true);	
+		if (cacheResults)
+			criteria.setCacheable(true);	
 	}
 	
 	public void detach() {
