@@ -156,7 +156,14 @@ public class UserService {
 		c.setPeriod(mPeriod);
 		return new SortableHibernateProvider<User>(User.class, c);
 	}
-	
+
+	public ISortableDataProvider<User> getUncachedUserListProvider(IModel<Period> mPeriod) {
+		UserCriteriaBuilder c = new UserCriteriaBuilder();
+		c.setPeriod(mPeriod);
+		c.setCacheResults(false);
+		return new SortableHibernateProvider<User>(User.class, c);
+	}
+
 	/**
 	 * Get an object that will give the total number of logins
 	 * and the latest login date for a particular user.  This is a
