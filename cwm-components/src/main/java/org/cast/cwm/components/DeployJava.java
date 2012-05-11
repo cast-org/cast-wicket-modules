@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * 
  * <p>
  * Note: Sun's Deployment Toolkit does not work with AJAX.  If this component is rendered during
- * an ajax call, uses a standard <applet> tag instead of Sun's deployment.
+ * an ajax call, uses a standard &lt;applet&gt; tag instead of Sun's deployment.
  * </p>
  * <p>
  * Suppose we have the following markup:
@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * In a Wicket page we can create this component and add it to the page:
  * <pre>
- * final DeployJava deployJava = new DeployJava("applet");
+ * DeployJava deployJava = new DeployJava("applet");
  * add(deployJava);
  * </pre>
  * We get the following output:
