@@ -374,8 +374,8 @@ public abstract class ResponseEditor extends Panel {
 			// if you are editing an existing model use that one, otherwise use the new model
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 			TextArea<String> textArea = new TextArea<String>("message", textModel);
+			textArea.setEscapeModelStrings(false);
 			if (useWysiwyg) {
-				textArea.setEscapeModelStrings(false);
 				textArea.add(new TinyMceBehavior(getTinyMCESettings()));
 				save.add(new TinyMceAjaxSubmitModifier());
 			}
