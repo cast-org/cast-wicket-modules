@@ -19,9 +19,6 @@
  */
 package org.cast.cwm.data.component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -51,6 +48,7 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponentLabel;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextArea;
@@ -65,12 +63,14 @@ import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.components.UrlStreamedToString;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
@@ -145,7 +145,6 @@ public abstract class ResponseEditor extends Panel {
 	public ResponseEditor(String id, IModel<? extends Prompt> prompt, IResponseType type) {
 		this(id, ResponseService.get().newResponse(CwmSession.get().getUserModel(), type, prompt));
 		newResponse = true;
-		log.debug("ADDING NEW RESPONSE");
 	}
 	
 	/**
@@ -195,7 +194,6 @@ public abstract class ResponseEditor extends Panel {
 					ResponseService.get().deleteResponse(getModel());
 					setModelObject(null);
 				} else if (hasAutoSaved){
-					log.debug("CANCEL EDITS ON EXISTING RESPONSE");
 					// FIXME:  Need to implement a transaction rollback here - ldm
 					// if you have already autosaved and then the user cancels - restore the original response
 					hasAutoSaved = false;
@@ -360,7 +358,21 @@ public abstract class ResponseEditor extends Panel {
 			};
 			add(save);
 			
-			IModel<String> textModel = new Model<String>(((Response) getDefaultModelObject()).getText());
+			//IModel<String> textModel = new Model<String>(((Response) getDefaultModelObject()).getText());
+
+			// if this is a new response, check if there is an authored text template
+			// otherwise the new model is set to an empty string
+			IModel<String> newTextModel = new Model<String>("");
+			if (newResponse) {				
+				URL defaultTemplateUrl = null;
+				if (templateURL != null) {
+					defaultTemplateUrl = getUrlFromString(templateURL);
+					newTextModel = new Model<String>(new UrlStreamedToString(defaultTemplateUrl).getPostString());
+				}
+			}
+
+			// if you are editing an existing model use that one, otherwise use the new model
+			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 			TextArea<String> textArea = new TextArea<String>("message", textModel);
 			if (useWysiwyg) {
 				textArea.setEscapeModelStrings(false);
@@ -381,12 +393,14 @@ public abstract class ResponseEditor extends Panel {
 			 * Sentence Starter Dropdown List
 			 * @see onBeforeRender for choice modifications and visibility.
 			 */
-			// TODO there needs to be a label in here attached to this pulldown
-			add(choiceList = new DropDownChoice<String>("sentenceStarters", new Model<String>(null), new PropertyModel<List<String>>(ResponseEditor.this, "starters"), new SentenceStarterRenderer()));
+			add(choiceList = new DropDownChoice<String>("sentenceStarters", new Model<String>("default"), new PropertyModel<List<String>>(ResponseEditor.this, "starters"), new SentenceStarterRenderer()));
 			choiceList.setOutputMarkupId(true);
 			choiceList.setNullValid(true);
 			add(new WebMarkupContainer("addLink").add(new SimpleAttributeModifier("onclick", "tinyMCE.get('" + textArea.getMarkupId() + "').setContent(tinyMCE.get('" + textArea.getMarkupId() + "').getContent() + $('#" + choiceList.getMarkupId(true) + "').val()); return false;")));
-			
+
+			// make sure the label is linked to the sentence starter dropdown		
+			FormComponentLabel choiceListLabel = (new FormComponentLabel("sentenceStartersLabel", choiceList));
+			add(choiceListLabel);
 		}
 
 		@Override
@@ -394,7 +408,10 @@ public abstract class ResponseEditor extends Panel {
 			// If there are no starters, make the dropdown/link invisible
 			if (starters == null || starters.isEmpty()) {
 				choiceList.setVisible(false);
+				get("sentenceStartersLabel").setVisible(false);
 				get("addLink").setVisible(false);
+			} else if (!starters.contains("default")) {
+				starters.add(0, "default");
 			}
 			super.onBeforeRender();
 		}
@@ -403,11 +420,17 @@ public abstract class ResponseEditor extends Panel {
 			private static final long serialVersionUID = 1L;
 
 			public String getDisplayValue(String object) {
-				return object;
+				if ("default".equals(object))
+					return new StringResourceModel("sentenceStarters.null", null, "Choose a Sentence Starter").getString();
+				else
+					return object;
 			}
 
 			public String getIdValue(String object, int index) {
-				return object;
+				if ("default".equals(object))
+					return " ";
+				else
+					return object;
 			}
 		}
 	}
@@ -449,31 +472,16 @@ public abstract class ResponseEditor extends Panel {
 
 			if (newResponse) {
 				if (templateURL != null) {
-					try {
-						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(templateURL)).toURL();
-					} catch (MalformedURLException e) {
-						log.equals("There is a problem with the Authored Data file for this Table");
-						e.printStackTrace();
-					} catch (URISyntaxException e) {
-						log.equals("There is a problem with the Authored Data file for this Table");
-						e.printStackTrace();
-					}
+					defaultTableUrl = getUrlFromString(templateURL);
 				} else { //new response with no authored default
 					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json"));
-					try {
-						defaultTableUrl = new URI(RequestUtils.toAbsolutePath(defaultTableUrlString)).toURL();
-					} catch (MalformedURLException e) {
-						log.equals("There is a problem with the Default Data file for this Table");
-						e.printStackTrace();
-					} catch (URISyntaxException e) {
-						log.equals("There is a problem with the Default Data file for this Table");
-						e.printStackTrace();
-					}
+					defaultTableUrl = getUrlFromString(defaultTableUrlString);
 				}
-				newTextModel = new Model<String>(getUrlContents(defaultTableUrl));
-				//log.debug("THE TABLE TEXT IS {}", newTextModel.getObject());
+				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
 			} 
 			
+			// if you are editing an existing model use that one, otherwise use the new model
+			// this model setting is used for autosave purposes and not for sending data down to the grid
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 
 			HiddenField<String> textArea = new HiddenField<String>("tableContent", textModel);
@@ -674,9 +682,8 @@ public abstract class ResponseEditor extends Panel {
 
 			response.renderCSSReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
-			// once the text for the grid is available in the hidden text field make this js call 
+			// once the text for the grid is available via the url make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', 'false');");
-			log.debug("SENDING JS TO BUILD GRID {}", jsString);
 			response.renderOnDomReadyJavascript(jsString);
 		}
 	}
@@ -1047,31 +1054,27 @@ public abstract class ResponseEditor extends Panel {
 		super.onDetach();
 	}
 	
-	
-	// TODO: move this into its own class, or do we have this defined somewhere? - ldm
-	public static String getUrlContents(URL url) {
-		StringBuffer stringBuffer = new StringBuffer();
-
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new InputStreamReader(url.openStream()));
-		} catch (IOException e) {
-			log.error("There is a problem opening the Data file for this Table");
-			e.printStackTrace();
+	/**
+	 * Return an actual URL from a string that represents a URL
+	 * @param stringUrl
+	 * @return
+	 */
+	public static URL getUrlFromString(String stringUrl) {
+		URL url = null;
+		if (stringUrl != null) {
+			try {
+				url = new URI(RequestUtils.toAbsolutePath(stringUrl)).toURL();
+				return url;
+			} catch (MalformedURLException e) {
+				log.error("There is a problem with the Authored Data:  {}", stringUrl);
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				log.error("There is a problem with the Authored Data:  {}", stringUrl);
+				e.printStackTrace();
+			}
 		}
-
-		String inputLine;
-		try {
-			while ((inputLine = in.readLine()) != null) 
-				stringBuffer.append(inputLine);
-			in.close();
-		} catch (IOException e) {
-			log.error("There is a problem reading the Data file for this Table");
-			e.printStackTrace();
-		}
-		
-		return stringBuffer.toString();		
-	}
+		return null;
+	}	
 
 	public class DefaultSvgModel extends AbstractReadOnlyModel<String> implements IDetachable {
 		private static final long serialVersionUID = 1L;
