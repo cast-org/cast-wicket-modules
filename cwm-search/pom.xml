@@ -3,7 +3,7 @@
   <parent>
     <artifactId>cwm-parent</artifactId>
     <groupId>org.cast.cwm</groupId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>cwm-search</artifactId>
