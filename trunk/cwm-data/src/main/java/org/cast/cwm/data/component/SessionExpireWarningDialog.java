@@ -36,8 +36,11 @@ import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.ICwmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Add this to any page that should warn the user when their session is going to expire.  This
@@ -54,6 +57,9 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	
 	public static final ResourceReference JAVASCRIPT_REFERENCE = new ResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
 	
+	@Inject
+	private ICwmService cwmService;
+
 	@Getter
 	private int warningTime = 60 * 5; // Number of seconds before session expires that the user receives a warning.
 	
@@ -143,7 +149,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		// We're signed in; redirect to login.
 		if (CwmSession.get().getLoginSession() != null) {
 			EventService.get().forceCloseLoginSession(Databinder.getHibernateSession(), CwmSession.get().getLoginSession(), "[timeout]");
-			CwmService.get().flushChanges();
+			cwmService.flushChanges();
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();
 			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters("expired=true"));

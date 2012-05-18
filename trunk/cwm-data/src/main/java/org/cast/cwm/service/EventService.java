@@ -30,6 +30,7 @@ import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.Request;
 import org.apache.wicket.RequestCycle;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
@@ -45,6 +46,8 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+
 /**
  * Methods for working with Events and related information in the database.
  *
@@ -59,15 +62,20 @@ public class EventService extends AbstractEventService {
 	public static final String AUTOSAVE_POST_TYPE_NAME = "post:autosave";
 	public static final String AGENTVIEW_TYPE_NAME = "agent:animate";
 	
-	private static final long serialVersionUID = 1L;
-	
 	private final static Logger log = LoggerFactory.getLogger(EventService.class);
 	
+	@Inject
+	private ICwmService cwmService;
+
 	@Getter @Setter  
 	protected Class<? extends Event> eventClass = Event.class;
 	
 	@Getter @Setter
 	protected Class<? extends LoginSession> loginSessionClass = LoginSession.class;
+
+	public EventService() {
+		InjectorHolder.getInjector().inject(this);
+	}
 	
 	public static EventService get() {
 		return (EventService)instance;
@@ -98,20 +106,11 @@ public class EventService extends AbstractEventService {
 	protected IModel<? extends Event> saveEvent (Event e) {
 		e.setDefaultValues();
 		Databinder.getHibernateSession().save(e);
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 		log.debug("Event: {}: {}", e.getType(), e.getDetail());
 		return new HibernateObjectModel<Event>(e);
 	}
 	
-	/**
-	 * Some methods that will eventually be replaced use this in ISI.
-	 * @param e
-	 */
-	@Deprecated
-	public void oldSaveEvent(Event e) {
-		saveEvent(e);
-	}
-
 	/**
 	 * Save an event to the datastore.
 	 * 
@@ -199,7 +198,7 @@ public class EventService extends AbstractEventService {
 		}
 		Databinder.getHibernateSession().save(loginSession);
 
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 		
 		// register loginSession with Wicket session
 		CwmSession.get().setLoginSessionModel(new HibernateObjectModel<LoginSession>(loginSession));
@@ -219,7 +218,7 @@ public class EventService extends AbstractEventService {
 			Date now = new Date();
 			ls.setEndTime(now);
 			Databinder.getHibernateSession().update(ls);
-			CwmService.get().flushChanges();
+			cwmService.flushChanges();
 			
 			sesLength = "Session length=" + (now.getTime()-ls.getStartTime().getTime())/1000 + "s";
 			

@@ -37,26 +37,29 @@ import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CwmService {
+public class CwmService implements ICwmService {
 
 	private static final Logger log = LoggerFactory.getLogger(CwmService.class);
 	
 	protected static CwmService instance = new CwmService();
 
+	/**
+	 * @deprecated  This service is now Guice-injected.
+	 * 
+	 * Use the @Inject annotation on a field to have it injected in a Wicket Component or
+	 * call InjectorHolder.getInjector().inject(this) from a constructor to have it
+	 * injected in something that's not a Wicket Component.
+	 * 
+	 * After all calls to this are removed, we'll make this service stop being a singleton.
+	 * 
+	 */
+	@Deprecated
 	public static CwmService get() {
 		return instance;
 	}
 
-	public static void setInstance(CwmService inst) {
-		CwmService.instance = inst;
-	}
-	
-	/**
-	 * Checks the model wrapping a {@link PersistedObject} to confirm that
-	 * it has properly been implemented to work with the underlying datastore.
-	 * 
-	 * Override this method to provide your own custom implementation.
-	 * @param objectModel
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#confirmDatastoreModel(org.apache.wicket.model.IModel)
 	 */
 	public void confirmDatastoreModel(IModel<? extends PersistedObject> objectModel) {
 		if ((objectModel instanceof IChainingModel && !(((IChainingModel<? extends PersistedObject>) objectModel).getChainedModel() instanceof HibernateObjectModel))
@@ -64,58 +67,38 @@ public class CwmService {
 			throw new IllegalStateException("This Service class expects HibernateObjectModels.");
 	}
 	
-	/**
-	 * Look up a datastore object by its ID.  This method is implemented using
-	 * the underlying datastore system.
-	 * 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#getById(java.lang.Class, long)
 	 */
 	public <T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id) {
 		return new HibernateObjectModel<T>(clazz, id);
 	}
 	
-	/**
-	 * Add a {@link PersistedObject} to the datastore.
-	 * Does not take a model as parameter because you usually won't have one for a
-	 * brand new object.
-	 * @param object
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#save(org.cast.cwm.data.PersistedObject)
 	 */
 	public void save(PersistedObject object) {
 		Databinder.getHibernateSession().save(object);
 	}
 	
-	/**
-	 * Delete a {@link PersistedObject} from the datastore.
-	 * 
-	 * @param objectModel
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#delete(org.apache.wicket.model.IModel)
 	 */
 	public void delete(IModel<? extends PersistedObject> objectModel) {
 		confirmDatastoreModel(objectModel);
 		Databinder.getHibernateSession().delete(objectModel.getObject());
-		CwmService.get().flushChanges();
+		flushChanges();
 	}
 	
-	/**
-	 * Flush changes to the datastore.  Essentially, this commits the previous
-	 * transaction and starts a new transaction.  This should be run at the end of
-	 * any Service method that is making changes to the datastore.
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#flushChanges()
 	 */
 	public void flushChanges() {
 		flushChanges(false);
 	}
 	
-	/**
-	 * <p>
-	 * Flush changes to the datastore.  Essentially, this commits the previous
-	 * transaction and starts a new transaction.  This should be run at the end of
-	 * any Service method that is making changes to the datastore.
-	 * </p>
-	 * 
-	 * <p>
-	 * If catchErrors is true, the commit will be run in a <em>try</em> block
-	 * and any exceptions will be ignored.
-	 * </p>
-	 * 
-	 * @param catchErrors
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#flushChanges(boolean)
 	 */
 	public void flushChanges(boolean catchErrors) {
 		
@@ -137,9 +120,8 @@ public class CwmService {
 		}
 	}
 
-	/**
-	 * Return a list of all distinct initializers that have been run.
-	 * @return list of names of initializers that have at some point been run.
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#getInitializationNames()
 	 */
 	@SuppressWarnings("unchecked")
 	public List<String> getInitializationNames() {
@@ -148,9 +130,8 @@ public class CwmService {
 		return criteria.list();
 	}
 	
-	/**
-	 * Record an initialization record in the database.
-	 * @param initializer the database initializer that was run.
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#saveInitialization(org.cast.cwm.data.init.IDatabaseInitializer)
 	 */
 	public void saveInitialization (IDatabaseInitializer izer) {
 		Initialization init = new Initialization();

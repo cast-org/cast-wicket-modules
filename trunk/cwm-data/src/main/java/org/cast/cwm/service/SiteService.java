@@ -28,6 +28,7 @@ import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.HibernateProvider;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -40,6 +41,8 @@ import org.cast.cwm.data.component.HibernateEditPeriodForm;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
+import com.google.inject.Inject;
+
 /**
  * General Service Class for both Sites and Periods  
  */
@@ -47,11 +50,18 @@ public class SiteService {
 
 	protected static SiteService instance = new SiteService();
 
+	@Inject
+	private ICwmService cwmService;
+
 	@Getter @Setter
 	private Class<? extends Period> periodClass = Period.class;
 	
 	@Getter @Setter
 	private Class<? extends Site> siteClass = Site.class;
+
+	public SiteService() {
+		InjectorHolder.getInjector().inject(this);
+	}
 	
 	public static SiteService get() {
 		return (SiteService) instance;
@@ -140,7 +150,7 @@ public class SiteService {
 	 */
 	public void deletePeriod(IModel<Period> period) {
 		
-		CwmService.get().confirmDatastoreModel(period);
+		cwmService.confirmDatastoreModel(period);
 		
 		Period p = period.getObject();
 		p.getSite().getPeriods().remove(p);
@@ -148,7 +158,7 @@ public class SiteService {
 			u.getPeriods().remove(p);
 		Databinder.getHibernateSession().delete(p);
 		
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 	}
 
 	/**

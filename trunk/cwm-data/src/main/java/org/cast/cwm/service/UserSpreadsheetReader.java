@@ -36,6 +36,7 @@ import lombok.Setter;
 
 import net.databinder.hib.Databinder;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
@@ -49,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.generationjava.io.CsvReader;
+import com.google.inject.Inject;
 
 /**
  * Object to read a spreadsheet defining users and create those users in the database.
@@ -58,6 +60,9 @@ import com.generationjava.io.CsvReader;
  */
 public class UserSpreadsheetReader implements Serializable {
 	
+	@Inject
+	private ICwmService cwmService;
+
 	@Getter @Setter
 	protected IModel<Site> defaultSite;
 	
@@ -86,6 +91,7 @@ public class UserSpreadsheetReader implements Serializable {
 
 
 	public UserSpreadsheetReader() {
+		InjectorHolder.getInjector().inject(this);
 	}
 	
 	/**
@@ -258,7 +264,7 @@ public class UserSpreadsheetReader implements Serializable {
 			session.save(u);
 		}
 
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 	}
 	
 
