@@ -20,6 +20,7 @@
 package org.cast.cwm;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -31,8 +32,6 @@ import lombok.Getter;
 import net.databinder.auth.data.DataUser;
 import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.hib.DataRequestCycle;
-import net.databinder.hib.Databinder;
-import net.databinder.hib.SessionUnit;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
@@ -40,6 +39,7 @@ import org.apache.wicket.Request;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.Response;
 import org.apache.wicket.Session;
+import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -67,6 +67,7 @@ import org.cast.cwm.data.resource.SvgImageResource;
 import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.ICwmService;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -76,6 +77,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+
+import com.google.inject.Binder;
+import com.google.inject.Module;
 
 /** 
  * An abstract Application class that CWM-based apps can extend.
@@ -100,6 +104,7 @@ import ch.qos.logback.core.util.StatusPrinter;
  * 
  * @author bgoldowsky
  */
+@SuppressWarnings("deprecation")
 public abstract class CwmApplication extends AuthDataApplication {
 	
 	@Getter
@@ -122,12 +127,17 @@ public abstract class CwmApplication extends AuthDataApplication {
     // A few things that need to get set up before regular init().
 	@Override
 	protected void internalInit() {
-
-		EventService.setInstance(new EventService());
+		log.debug("Starting CWM Application Internal Init");
+		log.debug("Application Class is " + getClass().getName());
+		
 
 		if(appProperties == null) {
 			loadAppProperties();		
 		}
+
+		addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
+
+		EventService.setInstance(new EventService());
 
 		// If using Logback as the logger, and we have a logConfig property,
 		// then read that configuration.
@@ -159,6 +169,8 @@ public abstract class CwmApplication extends AuthDataApplication {
 		mailHost   = appProperties.getProperty("cwm.mailHost");
 		mailFromAddress = appProperties.getProperty("cwm.mailFromAddress");
 		
+		getDebugSettings().setOutputMarkupContainerClassName(true);		
+
 		initResponseTypes();
 		runDatabaseInitializers();
 		configureMountPaths();
@@ -167,7 +179,31 @@ public abstract class CwmApplication extends AuthDataApplication {
 		UploadedFileResource.mount(this);
 		SvgImageResource.mount(this);
 	}
+
+	private Module[] getInjectionModuleArray() {
+		return getInjectionModules().toArray(new Module[0]);
+	}
 	
+	/**
+	 * Returns a list of Guice Modules to be injected.
+	 * Applications should override this method to inject services.
+	 * 
+	 * A typical usage should be to call super.getInjectionModules() to get the list, and then add to that list.
+	 * 
+	 * @return list of com.google.inject.Module objects
+	 */
+	protected List<Module> getInjectionModules() {
+		ArrayList<Module> modules = new ArrayList<Module>();
+		modules.add(new Module() {
+			public void configure(Binder binder) {
+				log.debug("Binding CWM Service");
+				// Temporary while we deprecate the singleton get().
+				binder.bind(ICwmService.class).toInstance(CwmService.get());
+			}
+		});
+		return modules;
+	}
+
 	/**
 	 * Returns the list of database initialization methods that will be run at startup.
 	 * Applications should override this method if they want to define additional
@@ -197,26 +233,11 @@ public abstract class CwmApplication extends AuthDataApplication {
 		mount(new QueryStringUrlCodingStrategy("edituser", UserFormPage.class));
 	}
 	
-	/** Execute database initialization objects given by {@link #getDatabaseInitializers()}.
+	/** 
+	 * Execute database initialization objects given by {@link #getDatabaseInitializers()}.
 	 */
-	protected void runDatabaseInitializers () {
-		Databinder.ensureSession(new SessionUnit() {
-			public Object run(org.hibernate.Session session) {
-				CwmService cwmService = CwmService.get();
-				List<String> initsDone = cwmService.getInitializationNames();
-				for (IDatabaseInitializer init : getDatabaseInitializers()) {
-					// Run the initializer unless it's a one-time-only that's already done.
-					if (!init.isOneTimeOnly() || !initsDone.contains(init.getName())) {
-						log.debug("Running {}", init.getName());
-						if (init.run(appProperties)) {
-							// record the run if it did any work.
-							cwmService.saveInitialization(init);
-						}
-					}
-				}
-				return null;
-			}
-		});
+	private void runDatabaseInitializers () {
+		new DatabaseInitializerRunner(appProperties).run(getDatabaseInitializers());
 	}
 
 	@Override
@@ -224,17 +245,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 		return new CwmSessionStore(this, new DiskPageStore());
 	}
 
-	/** Used in testing, when you don't have the servlet context
-	 * from which to pull the application properties path. If
-	 * the app properties are set, then they will not be reloaded
-	 * in the call to configureHibernate
-	 * 
-	 * @param appProperties the application configuration properties 
-	 */
-	public void setApplicationProperties(Properties appProperties) {
-		this.appProperties = appProperties;
-	}
-	
 	public static CwmApplication get() {
 		return (CwmApplication) Application.get();
 	}

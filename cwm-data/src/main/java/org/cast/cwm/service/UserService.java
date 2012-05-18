@@ -30,6 +30,7 @@ import net.databinder.models.hib.QueryBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.admin.EditUserPanel;
 import org.cast.cwm.data.Period;
@@ -42,6 +43,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Database operations on Users and related classes.
@@ -58,8 +61,15 @@ public class UserService {
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
+	@Inject
+	private ICwmService cwmService;
+
 	@Getter @Setter
 	private Class<? extends User> userClass = User.class;
+
+	public UserService() {
+		InjectorHolder.getInjector().inject(this);
+	}
 	
 	protected static UserService instance = new UserService();
 	
@@ -97,12 +107,12 @@ public class UserService {
 	public void confirmUser(User user) {
 		user.setValid(true);
 		user.setSecurityToken(null);
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 	}
 	
 	public void generateSecurityToken(IModel<User> mUser) {
 		mUser.getObject().generateSecurityToken();
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 	}
 
 	

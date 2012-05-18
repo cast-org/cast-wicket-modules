@@ -33,6 +33,7 @@ import org.apache.wicket.Application;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.BinaryFileData;
@@ -52,6 +53,8 @@ import org.hibernate.Session.LockRequest;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import com.google.inject.Inject;
+
 /**
  * A Hibernate implementation of the service class used to save/load/modify
  * {@link Response} objects.  Eventually, this should be split into Abstract
@@ -62,12 +65,17 @@ import org.hibernate.criterion.Restrictions;
  */
 public class ResponseService {
 
+	@Inject
+	private ICwmService cwmService;
+
 	protected static ResponseService instance;
 	
 	@Getter @Setter
 	protected Class<? extends Response> responseClass = Response.class;
 
-	protected ResponseService() { /* Protected Constructor - use ResponseService.get() */};
+	public ResponseService() {
+		InjectorHolder.getInjector().inject(this);
+	};
 	
 	public static ResponseService get() {
 		return instance;
@@ -284,7 +292,7 @@ public class ResponseService {
 		mResponse.getObject().getFiles().add(dbFile);
 		
 		// Persist Changes
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 		
 		return new HibernateObjectModel<BinaryFileData>(dbFile);
 	}
@@ -331,11 +339,11 @@ public class ResponseService {
 		rd.setEvent(EventService.get().savePostEvent(true, pageName).getObject());
 
 		// Flush changes to datastore
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 	}
 	
 	public void saveResponseWithoutData (IModel<Response> mResponse) {
-		CwmService.get().confirmDatastoreModel(mResponse);
+		cwmService.confirmDatastoreModel(mResponse);
 		Response response = mResponse.getObject();
 		// If the Response is new, save it.
 		if (response.isTransient()) {
@@ -343,7 +351,7 @@ public class ResponseService {
 				response.setCreateDate(new Date());
 			Databinder.getHibernateSession().save(response);
 		}
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 	}
 	
 	/**
@@ -406,7 +414,7 @@ public class ResponseService {
 		
 		mResponse.getObject().setSortOrder(index);
 		
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 		
 	}
 	/**
@@ -417,7 +425,7 @@ public class ResponseService {
 	 */
 	public void deleteResponse(IModel<Response> r) {
 
-		CwmService.get().confirmDatastoreModel(r);
+		cwmService.confirmDatastoreModel(r);
 
 		// Do nothing for a transient Response object
 		if (r.getObject().isTransient())
@@ -430,7 +438,7 @@ public class ResponseService {
 		r.getObject().setSortOrder(null);
 		
 		// Flush changes to datastore
-		CwmService.get().flushChanges();
+		cwmService.flushChanges();
 		
 		EventService.get().saveEvent("post:delete", String.valueOf(r.getObject().getId()), null);
 	}

@@ -41,6 +41,7 @@ import org.apache.sanselan.Sanselan;
 import org.apache.wicket.Resource;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
@@ -48,6 +49,8 @@ import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 /**
  * TODO: Compare for quality with https://cwiki.apache.org/WICKET/uploaddownload.html as it was suggested by Igor
  * 
@@ -58,6 +61,9 @@ public class ImageService {
 
 	private static final Logger log = LoggerFactory.getLogger(ImageService.class);
 	
+	@Inject
+	private ICwmService cwmService;
+
 	protected static Map<ScaledImageKey, ScaledImage> scaledImageCache;
 	protected static final int MAX_SCALED_ENTRIES = 1000;
 	protected static Color FILL_COLOR = new Color(248, 248, 248); // #F8F8F8
@@ -80,6 +86,10 @@ public class ImageService {
 
 	public static ImageService get() {
 		return instance;
+	}
+
+	public ImageService() {
+		InjectorHolder.getInjector().inject(this);
 	}
 	
 	/**
@@ -214,7 +224,7 @@ public class ImageService {
 		
 		if (key.getKey() instanceof Long) {
 			Long datastoreId = (Long) key.getKey();
-			BinaryFileData data = CwmService.get().getById(BinaryFileData.class, datastoreId).getObject();
+			BinaryFileData data = cwmService.getById(BinaryFileData.class, datastoreId).getObject();
 			thumb = new ScaledImage(resizeToBufferedImage(data.getData(), key.getWidth(), key.getHeight()));
 			try {
 				thumb.setType(Sanselan.getImageInfo(data.getData()).getFormat().extension.toLowerCase());
@@ -257,7 +267,7 @@ public class ImageService {
 	}
 	
 	public ScaledImageResourceReference getResourceReference(Long datastoreId, Integer maxWidth, Integer maxHeight) {
-		BinaryFileData data = CwmService.get().getById(BinaryFileData.class, datastoreId).getObject();
+		BinaryFileData data = cwmService.getById(BinaryFileData.class, datastoreId).getObject();
 		String name = datastoreId.toString() + "_" + (data == null ? "unknown.png" : data.getName());
 		return getResourceReference(name, datastoreId, maxWidth, maxHeight);
 		

@@ -22,12 +22,16 @@ package org.cast.cwm.data.resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.DynamicWebResource;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.CwmService;
+import org.cast.cwm.service.ICwmService;
+
+import com.google.inject.Inject;
 
 /**
  * A simple resource that accepts an "id" parameter and serves up
@@ -45,12 +49,16 @@ public class UploadedFileResource extends DynamicWebResource {
 	public static final String UPLOAD_FILE_PATH = "file";
 	private static boolean mounted = false;
 
+	@Inject
+	private ICwmService cwmService;
+
 	/**
 	 * Constructor.  Turns caching on by default,
 	 * overriding superclass behavior.  
 	 */
 	public UploadedFileResource() {
 		super();
+		InjectorHolder.getInjector().inject(this);
 		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
 		// date, before the session context has been set up, and this database session can remain unclosed.
 		// setCacheable(true);
@@ -65,7 +73,7 @@ public class UploadedFileResource extends DynamicWebResource {
 			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Invalid File Id");	
 		
 		// Get Data; throw 404 if not found
-		final BinaryFileData bfd = CwmService.get().getById(BinaryFileData.class, id).getObject();
+		final BinaryFileData bfd = cwmService.getById(BinaryFileData.class, id).getObject();
 		if (bfd == null)
 			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "File not found [id=" + id + "]");
 		

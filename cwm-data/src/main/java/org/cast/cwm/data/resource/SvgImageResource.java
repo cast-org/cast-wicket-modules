@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.DynamicWebResource;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
@@ -31,6 +32,9 @@ import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.drawtool.SvgEditor;
 import org.cast.cwm.service.CwmService;
+import org.cast.cwm.service.ICwmService;
+
+import com.google.inject.Inject;
 
 /**
  * A simple resource that accepts an "id" parameter and serves up
@@ -48,8 +52,12 @@ public class SvgImageResource extends DynamicWebResource {
 	
 	private static final long serialVersionUID = 1L;
 
+	@Inject
+	private ICwmService cwmService;
+
 	public SvgImageResource() {
 		super();
+		InjectorHolder.getInjector().inject(this);
 		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
 		// date, before the session context has been set up, and this database session can remain unclosed.
 		//setCacheable(true);
@@ -63,7 +71,7 @@ public class SvgImageResource extends DynamicWebResource {
 			log.warn("Invalid SVG request: null id");
 			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Invalid Svg Id");	
 		}
-		ResponseData rd = CwmService.get().getById(ResponseData.class, id).getObject();
+		ResponseData rd = cwmService.getById(ResponseData.class, id).getObject();
 		if (rd == null) {
 			log.warn("Invalid SVG request, id {} does not exist", id);
 			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [id=" + id + "]");

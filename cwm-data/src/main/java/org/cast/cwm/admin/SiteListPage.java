@@ -32,7 +32,10 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
 import org.cast.cwm.service.CwmService;
+import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.SiteService;
+
+import com.google.inject.Inject;
 
 /**
  * Page for viewing sites and their associated periods.  Links generated for edit site, edit
@@ -45,6 +48,9 @@ public class SiteListPage extends AdminPage {
 	private static int ITEMS_PER_PAGE = 5;
 	private DataView<Site> siteList;
 	
+	@Inject
+	private ICwmService cwmService;
+
 	public SiteListPage(PageParameters parameters) {
 		super(parameters);
 		
@@ -76,7 +82,7 @@ public class SiteListPage extends AdminPage {
 
 					@Override
 					protected void deleteObject() {
-						CwmService.get().delete(getModel());
+						cwmService.delete(getModel());
 					}
 				};
 				item.add(dialog);
