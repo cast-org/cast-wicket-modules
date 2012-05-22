@@ -135,10 +135,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 			loadAppProperties();		
 		}
 
-		addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
-
-		EventService.setInstance(new EventService());
-
 		// If using Logback as the logger, and we have a logConfig property,
 		// then read that configuration.
 		String logConfig = appProperties.getProperty("cwm.logConfig");
@@ -158,6 +154,9 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    	}
 	    	StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 	    }
+
+	    addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
+	    EventService.setInstance(new EventService());
 
 	    super.internalInit();
 	}
