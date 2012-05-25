@@ -89,7 +89,7 @@ public class CwmWicketTester extends WicketTester {
 			try {
 				IModel<?> model = (IModel<?>) getReplaceModelMethod
 						.invoke(behavior);
-				assertThat(message, model.getObject().toString(), equalTo("current"));
+				assertThat(message, model.getObject().toString(), equalTo(expected));
 				return;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -109,7 +109,7 @@ public class CwmWicketTester extends WicketTester {
 			try {
 				IModel<?> model = (IModel<?>) getReplaceModelMethod
 						.invoke(behavior);
-				assertThat(message, model.getObject().toString(), not(equalTo("current")));
+				assertThat(message, model.getObject().toString(), not(equalTo(expected)));
 				return;
 			} catch (Exception e) {
 				throw new RuntimeException(e);
