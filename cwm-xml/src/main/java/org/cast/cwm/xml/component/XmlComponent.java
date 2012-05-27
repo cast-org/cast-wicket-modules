@@ -47,13 +47,15 @@ import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.TransformResult;
 import org.cast.cwm.xml.XmlSection;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
 import org.cast.cwm.xml.transform.TransformParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.google.inject.Inject;
 
 /**
  * A Wicket Component that displays HTML generated from a section of an XML file.
@@ -74,6 +76,9 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	
 	@Getter @Setter
 	private TransformParameters transformParameters = null;
+	
+	@Inject
+	protected IXmlService xmlService;
 	
 	public XmlComponent(String id, ICacheableModel<? extends IXmlPointer> secMod, String transformName) {
 		super(id, secMod);
@@ -102,7 +107,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	}
 	
 	public boolean isEmpty () {
-		TransformResult res = XmlService.get().getTransformed(getModel(), transformName, transformParameters);
+		TransformResult res = xmlService.getTransformed(getModel(), transformName, transformParameters);
 		return res.getElement() == null;
 	}
 
@@ -114,8 +119,8 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	 * 
 	 */
 	protected void addDynamicComponents() {
-		Element dom = XmlService.get().getTransformed(getModel(), transformName, transformParameters).getElement();
-		NodeList componentNodes = XmlService.get().getWicketNodes(dom, true);
+		Element dom = xmlService.getTransformed(getModel(), transformName, transformParameters).getElement();
+		NodeList componentNodes = xmlService.getWicketNodes(dom, true);
 		Map<Element,Component> componentMap = new HashMap<Element,Component>(); // Mapping of Nodes to Components; used for nesting
 		final Set<String> wicketIds = new HashSet<String>();
 		
@@ -181,22 +186,6 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	}
 	
 	/**
-	 * @deprecated  Use XmlService.get().getWicketNodes(Element elt, boolean all) instead.
-	 * 
-	 * Finds wicket nodes for a given element. This method either returns all of the 
-	 * wicket nodes (up and down the DOM) or the first layer of wicket nodes immediately
-	 * below the provided element.
-	 * 
-	 * @param elt the element to search
-	 * @param all true, if searching the entire tree.  false, if just searching for the first wicket children.
-	 * @return
-	 */
-	@Deprecated()
-	public static NodeList getWicketNodes(Element elt, boolean all) {
-		return XmlService.get().getWicketNodes(elt, all);
-	}
-
-	/**
 	 * Determine what Wicket Component to insert into the XmlComponent based on the ID and XML Element.
 	 * Override this method to create the proper dynamic behavior for your application.
 	 * 
@@ -209,7 +198,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 		boolean isContainer = false;
 		
 		// Check to see if this element has any Wicket Children.
-		NodeList childrenComponents = XmlService.get().getWicketNodes(elt, false);
+		NodeList childrenComponents = xmlService.getWicketNodes(elt, false);
 		if (childrenComponents.getLength() > 0) {
 			isContainer = true;
 		}
@@ -227,7 +216,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	 * @return
 	 */
 	protected String getMarkup() {
-		String content = XmlService.get().getTransformed(getModel(), transformName, transformParameters).getString();
+		String content = xmlService.getTransformed(getModel(), transformName, transformParameters).getString();
 		if (content == null)
 			content = "";
 		return "<wicket:panel>" + content + "</wicket:panel>";

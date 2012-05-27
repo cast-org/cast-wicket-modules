@@ -29,13 +29,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Resource;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.parser.XmlParser;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+
+import com.google.inject.Inject;
 
 /**
  * A class that parses and holds the high level structure of an XML document.  Also,
@@ -68,7 +71,12 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	protected Map<String,XmlSection> longDescMap;
 	protected Map<Serializable, List<XmlSection>> labelMap;
 	
-	public XmlDocument(String name, Resource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {		
+	@Inject
+	private IXmlService xmlService;
+	
+	public XmlDocument(String name, Resource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
+		super();
+		InjectorHolder.getInjector().inject(this);
 		this.name = name;
 		this.xmlFile = xmlFile;
 		this.parser = parser;
@@ -127,7 +135,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	 */
 	public Time getLastModified() {
 		// Only actually look at the disk to find last-modified time every 10 seconds or so (whatever value is set in XmlService)
-		if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > XmlService.get().getUpdateCheckInterval())
+		if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > xmlService.getUpdateCheckInterval())
 			updateIfModified();
 		return lastModified;
 	}

@@ -22,18 +22,29 @@ package org.cast.cwm.xml.transform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.util.time.Time;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import com.google.inject.Inject;
 
 public class EnsureUniqueWicketIds implements IDOMTransformer {
 
 	private static final String WICKET_NS = "http://wicket.apache.org";
+	
+	@Inject
+	private IXmlService xmlService;
+
+	public EnsureUniqueWicketIds() {
+		super();
+		InjectorHolder.getInjector().inject(this);
+	}
 
 	public Element applyTransform(Element elt, TransformParameters params) {
 		List<String> wicketIds = new ArrayList<String>();
-		NodeList wicketChildren = XmlService.get().getWicketNodes(elt, false);
+		NodeList wicketChildren = xmlService.getWicketNodes(elt, false);
 		
 		for (int i=0; i < wicketChildren.getLength(); i++) {
 			Element child = (Element) wicketChildren.item(i);

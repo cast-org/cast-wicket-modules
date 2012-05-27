@@ -35,15 +35,18 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.xerces.util.XMLCatalogResolver;
 import org.cast.cwm.xml.XmlSection;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.inject.Inject;
 
 /**
  * Parses an XML document using the DaisyBook format in the document
@@ -63,6 +66,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 	
 	public DtbookParser () {
 		super();
+		InjectorHolder.getInjector().inject(this);
 	}
 	
 	/**
@@ -74,6 +78,9 @@ public class DtbookParser extends XmlParser implements Serializable {
 	 * A counter to keep track of XmlSections as we come to them.  Used by XmlSection for ordering
 	 */
 	private int elementCounter = 0;
+	
+	@Inject
+	private IXmlService xmlService;
 	
 	/** 
 	 * Elements that are of interest for creating the document tree structure  
@@ -131,7 +138,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 		document.setXmlStandalone(false);
 		
 		// Create the Root XmlSection
-		XmlSection root = XmlService.get().newXmlSection(); 
+		XmlSection root = xmlService.newXmlSection(); 
 		root.init(doc, null, XmlSection.DOCUMENT_ID, document.getDocumentElement(), "DocumentTitle");
 
 		addToIdMap(XmlSection.DOCUMENT_ID, root);

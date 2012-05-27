@@ -46,22 +46,29 @@ import org.slf4j.LoggerFactory;
 public class TransformContextURIResolver implements URIResolver {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformContextURIResolver.class);
-
+	
 	public Source resolve(String href, String base) throws TransformerException {
-		String hrefPath = null;
-		File file;
+		File file = findTransformFile(href, base);
 		
-		// loop through the directories defined in xmlService to find the transformation file
-		for (String directory : XmlService.get().getTransformerDirectories()) {
-			file = new File(directory, href);
-			if (file.exists()) {
-				// return a valid stream
-				return getValidStream(file);
-			}
-		}
+		if ((file != null) && (file.exists())) {
+			// return a valid stream
+			return getValidStream(file);
+		} 
 		
+		log.error("The xsl file {} was not found", href);
+		return null;
+	}
+
+	private File findTransformFile(String href, String base) {
+		File file = XmlService.get().findTransformFile(href);
+		if (file != null) 
+			return file;
+		return findRelativeToCurrentTransformationDirectory(href, base);
+	}
+	
+	private File findRelativeToCurrentTransformationDirectory(String href, String base) {
 		// If the file wasn't found in the explicit directories, check relative to the current transformation directory. 	
-		hrefPath = RequestUtils.toAbsolutePath(base, href);	
+		String hrefPath = RequestUtils.toAbsolutePath(base, href);	
 		URL url = null;
 		try {
 			url = new URI(hrefPath).toURL();
@@ -72,16 +79,15 @@ public class TransformContextURIResolver implements URIResolver {
 			log.error("Error URI Syntax Exception retrieving url for path {}", hrefPath);
 			e.printStackTrace();
 		}
-		file = new File(url.getFile());
+		File file = new File(url.getFile());
 		if (file.exists()) {
 			// return a valid stream
-			return getValidStream(file);
+			return file;
 		} 
 		
-		log.error("The xsl file {} was not found", href);
 		return null;
 	}
-	
+
 	/**
 	 * Returns a StreamSource for a file that exists.
 	 * @param file
