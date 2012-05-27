@@ -154,6 +154,8 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    	}
 	    	StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 	    }
+	    
+	    loadServices();
 
 	    addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
 	    EventService.setInstance(new EventService());
@@ -161,8 +163,18 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    super.internalInit();
 	}
 
+	/**
+	 * Load services needed before Guice setup.
+	 * 
+	 * To be overriden in subclasses...
+	 * 
+	 */
+	protected void loadServices() {
+	}
+
 	@Override
 	protected void init() {
+		log.debug("Starting CWM Application Init");
 		super.init();
 		
 		mailHost   = appProperties.getProperty("cwm.mailHost");
@@ -177,6 +189,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 		// Mount Resource Handlers
 		UploadedFileResource.mount(this);
 		SvgImageResource.mount(this);
+		log.debug("Finished CWM Application Init");
 	}
 
 	private Module[] getInjectionModuleArray() {

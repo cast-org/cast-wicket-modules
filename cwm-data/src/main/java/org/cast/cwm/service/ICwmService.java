@@ -85,7 +85,6 @@ public interface ICwmService {
 	 * Return a list of all distinct initializers that have been run.
 	 * @return list of names of initializers that have at some point been run.
 	 */
-	@SuppressWarnings("unchecked")
 	List<String> getInitializationNames();
 
 	/**
