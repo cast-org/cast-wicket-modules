@@ -23,9 +23,12 @@ import java.io.Serializable;
 
 import lombok.EqualsAndHashCode;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.time.Time;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
+
+import com.google.inject.Inject;
 
 /**
  * A Model pointing to an XmlSection.
@@ -45,9 +48,14 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 	private String docName;
 	private String sectionId;
 	
+	@Inject
+	private IXmlService xmlService;
+	
 	private static final long serialVersionUID = 1L;
 
 	public XmlSectionModel (XmlSection s) {
+		super();
+		InjectorHolder.getInjector().inject(this);
 		setObject(s);
 	}
 
@@ -70,7 +78,7 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 	}
 
 	protected XmlDocument getDocument() {
-		return XmlService.get().getDocument(docName);
+		return xmlService.getDocument(docName);
 	}
 
 	public Serializable getKey() {

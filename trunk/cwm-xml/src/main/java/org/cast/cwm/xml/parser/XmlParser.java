@@ -19,18 +19,14 @@
  */
 package org.cast.cwm.xml.parser;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import org.cast.cwm.xml.XmlDocument;
 import org.cast.cwm.xml.XmlSection;
-import org.xml.sax.SAXException;
 
 /**
  * Parses XML input and returns a root {@link XmlSection} for the parsed tree.  The
