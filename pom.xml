@@ -299,8 +299,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.3.1</version>
-                <scope>test</scope>
+                <version>4.10</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
