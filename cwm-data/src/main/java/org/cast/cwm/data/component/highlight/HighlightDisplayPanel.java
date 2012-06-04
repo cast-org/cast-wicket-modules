@@ -47,7 +47,9 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.service.HighlightService;
 import org.cast.cwm.service.HighlightService.HighlightType;
-import org.cast.cwm.service.ResponseService;
+import org.cast.cwm.service.IResponseService;
+
+import com.google.inject.Inject;
 
 /**
  * A panel that outputs several hidden input fields for each registered highlighter.  These
@@ -72,6 +74,9 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	
 	private IModel<User> mUser; // Target user to display
 
+	@Inject
+	protected IResponseService responseService;
+	
 	public HighlightDisplayPanel(String id, IModel<Prompt> model) {
 		this(id, model, null);
 	}
@@ -79,7 +84,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	public HighlightDisplayPanel(String id, IModel<Prompt> model, IModel<User> targetUser) {
 		super(id, model);
 		mUser = (targetUser == null ? CwmSession.get().getUserModel() : targetUser);
-		add(new HighlightDisplayForm("highlightDisplay", ResponseService.get().getResponseForPrompt(model, mUser)));
+		add(new HighlightDisplayForm("highlightDisplay", responseService.getResponseForPrompt(model, mUser)));
 	}
 
 	
@@ -101,7 +106,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 			
 			// If there are no existing highlights, create new Response
 			if (getModelObject() == null)
-				setModel(ResponseService.get().newResponse(mUser, CwmApplication.get().getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
+				setModel(responseService.newResponse(mUser, CwmApplication.get().getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
 			
 			highlights = HighlightService.get().decodeHighlights(model.getObject() == null ? "" : model.getObject().getResponseData().getText());
 			
@@ -141,7 +146,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 			String encodedString = HighlightService.get().encodeHighlights(colors, highlightsToSave);
 
 			// TODO: Need a page name...how?
-			ResponseService.get().saveTextResponse(this.getModel(), encodedString, null);
+			responseService.saveTextResponse(this.getModel(), encodedString, null);
 		}
 		
 		@Override

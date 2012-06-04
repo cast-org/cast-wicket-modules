@@ -54,9 +54,12 @@ import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.models.ResponseModel;
+import org.cast.cwm.service.IResponseService;
 import org.cast.cwm.service.ResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 import wicket.contrib.tinymce.settings.AutoResizePlugin;
 import wicket.contrib.tinymce.settings.Button;
@@ -129,6 +132,9 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	 */
 	private boolean isEditing = false;
 
+	@Inject
+	protected IResponseService responseService;
+
 	public BasicResponseArea(String id, IModel<? extends Prompt> model) {
 		this(id, model, false);
 	}
@@ -200,7 +206,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			@Override
 			protected Iterator<IModel<Response>> getItemModels() {
 				
-				Iterator<Response> responses = ResponseService.get().getResponsesForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel()).getObject().iterator();
+				Iterator<Response> responses = responseService.getResponsesForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel()).getObject().iterator();
 
 				return new ModelIteratorAdapter<Response>(responses) {
 

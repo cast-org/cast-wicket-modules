@@ -79,13 +79,15 @@ import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.drawtool.SvgEditor;
-import org.cast.cwm.service.ResponseService;
+import org.cast.cwm.service.IResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import wicket.contrib.tinymce.TinyMceBehavior;
 import wicket.contrib.tinymce.ajax.TinyMceAjaxSubmitModifier;
 import wicket.contrib.tinymce.settings.TinyMCESettings;
+
+import com.google.inject.Inject;
 
 /**
  * Base class for editing any type of response.  This class handles the actual saving
@@ -105,7 +107,7 @@ public abstract class ResponseEditor extends Panel {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(ResponseEditor.class);
 	
-	@Getter @Setter protected IModel<Prompt> prompt;
+	@Getter @Setter protected IModel<? extends Prompt> prompt;
 	@Getter @Setter protected String pageName;
 	@Getter @Setter protected IResponseType type;
 	@Getter @Setter protected List<String> starters = new ArrayList<String>();
@@ -134,6 +136,8 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected boolean newResponse = false;
 	@Getter @Setter protected boolean hasAutoSaved = false;
 
+	@Inject
+	protected IResponseService responseService;
 
 	/**
 	 * Creates a panel with no existing data, attached to the given prompt.
@@ -143,8 +147,13 @@ public abstract class ResponseEditor extends Panel {
 	 * @param prompt
 	 */
 	public ResponseEditor(String id, IModel<? extends Prompt> prompt, IResponseType type) {
-		this(id, ResponseService.get().newResponse(CwmSession.get().getUserModel(), type, prompt));
+		super(id);
 		newResponse = true;
+		this.prompt = prompt;
+		this.type = type;
+		mOriginalResponse = responseService.newResponse(CwmSession.get().getUserModel(), type, prompt);
+		setModel(mOriginalResponse);
+		setOutputMarkupPlaceholderTag(true);
 	}
 	
 	/**
@@ -191,7 +200,7 @@ public abstract class ResponseEditor extends Panel {
 			protected void onCancel(AjaxRequestTarget target) {
 				if (newResponse) {
 					// cancel a new response - remove that response
-					ResponseService.get().deleteResponse(getModel());
+					responseService.deleteResponse(getModel());
 					setModelObject(null);
 				} else if (hasAutoSaved){
 					// FIXME:  Need to implement a transaction rollback here - ldm
@@ -221,7 +230,7 @@ public abstract class ResponseEditor extends Panel {
 
 			@Override
 			protected void deleteObject(AjaxRequestTarget target) {
-				ResponseService.get().deleteResponse(getModel());
+				responseService.deleteResponse(getModel());
 				setModelObject(null);
 				target.addComponent(feedbackPanel);
 				onDelete(target);				
@@ -300,7 +309,7 @@ public abstract class ResponseEditor extends Panel {
 				public void onSubmit() {
 					super.onSubmit();
 					String message = this.get("message").getDefaultModelObjectAsString();
-					ResponseService.get().saveTextResponse(getModel(), message, pageName);
+					responseService.saveTextResponse(getModel(), message, pageName);
 				}
 			};
 			form.setOutputMarkupId(true);
@@ -458,7 +467,7 @@ public abstract class ResponseEditor extends Panel {
 					super.onSubmit();
 					// get the value of the table content from the model and save it as a text response
 					String tableContent = this.get("tableContent").getDefaultModelObjectAsString();
-					ResponseService.get().saveTextResponse(getModel(), tableContent, pageName);
+					responseService.saveTextResponse(getModel(), tableContent, pageName);
 					newResponse = false;
 				}
 			};
@@ -707,7 +716,7 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public void onReceiveAudio() {
 					String filename = ResponseEditor.this.getModel().getObject().getUser().getId() + "_" + Time.now().getMilliseconds() + ".au";
-					ResponseService.get().saveBinaryResponse(ResponseEditor.this.getModel(), getModelObject(), "audio/au", filename, pageName);
+					responseService.saveBinaryResponse(ResponseEditor.this.getModel(), getModelObject(), "audio/au", filename, pageName);
 				}
 
 				@Override
@@ -742,7 +751,7 @@ public abstract class ResponseEditor extends Panel {
 					
 					FileUpload fileUpload = ((FileUploadField) this.get("fileUploadField")).getFileUpload();
 					if (fileUpload != null) {
-						ResponseService.get().saveBinaryResponse(getModel(), fileUpload.getBytes(), fileUpload.getContentType(), fileUpload.getClientFileName(), pageName);
+						responseService.saveBinaryResponse(getModel(), fileUpload.getBytes(), fileUpload.getContentType(), fileUpload.getClientFileName(), pageName);
 					}
 				}
 			};
@@ -823,7 +832,7 @@ public abstract class ResponseEditor extends Panel {
 					super.onSubmit();
 					String svg = this.get("svg").getDefaultModelObjectAsString();
 					svg = svg.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"").replaceAll("[\\r\\n\\f]", " ");
-					ResponseService.get().saveSVGResponse(getModel(), svg, pageName);
+					responseService.saveSVGResponse(getModel(), svg, pageName);
 				}
 			};
 			final HiddenField<String> svg = new HiddenField<String>("svg", new Model<String>(""));

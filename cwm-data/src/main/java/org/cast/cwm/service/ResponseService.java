@@ -33,7 +33,6 @@ import org.apache.wicket.Application;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
-import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.BinaryFileData;
@@ -63,19 +62,17 @@ import com.google.inject.Inject;
  * @author jbrookover
  *
  */
-public class ResponseService {
+public class ResponseService implements IResponseService {
 
 	@Inject
-	private ICwmService cwmService;
+	protected ICwmService cwmService;
 
 	protected static ResponseService instance;
 	
 	@Getter @Setter
 	protected Class<? extends Response> responseClass = Response.class;
 
-	public ResponseService() {
-		InjectorHolder.getInjector().inject(this);
-	};
+	protected ResponseService() {/* Protected Constructor - use injection */}
 	
 	public static ResponseService get() {
 		return instance;
@@ -97,15 +94,8 @@ public class ResponseService {
 		}
 	}
 	
-	/** 
-	 * Create a new Response object of the application's preferred class,
-	 * starting with the basic information provided, and wrap it in a model that
-	 * is supported by the datastore.
-	 * 
-	 * @param user
-	 * @param type
-	 * @param prompt
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#newResponse(org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType, org.apache.wicket.model.IModel)
 	 */
 	public IModel<Response> newResponse (IModel<User> user, IResponseType type, IModel<? extends Prompt> prompt) {
 		Response instance = newResponse();
@@ -115,32 +105,16 @@ public class ResponseService {
 		return new ResponseModel(instance);
 	}
 	
-	/**
-	 * Get a list of responses for a given prompt.  This will
-	 * include responses from ALL users.  The list is sorted by 
-	 * date with the most recent response first.
-	 * 
-	 * Note: Deprecated.  You should really use a ISortableProvider.  See
-	 * {@link #getResponseProviderForPrompt(IModel)}.
-	 * 
-	 * @param p
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponsesForPrompt(org.apache.wicket.model.IModel)
 	 */
 	@Deprecated
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p) {
 		return getResponsesForPrompt(p, null);
 	}
 	
-	/**
-	 * Get a single response by a given user for a given prompt.  This assumes that only
-	 * one such response should exist.  If multiple responses are returned, an exception
-	 * will be thrown.  In such cases, use {@link #getResponsesForPrompt(IModel, IModel)},
-	 * or preferably, ISortableProvider.  See
-	 * {@link #getResponseProviderForPrompt(IModel, IModel)}.
-	 * 
-	 * @param p
-	 * @param u
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponseForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
 	public IModel<Response> getResponseForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
@@ -149,17 +123,8 @@ public class ResponseService {
 		return new ResponseModel(c);
 	}
 	
-	/**
-	 * Get a given user's responses for a given prompt, sorted by date
-	 * with the most recent response first.
-	 * 
-	 * Note: Deprecated.  You should really use a ISortableProvider.  See
-	 * {@link #getResponseProviderForPrompt(IModel)}.
-	 * 
-	 * 
-	 * @param p the prompt
-	 * @param u the user
-	 * @return a list of {@link Response} objects
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponsesForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
 	@Deprecated
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
@@ -169,6 +134,9 @@ public class ResponseService {
 		return new ResponseListModel(c);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponsesForPrompt(org.apache.wicket.model.IModel, java.util.Date, java.util.Date)
+	 */
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p, Date from, Date to) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -177,6 +145,9 @@ public class ResponseService {
 		return new ResponseListModel(c);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponsesForPeriod(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
+	 */
 	public IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p, IModel<Period> period) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -184,10 +155,16 @@ public class ResponseService {
 		return new ResponseListModel(c);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponseProviderForPrompt(org.apache.wicket.model.IModel)
+	 */
 	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p) {
 		return getResponseProviderForPrompt(p, null);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponseProviderForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
+	 */
 	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -195,14 +172,8 @@ public class ResponseService {
 		return new SortableHibernateProvider<Response>(Response.class, c);
 	}
 	
-	/**
-	 * Get the total number of valid responses for the given prompt.
-	 * If a response type is specified, only responses of that type will be counted.
-	 * If mUser is specified, then only responses by that user will be counted.
-	 * @param mPrompt the prompt for which responses will be counted
-	 * @param type the type of responses to count (null to count all)
-	 * @param mUser the user whose responses will be counted, or null to count all users.
-	 * @return the count
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponseCountForPrompt(org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType, org.apache.wicket.model.IModel)
 	 */
 	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, IResponseType type, IModel<? extends User> mUser) {
 		Criteria c = Databinder.getHibernateSession().createCriteria(Response.class);
@@ -217,12 +188,8 @@ public class ResponseService {
 		return (Long) c.uniqueResult();
 	}
 	
-	/**
-	 * Get the latest response, from any user, for a given prompt and response type.
-	 * 
-	 * @param p
-	 * @param type
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getLatestResponseByType(org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType)
 	 */
 	public IModel<Response> getLatestResponseByType(IModel<? extends Prompt> p, IResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
@@ -232,13 +199,8 @@ public class ResponseService {
 		return new ResponseModel(c);
 	}
 
-	/**
-	 * Get the latest response, from the provided user, for a given prompt and response type.
-	 * 
-	 * @param p
-	 * @param u
-	 * @param type
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getLatestResponseByTypeForUser(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType)
 	 */
 	public IModel<Response> getLatestResponseByTypeForUser(IModel<? extends Prompt> p, IModel<User> u, IResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
@@ -251,26 +213,30 @@ public class ResponseService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#saveTextResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.String)
+	 */
 	public void saveTextResponse(IModel<Response> response, String message, String pageName) {
 		genericSaveResponse(response, message, null, null, null, null, pageName);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#saveStarRating(org.apache.wicket.model.IModel, int)
+	 */
 	public void saveStarRating(IModel<Response> mResponse, int score) {
 		genericSaveResponse(mResponse, null, score, null, score, null, null);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#saveBinaryResponse(org.apache.wicket.model.IModel, byte[], java.lang.String, java.lang.String, java.lang.String)
+	 */
 	public void saveBinaryResponse(IModel<Response> r, byte[] bytes, String mimeType, String fileName, String pageName) {
 		BinaryFileData bd = new BinaryFileData(fileName, mimeType, bytes);
 		genericSaveResponse(r, null, null, null, null, bd, pageName);
 	}
 	
-	/**
-	 * Attach a {@link BinaryFileData
-	 * @param mResponse
-	 * @param bytes
-	 * @param mimeType
-	 * @param fileName
-	 * @param pageName
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#attachBinaryResponse(org.apache.wicket.model.IModel, org.apache.wicket.markup.html.form.upload.FileUpload)
 	 */
 	public IModel<BinaryFileData> attachBinaryResponse(IModel<Response> mResponse, FileUpload file) {
 
@@ -297,24 +263,22 @@ public class ResponseService {
 		return new HibernateObjectModel<BinaryFileData>(dbFile);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#saveSVGResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.String)
+	 */
 	public void saveSVGResponse(IModel<Response> mResponse, String svg, String pageName) {
 		saveTextResponse(mResponse, svg, pageName);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#saveFlashAudioResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.String)
+	 */
 	public void saveFlashAudioResponse(IModel<Response> response, String audioId, String pageName) {
 		saveTextResponse(response, audioId, pageName); // Flash audio just saves id in 3rd party server
 	}
 	
-	/**
-	 * Create a new {@link ResponseData} value for the given {@link Response}.  You can also
-	 * use this method to create an entirely new Response by passing in a transient object.
-	 * 
-	 * @param type
-	 * @param prompt
-	 * @param user
-	 * @param text
-	 * @param score
-	 * @param total
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#genericSaveResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Integer, org.cast.cwm.data.BinaryFileData, java.lang.String)
 	 */
 	public void genericSaveResponse(IModel<Response> mResponse, String text, Integer score, Integer attempted, Integer total, BinaryFileData bd, String pageName) {		
 		
@@ -342,6 +306,9 @@ public class ResponseService {
 		cwmService.flushChanges();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#saveResponseWithoutData(org.apache.wicket.model.IModel)
+	 */
 	public void saveResponseWithoutData (IModel<Response> mResponse) {
 		cwmService.confirmDatastoreModel(mResponse);
 		Response response = mResponse.getObject();
@@ -354,23 +321,8 @@ public class ResponseService {
 		cwmService.flushChanges();
 	}
 	
-	/**
-	 * Uses {@link Response#setSortOrder(Integer)} to adjust the location of a 
-	 * {@link Response} in a list of responses for a given {@link Prompt}.  Adjusts
-	 * all affected Response objects whose sortOrder changes.
-	 * 
-	 * Note 1: This method assumes that the response has already been persisted (and therefore attached
-	 * to the prompt).
-	 * 
-	 * Note 2: This method overrides any existing sortOrder values and re-indexes them
-	 * into sequential order.  This erases any drift from 'deleting' Responses, which
-	 * does not cascade to the sortOrder and leaves gaps in the sequence.
-	 * 
-	 * TODO: This has not been extensively tested.
-	 * 
-	 * @param iterator
-	 * @param modelObject
-	 * @param index target index; null value appends to the end
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#setResponseSortOrder(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel, java.lang.Integer)
 	 */
 	public void setResponseSortOrder(IModel<? extends Prompt> mPrompt, IModel<Response> mResponse, Integer index) {
 		
@@ -417,11 +369,8 @@ public class ResponseService {
 		cwmService.flushChanges();
 		
 	}
-	/**
-	 * Delete a response from the datastore.  This does not actually remove
-	 * any data, but sets {@link Response#setValid(boolean)} to 'false.'
-	 *  
-	 * @param r the response to be deleted
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#deleteResponse(org.apache.wicket.model.IModel)
 	 */
 	public void deleteResponse(IModel<Response> r) {
 
@@ -445,10 +394,16 @@ public class ResponseService {
 
 	
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getResponseById(java.lang.Long)
+	 */
 	public IModel<Response> getResponseById(Long id) {
 		return new ResponseModel(id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IResponseService#getPromptById(java.lang.Long)
+	 */
 	public IModel<Prompt> getPromptById(Long id) {
 		return new PromptModel(id);
 	}
