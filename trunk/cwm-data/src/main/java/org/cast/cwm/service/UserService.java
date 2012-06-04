@@ -30,6 +30,8 @@ import net.databinder.models.hib.QueryBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.admin.EditUserPanel;
@@ -140,6 +142,25 @@ public class UserService {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setEmail(email);
 		return new UserModel(c);
+	}
+	
+	// gets both valid and invalid users
+	public IModel<User> getAllByEmail (String email) {
+
+		// Sort valid users to the top
+		SingleSortState sort = new SingleSortState();
+		SortParam sortParam = new SortParam("valid", false);
+		sort.setSort(sortParam);
+
+		// it is possible to return both valid and invalid
+		UserCriteriaBuilder c = new UserCriteriaBuilder();
+		c.setEmail(email);
+		c.setGetAllUsers(true);
+		c.setSortState(sort);
+		UserListModel userListModel = new UserListModel(c);
+		UserModel mUser = new UserModel(userListModel.getObject().get(0));
+		
+		return mUser;
 	}
 	
 	public IModel<User> getByFullnameFromPeriod(String firstName, String lastName, IModel<Period> period) {
