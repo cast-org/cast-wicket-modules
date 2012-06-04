@@ -25,12 +25,17 @@ import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.drawtool.extension.UploadExtension;
-import org.cast.cwm.service.ResponseService;
+import org.cast.cwm.service.IResponseService;
+
+import com.google.inject.Inject;
 
 public class SvgUploadExtensionImpl extends UploadExtension {
 
 	private static final long serialVersionUID = 1L;
 	
+	@Inject
+	private IResponseService responseService;
+
 	public SvgUploadExtensionImpl(IModel<Response> model) {
 		super();
 		setDefaultModel(model);
@@ -39,7 +44,7 @@ public class SvgUploadExtensionImpl extends UploadExtension {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected String processFile(FileUpload file) {
-		IModel<BinaryFileData> mUploadedFile = ResponseService.get().attachBinaryResponse((IModel<Response>) getDefaultModel(), file);
+		IModel<BinaryFileData> mUploadedFile = responseService.attachBinaryResponse((IModel<Response>) getDefaultModel(), file);
 		return UploadedFileResource.constructUrl(mUploadedFile.getObject());
 	}
 }

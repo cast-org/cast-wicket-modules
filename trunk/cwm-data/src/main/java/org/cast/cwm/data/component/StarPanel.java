@@ -43,9 +43,12 @@ import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.service.IResponseService;
 import org.cast.cwm.service.ResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Basic Star Rating Panel  This is essentially both a {@link ResponseEditor} and
@@ -68,6 +71,9 @@ public class StarPanel extends Panel implements IHeaderContributor {
 	 */
 	private int numStars = 5;
 	
+	@Inject
+	private IResponseService responseService;
+
 	/**
 	 * Constructor.  If the model object is null, this component will be invisible.
 	 * 
@@ -98,7 +104,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 
 			@Override
 			public void onSubmit() {
-				ResponseService.get().saveStarRating(getModel(), Integer.valueOf(radioGroup.getValue()).intValue());
+				responseService.saveStarRating(getModel(), Integer.valueOf(radioGroup.getValue()).intValue());
 			}
 		}; 
 
