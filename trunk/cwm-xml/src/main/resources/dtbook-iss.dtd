@@ -21,6 +21,26 @@
 
 %dtbook;
 
+<!-- Allow certain behavior options to be specified on sections.
+     Currently known values:
+
+     "lock-response": responsegroups in the section become read only
+     when section is considered "complete"
+
+     "delay-feedback": don't show feedback and scores for responses
+      until the section is considered "reviewed"
+ -->
+
+<!ENTITY % behaviorAttribute " behavior NMTOKENS #IMPLIED" >
+
+<!ATTLIST level1 %behaviorAttribute; >
+<!ATTLIST level2 %behaviorAttribute; >
+<!ATTLIST level3 %behaviorAttribute; >
+<!ATTLIST level4 %behaviorAttribute; >
+<!ATTLIST level5 %behaviorAttribute; >
+<!ATTLIST level6 %behaviorAttribute; >
+<!ATTLIST level  %behaviorAttribute; >
+
 <!-- Responsegroup: indicates where a user response is expected.
      Various types are supported: general "response" allows the user
      to write, draw, audio record, or upload a file.  Select and
@@ -36,6 +56,7 @@
 <!ATTLIST responsegroup class CDATA #IMPLIED>
 <!ATTLIST responsegroup title CDATA #IMPLIED>
 <!ATTLIST responsegroup group CDATA #IMPLIED>
+<!ATTLIST responsegroup %behaviorAttribute; >
 
 <!-- Prompt is the question to which the user is responding. -->
 <!ELEMENT prompt (p|list|div|blockquote|poem|linegroup|table|line|prodnote)+>
