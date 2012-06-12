@@ -33,6 +33,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.behavior.IBehavior;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -96,16 +97,20 @@ public class CwmWicketTester extends WicketTester {
 			}
 		}
 
+		SimpleAttributeModifier simpleBehavior = getSimpleAttributeModifier(component, attribute);
+		if (simpleBehavior != null) {
+			assertThat(message, simpleBehavior.getValue().toString(), equalTo(expected));
+			return;
+		}
+		
 		fail("Attribute " + attribute + " not found.");
 	}
 
 	public void assertNotAttribute(String message, String expected,
 			Component component, String attribute) {
 		AttributeModifier behavior = getAttributeModifier(component, attribute);
-		if (behavior == null) {
-			return;
-		}
-		else {
+		SimpleAttributeModifier simpleBehavior = getSimpleAttributeModifier(component, attribute);
+		if (behavior != null) {
 			try {
 				IModel<?> model = (IModel<?>) getReplaceModelMethod
 						.invoke(behavior);
@@ -115,8 +120,16 @@ public class CwmWicketTester extends WicketTester {
 				throw new RuntimeException(e);
 			}
 		}
+		else if (simpleBehavior != null) {
+			assertThat(message, simpleBehavior.getValue().toString(), not(equalTo(expected)));
+			return;
+		}
+		else {
+			return;
+		}
 		
 	}
+	
 	private AttributeModifier getAttributeModifier(Component component,
 			String attribute) {
 		List<IBehavior> behaviors = component.getBehaviors();
@@ -126,6 +139,20 @@ public class CwmWicketTester extends WicketTester {
 				if (attribute.equals(attributeModifier.getAttribute()))
 					return attributeModifier;
 			}
+		}
+		return null;
+	}
+	
+	private SimpleAttributeModifier getSimpleAttributeModifier(Component component,
+			String attribute) {
+		List<IBehavior> behaviors = component.getBehaviors();
+		for (IBehavior behavior : behaviors) {
+			if (SimpleAttributeModifier.class.isAssignableFrom(behavior.getClass())) {
+				SimpleAttributeModifier attributeModifier = (SimpleAttributeModifier) behavior;
+				if (attribute.equals(attributeModifier.getAttribute()))
+					return attributeModifier;
+			}
+			
 		}
 		return null;
 	}
