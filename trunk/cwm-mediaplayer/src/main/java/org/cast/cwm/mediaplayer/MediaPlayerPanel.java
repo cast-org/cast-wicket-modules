@@ -220,22 +220,23 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		//jsString.append(",  \'modes\': [ {type: \'html5\'}, {type: \'flash\', src: \'" + getSourceHRef() + "\'}, {type: \'download\'} ] ");
 		
 		// add the plugins section
-		if (!Strings.isEmpty(captionHRef) | !Strings.isEmpty(audioDescriptionHRef)) {
-			jsString.append(", " + "plugins: { ");
+		jsString.append(", " + "plugins: { ");
 
+		// Disable viral plugin (there doesn't seem to be any way to avoid loading it in the current version)
+		jsString.append("'viral-2': {'onpause': false, 'oncomplete': false, 'allowmenu': false, 'functions' : 'info'}");
+
+		if (!Strings.isEmpty(captionHRef))
+			jsString.append(", \"captions-2\": {file: " + "\"" + captionHRef +  "\"}");
+
+		if (!Strings.isEmpty(audioDescriptionHRef)) {
 			if (!Strings.isEmpty(captionHRef))
-				jsString.append("\"captions-2\": {file: " + "\"" + captionHRef +  "\"}");
-			
-			if (!Strings.isEmpty(audioDescriptionHRef)) {
-				if (!Strings.isEmpty(captionHRef))
-					jsString.append(", ");
-				jsString.append("\"audiodescription-2\": {file: " + "\"" + audioDescriptionHRef +  "\"}");
-			}
-
-			jsString.append("}");
+				jsString.append(", ");
+			jsString.append("\"audiodescription-2\": {file: " + "\"" + audioDescriptionHRef +  "\"}");
 		}
 
-		jsString.append("});");
+		jsString.append("}"); // end plugins
+
+		jsString.append("});"); // end setup
 		r.renderOnDomReadyJavascript(jsString.toString());
 		
 		if (useOnPlay) {
