@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -56,6 +57,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
 import org.cast.cwm.data.Event;
+import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.EventService;
 import org.cast.cwm.service.SiteService;
@@ -199,8 +201,12 @@ public class EventLog extends AdminPage {
 			public String getItemString(IModel<Event> rowModel) {
 				if (!rowModel.getObject().hasResponses())
 					return "N/A";
-				else
-					return rowModel.getObject().getResponseData().iterator().next().getText();
+				else {
+					Set<ResponseData> responseData = rowModel.getObject().getResponseData();
+					if ((responseData == null) || (responseData.isEmpty()))
+						return "Missing Response Data";
+					return responseData.iterator().next().getText();
+				}
 			}
 			
 		});
