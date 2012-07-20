@@ -56,12 +56,14 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
+import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.EventService;
 import org.cast.cwm.service.SiteService;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -192,20 +194,33 @@ public class EventLog extends AdminPage {
 
 			@Override
 			public void populateItem(Item<ICellPopulator<Event>> cellItem, String componentId, IModel<Event> rowModel) {
-				if (!rowModel.getObject().hasResponses())
-					cellItem.add(new Label(componentId, "N/A"));
-				else
-					cellItem.add(new Label(componentId, rowModel.getObject().getResponseData().iterator().next().getText()));				
+				cellItem.add(new Label(componentId, getItemString(rowModel)));				
 			}
 			
+			// TODO: this should do something more useful for audio, drawing, upload, and table responses.
+			// The raw data display is not very usable inside a spreadsheet; and for audio and upload we don't display anything at all.
+			// Perhaps we could include a link to display the item?  Or some metadata about it?
 			public String getItemString(IModel<Event> rowModel) {
-				if (!rowModel.getObject().hasResponses())
-					return "N/A";
-				else {
+				if (!rowModel.getObject().hasResponses()) {
+					return "";
+				} else {
 					Set<ResponseData> responseData = rowModel.getObject().getResponseData();
-					if ((responseData == null) || (responseData.isEmpty()))
+					if ((responseData == null) || (responseData.isEmpty())) {
+						log.warn("Event {} claims to have responses, but none found", rowModel.getObject().getId());
 						return "Missing Response Data";
-					return responseData.iterator().next().getText();
+					}
+					StringBuffer result = new StringBuffer(256);
+					if (responseData.size() > 1)
+						result.append (String.format("[%d responses] ", responseData.size()));
+					for (ResponseData r : responseData) {
+						result.append(r.getResponse().getType().getName());
+						result.append(" ");
+						String text = r.getText();
+						if (!Strings.isEmpty(text)) {
+							result.append(text);
+						}
+					}
+					return (result.toString());
 				}
 			}
 			
@@ -239,17 +254,16 @@ public class EventLog extends AdminPage {
 			criteria.add(siteRestriction);
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
 			
-			// Date check
-			//TODO Fix these dates and the From date as well
 			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
-				Calendar c = Calendar.getInstance(); // Set "to" time to end of the day
-				c.setTime((Date)toDateM.getObject());
-				c.set(Calendar.HOUR_OF_DAY, 24);
-				c.set(Calendar.MINUTE, 59);
-				c.set(Calendar.SECOND, 59);
-				log.debug("Considering events between {} and {}", fromDateM.getObject(), c.getTime());
-				criteria.add(Restrictions.between("insertTime", fromDateM.getObject(), c.getTime()));
+				Calendar toDate = Calendar.getInstance(); // Set "to" time to end of the day (expressed as <00:00 of the following day)
+				toDate.setTime((Date)toDateM.getObject());
+				toDate.add(Calendar.DAY_OF_MONTH, 1);
+				log.debug("Considering events between {} and {}", fromDateM.getObject(), toDate.getTime());
+				criteria.add(Restrictions.between("insertTime", fromDateM.getObject(), toDate.getTime()));
 			}
+			
+			// Also load ResponseData elements in the same query, to avoid thousands of subsequent queries.
+			criteria.setFetchMode("responseData", FetchMode.JOIN);
 
 		}
 

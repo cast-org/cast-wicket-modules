@@ -51,7 +51,6 @@ import com.generationjava.io.CsvWriter;
 class CSVDownload extends WebResource {
 
 	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(CSVDownload.class);
 
 	protected IDataColumn[] columns;
@@ -104,7 +103,13 @@ class CSVDownload extends WebResource {
 				while (it.hasNext()) {
 					Event e = it.next();
 					for (IDataColumn col : columns) {
-						writer.writeField(col.getItemString(new HibernateObjectModel<Event>(e)));
+						String columnValue = col.getItemString(new HibernateObjectModel<Event>(e));
+						if (columnValue==null) {
+							log.warn("Got a null value for {} of event {}", col.getHeaderString(), e.getId());
+							columnValue="null";
+						}
+						// Clean up text -- CSV file cannot have newlines in it
+						writer.writeField(columnValue.replaceAll("[\r\n]", " "));
 					}
 					writer.endBlock();
 				}
@@ -134,8 +139,7 @@ class CSVDownload extends WebResource {
 		}
 
 		public Time lastModifiedTime() {
-			// TODO Auto-generated method stub
-			return null;
+			return Time.now();
 		}
 
 		public long length() {
