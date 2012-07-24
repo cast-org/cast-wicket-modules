@@ -41,7 +41,6 @@ import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -70,6 +69,7 @@ import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.components.AttributePrepender;
 import org.cast.cwm.components.UrlStreamedToString;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
@@ -367,8 +367,6 @@ public abstract class ResponseEditor extends Panel {
 			};
 			add(save);
 			
-			//IModel<String> textModel = new Model<String>(((Response) getDefaultModelObject()).getText());
-
 			// if this is a new response, check if there is an authored text template
 			// otherwise the new model is set to an empty string
 			IModel<String> newTextModel = new Model<String>("");
@@ -405,9 +403,22 @@ public abstract class ResponseEditor extends Panel {
 			add(choiceList = new DropDownChoice<String>("sentenceStarters", new Model<String>("default"), new PropertyModel<List<String>>(ResponseEditor.this, "starters"), new SentenceStarterRenderer()));
 			choiceList.setOutputMarkupId(true);
 			choiceList.setNullValid(true);
-			add(new WebMarkupContainer("addLink").add(new SimpleAttributeModifier("onclick", "tinyMCE.get('" + textArea.getMarkupId() + "').setContent(tinyMCE.get('" + textArea.getMarkupId() + "').getContent() + $('#" + choiceList.getMarkupId(true) + "').val()); return false;")));
 
-			// make sure the label is linked to the sentence starter dropdown		
+			// link for addins sentence starter to text response
+			AjaxLink<Void> addStarterLink = new AjaxLink<Void>("addLink") {
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(AjaxRequestTarget target) {
+					onStarterAdded(target);
+				}
+			};
+			add(addStarterLink);
+			
+			// add the sentence starter chosen to the text area response
+			addStarterLink.add(new AttributePrepender("onclick", "tinyMCE.get('" + textArea.getMarkupId() + "').setContent(tinyMCE.get('" + textArea.getMarkupId() + "').getContent() + $('#" + choiceList.getMarkupId(true) + "').val());", ";"));
+
+	         // label is linked to the sentence starter dropdown		
 			FormComponentLabel choiceListLabel = (new FormComponentLabel("sentenceStartersLabel", choiceList));
 			add(choiceListLabel);
 		}
@@ -441,7 +452,7 @@ public abstract class ResponseEditor extends Panel {
 				else
 					return object;
 			}
-		}
+		}		
 	}
 
 	
@@ -986,6 +997,19 @@ public abstract class ResponseEditor extends Panel {
 	 */
 	protected void onAutoSave(AjaxRequestTarget target) {
 		
+	}
+
+	/**
+	 * Override this function to execute behavior when the add starter
+	 * link is clicked.  For example, this is where you can set
+	 * a log event.<br />
+	 * <br />
+	 * By default, this does nothing.
+	 * 
+	 * @param target
+	 */
+	protected void onStarterAdded(AjaxRequestTarget target) {
+		log.debug("called starter added for event logging purposes");
 	}
 	
 	/**
