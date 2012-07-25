@@ -35,10 +35,17 @@ function keyboardMove(e, thisGrid) {
             break;
         }
     }
-
-    // Stop event propagation
-    if (e.stopPropagation) { e.stopPropagation(); }
-    if (e.cancelBubble != null) { e.cancelBubble = true; }
+    // Stop event propagation for arrow keys
+    switch(e.keyCode) {
+        case 37:
+        case 38:
+        case 39:
+        case 40: {
+            if (e.stopPropagation) { e.stopPropagation(); }
+            if (e.cancelBubble != null) { e.cancelBubble = true; }
+            break;
+        }
+    }
 }
 /* END::CAST - keyboard/arrow movement */
 
