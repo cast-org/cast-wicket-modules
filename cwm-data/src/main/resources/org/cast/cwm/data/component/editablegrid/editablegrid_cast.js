@@ -37,6 +37,8 @@ function cwmImportGrid(divId, url, readonly) {
 
 	//parse string into object
 	castEditableGridObjects[divId] = JSON.parse(data);
+	
+	setRemoveButtonState(divId);
 }
 
 function initializeGrid(divId) {
@@ -47,7 +49,21 @@ function initializeGrid(divId) {
 			myObject.data[rowIndex].values[myObject.metadata[columnIndex].name] = newValue;
 			castEditableGridObjects[divId] = myObject;
 	};	
+	
 }
+
+function setRemoveButtonState(divId) {	
+	var myObject = castEditableGridObjects[divId];
+
+	//Disable delete button when there is only one row or column
+	if (myObject.data.length == 1) {
+		jQuery('#'+divId).parent().find('.delRow').addClass('off');
+	}
+	if (myObject.metadata.length == 1) {
+		jQuery('#'+divId).parent().find('.delColumn').addClass('off');
+	} 
+}
+
 
 // export the json value of the grid to the textarea
 function cwmExportGrid(textAreaId, divId) {
@@ -56,7 +72,6 @@ function cwmExportGrid(textAreaId, divId) {
 }
 
 function cwmAddRow(divId) {	
-	console.log("calling addrow");
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
 	var objectValue = {"id":myObject.data.length+1, "values":{"c1":"","c2":"","c3":"","c4":"","c5":""}};
@@ -65,40 +80,71 @@ function cwmAddRow(divId) {
 	synchronizeDataToMedataDimension(divId);
 	castEditableGrids[divId] = editableGrid;
 	castEditableGridObjects[divId] = myObject;	
+
+	//Enable delete button when there is more than one row
+	if (myObject.data.length > 1) {
+		jQuery('#'+divId).parent().find('.delRow').removeClass('off');
+	}
 }
 
 function cwmRemoveRow(divId) {
+	
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
-	editableGrid.remove(myObject.data.length - 1);
-	myObject.data.splice(myObject.data.length - 1,1);
-	castEditableGrids[divId] = editableGrid;
-	castEditableGridObjects[divId] = myObject;	
-	synchronizeDataToMedataDimension(divId);
+
+	//prevent removing the last 
+	if ((myObject.data.length) > 1) {
+		editableGrid.remove(myObject.data.length - 1);
+		myObject.data.splice(myObject.data.length - 1,1);
+		castEditableGrids[divId] = editableGrid;
+		castEditableGridObjects[divId] = myObject;
+		synchronizeDataToMedataDimension(divId);
+	}
+	//Disable button - set class "off"
+	if (myObject.data.length == 1) {
+		jQuery('#'+divId).parent().find('.delRow').addClass('off');
+	}
 }
 
 function cwmAddColumn(divId) {
+	
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
+	
 	var nextColumnNumber = myObject.metadata.length + 1;
 	var nextColumnLabel = "Column " + nextColumnNumber;
 	var nextColumnName = "c" + nextColumnNumber;
 	var newColumn = {"name":nextColumnName,"label":nextColumnLabel,"datatype":"string","editable":true};
+	
 	myObject.metadata.push(newColumn);
 	editableGrid.addColumn();
 	castEditableGrids[divId] = editableGrid;
 	castEditableGridObjects[divId] = myObject;	
 	synchronizeDataToMedataDimension(divId);
+
+	//Enable delete button when there is more than one column
+	if (myObject.metadata.length > 1) {
+		jQuery('#'+divId).parent().find('.delColumn').removeClass('off');
+	}
 }
 
 function cwmRemoveColumn(divId) {	
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
-	editableGrid.deleteColumn();
-	myObject.metadata.splice(myObject.metadata.length - 1,1);
-	castEditableGrids[divId] = editableGrid;
-	castEditableGridObjects[divId] = myObject;	
-	synchronizeDataToMedataDimension(divId);
+	
+	//prevent removing the last 
+	if ((myObject.metadata.length) > 1) {
+		editableGrid.deleteColumn();
+		myObject.metadata.splice(myObject.metadata.length - 1,1);
+		castEditableGrids[divId] = editableGrid;
+		castEditableGridObjects[divId] = myObject;	
+		synchronizeDataToMedataDimension(divId);
+	}
+
+	//Disable button - set class "off"
+	if (myObject.metadata.length == 1) {
+		jQuery('#'+divId).parent().find('.delColumn').addClass('off');
+	}
 }
 
 function generateColumnNameByIndex(indexOfColumn) {
