@@ -80,7 +80,7 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 		dj.setOutputMarkupId(true);
 		dj.setWidth(1);
 		dj.setHeight(1);
-		dj.setAllowScripting(true);		
+		dj.setAllowScripting(true);
 		dj.addParameter("readOnly", "true");
 		if (autoPlay) 
 			dj.addParameter("autoPlay", "true");
@@ -111,7 +111,8 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 		}
 
 		dj.addParameter("markupId", getMarkupId());
-		
+		dj.setOnJavaDisabled(getOnNoJavaScript());
+
 		super.onBeforeRender();
 	}
 	
@@ -134,6 +135,15 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 		return (loadBehavior.getCallbackUrl());
 	}
 	
+	/**
+	 * Return an appropriate string of javascript to run in case of Java-not-available error.
+	 * @return
+	 */
+	protected String getOnNoJavaScript() {
+		String id = getMarkupId();
+		return String.format("error('%s'); setStatusBar('%s', 'Error: Java is disabled');", id, id, id);
+	}
+
 	/**
 	 * Return the markup id of the applet itself.  Useful for javascript, etc.
 	 * @return

@@ -139,6 +139,11 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	private IValueMap appletParameters = new ValueMap();
 
 	/**
+	 * Javascript that will be run if Java is not enabled in the browser.
+	 */
+	private String onJavaDisabled = "";
+	
+	/**
 	 * Default constructor with markup id.
 	 *
 	 * @param id Markup id for applet.
@@ -285,6 +290,14 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 			appletAttributes.remove("MAYSCRIPT");
 	}
 
+	public String getOnJavaDisabled() {
+		return onJavaDisabled;
+	}
+
+	public void setOnJavaDisabled(String onJavaDisabled) {
+		this.onJavaDisabled = onJavaDisabled;
+	}
+
 	/**
 	 * Get the attributes already set and assign them to the attribute
 	 * list for the Javascript code (or applet tag). And we change the tag name 
@@ -347,7 +360,8 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 			} else {
 				deployScript.append("var version = null;\n");
 			}
-			deployScript.append("deployJava.runApplet(attributes, parameters, version);\n");
+			deployScript.append(String.format("if (navigator.javaEnabled()) { deployJava.runApplet(attributes, parameters, version); } else { %s }\n", 
+					onJavaDisabled));
 			replaceComponentTagBody(markupStream, openTag, deployScript.toString());
 			
 		// Otherwise, just add the parameters.
