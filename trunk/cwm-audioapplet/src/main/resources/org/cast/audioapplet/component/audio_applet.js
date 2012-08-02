@@ -82,6 +82,7 @@ function showProgressStyle(id) {
 
 function error(id) {
 	setStatusBar(id, "An Error Occurred");
+	audioIndicator(id, 'progress');
 	$("#" + id + " .actions .play").addClass("off");
     $("#" + id + " .actions .pause").addClass("off");
     $("#" + id + " .actions .record").addClass("off");
