@@ -1,0 +1,160 @@
+<!-- CAST Extensions to DTBook DTD -->
+
+<!ENTITY % dtbook PUBLIC "-//NISO//DTD dtbook 2005-3//EN" "http://www.daisy.org/z3986/2005/dtbook-2005-3.dtd">
+
+<!-- Include MathML; see MathML-in-DAISY spec -->
+
+<!ENTITY % MATHML.prefixed "INCLUDE">
+<!ENTITY % MATHML.prefix "m">
+<!ENTITY % mathml-charent.module "IGNORE" >
+<!ENTITY % MATHML.Common.attrib "xlink:href CDATA #IMPLIED  xlink:type CDATA #IMPLIED  class CDATA #IMPLIED  style CDATA #IMPLIED  id ID #IMPLIED  xref IDREF #IMPLIED  other CDATA #IMPLIED  xmlns:dtbook CDATA #FIXED  'http://www.daisy.org/z3986/2005/dtbook/'  dtbook:smilref CDATA #IMPLIED">
+<!ENTITY % mathML2 PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
+%mathML2;
+
+<!ENTITY % externalFlow " | m:math">
+<!ENTITY % externalNamespaces "xmlns:m CDATA #FIXED  'http://www.w3.org/1998/Math/MathML'">
+
+<!-- Extend inline and block element definitions with our extension elements -->
+
+<!ENTITY % externalinline " | clozeword">
+<!ENTITY % externalblock " | responsegroup | object">
+
+%dtbook;
+
+<!-- Allow certain behavior options to be specified on sections.
+     Currently known values:
+
+     "lock-response": responsegroups in the section become read only
+     when section is considered "complete"
+
+     "delay-feedback": don't show feedback and scores for responses
+      until the section is considered "reviewed"
+ -->
+
+<!ENTITY % behaviorAttribute " behavior NMTOKENS #IMPLIED" >
+
+<!ATTLIST level1 %behaviorAttribute; >
+<!ATTLIST level2 %behaviorAttribute; >
+<!ATTLIST level3 %behaviorAttribute; >
+<!ATTLIST level4 %behaviorAttribute; >
+<!ATTLIST level5 %behaviorAttribute; >
+<!ATTLIST level6 %behaviorAttribute; >
+<!ATTLIST level  %behaviorAttribute; >
+
+<!-- Responsegroup: indicates where a user response is expected.
+     Various types are supported: general "response" allows the user
+     to write, draw, audio record, or upload a file.  Select and
+     select1 allow a choice between a fixed number of given choices.
+     Clozepassage is a passage of text with some words that the user
+     must fill in.
+
+     The "group" attribute can be used to note an association between
+     several responsegroups scattered throughout the content.
+-->
+<!ELEMENT responsegroup (prompt?,annotation?,(response*|select|select1|clozepassage))>
+<!ATTLIST responsegroup id ID #IMPLIED>
+<!ATTLIST responsegroup class CDATA #IMPLIED>
+<!ATTLIST responsegroup title CDATA #IMPLIED>
+<!ATTLIST responsegroup group CDATA #IMPLIED>
+<!ATTLIST responsegroup %behaviorAttribute; >
+
+<!-- Prompt is the question to which the user is responding. -->
+<!ELEMENT prompt (p|list|div|blockquote|poem|linegroup|table|line|prodnote)+>
+
+<!-- The Response element holds information about a particular type of 
+     response that is expected within a response area.  
+     The usual type values are "text", "image", "audio", and "upload",
+     but applications can add their own additional ones.
+     One or more responses within the group can be marked as "preferred",
+     which gives it application-defined special status (eg, a special icon).
+ -->
+<!ELEMENT response (templates?,fragments?)>
+<!ATTLIST response type NMTOKEN #REQUIRED>
+<!ATTLIST response height CDATA #IMPLIED>
+<!ATTLIST response width CDATA #IMPLIED>
+<!ATTLIST response preferred (true|false) #IMPLIED>
+
+<!-- Free responses can have templates, which are base content that
+     the user edits or adds to.  In most cases the content of this element is a filename. -->
+<!ELEMENT templates (template*)>
+<!ELEMENT template (#PCDATA)>
+
+<!-- Free responses can also have fragments, which are small pieces
+     of text that users can incorporate into their responses (eg
+     sentence-starters for text; stamps for drawings.  May be literal text or
+     a filename for non-text types. -->
+<!ELEMENT fragments (fragment*)>
+<!ELEMENT fragment (#PCDATA)>
+
+<!-- Select responses are like multiple choice questions.  Select1
+     only allows one answer, while select allows multiple answers to
+     be chosen.  Each item may be designated as correct or not, and
+     each can also have specific feedback message associated with it. -->
+<!ELEMENT select (item+)>
+
+<!ELEMENT select1 (item+)>
+<!ATTLIST select1 %attrs;>
+
+<!ELEMENT item (label, message?)>
+<!ATTLIST item 
+	%attrs;
+	correct (true|false) #IMPLIED
+>
+
+<!ELEMENT label (%inline;)*>
+<!ATTLIST label %attrs; >	
+
+<!ELEMENT message (#PCDATA|p|list|div|blockquote|poem|linegroup|table|line|prodnote)*>
+<!ATTLIST message %attrs;>
+
+<!-- Clozepassage is a passage of text with some words that the user
+     fills in.  The clozeword element is expected to be used inside
+     the block content. -->
+<!ELEMENT clozepassage (%block;)*>
+
+<!ELEMENT clozeword (#PCDATA)>
+<!ATTLIST clozeword id ID #REQUIRED>
+<!-- List of distractors, or other options presented to the user for
+     this clozeword -->
+<!ATTLIST clozeword opts CDATA #REQUIRED>
+<!-- Source of autogenerated clozeword.  TODO: determine if this is necessary. -->
+<!ATTLIST clozeword type (target | glossary) #IMPLIED> 
+
+
+<!-- We use the annotation element for several purposes.
+     TODO: describe these, determine if they are necessary.
+     hotspot: this is an image annotation, requires top,
+     left, width, and height attributes to determine placement.
+-->
+<!ATTLIST annotation type (coach | highlight | annotation | page | sidebar | hotspot) #IMPLIED>
+<!ATTLIST annotation top %Length; #IMPLIED>
+<!ATTLIST annotation left %Length; #IMPLIED>
+<!ATTLIST annotation width %Length; #IMPLIED>
+<!ATTLIST annotation height %Length; #IMPLIED>
+<!-- image used to indicate hotspot (optional) -->
+<!ATTLIST annotation imgSrc %URI; #IMPLIED>
+<!ATTLIST annotation imgClass CDATA #IMPLIED>
+
+
+<!-- OBJECT element for inclusion of non-image resources:
+     Java or Flash applets or audio files.
+     Content of the element is to be used as a fallback if the browser
+     cannot render the object.
+     A caption can be provided to display below it.
+-->
+<!ELEMENT object (param*, caption?, (p|list|div|blockquote|poem|linegroup|table|line|prodnote)+)>
+<!ATTLIST object id ID #IMPLIED>
+<!ATTLIST object src CDATA #REQUIRED>
+<!ATTLIST object type CDATA #IMPLIED>
+<!ATTLIST object height CDATA #IMPLIED>
+<!ATTLIST object width CDATA #IMPLIED>
+<!ATTLIST object class CDATA #IMPLIED>
+
+<!-- parameters for the applet -->
+<!ELEMENT param EMPTY>
+<!ATTLIST param name CDATA #REQUIRED>
+<!ATTLIST param value CDATA #REQUIRED>
+
+<!-- Extend Meta so it fits Dublin Core format -->
+<!-- TODO: necessary? -->
+<!ATTLIST meta role CDATA #IMPLIED>

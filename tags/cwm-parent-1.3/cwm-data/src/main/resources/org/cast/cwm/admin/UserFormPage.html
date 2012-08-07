@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head></head>
+<body>
+<wicket:extend>
+  	<div>
+  		Back to <span wicket:id="breadCrumbLinkRepeater"><a wicket:id="link"><span wicket:id="label">Link</span></a></span>	
+	</div>
+  
+  	<br />
+    <h2>User details</h2>
+    <div wicket:id="editUserPanel"></div>
+	<wicket:enclosure child="logincount">
+        <h3>Activity</h3>
+	    <ul>
+	      <li>Number of logins: <strong wicket:id="logincount">0</strong></li>
+          <li>Most recent login: <strong wicket:id="logindate">never</strong></li>
+	    </ul>
+     </wicket:enclosure>
+</wicket:extend>
+</body>
+</html>

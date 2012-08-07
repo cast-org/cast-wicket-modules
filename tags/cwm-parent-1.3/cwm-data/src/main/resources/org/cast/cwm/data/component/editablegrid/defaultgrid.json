@@ -1,0 +1,86 @@
+{
+    "metadata": [
+        {
+            "name": "c1",
+            "label": "Column 1",
+            "datatype": "string",
+            "editable": true
+        },
+        {
+            "name": "c2",
+            "label": "Column 2",
+            "datatype": "string",
+            "editable": true
+        },
+        {
+            "name": "c3",
+            "label": "Column 3",
+            "datatype": "string",
+            "editable": true
+        },
+        {
+            "name": "c4",
+            "label": "Column 4",
+            "datatype": "string",
+            "editable": true
+        },
+        {
+            "name": "c5",
+            "label": "Column 5",
+            "datatype": "string",
+            "editable": true
+        }
+    ],
+    "data": [
+        {
+            "id": 1,
+            "values": {
+                "c1": "",
+                "c2": "",
+                "c3": "",
+                "c4": "",
+                "c5": ""
+            }
+        },
+        {
+            "id": 2,
+            "values": {
+                "c1": "",
+                "c2": "",
+                "c3": "",
+                "c4": "",
+                "c5": ""
+            }
+        },
+        {
+            "id": 3,
+            "values": {
+                "c1": "",
+                "c2": "",
+                "c3": "",
+                "c4": "",
+                "c5": ""
+            }
+        },
+        {
+            "id": 4,
+            "values": {
+                "c1": "",
+                "c2": "",
+                "c3": "",
+                "c4": "",
+                "c5": ""
+            }
+        },
+        {
+            "id": 5,
+            "values": {
+                "c1": "",
+                "c2": "",
+                "c3": "",
+                "c4": "",
+                "c5": ""
+            }
+        }
+    ]
+}
