@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.cast.cwm</groupId>
         <artifactId>cwm-parent</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.3</version>
     </parent>
 
     <artifactId>cwm-glossary</artifactId>
