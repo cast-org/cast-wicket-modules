@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
@@ -39,6 +40,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.string.UrlUtils;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Prompt;
@@ -158,7 +160,9 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	}
 	
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new ResourceReference("/css/highlight.css"));
+		// FIXME: this is dependent on the named CSS file being supplied by the application in the expected location.
+		// Either a default CSS should be supplied in this package, or a better mechanism devised to have application supply it.
+		response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
 		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "highlight.js"));
 		
 		// Initialize the javascript
