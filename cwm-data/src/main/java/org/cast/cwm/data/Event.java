@@ -88,6 +88,7 @@ public class Event extends PersistedObject {
 	@Column(nullable=false)
 	protected String type;
 	
+	@Column(columnDefinition="TEXT")
 	protected String detail;
 	
 	protected String page;
