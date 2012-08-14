@@ -26,9 +26,28 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
 
 /**
- * A TextArea that will automatically resize itself.
- * Uses Chris Bader's Javascript library, pulled from https://github.com/akaihola/jquery-autogrow .
+ * A TextArea that will dynamically resize itself to a height that fits its current content.
+ * NOTE: your textarea MUST use the cols and rows attributes to set a default size,
+ * otherwise it will default to some browser-defined default size.  CSS sizing of the text area will 
+ * not work when this Javascript is in effect.
  * 
+ * There are many Javascript libraries that try to do autosizing, but none that I've tested
+ * work well in all situations.
+ * 
+ * Tried:
+ *   http://www.technoreply.com/autogrow-textarea-plugin-version-2-0
+ *      Works reasonably well cross browser, but depends on (deprecated) rows and cols attributes.
+ *   Chris Bader's autogrow,  https://github.com/akaihola/jquery-autogrow .
+ *      Fails completely on Chrome, heights get slightly off eventually.
+ *   Brinley Ang's patch to the above, https://github.com/brinley/jquery-autogrow
+ *      Better on Chrome, but still gets off with enough random content.
+ *   http://github.com/jaz303/jquery-grab-bag/tree/master/javascripts/jquery.autogrow-textarea.js
+ *   http://www.jacklmoore.com/autosize
+ *   http://unwrongest.com/projects/elastic/
+ *      Fails in FF 15
+ * 
+ *  The current code is based on the technoreply.com script.
+ *      
  * @author bgoldowsky
  *
  * @param <T>  the model type of the TextArea
@@ -48,8 +67,9 @@ public class AutoGrowTextArea<T> extends TextArea<T> implements IHeaderContribut
 	}
 
 	public void renderHead(IHeaderResponse response) {
-		response.renderJavascriptReference(new ResourceReference(AutoGrowTextArea.class, "jquery.autogrow.js"));
-		response.renderOnDomReadyJavascript(String.format("$('#%s').autogrow();", getMarkupId()));
+		// This script works well but requires the text area to have cols and rows attributes - CSS sizing doesn't work
+		 response.renderJavascriptReference(new ResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js"));
+		 response.renderOnDomReadyJavascript(String.format("$('#%s').autoGrow();", getMarkupId()));
 	}
 
 
