@@ -178,12 +178,19 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		script.append(warningTime + ", ");
 		script.append("function() {" + dialogBorder.getOpenString() + "}, ");
 		script.append(responseTime + ", ");
-		script.append("function() { wicketAjaxGet('" + inactiveBehavior.getCallbackUrl() + "'); }");
+		script.append("function() { ");
+		script.append(getBeforeInactiveTimeoutJavaScript());
+		script.append("wicketAjaxGet('" + inactiveBehavior.getCallbackUrl() + "'); ");
+		script.append("}");
 		script.append(");"); 
 		
 		response.renderOnDomReadyJavascript(script.toString());
 	}
 	
+	protected String getBeforeInactiveTimeoutJavaScript() {
+		// Subclasses can use this to execute JavaScript just before the seeion close callback.
+		return "";
+	}
 	/**
 	 * <p>
 	 * Returns a javascript that will reset the counter.  Append this to every AjaxRequestTarget by 
