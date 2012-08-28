@@ -47,21 +47,14 @@ public class UrlStreamedToString {
 	public String getPostString() {
 		StringBuffer stringBuffer = new StringBuffer();
 
-		BufferedReader in = null;
 		try {
-			in = new BufferedReader(new InputStreamReader(url.openStream()));
-		} catch (IOException e) {
-			log.error("There is a problem opening the url {}", url);
-			e.printStackTrace();
-		}
-
-		String inputLine;
-		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+			String inputLine;
 			while ((inputLine = in.readLine()) != null)
 				stringBuffer.append(inputLine);
 			in.close();
 		} catch (IOException e) {
-			log.error("There is a problem reading the url {}", url);
+			log.error("There is a problem opening the url {}", url);
 			e.printStackTrace();
 		}
 
