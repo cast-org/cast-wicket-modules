@@ -69,7 +69,8 @@ public class AutoGrowTextArea<T> extends TextArea<T> implements IHeaderContribut
 	public void renderHead(IHeaderResponse response) {
 		// This script works well but requires the text area to have cols and rows attributes - CSS sizing doesn't work
 		 response.renderJavascriptReference(new ResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js"));
-		 response.renderOnDomReadyJavascript(String.format("$('#%s').autoGrow();", getMarkupId()));
+		 // Must be onLoad, not onDomReady, or else it happens too early in AJAX insertion
+		 response.renderOnLoadJavascript(String.format("$('#%s').autoGrow();", getMarkupId()));
 	}
 
 
