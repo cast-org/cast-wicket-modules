@@ -158,8 +158,20 @@ public class CwmWicketTester extends WicketTester {
 	}
 
 	public void assertErrorMessagesContain(String expectedMessage) {
+		assertMessagesContain(expectedMessage, FeedbackMessage.ERROR);
+	}
+
+	public void assertInfoMessagesContain(String expectedMessage) {
+		assertMessagesContain(expectedMessage, FeedbackMessage.INFO);
+	}
+
+	public void assertWarningMessagesContain(String expectedMessage) {
+		assertMessagesContain(expectedMessage, FeedbackMessage.WARNING);
+	}
+
+	public void assertMessagesContain(String expectedMessage, int messageLevel) {
 		List<Serializable> actualMessages = this
-				.getMessages(FeedbackMessage.ERROR);
+				.getMessages(messageLevel);
 		List<Serializable> msgs = new ArrayList<Serializable>();
 		for (Iterator<Serializable> iterator = actualMessages.iterator(); iterator
 				.hasNext();) {
