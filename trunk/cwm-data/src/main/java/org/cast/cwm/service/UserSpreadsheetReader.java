@@ -346,8 +346,8 @@ public class UserSpreadsheetReader implements Serializable {
   		}
   		
   		// Set SubjectId (Default to Username)
-  		if(map.containsKey("subjectId")) {
-  			user.getObject().setSubjectId(map.get("subjectId"));
+  		if(map.containsKey("subjectid")) {
+  			user.getObject().setSubjectId(map.get("subjectid"));
   		} else {
   			user.getObject().setSubjectId(map.get("username"));
   		}
