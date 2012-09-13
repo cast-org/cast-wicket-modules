@@ -189,7 +189,12 @@ public class UserSpreadsheetReader implements Serializable {
   				if (UserService.get().getBySubjectId(user.getObject().getSubjectId()).getObject() != null) {
   					messages += "SubjectId " + user.getObject().getSubjectId() + " already exists in database. \n";
   				}
- 
+
+  				// Check database for duplicate email addresses
+  				if (UserService.get().getByEmail(user.getObject().getEmail()).getObject() != null) {
+  					messages += "Email " + user.getObject().getEmail() + " already exists in database. \n";
+  				}
+  				
   				// Check uploaded user list for duplicate username, subjectId, "Full Name"
   				for (PotentialUserSave pe : potentialUsers) {
   					if (user.getObject().getUsername().matches(pe.getUser().getObject().getUsername())) {
@@ -351,7 +356,12 @@ public class UserSpreadsheetReader implements Serializable {
   		} else {
   			user.getObject().setSubjectId(map.get("username"));
   		}
- 
+
+  		// Set email
+  		if(map.containsKey("email")) {
+  			user.getObject().setEmail(map.get("email"));
+  		}
+
   	  	return errors;
   	}
 
