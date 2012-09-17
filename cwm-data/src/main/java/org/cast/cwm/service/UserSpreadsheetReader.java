@@ -190,8 +190,8 @@ public class UserSpreadsheetReader implements Serializable {
   					messages += "SubjectId " + user.getObject().getSubjectId() + " already exists in database. \n";
   				}
 
-  				// Check database for duplicate email addresses
-  				if (UserService.get().getByEmail(user.getObject().getEmail()).getObject() != null) {
+  				// Check database for duplicate email addresses when an email address exists 				
+  				if (user.getObject().getEmail() != null && UserService.get().getByEmail(user.getObject().getEmail()).getObject() != null) {
   					messages += "Email " + user.getObject().getEmail() + " already exists in database. \n";
   				}
   				
