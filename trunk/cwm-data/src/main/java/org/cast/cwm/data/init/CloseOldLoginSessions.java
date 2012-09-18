@@ -24,11 +24,15 @@ import java.util.Properties;
 
 import net.databinder.models.hib.HibernateListModel;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
+import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Database initializer that will close any open LoginSession objects that have expired.
@@ -40,8 +44,16 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class CloseOldLoginSessions implements IDatabaseInitializer {
-
+	
 	private static final Logger log = LoggerFactory.getLogger(CloseOldLoginSessions.class);
+	
+	@Inject
+	private IEventService eventService;
+	
+	public CloseOldLoginSessions() {
+		super();
+		InjectorHolder.getInjector().inject(this);
+	}
 
 	public String getName() {
 		return "close old loginsessions";
@@ -56,11 +68,13 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 		Date now = new Date();
 		long expiryTime = now.getTime() - CwmApplication.get().getSessionTimeout()*1000;
 		for (LoginSession ls : new HibernateListModel<LoginSession>(LoginSession.class, new LoginSessionCriteriaBuilder()).getObject()) {
-			Date lastEventTime = ls.getLastEventTime();
+			Date lastEventTime = eventService.getLastEventTime(ls);
 			if (lastEventTime == null || lastEventTime.getTime()<expiryTime) {
 				log.debug("Closing stale LoginSession: {}", ls);
-				ls.setEndTime(now);
+				eventService.closeLoginSession(ls, lastEventTime==null ? new Date() : lastEventTime);
 				changesMade = true;
+			} else {
+				log.debug("LoginSession {} is still alive as of {}", ls, lastEventTime);
 			}
 		}
 		return changesMade;

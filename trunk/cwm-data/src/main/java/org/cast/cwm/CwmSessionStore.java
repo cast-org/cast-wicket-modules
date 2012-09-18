@@ -30,12 +30,15 @@ import net.databinder.hib.DataApplication;
 import org.apache.wicket.Application;
 import org.apache.wicket.Request;
 import org.apache.wicket.Session;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.protocol.http.SecondLevelCacheSessionStore;
 import org.cast.cwm.data.LoginSession;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /** 
  * A session store that adds a listener to do cleanup of CwmSession objects.
@@ -83,11 +86,16 @@ public class CwmSessionStore extends SecondLevelCacheSessionStore {
 		private final CwmSession cwmSession;
 		private final String appKey;
 
+		// FIXME Injection doesn't work here since we're not in the application's thread
+//		@Inject
+//		private IEventService eventService;
+
 		private static final long serialVersionUID = 1L;
 
 		public CwmSessionBindingListener(CwmSession session) {
 			this.cwmSession = session;
 			this.appKey = Application.get().getApplicationKey();
+			InjectorHolder.getInjector().inject(this);
 		}
 
 		/**
@@ -106,19 +114,8 @@ public class CwmSessionStore extends SecondLevelCacheSessionStore {
 			}
 			Long lsid = cwmSession.getLoginSessionId();
 			if (lsid != null) {
-				org.hibernate.Session hibernateSess = ((DataApplication) CwmApplication.get(appKey)).getHibernateSessionFactory(null).openSession();
-				// Get latest version attached to this session (can't trust HibernateObjectModel in this context)
-				LoginSession ls = (LoginSession) hibernateSess.load(LoginSession.class, lsid);
-				if (ls != null && ls.getEndTime()==null) { 
-					Transaction tx = hibernateSess.beginTransaction();
-					EventService.get().forceCloseLoginSession(hibernateSess, ls,  "[timeout]");
-					tx.commit();
-					if (log.isDebugEnabled())
-						log.debug("Session {} destroyed; closed LoginSession {}", evt.getSession().getId(), ls.getId());
-				} else {
-					log.debug("LoginSession was already closed");
-				}
-				hibernateSess.close();
+				CwmApplication app = (CwmApplication) CwmApplication.get(appKey); 
+				app.expireLoginSession(lsid);
 			} else {
 				log.debug ("Session {} destroyed; no LoginSession", evt.getSession().getId());
 			}

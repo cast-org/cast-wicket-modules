@@ -40,8 +40,9 @@ import org.apache.wicket.markup.html.border.Border;
 import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 
+import com.google.inject.Inject;
 import com.visural.wicket.component.submitters.impl.ModalCSSRef;
 
 /**
@@ -89,6 +90,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
 
 	@Getter
 	protected WebMarkupContainer contentContainer;
+	
+	@Inject
+	private IEventService eventService;
 	
 	/**
 	 * The ancestor of this DialogBorder thats client-side markup will be moved, via Javascript, 
@@ -155,7 +159,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * @param target
 	 */
 	protected void logOpenEvent(AjaxRequestTarget target) {
-		EventService.get().saveEvent(eventCode, eventDetail, pageName);
+		eventService.saveEvent(eventCode, eventDetail, pageName);
 	}
 	
 	

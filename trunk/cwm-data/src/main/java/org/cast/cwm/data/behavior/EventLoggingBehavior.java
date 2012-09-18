@@ -29,9 +29,11 @@ import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * An Ajax Behavior for logging events.  Supports executing
@@ -85,6 +87,9 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	@Getter @Setter
 	private String queryStringExpression;
 	
+	@Inject
+	private IEventService eventService;
+
 	/**
 	 * Constructor
 	 * 
@@ -123,7 +128,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 		
 		// Log Event
 		if (CwmSession.get().isSignedIn())
-			EventService.get().saveEvent(eventCode, finalDetail.toString(), pageName);
+			eventService.saveEvent(eventCode, finalDetail.toString(), pageName);
 		else
 			log.info("Event triggered for non-logged in user: {}, {}, {}", new Object[] {eventCode, finalDetail, pageName});
 	}

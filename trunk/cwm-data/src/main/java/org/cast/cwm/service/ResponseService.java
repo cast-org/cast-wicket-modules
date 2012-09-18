@@ -66,6 +66,9 @@ public class ResponseService implements IResponseService {
 
 	@Inject
 	protected ICwmService cwmService;
+	
+	@Inject
+	private IEventService eventService;
 
 	protected static ResponseService instance;
 	
@@ -300,7 +303,7 @@ public class ResponseService implements IResponseService {
 		}
 		
 		// Save (and keep a reference to) an event
-		rd.setEvent(EventService.get().savePostEvent(true, pageName).getObject());
+		rd.setEvent(eventService.savePostEvent(true, pageName).getObject());
 
 		// Flush changes to datastore
 		cwmService.flushChanges();
@@ -389,7 +392,7 @@ public class ResponseService implements IResponseService {
 		// Flush changes to datastore
 		cwmService.flushChanges();
 		
-		EventService.get().saveEvent("post:delete", String.valueOf(r.getObject().getId()), null);
+		eventService.saveEvent("post:delete", String.valueOf(r.getObject().getId()), null);
 	}
 
 	

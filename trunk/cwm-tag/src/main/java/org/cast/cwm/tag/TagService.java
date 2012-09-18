@@ -27,9 +27,10 @@ import java.util.Map.Entry;
 
 import net.databinder.hib.Databinder;
 
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 import org.cast.cwm.tag.model.Tag;
 import org.cast.cwm.tag.model.TagPlusInt;
 import org.cast.cwm.tag.model.Tagging;
@@ -38,6 +39,8 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.classic.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+
+import com.google.inject.Inject;
 
 /**
  * TODO: These methods should return IModels, not Lists of database objects
@@ -55,8 +58,15 @@ public class TagService implements Serializable {
     
     protected List<String> defaultTags;
     
+	@Inject
+	private IEventService eventService;
+
 	private static final long serialVersionUID = 1L;
 
+	public TagService() {
+		InjectorHolder.getInjector().inject(this);
+	}
+	
 	public static TagService get() { 
     	return instance;
     }
@@ -250,7 +260,7 @@ public class TagService implements Serializable {
 			Session session = Databinder.getHibernateSession();
 			session.save(t);
 			flushChanges();
-			EventService.get().saveEvent("tag:create", "Tag: " + tag.getName() + ", TargetType: " + targetType.getSimpleName() + ", TargetId: " + targetId, null);
+			eventService.saveEvent("tag:create", "Tag: " + tag.getName() + ", TargetType: " + targetType.getSimpleName() + ", TargetId: " + targetId, null);
 		}
 		return t;
 	}
@@ -264,7 +274,7 @@ public class TagService implements Serializable {
 		Session session = Databinder.getHibernateSession();
 		session.delete(t);
 		flushChanges();
-		EventService.get().saveEvent("tag:delete", "Tag: " + t.getTag().getName() + ", TargetType: " + getTaggableType(t.getTargetType()).getSimpleName() + ", TargetId: " + t.getTargetId(), null);
+		eventService.saveEvent("tag:delete", "Tag: " + t.getTag().getName() + ", TargetType: " + getTaggableType(t.getTargetType()).getSimpleName() + ", TargetId: " + t.getTargetId(), null);
 	}
 
 	public void removeTagging (User person, PersistedObject target, String tagName) {
