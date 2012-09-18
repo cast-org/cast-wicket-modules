@@ -10,7 +10,7 @@ import org.apache.wicket.util.string.UrlUtils;
 import org.cast.cwm.components.ImageUrlCodingStrategy;
 
 /**
- * A very simple image component that generates URLs targeted at {@link ImageUrlCodingStrategy} directories.
+ * A simple image component that generates URLs targeted at {@link ImageUrlCodingStrategy} directories.
  * Unlike {@link Image} in that you don't need a package resource or a ResourceReference for the image.
  * 
  * @author bgoldowsky
@@ -32,7 +32,7 @@ public class Icon extends WebComponent {
 	
 	public Icon (String wicketId, IModel<String> mImagePath) {
 		super(wicketId);
-		if(mImagePath == null) throw new RuntimeException();
+		if(mImagePath == null) throw new IllegalArgumentException("image path model must be supplied");
 		this.mImagePath = mImagePath;
 	}
 	
@@ -43,7 +43,7 @@ public class Icon extends WebComponent {
 	
 	public Icon (String wicketId, IModel<String> mImagePath, IModel<String> mAltText, IModel<String> mTitleText) {
 		this(wicketId, mImagePath);
-		if(mImagePath == null) throw new RuntimeException();
+		if(mImagePath == null) throw new IllegalArgumentException("image path model must be supplied");
 		this.mAltText = mAltText;
 		this.mTitleText = mTitleText;		
 	}

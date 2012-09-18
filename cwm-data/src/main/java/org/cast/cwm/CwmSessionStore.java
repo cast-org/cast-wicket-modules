@@ -25,20 +25,13 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
-import net.databinder.hib.DataApplication;
-
 import org.apache.wicket.Application;
 import org.apache.wicket.Request;
 import org.apache.wicket.Session;
 import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.protocol.http.SecondLevelCacheSessionStore;
-import org.cast.cwm.data.LoginSession;
-import org.cast.cwm.service.IEventService;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 /** 
  * A session store that adds a listener to do cleanup of CwmSession objects.
@@ -85,10 +78,6 @@ public class CwmSessionStore extends SecondLevelCacheSessionStore {
 		
 		private final CwmSession cwmSession;
 		private final String appKey;
-
-		// FIXME Injection doesn't work here since we're not in the application's thread
-//		@Inject
-//		private IEventService eventService;
 
 		private static final long serialVersionUID = 1L;
 

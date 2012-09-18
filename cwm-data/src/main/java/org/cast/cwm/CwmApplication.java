@@ -497,10 +497,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 		@Override
 		public void run() {
 			Application.set(CwmApplication.this);
-			log.debug("LSC STARTED.......................");
-			log.debug("APP =============== {}", Application.get());
-			log.debug("EVENTSERVICE ======={}", eventService);
-			log.debug("TESTING........ {}", eventService.newEvent());
 			while(true) {
 				try {
 					final Long loginSessionId = closeQueue.take();
