@@ -21,7 +21,6 @@ package org.cast.cwm.data.component;
 
 import lombok.Getter;
 import net.databinder.auth.AuthDataSessionBase;
-import net.databinder.hib.Databinder;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.ResourceReference;
@@ -34,9 +33,8 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.service.CwmService;
-import org.cast.cwm.service.EventService;
 import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +57,9 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	
 	@Inject
 	private ICwmService cwmService;
+	
+	@Inject
+	private IEventService eventService;
 
 	@Getter
 	private int warningTime = 60 * 5; // Number of seconds before session expires that the user receives a warning.
@@ -148,7 +149,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		
 		// We're signed in; redirect to login.
 		if (CwmSession.get().getLoginSession() != null) {
-			EventService.get().forceCloseLoginSession(Databinder.getHibernateSession(), CwmSession.get().getLoginSession(), "[timeout]");
+			eventService.forceCloseLoginSession(CwmSession.get().getLoginSession(), "[timeout]");
 			cwmService.flushChanges();
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();

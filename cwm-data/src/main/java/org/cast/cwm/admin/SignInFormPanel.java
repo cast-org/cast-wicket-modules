@@ -33,10 +33,12 @@ import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FeedbackBorder;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * A simple Sign-In form for authenticating users.
@@ -57,6 +59,9 @@ public class SignInFormPanel extends Panel {
 	
 	private RequiredTextField<String> username;
 	private RSAPasswordTextField password;
+	
+	@Inject
+	private IEventService eventService;
 
 	public SignInFormPanel(String id) {
 		super(id);
@@ -95,7 +100,6 @@ public class SignInFormPanel extends Panel {
 				return;
 			}
 			
-			EventService eventService = EventService.get();
 			eventService.createLoginSession(getRequest());
 			eventService.saveLoginEvent();
 			if (!continueToOriginalDestination()) {

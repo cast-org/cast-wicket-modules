@@ -60,7 +60,7 @@ import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.SiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -69,6 +69,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * 
@@ -86,6 +88,9 @@ public class EventLog extends AdminPage {
 	
 	private static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 	private static final Logger log = LoggerFactory.getLogger(EventLog.class);
+	
+	@Inject
+	private IEventService eventService;
 
 	public EventLog(final PageParameters params) {
 		super(params);
@@ -131,7 +136,7 @@ public class EventLog extends AdminPage {
 	}
 
 	protected void addEventTypeFilter(Form<Object> form) {
-		IModel<List<String>> allEventTypes = EventService.get().getEventTypes();
+		IModel<List<String>> allEventTypes = eventService.getEventTypes();
 		List<String> eventTypes = new ArrayList<String>();
 		eventTypes.addAll(allEventTypes.getObject());
 		showEventTypesM = new ListModel<String>(eventTypes);

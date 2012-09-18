@@ -25,15 +25,18 @@ import net.databinder.auth.AuthDataSessionBase;
 
 import org.apache.wicket.Request;
 import org.apache.wicket.Session;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.models.UserModel;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Extension of Databinder's AuthDataSession that keeps track of the LoginSession.
@@ -66,10 +69,14 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	@Getter
 	private Long loginSessionId;
 	
+	@Inject
+	IEventService eventService;
+
 	public CwmSession(Request request) {
 		super(request);
+		InjectorHolder.getInjector().inject(this);
 	}
-
+	
 	public static CwmSession get() {
 		return (CwmSession) Session.get();
 	}
@@ -78,7 +85,7 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	public void signOut() {
 		synchronized(this) {
 			if (loginSessionModel != null) {
-				EventService.get().recordLogout();
+				eventService.recordLogout();
 				loginSessionModel = null;
 			}
 		}

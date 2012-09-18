@@ -32,7 +32,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.cast.cwm.AbstractEventService;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Role;
 
@@ -90,10 +89,8 @@ public class AdminHome extends AdminPage {
 			}.add(new Label("label", "Data browser")));
 		}
 		
-		// Link to view event logs if there's actually an event service.
-		if (AbstractEventService.get() != null) {
-			list.add(new BookmarkablePageLink<Page>("link", EventLog.class).add(new Label("label", "Event Log")));
-		}
+		list.add(new BookmarkablePageLink<Page>("link", EventLog.class).add(new Label("label", "Event Log")));
+		
 		return list;
 	}
 

@@ -25,25 +25,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Basic implementation of {@link AbstractEventService} that logs events as DEBUG messages
+ * Basic implementation of {@link IEventLogger} that logs events as DEBUG messages
  * in the console.
  * 
  * @author jbrookover
  *
  */
-public class LoggingEventService extends AbstractEventService {
+public class LoggingEventService implements IEventLogger {
 
 	private final static Logger log = LoggerFactory.getLogger(LoggingEventService.class);
 	
-	public static LoggingEventService get() {
-		return (LoggingEventService) instance;
-	}
-	
-	public static void setInstance(LoggingEventService instance) {
-		LoggingEventService.instance = instance;
-	}
-	
-	@Override
 	public Object saveEvent(String type, String detail, String location) {
 		log.debug("Event: {}, {}, {}", Arrays.asList(type, detail, location));
 		return null;

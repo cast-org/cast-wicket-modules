@@ -22,20 +22,16 @@ package org.cast.cwm.service;
 import java.util.Date;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.Request;
 import org.apache.wicket.RequestCycle;
-import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
-import org.cast.cwm.AbstractEventService;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
@@ -52,7 +48,7 @@ import com.google.inject.Inject;
  * Methods for working with Events and related information in the database.
  *
  */
-public class EventService extends AbstractEventService {
+public class EventService implements IEventService {
 	
 	public static final String LOGIN_TYPE_NAME = "login";
 	public static final String LOGOUT_TYPE_NAME = "logout";
@@ -67,33 +63,12 @@ public class EventService extends AbstractEventService {
 	@Inject
 	private ICwmService cwmService;
 
-	@Getter @Setter  
-	protected Class<? extends Event> eventClass = Event.class;
-	
-	@Getter @Setter
-	protected Class<? extends LoginSession> loginSessionClass = LoginSession.class;
-
-	public EventService() {
-		InjectorHolder.getInjector().inject(this);
-	}
-	
-	public static EventService get() {
-		return (EventService)instance;
-	}
-	
-	public static void setInstance(EventService instance) {
-		AbstractEventService.instance = instance;
-	}
-	
 	/** 
-	 * Create a new Event of the proper subclass type.
+	 * Create a new Event instance.
+	 * Applications that use a subclass of Event can override this factory method to create it.
 	 */
-	public final Event newEvent() {
-		try {
-			return eventClass.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException (e);
-		}	
+	public Event newEvent() {
+		return new Event();
 	}
 	
 	/**
@@ -111,11 +86,8 @@ public class EventService extends AbstractEventService {
 		return new HibernateObjectModel<Event>(e);
 	}
 	
-	/**
-	 * Save an event to the datastore.
-	 * 
-	 * @see {@link AbstractEventService#saveEvent(String, String, String)}
-	 * @return model wrapping the event that was saved
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public IModel<? extends Event> saveEvent(String type, String detail, String pageName) {
 		Event e = newEvent();
@@ -125,30 +97,22 @@ public class EventService extends AbstractEventService {
 		return saveEvent(e);
 	}
 
-	/**
-	 * Save a login event.
-	 * 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#saveLoginEvent()
 	 */
 	public void saveLoginEvent() {
 		saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
 	}
 	
-	/**
-	 * Save a page view event.
-	 * 
-	 * @param detail
-	 * @param pageName
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#savePageViewEvent(java.lang.String, java.lang.String)
 	 */
 	public void savePageViewEvent (String detail, String pageName) {
 		saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
 	}
 	
-	/**
-	 * Save a post event.  If this event has an accompanying {@link ResponseData} object,
-	 * set hasResponses=true so the event log knows to look it up.
-	 * 
-	 * @param hasResponses 
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#savePostEvent(boolean, java.lang.String)
 	 */
 	public IModel<? extends Event> savePostEvent(boolean hasResponses, String pageName) {
 		Event e = newEvent();
@@ -157,41 +121,38 @@ public class EventService extends AbstractEventService {
 		e.setPage(pageName);
 		return saveEvent(e);
 	}
-	/** 
-	 * Create a LoginSession object in the database based on the current Session and the given Request.
-	 * This should generally be called when a user logs in.
-	 * Many details about the client and session will be filled in automatically if you put this in your 
-	 * Application's init() method:
-	 *   getRequestCycleSettings().setGatherExtendedBrowserInfo(true);
-	 * (see the javadoc for ClientProperties).	
-	 * @param r the current Request object
-	 * @return the created LoginSession
+	
+	////// Login Session methods
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#newLoginSession()
+	 */
+	public LoginSession newLoginSession() {
+		return new LoginSession();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#createLoginSession(org.apache.wicket.Request)
 	 */
 	public LoginSession createLoginSession (Request r) {
-		LoginSession loginSession;
-		try {
-			loginSession = loginSessionClass.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		CwmSession s = CwmSession.get();
-		loginSession.setSessionId(s.getId());
+		LoginSession loginSession = newLoginSession();
+		CwmSession cwmSession = CwmSession.get();
+		loginSession.setSessionId(cwmSession.getId());
 		loginSession.setStartTime(new Date());
-		loginSession.setUser(s.getUser());
+		loginSession.setUser(cwmSession.getUser());
 		if (r instanceof ServletWebRequest) 
 			loginSession.setIpAddress(((ServletWebRequest)r).getHttpServletRequest().getRemoteAddr());
 		
 		loginSession.setCookiesEnabled(false);
-		if (s.getClientInfo() instanceof WebClientInfo) {
-			ClientProperties info = ((WebClientInfo) s.getClientInfo()).getProperties();
+		if (cwmSession.getClientInfo() instanceof WebClientInfo) {
+			ClientProperties info = ((WebClientInfo) cwmSession.getClientInfo()).getProperties();
 			loginSession.setScreenHeight(info.getBrowserHeight());
 			loginSession.setScreenWidth(info.getBrowserWidth());
 			if (info.getTimeZone() != null)
 				loginSession.setTimezoneOffset(info.getTimeZone().getOffset(new Date().getTime()));
 			loginSession.setCookiesEnabled(info.isCookiesEnabled());
 			loginSession.setPlatform(info.getNavigatorPlatform());
-			loginSession.setUserAgent(((WebClientInfo)s.getClientInfo()).getUserAgent());
+			loginSession.setUserAgent(((WebClientInfo)cwmSession.getClientInfo()).getUserAgent());
 			// TODO
 			//loginSession.setflashVersion(flashVersion)
 			// isJavaEnabled
@@ -205,9 +166,16 @@ public class EventService extends AbstractEventService {
 		
 		return loginSession;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#closeLoginSession(org.cast.cwm.data.LoginSession, java.util.Date)
+	 */
+	public void closeLoginSession (LoginSession loginSession, Date closeTime) {
+		loginSession.setEndTime(closeTime);
+	}
 
-	/**
-	 * Close the current {@link LoginSession} and save a Logout Event
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#recordLogout()
 	 */
 	public void recordLogout() {
 		LoginSession ls = CwmSession.get().getLoginSession();
@@ -216,8 +184,7 @@ public class EventService extends AbstractEventService {
 		if (ls != null) {
 			log.debug("Logout user {}", ls.getUser().getUsername());
 			Date now = new Date();
-			ls.setEndTime(now);
-			Databinder.getHibernateSession().update(ls);
+			closeLoginSession(ls, now);
 			cwmService.flushChanges();
 			
 			sesLength = "Session length=" + (now.getTime()-ls.getStartTime().getTime())/1000 + "s";
@@ -229,24 +196,12 @@ public class EventService extends AbstractEventService {
 		saveEvent(LOGOUT_TYPE_NAME, sesLength, null);
 	}
 
-	/**
-	 * 
-	 * Closes a LoginSession without a logout - timeout or server shutdown. This will
-	 * also save an event.  
-	 * <p>
-	 * <b>Note</b>: Since this is called from shutdown hooks, a regular Databinder 
-	 * session may not be available.  Therefore, a Databinder session must be passed in.  
-	 * This method will NOT commit any changes or handle any transactions.  The session
-	 * transaction must be flushed after this method is called.   
-	 * </p>
-	 * 
-	 * @param dbSession a Hibernate session to use
-	 * @param loginSession the LoginSession to be closed
-	 * @param comment added to the event detail field
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#forceCloseLoginSession(org.hibernate.Session, org.cast.cwm.data.LoginSession, java.lang.String)
 	 */
-	public void forceCloseLoginSession(Session dbSession, LoginSession loginSession, String comment) {
+	public void forceCloseLoginSession(LoginSession loginSession, String comment) {
 		Date now = new Date();
-		loginSession.setEndTime(now); // TODO: consider setting this to date of last Event
+		closeLoginSession(loginSession, now); // TODO: consider setting this to date of last Event
 
 		// Record Event for the session end
 		Event ev = newEvent();
@@ -255,21 +210,18 @@ public class EventService extends AbstractEventService {
 		ev.setInsertTime(now);
 		ev.setLoginSession(loginSession);
 		ev.setUser(loginSession.getUser());
-		dbSession.save(ev);
+		saveEvent(ev);
 	}
 
-	/**
-	 * Return a list of all types of events currently found in the database.
-	 * Used for creating filters in Event Log page.
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#getEventTypes()
 	 */
 	public IModel<List<String>> getEventTypes() {
 		return new HibernateListModel<String>("select distinct type from Event", true);
 	}
 	
-	/**
-	 * Get the date of most recent event in a LoginSession.  
-	 * Use sparingly; this requires a database query across all events in the LoginSession.
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#getLastEventTime(org.cast.cwm.data.LoginSession)
 	 */
 	public Date getLastEventTime (LoginSession ls) {
 		Session session = Databinder.getHibernateSession();

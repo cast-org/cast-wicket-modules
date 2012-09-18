@@ -90,26 +90,6 @@ public class LoginSession extends PersistedObject {
 		return( (new Date().getTime() - startTime.getTime()) / 1000L );
 	}
 
-	/** 
-	 * Return timestamp of most recent event in this LoginSession.
-	 * @return Date of last Event, or null if none recorded.
-	 */
-	public Date getLastEventTime() {
-		return EventService.get().getLastEventTime(this);
-	}
-	
-	/**
-	 * Return number of seconds since last Event.
-	 * @return number of seconds, or null if no event recorded.
-	 */
-	public Long getSecondsSinceLastEvent() {
-		Date lastEvent = getLastEventTime();
-		if (lastEvent != null)
-			return (new Date().getTime()-lastEvent.getTime())/1000L;
-		else
-			return null;
-	}
-	
 	// Override setters to avoid throwing an exception for very long user-agent strings and the like.
 	// Yes, I have seen user agent strings longer than 255 bytes.
 	public void setUserAgent (String userAgent) {

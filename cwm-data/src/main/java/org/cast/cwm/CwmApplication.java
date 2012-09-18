@@ -27,11 +27,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
 import net.databinder.auth.data.DataUser;
 import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.hib.DataRequestCycle;
+import net.databinder.hib.Databinder;
+import net.databinder.hib.SessionUnit;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
@@ -40,6 +44,7 @@ import org.apache.wicket.RequestCycle;
 import org.apache.wicket.Response;
 import org.apache.wicket.Session;
 import org.apache.wicket.guice.GuiceComponentInjector;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -57,6 +62,7 @@ import org.cast.cwm.admin.SiteListPage;
 import org.cast.cwm.admin.UserFormPage;
 import org.cast.cwm.admin.UserListPage;
 import org.cast.cwm.data.IResponseType;
+import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.init.CloseOldLoginSessions;
@@ -66,8 +72,8 @@ import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.data.resource.SvgImageResource;
 import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.service.CwmService;
-import org.cast.cwm.service.EventService;
 import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.service.IEventService;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -79,6 +85,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
 import com.google.inject.Binder;
+import com.google.inject.Inject;
 import com.google.inject.Module;
 
 /** 
@@ -122,6 +129,11 @@ public abstract class CwmApplication extends AuthDataApplication {
 	@Getter
 	private String mailFromAddress;
 	
+	@Inject
+	private IEventService eventService;
+	
+	private LoginSessionCloser loginSessionCloser;
+	
 	private static final Logger log = LoggerFactory.getLogger(CwmApplication.class);
 		
     // A few things that need to get set up before regular init().
@@ -130,7 +142,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 		log.debug("Starting CWM Application Internal Init");
 		log.debug("Application Class is " + getClass().getName());
 		
-
 		if(appProperties == null) {
 			loadAppProperties();		
 		}
@@ -158,7 +169,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    loadServices();
 
 	    addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
-	    EventService.setInstance(new EventService());
+	    InjectorHolder.getInjector().inject(this);
 
 	    super.internalInit();
 	}
@@ -189,6 +200,10 @@ public abstract class CwmApplication extends AuthDataApplication {
 		// Mount Resource Handlers
 		UploadedFileResource.mount(this);
 		SvgImageResource.mount(this);
+		
+		loginSessionCloser = new LoginSessionCloser();
+		loginSessionCloser.start();
+		
 		log.debug("Finished CWM Application Init");
 	}
 
@@ -348,6 +363,17 @@ public abstract class CwmApplication extends AuthDataApplication {
 		};
 	}
 	
+	/**
+	 * Mark the given LoginSession as ended due to session expiration.
+	 * 
+	 * This is made available in the Application class so that it can be called from the 
+	 * SessionStore when sessions expire - SessionStore is in a separate thread and
+	 * does not have easy access to service classes.
+	 * @param ID of the loginSession the LoginSession to close
+	 */
+	public void expireLoginSession(Long loginSessionId) {
+		loginSessionCloser.closeQueue.add(loginSessionId);
+	}
 	
 	// TODO: move these to a separate class, injected via Guice
 	private Map<String,IResponseType> legalResponseTypes = new HashMap<String,IResponseType>();
@@ -457,4 +483,47 @@ public abstract class CwmApplication extends AuthDataApplication {
 		// TODO: Create a base login page
 		throw new IllegalStateException("Way too many things go wrong without Cast's custom login.");
 	}
+	
+	
+	/**
+	 * A separate thread that is deals with the asynchronous need to close LoginSessions
+	 * that have timed out.  Connected to the application so that it can access service classes
+	 * (the SessionStore can not).
+	 */
+	protected class LoginSessionCloser extends Thread {
+		
+		private BlockingQueue<Long> closeQueue = new LinkedBlockingQueue<Long>();
+		
+		@Override
+		public void run() {
+			Application.set(CwmApplication.this);
+			log.debug("LSC STARTED.......................");
+			log.debug("APP =============== {}", Application.get());
+			log.debug("EVENTSERVICE ======={}", eventService);
+			log.debug("TESTING........ {}", eventService.newEvent());
+			while(true) {
+				try {
+					final Long loginSessionId = closeQueue.take();
+					Databinder.ensureSession(new SessionUnit() {
+						public Object run(org.hibernate.Session dbSession) {
+							dbSession.beginTransaction();
+							LoginSession loginSession = (LoginSession) dbSession.load(LoginSession.class, loginSessionId);
+							if (loginSession != null && loginSession.getEndTime() == null) {
+								log.debug("thrad closing {}", loginSessionId);
+								eventService.forceCloseLoginSession(loginSession, "[timed out]");
+							} else {
+								log.error("LoginSession ID passed in ({}) was invalid or closed: {}", loginSessionId, loginSession);
+							}
+								dbSession.getTransaction().commit();
+							return null;
+						}						
+					});
+				} catch (InterruptedException e) {
+					log.warn("Interrupted");
+				}
+			}
+
+		}
+	}
+	
 }

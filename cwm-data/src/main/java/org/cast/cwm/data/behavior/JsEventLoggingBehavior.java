@@ -23,7 +23,9 @@ import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.IHeaderResponse;
-import org.cast.cwm.service.EventService;
+import org.cast.cwm.service.IEventService;
+
+import com.google.inject.Inject;
 
 /**
  * A generic behavior that allows JS events to be logged
@@ -33,6 +35,8 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 	
 	public JsEventLoggingBehavior() {}
 
+	@Inject
+	private IEventService eventService;
 	
 	@Override
 	protected void respond(AjaxRequestTarget target) {
@@ -52,7 +56,7 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 	protected void logJsEvent(String eventDetail, String eventType, String eventPage) {
 		if (eventPage == null || eventPage.equals(""))
 			eventPage = getEventPage();
-		EventService.get().saveEvent(eventType, eventDetail, eventPage);
+		eventService.saveEvent(eventType, eventDetail, eventPage);
 	}
 
 	/**
