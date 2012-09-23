@@ -229,9 +229,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 			jsString.append(", \"captions-2\": {file: " + "\"" + captionHRef +  "\"}");
 
 		if (!Strings.isEmpty(audioDescriptionHRef)) {
-			if (!Strings.isEmpty(captionHRef))
-				jsString.append(", ");
-			jsString.append("\"audiodescription-2\": {file: " + "\"" + audioDescriptionHRef +  "\"}");
+			jsString.append(", \"audiodescription-2\": {file: " + "\"" + audioDescriptionHRef +  "\"}");
 		}
 
 		jsString.append("}"); // end plugins
