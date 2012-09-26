@@ -32,6 +32,8 @@ public class ShyContainer extends WebMarkupContainer {
 
 	public ShyContainer(String id) {
 		super(id);
+		setOutputMarkupId(true);
+		setOutputMarkupPlaceholderTag(true);
 	}
 	
 	@Override
