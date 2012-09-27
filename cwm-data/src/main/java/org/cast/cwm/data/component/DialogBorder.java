@@ -82,6 +82,13 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	@Getter @Setter
 	protected boolean clickBkgToClose = false;
 	
+	/**
+	 * If true, DOM contents will be erased by the close javascript.
+	 * Useful if, for instance, there are videos or other active components in the modal that must be stopped.
+	 */
+	@Getter @Setter
+	protected boolean emptyOnClose = false;
+	
 	@Getter @Setter
 	protected Integer zIndex;
 	
@@ -331,11 +338,14 @@ public class DialogBorder extends Border implements IHeaderContributor {
      */
     public String getCloseString(boolean returnFocus) {
     	StringBuffer result = new StringBuffer();
-        result.append("$('#" + contentContainer.getMarkupId() + "').hide();");
+        result.append(String.format("$('#%s').hide()%s;", 
+        		contentContainer.getMarkupId(), 
+        		emptyOnClose ? ".empty()" : ""));
         if (masking)
         	result.append("$('#" + overlay.getMarkupId() + "').hide();");
         if (returnFocus)
-        	result.append("DialogBorder.focusButton(" + (focusFallbackSelector == null ?  "" : "'" + focusFallbackSelector + "'") + ");");
+        	result.append(String.format("DialogBorder.focusButton(%s);", 
+        			(focusFallbackSelector == null ?  "" : "'" + focusFallbackSelector + "'")));
         return result.toString();
     }
 
