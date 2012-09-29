@@ -27,6 +27,7 @@ import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.service.IEventService;
@@ -99,6 +100,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	public EventLoggingBehavior(String jsEvent, String eventCode) {
 		super(jsEvent);
 		this.eventCode = eventCode;
+		InjectorHolder.getInjector().inject(this);
 	}
 	
 	@Override
