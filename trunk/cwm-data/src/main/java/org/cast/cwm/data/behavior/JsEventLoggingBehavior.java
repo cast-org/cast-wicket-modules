@@ -22,6 +22,7 @@ package org.cast.cwm.data.behavior;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.cast.cwm.service.IEventService;
 
@@ -32,12 +33,14 @@ import com.google.inject.Inject;
  */
 public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 	private static final long serialVersionUID = 1L;
-	
-	public JsEventLoggingBehavior() {}
 
 	@Inject
 	private IEventService eventService;
 	
+	public JsEventLoggingBehavior() {
+		InjectorHolder.getInjector().inject(this);
+	}
+
 	@Override
 	protected void respond(AjaxRequestTarget target) {
 		String eventDetail = RequestCycle.get().getRequest().getParameter("eventDetail");
