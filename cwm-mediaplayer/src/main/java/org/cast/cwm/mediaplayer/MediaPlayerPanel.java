@@ -145,6 +145,8 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		if (rr == null)
 			return null;
 		CharSequence url = urlFor(rr);
+		// Since we're going to make the path absolute, get rid of leading ../
+		url = url.toString().replaceAll("\\.\\./", "");
 		if (url == null) {
 			log.error("Could not determine URL for media {}", rr);
 			return "";
