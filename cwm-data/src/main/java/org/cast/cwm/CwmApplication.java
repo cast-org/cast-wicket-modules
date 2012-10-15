@@ -484,6 +484,13 @@ public abstract class CwmApplication extends AuthDataApplication {
 		throw new IllegalStateException("Way too many things go wrong without Cast's custom login.");
 	}
 	
+	@Override
+	protected void onDestroy() {
+		log.debug("Running shutdown steps");
+		loginSessionCloser.interrupt();
+		this.getHibernateSessionFactory(null).close();
+		super.onDestroy();
+	}
 	
 	/**
 	 * A separate thread that is deals with the asynchronous need to close LoginSessions
@@ -515,7 +522,8 @@ public abstract class CwmApplication extends AuthDataApplication {
 						}						
 					});
 				} catch (InterruptedException e) {
-					log.warn("Interrupted");
+					log.debug("LoginSessionCloser exiting due to interrupt");
+					break;
 				}
 			}
 
