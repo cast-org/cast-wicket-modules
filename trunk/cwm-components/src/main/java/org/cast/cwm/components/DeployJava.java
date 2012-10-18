@@ -96,7 +96,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	/**
 	 * Javascript URL on Sun's website for deployJava Javascript. (={@value})
 	 */
-	private static final String JAVASCRIPT_URL = "http://java.com/js/deployJava.js";
+	public static final String JAVASCRIPT_URL = "http://java.com/js/deployJava.js";
 
 	/**
 	 * Attribute to set the width of the applet. (={@value})
@@ -189,24 +189,33 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 		// If this jarName is not listed as a shared resource, add it as one.
 		if (sr.get(DeployJava.class, jarName, null, null, false) == null) {
 			ServletContext sc = ((WebApplication)WebApplication.get()).getServletContext();
-			Folder libdir = new Folder(sc.getRealPath("/WEB-INF/lib"));
-			File[] options = libdir.listFiles(new FilenameFilter() {
-				public boolean accept(File dir, String file) {
-					return (file.startsWith(jarName));
-				}
-			});
-			if (options == null || options.length < 1) {
-				log.error("No JAR found matching {}/{}*", libdir, jarName);
+			File jar = findMatchingFile(new Folder(sc.getRealPath("/WEB-INF/lib")), jarName);
+			if (jar==null)
+				jar = findMatchingFile(new Folder(sc.getRealPath("/WEB-INF/classes")), jarName);
+			if (jar == null) {
+				log.error("No JAR found matching {}, looked in {} and {}", jarName, sc.getRealPath("/WEB-INF/lib"), sc.getRealPath("/WEB-INF/classes"));
 			} else {
-				log.debug("Adding JAR to Shared Resources: {}", options[0].getAbsolutePath());
-				ContextRelativeResource resource = new ContextRelativeResource("WEB-INF/lib/" + options[0].getName());
+				log.debug("Adding JAR to Shared Resources: {}", jar.getAbsolutePath());
+				ContextRelativeResource resource = new ContextRelativeResource("WEB-INF/lib/" + jar.getName());
 				sr.add(DeployJava.class, jarName, null, null, resource);
 			}
 		}
 
 		return urlFor(new ResourceReference(DeployJava.class, jarName)).toString();
 	}
-
+	
+	// Look for a file beginning with the given prefix in the given folder.
+	private File findMatchingFile (Folder folder, final String prefix) {
+		File[] options = folder.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String file) {
+				return (file.startsWith(prefix));
+			}
+		});
+		if (options==null || options.length < 1)
+			return null;
+		return options[0];
+	}
+	
 	/**
 	 * Minimal Java version for the applet. E.g. Java 1.6 is "1.6"
 	 * 
