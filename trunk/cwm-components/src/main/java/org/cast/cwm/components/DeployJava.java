@@ -189,14 +189,17 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 		// If this jarName is not listed as a shared resource, add it as one.
 		if (sr.get(DeployJava.class, jarName, null, null, false) == null) {
 			ServletContext sc = ((WebApplication)WebApplication.get()).getServletContext();
-			File jar = findMatchingFile(new Folder(sc.getRealPath("/WEB-INF/lib")), jarName);
-			if (jar==null)
-				jar = findMatchingFile(new Folder(sc.getRealPath("/WEB-INF/classes")), jarName);
+			String path = "/WEB-INF/lib";
+			File jar = findMatchingFile(new Folder(sc.getRealPath(path)), jarName);
+			if (jar == null) {
+				path = "/WEB-INF/classes";
+				jar = findMatchingFile(new Folder(sc.getRealPath(path)), jarName);
+			}
 			if (jar == null) {
 				log.error("No JAR found matching {}, looked in {} and {}", jarName, sc.getRealPath("/WEB-INF/lib"), sc.getRealPath("/WEB-INF/classes"));
 			} else {
 				log.debug("Adding JAR to Shared Resources: {}", jar.getAbsolutePath());
-				ContextRelativeResource resource = new ContextRelativeResource("WEB-INF/lib/" + jar.getName());
+				ContextRelativeResource resource = new ContextRelativeResource(path + "/" + jar.getName());
 				sr.add(DeployJava.class, jarName, null, null, resource);
 			}
 		}
