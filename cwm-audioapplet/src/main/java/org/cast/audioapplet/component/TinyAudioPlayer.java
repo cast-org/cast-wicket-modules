@@ -42,11 +42,11 @@ public class TinyAudioPlayer extends AudioResourcePlayer {
 	@Override
 	protected void addButtons() {
 		WebMarkupContainer play = new WebMarkupContainer("playButton");
-		play.add(new SimpleAttributeModifier("onclick", "play('" + dj.getMarkupId() + "')"));
+		play.add(new SimpleAttributeModifier("onclick", "audioPlay('" + dj.getMarkupId() + "')"));
 		add(play);
 		
 		WebMarkupContainer stop = new WebMarkupContainer("stopButton");
-		stop.add(new SimpleAttributeModifier("onclick", "stop('" + dj.getMarkupId() + "')"));
+		stop.add(new SimpleAttributeModifier("onclick", "audioStop('" + dj.getMarkupId() + "')"));
 		add(stop);
 	}
 
