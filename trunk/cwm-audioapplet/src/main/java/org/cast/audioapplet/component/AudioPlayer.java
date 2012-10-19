@@ -91,15 +91,15 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 	
 	protected void addButtons() {
 		WebMarkupContainer play = new WebMarkupContainer("playButton");
-		play.add(new SimpleAttributeModifier("onclick", "play('" + dj.getMarkupId() + "')"));
+		play.add(new SimpleAttributeModifier("onclick", "audioPlay('" + dj.getMarkupId() + "'); return false;"));
 		add(play);
 		
 		WebMarkupContainer pause = new WebMarkupContainer("pauseButton");
-		pause.add(new SimpleAttributeModifier("onclick", "pause('" + dj.getMarkupId() + "')"));
+		pause.add(new SimpleAttributeModifier("onclick", "audioPause('" + dj.getMarkupId() + "'); return false;"));
 		add(pause);
 		
 		WebMarkupContainer stop = new WebMarkupContainer("stopButton");
-		stop.add(new SimpleAttributeModifier("onclick", "stop('" + dj.getMarkupId() + "')"));
+		stop.add(new SimpleAttributeModifier("onclick", "audioStop('" + dj.getMarkupId() + "'); return false;"));
 		add(stop);
 	}
 

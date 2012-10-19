@@ -1,28 +1,31 @@
+/* Javascript to control audio recording Java applet */
+
+/* FIXME: these variables need to be made specific to a single applet, not global! */
 var state = '';
 var lastState = '';
 
 /* Functions invoked by button clicks */
-function record(appletId) {
+function audioRecord(appletId) {
 	if(!$('#' + appletId).parent().find('.actions .record').hasClass('off') &&
 		!$('#' + appletId).parent().find('.actions .record').hasClass('on')) { 
 		document.getElementById(appletId).messageFromJavascript("RECORD");
 	}
 }
 
-function stop(appletId) {
+function audioStop(appletId) {
 	if(!$('#' + appletId).parent().find('.actions .stop').hasClass('off')) {
 		document.getElementById(appletId).messageFromJavascript("STOP");
 	}
 }
 
-function play(appletId) {
+function audioPlay(appletId) {
 	if(!$('#' + appletId).parent().find('.actions .play').hasClass('off') &&
 			!$('#' + appletId).parent().find('.actions .play').hasClass('on')) {
 		document.getElementById(appletId).messageFromJavascript("PLAY");
 	}
 }
 
-function pause(appletId) {
+function audioPause(appletId) {
 	if(!$('#' + appletId).parent().find('.actions .pause').hasClass('off')) {
 		document.getElementById(appletId).messageFromJavascript("PAUSE");
 	}

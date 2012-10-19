@@ -99,7 +99,7 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 		super.addButtons();
 		WebMarkupContainer record = new WebMarkupContainer("recordButton");
 		if(!readOnly) {
-			record.add(new SimpleAttributeModifier("onclick", "record('" + dj.getMarkupId() + "')"));
+			record.add(new SimpleAttributeModifier("onclick", "audioRecord('" + dj.getMarkupId() + "'); return false;"));
 		}
 		add(record);
 	}
