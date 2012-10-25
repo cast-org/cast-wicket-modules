@@ -72,6 +72,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	protected boolean showDownloadLink = false;
 	protected boolean useOnPlay = false;
 	protected boolean fullScreen = false;
+	protected String stopString = "jwplayer().stop();";
 	protected String fallbackText = "Click to watch video";
 	protected String downloadText = "Download video";
 	protected AbstractDefaultAjaxBehavior playResponse;
@@ -268,6 +269,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		return jsString;		
 	}
 
+	
 	/**
 	 * Called when the video is played/paused by the user.  By default does nothing.
 	 * 
@@ -277,7 +279,29 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	 */
 	public void onPlay(String status) {
 	}
-		
+
+	/**
+	 * Sets whether this panel loads javascript resources to detect click events in the video
+	 * and run the onPlay(String status) function.
+	 * 
+	 * @param useOnPlay - true if enabled, false otherwise
+	 */
+	public void setUseOnPlay(boolean useOnPlay) {
+		this.useOnPlay = useOnPlay;
+	}
+	public boolean isUseOnPlay() {
+		return useOnPlay;
+	}
+
+
+	public void setStopString(String stopString) {
+		this.stopString = stopString;
+	}
+	
+	public String getStopString(){
+		return stopString;
+	}
+
 	public int getWidth() {
 		return width;
 	}
@@ -387,17 +411,4 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		MediaPlayerPanel.playerResourceStored = false; // cause new resource to be saved into SharedResources
 	}
 	
-	public boolean isUseOnPlay() {
-		return useOnPlay;
-	}
-
-	/**
-	 * Sets whether this panel loads javascript resources to detect click events in the video
-	 * and run the onPlay(String status) function.
-	 * 
-	 * @param useOnPlay - true if enabled, false otherwise
-	 */
-	public void setUseOnPlay(boolean useOnPlay) {
-		this.useOnPlay = useOnPlay;
-	}
 }
