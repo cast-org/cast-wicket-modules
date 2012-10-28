@@ -28,6 +28,7 @@ import org.apache.wicket.IRequestTarget;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
@@ -125,20 +126,18 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 	 * @param id wicket:id of the link
 	 * @return Link component.
 	 */
-	public Link<Void> generateStandardSaveLink(String id) {
+	public WebMarkupContainer generateStandardSaveLink(String id) {
 
-		Link<Void> l = new Link<Void>(id) {
+		WebMarkupContainer l = new WebMarkupContainer(id) {
 
 			private static final long serialVersionUID = 1L;
-
-			public void onClick() {}
 
 			@Override
 			protected void onComponentTag(final ComponentTag tag) {
 				super.onComponentTag(tag);
 
 				if (isEnabled()) {
-					tag.put("onClick", "stop('" + dj.getMarkupId() + "'); document.getElementById('" 
+					tag.put("onclick", "stop('" + getAppletMarkupId() + "'); document.getElementById('" 
 							+ getAppletMarkupId() + "').messageFromJavascript('SAVE'); return false;");
 				}
 			}	  
