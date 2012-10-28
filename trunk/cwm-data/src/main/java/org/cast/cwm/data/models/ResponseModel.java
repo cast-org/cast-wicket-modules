@@ -19,11 +19,10 @@
  */
 package org.cast.cwm.data.models;
 
+import net.databinder.models.hib.HibernateObjectModel;
+
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.builders.ResponseCriteriaBuilder;
-import org.cast.cwm.service.ResponseService;
-
-import net.databinder.models.hib.HibernateObjectModel;
 
 /**
  * An extension of HibernateObjectModel<Response>.
@@ -37,14 +36,6 @@ public class ResponseModel extends HibernateObjectModel<Response> {
 
 	private static final long serialVersionUID = 1L;
 	private ResponseCriteriaBuilder criteria;
-	
-	/**
-	 * Constructor.  Populates this model with a transient,
-	 * 'empty' instance of a Response.
-	 */
-	public ResponseModel() {
-		super(ResponseService.get().getResponseClass());
-	}
 	
 	/**
 	 * Constructor.  Populates this model with an existing
