@@ -28,14 +28,12 @@ import org.apache.wicket.IRequestTarget;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IDetachable;
 
 /**
@@ -137,8 +135,11 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 				super.onComponentTag(tag);
 
 				if (isEnabled()) {
-					tag.put("onclick", "stop('" + getAppletMarkupId() + "'); document.getElementById('" 
-							+ getAppletMarkupId() + "').messageFromJavascript('SAVE'); return false;");
+					tag.put("onclick", 
+							String.format("audioStop('%s'); document.getElementById('%s').messageFromJavascript('SAVE'); return false;",
+									getAppletMarkupId(), getAppletMarkupId()));
+				} else {
+					tag.put("onclick", "return false;");
 				}
 			}	  
 		};
