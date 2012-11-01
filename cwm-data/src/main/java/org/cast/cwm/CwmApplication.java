@@ -511,9 +511,14 @@ public abstract class CwmApplication extends AuthDataApplication {
 						public Object run(org.hibernate.Session dbSession) {
 							dbSession.beginTransaction();
 							LoginSession loginSession = (LoginSession) dbSession.load(LoginSession.class, loginSessionId);
-							if (loginSession != null && loginSession.getEndTime() == null) {
-								log.debug("thrad closing {}", loginSessionId);
-								eventService.forceCloseLoginSession(loginSession, "[timed out]");
+							if (loginSession != null) {
+								 if (loginSession.getEndTime() != null) {
+									 log.debug("Closer thread closing login session {}", loginSessionId);
+									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
+								 } else {
+									 // If user logged out normally, login session would already be closed.
+									 log.debug("Login session {} was already closed", loginSessionId);
+								 }
 							} else {
 								log.error("LoginSession ID passed in ({}) was invalid or closed: {}", loginSessionId, loginSession);
 							}
