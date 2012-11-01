@@ -29,7 +29,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.type.StringType;
 import org.hibernate.usertype.UserType;
 
-public class ResponseTypeHibernateType implements UserType {
+public class ResponseTypeHibernateType implements UserType, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public int[] sqlTypes() {
 		return new int[] {		
