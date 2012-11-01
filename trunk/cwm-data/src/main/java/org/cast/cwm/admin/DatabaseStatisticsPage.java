@@ -36,8 +36,11 @@ public class DatabaseStatisticsPage extends AdminPage {
 		Statistics stats = Databinder.getHibernateSessionFactory().getStatistics();
 		if (stats.isStatisticsEnabled()) {
 			add(new Label("count", String.valueOf(stats.getQueryExecutionCount())));
+			add(new Label("cloads", String.valueOf(stats.getCollectionLoadCount())));
 			add(new Label("worst", stats.getQueryExecutionMaxTimeQueryString())); // Worked in SNUDLE, why am I getting no output here?
-			add(new Label("worsttime", String.valueOf(stats.getQueryExecutionMaxTime())));				
+			add(new Label("worsttime", String.valueOf(stats.getQueryExecutionMaxTime())));
+			add(new Label("qchit", String.valueOf(stats.getQueryCacheHitCount())));
+			add(new Label("qcmiss", String.valueOf(stats.getQueryCacheMissCount())));
 		} else {
 			stats.setStatisticsEnabled(true);
 			add (new Label("count", "--"));
