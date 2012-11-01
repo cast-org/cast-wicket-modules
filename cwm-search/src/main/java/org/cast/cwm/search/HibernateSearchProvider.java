@@ -75,9 +75,18 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 		}
 		query.setFirstResult(first);
 		query.setMaxResults(count);
-		return query.iterate();
+		onBeforeSearchExecution(query);
+		long startTime = System.currentTimeMillis();
+		Iterator<? extends T> iterator = query.iterate();
+		if (log.isDebugEnabled())
+			log.debug("Query took {}ms", System.currentTimeMillis()-startTime);
+		return iterator;
 	}
 
+	/** Override this in a subclass to modify the query before it is run */
+	protected void onBeforeSearchExecution(FullTextQuery query) {
+	}
+	
 	public int size() {
 		FullTextQuery query = getQuery();
 		return query == null ? 0 : query.getResultSize();
