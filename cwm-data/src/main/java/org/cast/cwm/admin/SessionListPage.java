@@ -65,6 +65,7 @@ public class SessionListPage extends AdminPage {
 	
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("User Name"), "user.username", "user.username"));
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Start time"), "startTime", "startTime"));
+		// FIXME the getSecondsSinceLastEvent() method doesn't currently exist.
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Time since last event"), "secondsSinceLastEvent")); // cannot sort since it's not a field Hibernate knows about
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Browser"), "userAgent"));
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("IP Address"), "ipAddress"));

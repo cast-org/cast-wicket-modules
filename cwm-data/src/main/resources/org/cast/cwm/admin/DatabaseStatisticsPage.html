@@ -10,8 +10,10 @@
   
   <ul>
     <li>Number of DB queries: <span wicket:id="count"></span></li>
+    <li>Number of collections loaded: <span wicket:id="cloads"></span></li>
     <li>Most expensive query: <span wicket:id="worst"></span></li>
     <li>Time for that query: <span wicket:id="worsttime"></span>ms</li>
+    <li>Query Cache hits/misses: <span wicket:id="qchit"></span> / <span wicket:id="qcmiss"></span></li>
   </ul>
   
   <p><strong>Note:</strong> visiting this page turned <strong>on</strong> statistics collection,
