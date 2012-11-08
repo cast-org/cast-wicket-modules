@@ -28,7 +28,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.Version;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -72,12 +71,14 @@ public class BinaryFileData extends PersistedObject {
 	
 	private byte[] data;
 	
-	@Version
 	private Date lastModified;
 	
-	protected BinaryFileData() { /* No Arg Constructor for DataStore */ }
-	
+	protected BinaryFileData() {
+		lastModified = new Date();
+	}
+
 	public BinaryFileData(String name, String mimeType, byte[] data) {
+		this();
 		this.name = name.replaceAll("\\s+", "_");
 		this.mimeType = mimeType;
 		this.data = data;
