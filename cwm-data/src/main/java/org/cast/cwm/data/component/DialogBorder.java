@@ -44,7 +44,6 @@ import org.cast.cwm.service.IEventService;
 
 import com.google.inject.Inject;
 import com.visural.wicket.component.submitters.impl.ModalCSSRef;
-
 /**
  * A Styled modal dialog popup box.  This provides a default style and markup, but applications
  * can override these.  The title of the dialog box is set by this component's model, while
@@ -120,11 +119,11 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	
 	
 	/**
-	 * When the dialog is closed, but the opening button is no longer on the page, the DialogBorder will
+	 * When the dialog is closed, the DialogBorder will
 	 * attempt to return focus to a component based on this jQuery selector.
 	 */
 	@Getter @Setter
-	protected String focusFallbackSelector;
+	protected String focusOverrideSelector;
 
 	public DialogBorder (String id) {
 		this(id, "");
@@ -344,8 +343,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
         if (masking)
         	result.append("$('#" + overlay.getMarkupId() + "').hide();");
         if (returnFocus)
-        	result.append(String.format("DialogBorder.focusButton(%s);", 
-        			(focusFallbackSelector == null ?  "" : "'" + focusFallbackSelector + "'")));
+        	result.append(String.format("DialogBorder.focusButton('%s', '%s');",        			
+        			contentContainer.getMarkupId(),
+        			focusOverrideSelector == null ?  "" : focusOverrideSelector));
         return result.toString();
     }
 
