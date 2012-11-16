@@ -34,10 +34,12 @@ var DialogBorder = {
 		var $dialog = $('#' + dialogId);
 		var $document = $(document);
 				
-		if (storeButton && !$document.data("DialogTrigger")) {
+		if (storeButton && !$dialog.data("DialogTrigger")) {
+			// store trigger data with the dialog and at the global level for chaining
 			var $trigger = $(document.activeElement);
+			DialogBorder.log("Storing button : " + $trigger.attr("id"));
+			$dialog.data("DialogTrigger", $trigger.attr("id"));
 			$document.data("DialogTrigger", $trigger.attr("id"));
-			DialogBorder.log("Storing button: " + $trigger.attr("id"));
 		}
 		
 		$dialog.get(0).focus();		
@@ -49,31 +51,45 @@ var DialogBorder = {
 	 * 
 	 * Failsafe behavior does nothing.
 	 * 
-	 * @param {Object} fallbackSelector
+	 * @param {Object} focusOverride
 	 */
-	focusButton: function(fallbackSelector) {
+	focusButton: function(dialogId, focusOverride) {
 		
+		var $dialog = $('#' + dialogId);
 		var $document = $(document);
+		DialogBorder.log("Dialog id: " + $dialog.attr("id"));
+		DialogBorder.log("focusOverride: " + focusOverride);
 		
-		if ($document.data("DialogTrigger")) {
-			var $trigger = $("#" + $document.data("DialogTrigger"));
-			$document.data("DialogTrigger", null);
-			if ($trigger.get(0)) {
-				$trigger.get(0).focus();
-				DialogBorder.log("Focusing on button: " + $trigger.attr("id"));
-				return;
-			}
-		}
-		
-		if (fallbackSelector) {
-			var $fallback = $(fallbackSelector);
+		// return focus here if specified
+		if (focusOverride) {
+			var $fallback = $(focusOverride);
 			if ($fallback.get(0)) {
 				$fallback.get(0).focus();
 				DialogBorder.log("Focusing on button: " + $fallback.attr("id"));
 				return;
 			}
 		}
-		
+
+		// fallback to data stored at dialog creation time
+		if ($dialog.data("DialogTrigger")) {
+			var $trigger = $("#" + $dialog.data("DialogTrigger"));
+			if ($trigger.get(0)) {
+				$trigger.get(0).focus();
+				DialogBorder.log("Focusing on button: " + $trigger.attr("id"));
+				return;
+			}
+		}
+
+		// fallback to data stored at global level - used for chaining modals
+		if ($document.data("DialogTrigger")) {
+			var $trigger = $("#" + $document.data("DialogTrigger"));
+			if ($trigger.get(0)) {
+				$trigger.get(0).focus();
+				DialogBorder.log("Focusing on button: " + $trigger.attr("id"));
+				return;
+			}
+		}
+
 		DialogBorder.log("Failed to focus on a button");
 	},
 	
@@ -88,4 +104,19 @@ var DialogBorder = {
 	}
 };
 
+/*=========================================================*/
+/*  Modal Close vis Esc key	                               */
+/*=========================================================*/
+function modalEscClose() {
+    $(document.body).delegate(".modalBody", "keyup", function(event) {
+            var code=event.charCode || event.keyCode;
+            if(code && code == 27) {// if ESC is pressed
+                // Click the close button
+                $(this).find(".modalClose").eq(0).click();
+        }
+    });
+}
 
+$(window).ready(function() {
+    modalEscClose();
+});
