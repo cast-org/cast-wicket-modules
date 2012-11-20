@@ -494,7 +494,7 @@ public abstract class ResponseEditor extends Panel {
 				if (templateURL != null) {
 					defaultTableUrl = getUrlFromString(templateURL);
 				} else { //new response with no authored default
-					String defaultTableUrlString = (String) RequestCycle.get().urlFor(new ResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json"));
+					String defaultTableUrlString = RequestCycle.get().urlFor(new ResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json")).toString();
 					defaultTableUrl = getUrlFromString(defaultTableUrlString);
 				}
 				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
