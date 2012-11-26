@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -266,6 +267,7 @@ public class UserSpreadsheetReader implements Serializable {
 			IModel<User> mUser = potentialUser.getUser();
 			User u = mUser.getObject();
 			u.setValid(true);
+			u.setCreateDate(new Date());
 			session.save(u);
 		}
 
