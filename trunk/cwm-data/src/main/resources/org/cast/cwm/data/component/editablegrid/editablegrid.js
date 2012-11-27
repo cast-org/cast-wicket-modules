@@ -290,7 +290,7 @@ EditableGrid.prototype.loadXML = function(url)
 			alert("Cannot load a XML url with this browser!");
 			return false;
 		}
-
+		
 		return true;
 	}
 };
@@ -393,6 +393,7 @@ EditableGrid.prototype.processXML = function()
 			// add row data in our model
 			data.push(rowData);
 		}
+
 	}
 
 	return true;
@@ -455,7 +456,7 @@ EditableGrid.prototype.processJSON = function(jsonData)
 	this.data = [];
 	this.dataUnfiltered = null;
 	this.table = null;
-
+	
 	// load metadata
 	if (jsonData.metadata) {
 
@@ -501,6 +502,18 @@ EditableGrid.prototype.processJSON = function(jsonData)
 		// add row data in our model
 		this.data.push(rowData);
 	}
+
+	// [BEGIN CAST SETTINGS - initialize settings]
+	this.castSettings = {};
+	
+	if (jsonData.settings) {
+		var settingdata = jsonData.settings[0];
+		
+		// add any additional settings here
+		this.castSettings['firstColumnHeader'] = (settingdata.firstColumnHeader ? true : false)
+		this.castSettings['firstRowHeader'] = (settingdata.firstRowHeader ? true : false)		
+	}
+	// [END CAST SETTINGS]
 
 	return true;
 };
@@ -1512,10 +1525,25 @@ EditableGrid.prototype._rendergrid = function(containerid, className, tableid)
 				var tr = tBody.insertRow(insertRowIndex++);
 				tr.rowId = data[i]['id'];
 				tr.id = this._getRowDOMId(data[i]['id']);
+				
+				/* BEGIN::CAST add header class to first row */
+				if (i == 0 && this.castSettings['firstRowHeader'] == true) {
+					tr.className = 'tableHeader';
+				}
+				/* END::CAST add header class */
+				
 				for (j = 0; j < columnCount; j++) {
 
 					// create cell and render its content
 					var td = tr.insertCell(j);
+					
+					/* BEGIN::CAST add header class to column */
+					if (j == 0 && this.castSettings['firstColumnHeader'] == true) {
+						td.className = 'tableHeader';
+					}
+					/* END::CAST add header class */
+
+					
 					/* BEGIN::CAST - add tabindex navigation */
 					td.setAttribute("tabindex", 0);
 					//td.onfocus = function(e) { _$(containerid).editablegrid.mouseClicked(e); };

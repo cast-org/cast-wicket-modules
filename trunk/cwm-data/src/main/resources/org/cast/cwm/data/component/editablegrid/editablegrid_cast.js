@@ -17,6 +17,7 @@ var castEditableGridObjects = {};  	// the data representation of the grid
 // The url is where the initial grid state is found as a json string.
 //
 function cwmImportGrid(divId, url, readonly) {
+	
 	castEditableGrids[divId] = new EditableGrid(divId);
 	var editableGrid = castEditableGrids[divId];
 	
@@ -34,11 +35,12 @@ function cwmImportGrid(divId, url, readonly) {
 
 	//pull json string from the URL
 	var data = $.ajax({type: "GET", url: url, async: false}).responseText;
-
+	
 	//parse string into object
 	castEditableGridObjects[divId] = JSON.parse(data);
 	
 	setRemoveButtonState(divId);
+
 }
 
 function initializeGrid(divId) {
@@ -48,8 +50,7 @@ function initializeGrid(divId) {
 			var myObject = castEditableGridObjects[divId];
 			myObject.data[rowIndex].values[myObject.metadata[columnIndex].name] = newValue;
 			castEditableGridObjects[divId] = myObject;
-	};	
-	
+	};		
 }
 
 function setRemoveButtonState(divId) {	
@@ -67,7 +68,7 @@ function setRemoveButtonState(divId) {
 
 // export the json value of the grid to the textarea
 function cwmExportGrid(textAreaId, divId) {
-	var myObject = castEditableGridObjects[divId];
+	var myObject = castEditableGridObjects[divId];	
 	jQuery('#'+textAreaId).val(JSON.stringify(myObject));  	
 }
 
@@ -75,6 +76,7 @@ function cwmAddRow(divId) {
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
 	var objectValue = {"id":myObject.data.length+1, "values":{"c1":"","c2":"","c3":"","c4":"","c5":""}};
+
 	myObject.data.push(objectValue);
 	editableGrid.append("Row" + myObject.data.length, objectValue, objectValue, true);
 	synchronizeDataToMedataDimension(divId);
@@ -87,8 +89,7 @@ function cwmAddRow(divId) {
 	}
 }
 
-function cwmRemoveRow(divId) {
-	
+function cwmRemoveRow(divId) {	
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
 
@@ -106,14 +107,15 @@ function cwmRemoveRow(divId) {
 	}
 }
 
-function cwmAddColumn(divId) {
-	
+function cwmAddColumn(divId) {	
 	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
 	
 	var nextColumnNumber = myObject.metadata.length + 1;
 	var nextColumnLabel = "Column " + nextColumnNumber;
 	var nextColumnName = "c" + nextColumnNumber;
+	
+	// LDM - this needs to take in the actual column type and the editable setting
 	var newColumn = {"name":nextColumnName,"label":nextColumnLabel,"datatype":"string","editable":true};
 	
 	myObject.metadata.push(newColumn);
@@ -153,7 +155,6 @@ function generateColumnNameByIndex(indexOfColumn) {
 }
 
 function synchronizeDataToMedataDimension(divId) {
-	var editableGrid = castEditableGrids[divId];
 	var myObject = castEditableGridObjects[divId];
 	
 	for (i=0; i<myObject.data.length; i++) {
@@ -169,6 +170,5 @@ function synchronizeDataToMedataDimension(divId) {
 			}
 		}
 	}	
-	castEditableGrids[divId] = editableGrid;
 	castEditableGridObjects[divId] = myObject;	
 }
