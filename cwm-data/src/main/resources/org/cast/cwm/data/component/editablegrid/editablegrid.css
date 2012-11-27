@@ -76,3 +76,16 @@
     bottom: 2.1em;
     left: 0;
 }
+
+/*================================================================*/
+/* Editable Table Headers */
+
+.dataTableResponse .tableHeader, .dataTableResponse .tableHeader td {
+    background: #D8D4C1;
+    color: #333333;
+    font-family: "Trebuchet MS",Helvetica,Arial,sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: middle;
+}

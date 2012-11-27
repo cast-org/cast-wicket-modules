@@ -82,5 +82,11 @@
                 "c5": ""
             }
         }
-    ]
+    ],
+    "settings": [
+		{
+			"firstColumnHeader":false,
+			"firstRowHeader":false
+		}
+	]
 }
