@@ -312,7 +312,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 
 			@Override
             public void onComponentTag(Component component, ComponentTag tag) {
-                tag.put("onclick", getCloseString());
+                tag.put("onclick", getCloseString()+"return false;");
             }
         };
     }
@@ -384,7 +384,6 @@ public class DialogBorder extends Border implements IHeaderContributor {
         	result.append(String.format("DialogBorder.focusButton('%s', '%s');",        			
         			contentContainer.getMarkupId(),
         			focusOverrideSelector == null ?  "" : focusOverrideSelector));
-        result.append("return false;");
         return result.toString();
     }
 
