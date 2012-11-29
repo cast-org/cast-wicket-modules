@@ -35,15 +35,14 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.border.Border;
 import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.cast.cwm.components.ShyLabel;
 import org.cast.cwm.service.IEventService;
 
 import com.google.inject.Inject;
-import com.visural.wicket.component.submitters.impl.ModalCSSRef;
 /**
  * A Styled modal dialog popup box.  This provides a default style and markup, but applications
  * can override these.  The title of the dialog box is set by this component's model, while
@@ -56,7 +55,6 @@ import com.visural.wicket.component.submitters.impl.ModalCSSRef;
  * 
  * TODO: determine if we should keep styleReferences or use overriding to set styles
  * TODO: somehow make default stylesheet not interfere so much with application stylesheets
- * TODO: remove Visural dependencies
  *
  * @param <T>
  */
@@ -65,6 +63,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	private static final long serialVersionUID = 1L;
 	
 	private static final ResourceReference JS_REFERENCE = new JavascriptResourceReference(DialogBorder.class, "DialogBorder.js");
+	private static final ResourceReference BLOCKING_CSS_REFERENCE = new ResourceReference(DialogBorder.class, "modal_blocking.css");
 	
 	@Getter @Setter
 	private boolean logEvents = true;
@@ -81,6 +80,12 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	@Getter @Setter
 	protected boolean clickBkgToClose = false;
 	
+	@Getter @Setter
+	private boolean showCloseLink = true;
+
+	@Getter @Setter
+	private boolean showMoveLink = false;
+
 	/**
 	 * If true, DOM contents will be erased by the close javascript.
 	 * Useful if, for instance, there are videos or other active components in the modal that must be stopped.
@@ -142,7 +147,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 		contentContainer.add(new SimpleAttributeModifier("tabindex", "-1"));
 		
 		addTitle(contentContainer);
-		addCloseLink(contentContainer);
+		addControls(contentContainer);
 		addBody(contentContainer);
 		
 		addOverlay();
@@ -197,15 +202,47 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * @param container
 	 */
 	protected void addTitle(WebMarkupContainer container) {
-		container.add(new Label("title", getModel()));
+		container.add(new ShyLabel("title", getModel()));
 	}
 	
+	/**
+	 * Add any buttons or controls to the window.
+	 * By default, adds a close button.
+	 * @param container
+	 */
+	protected void addControls(WebMarkupContainer container) {
+		addMoveLink(container);
+		addCloseLink(container);
+	}
+
+	/** Add a control that allows dragging the dialog (or moving it with the keyboard).
+	 * 
+	 * @param container
+	 */
+	protected void addMoveLink(WebMarkupContainer container) {
+		container.add (new WebMarkupContainer("moveWindowLink") {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public boolean isVisible() {
+				// Blocking modals should not show the move link since (a) they are blocking the
+				// content anyway, and (b) it does not work with current JS (z-index mismatch).
+				return showMoveLink && !masking;
+			}
+		});
+	}
+
 	/**
 	 * Add a close link to the dialog.
 	 * @param container
 	 */
 	protected void addCloseLink(WebMarkupContainer container) {
-		WebMarkupContainer link = new WebMarkupContainer("closeWindowLink");
+		WebMarkupContainer link = new WebMarkupContainer("closeWindowLink") {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public boolean isVisible() {
+				return showCloseLink;
+			}
+		};
 		container.add(link);
 		link.add(getClickToCloseBehavior());
 	}
@@ -300,6 +337,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
         
         result.append("$('#" + contentContainer.getMarkupId() + "').show();");
         result.append(getPositioningString());
+        result.append("if (typeof(modalInit)==='function') modalInit(); ");
         result.append("DialogBorder.focusDialog('" + contentContainer.getMarkupId() + "', " + (storeCallingButton? "true" : "false") + ");");
         if (logEvents)
         	result.append("wicketAjaxGet('" + openEventBehavior.getCallbackUrl() + "');");
@@ -346,13 +384,14 @@ public class DialogBorder extends Border implements IHeaderContributor {
         	result.append(String.format("DialogBorder.focusButton('%s', '%s');",        			
         			contentContainer.getMarkupId(),
         			focusOverrideSelector == null ?  "" : focusOverrideSelector));
+        result.append("return false;");
         return result.toString();
     }
 
 	public void renderHead(final IHeaderResponse response) {
         
 		response.renderJavascriptReference(JS_REFERENCE);
-        response.renderCSSReference(new ModalCSSRef());
+        response.renderCSSReference(BLOCKING_CSS_REFERENCE);
 
         // Move dialog components out of any containers on the page so that page CSS doesn't interfere with proper display
         // and so that they display on top of other content in older IE versions that don't respect z-index.
