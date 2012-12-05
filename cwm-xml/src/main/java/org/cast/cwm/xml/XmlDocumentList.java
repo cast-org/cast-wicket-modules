@@ -53,7 +53,7 @@ public class XmlDocumentList implements Iterable<XmlDocument> {
 	/**
 	 * Get the XmlSection for the Nth label from this ordered list of XmlDocuments.
 	 * As with {@link XmlDocument#getByLabel(Serializable, Integer)}, 
-	 * the count starts from 0 and goes in document order.
+	 * the count starts from 1 and goes in document order.
 	 * In this case, it continues on to each document in the list until the given N is reached.
 	 * @param label which label category to use
 	 * @param num (N) the index to retrieve
@@ -70,12 +70,12 @@ public class XmlDocumentList implements Iterable<XmlDocument> {
 	}
 	
 	/**
-	 * For an XmlSection with a given label, return the count of preceding elements in
-	 * the XmlDocumentList with that same label.
+	 * For an XmlSection with a given label, return the position of the XmlSection
+	 * among those in the XmlDocumentList with that same label.
 	 * 
 	 * @param label
-	 * @param sec
-	 * @return
+	 * @param sec the XmlSection
+	 * @return the (1-based) position of the XmlSection, or -1 if not found.
 	 */
 	public int getLabelIndex(Serializable label, XmlSection sec) {
 		int count = sec.getXmlDocument().getLabelIndex(label, sec);
