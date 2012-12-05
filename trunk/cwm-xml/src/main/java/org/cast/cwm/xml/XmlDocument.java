@@ -169,7 +169,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	}
 	
 	/**
-	 * Get an XmlSection from this book by its label and count within the book.  Applications
+	 * Get an XmlSection from this book by its label and (1-based) count within the book.  Applications
 	 * must override {@link XmlSection#getLabel()} for this to function properly.
 	 * 
 	 * @param label a label as defined by {@link XmlSection#getLabel()}
@@ -177,10 +177,12 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	 * @return the matching XmlSection, or null if not found.
 	 */
 	public XmlSection getByLabel(Serializable label, Integer num) {
-		if (labelMap == null || num < 0 || labelMap.get(label) == null || num >= labelMap.get(label).size())
+		if (labelMap == null || num < 1)
 			return null;
-		else
-			return labelMap.get(label).get(num);
+		List<XmlSection> labels = labelMap.get(label);
+		if (labels == null || num > labels.size())
+			return null;
+		return labelMap.get(label).get(num-1);
 	}
 	
 	/**
@@ -197,8 +199,8 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	
 	/**
 	 * Given an XmlSection with a particular label, return its position within the list
-	 * of all elements with that label (0-based).  In other words, returns the number of 
-	 * similarly-labeled elements that precede it.
+	 * of all elements with that label (1-based).  In other words, returns the number of 
+	 * similarly-labeled elements including the section and those that precede it.
 	 * @param label
 	 * @param sec
 	 * @return the index, or -1 if the element was not found or does not itself have the given label.
@@ -206,8 +208,8 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	public int getLabelIndex(Serializable label, XmlSection sec) {
 		if (labelMap == null || labelMap.get(label) == null || !labelMap.get(label).contains(sec))
 			return -1;
-		else
-			return labelMap.get(label).indexOf(sec);
+		int position = labelMap.get(label).indexOf(sec);
+		return (position==-1) ? -1 : position+1;
 	}
 	
 	public Document getDocument() {
