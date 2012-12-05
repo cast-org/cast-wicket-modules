@@ -61,7 +61,7 @@ public class XmlDocumentList implements Iterable<XmlDocument> {
 	 */
 	public XmlSection getByLabel(Serializable label, int num) {
 		for (XmlDocument doc : documentList) {
-			if (num >= doc.getLabelCount(label))
+			if (num > doc.getLabelCount(label))
 				num -= doc.getLabelCount(label);
 			else
 				return doc.getByLabel(label, num);
