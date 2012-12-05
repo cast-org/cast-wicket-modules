@@ -156,9 +156,9 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		if (!Strings.isEmpty(firstName) && !Strings.isEmpty(lastName)) {
 			return firstName + " " + lastName;
 		} else if (!Strings.isEmpty(lastName)) {
-			return firstName;
-		} else if (!Strings.isEmpty(firstName)) {
 			return lastName;
+		} else if (!Strings.isEmpty(firstName)) {
+			return firstName;
 		} else if (!Strings.isEmpty(email)){
 			return email;
 		} else {
