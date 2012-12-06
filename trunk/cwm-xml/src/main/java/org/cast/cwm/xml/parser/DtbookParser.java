@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -150,34 +151,6 @@ public class DtbookParser extends XmlParser implements Serializable {
 	}
 	
 	/**
-	 * Generates long descriptions for images.  Each long description spawns a new
-	 * XmlSection with the root argument as a parent.  However, the root element does
-	 * not see these sections as children.
-	 * 
-	 * TODO: This is a really bad way to do this.
-	 * 
-	 * @param root the root XmlSection of the document
-	 * @return a map of image Ids to XmlSection descriptions
-	 */
-	public Map<String, XmlSection> generateLongDescriptions(XmlSection root) {
-		
-		Map<String, XmlSection> longDescMap = new HashMap<String, XmlSection>();
-		NodeList nl = root.getElement().getOwnerDocument().getElementsByTagName("prodnote");
-		for (int i=0; i<nl.getLength(); i++) {
-			Element pnote = (Element) nl.item(i);
-			if (pnote.hasAttribute("imgref")) {
-				String imgref = pnote.getAttributeNS(null, "imgref");
-				XmlSection ldSec = new XmlSection();
-				ldSec.init(root.getXmlDocument(), root, imgref, pnote, "Image Description");
-				longDescMap.put(imgref, ldSec);
-			}
-		}
-		if (log.isDebugEnabled() && !longDescMap.isEmpty())
-			log.debug("{} long descriptions identified", longDescMap.size());
-		return longDescMap;
-	}	
-	
-	/**
 	 * Fill in DtbookSpecific elements (title, class) in this XmlSection.  Then,
 	 * process children of this section (if necessary).
 	 * 
@@ -199,18 +172,18 @@ public class DtbookParser extends XmlParser implements Serializable {
 
 		// Look for title and overwrite the default, if found.
 		if (thisElt.titleElt != null) {
-			NodeList nl = elt.getElementsByTagName(thisElt.titleElt);
-			if (nl != null && nl.getLength()>0) {
-				section.setTitle(normalizeTitle(nl.item(0).getTextContent()));
+			Element child = getChildByLocalName(elt, thisElt.titleElt);
+			if (child != null) {
+				section.setTitle(normalizeTitle(child.getTextContent()));
 			}
 		}
 		
 		// Look for sub title
+		// These are optional, so only look at direct children; don't allow descendants like getElementsByTagName does. 
 		if (thisElt.subTitleElt != null) {
-			NodeList nl = elt.getElementsByTagName(thisElt.subTitleElt);
-			if (nl != null && nl.getLength()>0) {
-				section.setSubTitle(normalizeTitle(nl.item(0).getTextContent()));
-			}
+			Element child = getChildByLocalName(elt, thisElt.subTitleElt);
+			if (child != null)
+				section.setSubTitle(normalizeTitle(child.getTextContent()));
 		}
 		
 		// Look for class attribute
@@ -265,6 +238,23 @@ public class DtbookParser extends XmlParser implements Serializable {
 			XmlSection subsect = section.addChild(id, child, "Title Unknown");
 			fillIn(subsect, child);
 		}
+	}
+
+	/**
+	 * Look for and return a direct child of an element with a given localname.
+	 * @param element the parent element
+	 * @param localName
+	 * @return the child element, or null
+	 */
+	private Element getChildByLocalName (Element element, String localName) {
+		NodeList nl = element.getChildNodes();
+		for (int i=0; i<nl.getLength(); i++) {
+			Node node = nl.item(i);
+			if (node instanceof Element && localName.equals(node.getLocalName())) {
+				return (Element) node;
+			}
+		}
+		return null;
 	}
 
 	protected XPathExpression getIdFinder() {
