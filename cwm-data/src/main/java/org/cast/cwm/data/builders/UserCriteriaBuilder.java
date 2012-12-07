@@ -36,7 +36,6 @@ import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-
 /**
  * <p>
  * An object used to query for {@link User} object(s).
@@ -67,8 +66,6 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private boolean cacheResults = true;
 	
 	public UserCriteriaBuilder() {
-		// By default, sort by username
-		((SingleSortState) getSortState()).setSort(new SortParam("username", true));
 	}
 	
 	public void build(Criteria criteria) {
@@ -83,6 +80,10 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());
 			else
 				criteria.addOrder(Order.desc(sort.getProperty()).ignoreCase());
+		} else {
+			// by default, sort to lastname, firstname
+			criteria.addOrder(Order.asc("lastName").ignoreCase());
+			criteria.addOrder(Order.asc("firstName").ignoreCase());
 		}
 	}
 	
