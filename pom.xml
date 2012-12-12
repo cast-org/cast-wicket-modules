@@ -399,6 +399,9 @@
                 <version>1.9.0</version>
                 <configuration>
                     <header>etc/header.txt</header>
+                    <validHeaders>
+                        <validHeader>etc/databinder-header.txt</validHeader>
+                    </validHeaders>
                     <strictCheck>true</strictCheck>
                     <aggregate>true</aggregate>
                     <includes>
@@ -478,6 +481,7 @@
         <wicket.version>1.4.20</wicket.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
+        <copyright.year>2012</copyright.year>
     </properties>
   
 </project>
