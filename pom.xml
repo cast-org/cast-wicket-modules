@@ -411,7 +411,7 @@
                         <java>SLASHSTAR_STYLE</java>
                     </mapping>
                     <properties>
-                        <year>${project.inceptionYear}</year>
+                        <year>${project.inceptionYear}-${copyright.year}</year>
                     </properties>
                 </configuration>
                 <executions>
@@ -481,7 +481,7 @@
         <wicket.version>1.4.20</wicket.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
-        <copyright.year>2012</copyright.year>
+        <copyright.year>2013</copyright.year>
     </properties>
   
 </project>
