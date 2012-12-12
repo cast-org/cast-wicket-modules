@@ -65,7 +65,6 @@ public class TagPanel extends Panel {
 	 */
 	public TagPanel(final String id, final PersistedObject target, ITagLinkBuilder linkBuilder, User s) {
 		super(id);
-		this.setOutputMarkupId(true);
 		this.target = target;
 		this.student = s;
 		add(currentListing = new TaggingsListPanel("current", target, linkBuilder, student));
