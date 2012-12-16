@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.ComponentTag;
@@ -163,18 +164,31 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		// FIXME: this is dependent on the named CSS file being supplied by the application in the expected location.
 		// Either a default CSS should be supplied in this package, or a better mechanism devised to have application supply it.
 		response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
-		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "highlight.js"));
+		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js"));
+		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "new-highlight.js"));
 		
-		// Initialize the javascript
-		StringBuffer colorArray = new StringBuffer("var colors = new Array(");
-		for (HighlightType type : HighlightService.get().getHighlighters())
-			colorArray.append("'" + type.getColor() + "',");
-		colorArray.deleteCharAt(colorArray.length() - 1); // Remove final comma
-		colorArray.append(");");
-		response.renderJavascript(colorArray.toString(), "colorArray");
-		response.renderOnDomReadyJavascript("initHighlighterTool(" + readOnly + ");");
+		response.renderOnDomReadyJavascript(getHighlighterInitScript()); 
 	}
 
+	private String getHighlighterInitScript() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("$().CAST_Highlighter({colors:[");
+		sb.append(getColors());
+		sb.append("], readonly: ");
+		sb.append(readOnly);
+		sb.append("});");
+		return sb.toString();
+	}
+
+	private String getColors() {
+		List<HighlightType> highlighters = HighlightService.get().getHighlighters();
+		List<String> colors = new ArrayList<String>();
+		for (HighlightType h: highlighters)
+			colors.add("'" + h.getColor() + "'");
+		return StringUtils.join(colors, ",");
+	}
+
+	
 	/**
 	 * A hidden field that knows what color highlight it is displaying.
 	 * 
