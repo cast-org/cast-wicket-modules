@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Service class used by (future) highlighting controls and display forms.
+ * Service class used by highlighting controls and display forms.
  * 
  * @author jbrookover
  *
@@ -70,9 +70,10 @@ public class HighlightService {
 	 * 
 	 * 
 	 * @param c the style character, e.g. 'Y' tends to be for the color yellow
-	 * @param label the name of this highlighter
+	 * @param isOn true if the highlighter is enabled by the application config
+	 * @param editable true if the highlighter name should be editable by the user
 	 */
-	public void addHighlighter(Character c, String label, boolean editable) {
+	public void addHighlighter(Character c, boolean isOn, boolean editable) {
 		Character key = Character.toUpperCase(c);
 
 		if (key.equals(Character.valueOf('E')))
@@ -81,7 +82,7 @@ public class HighlightService {
 		if (highlighters.containsKey(key))
 			throw new IllegalArgumentException("The character " + c + " is already being used.");
 		
-		highlighters.put(key, new HighlightType(key, label, editable));
+		highlighters.put(key, new HighlightType(key, isOn, editable));
 	}
 	
 	/**
@@ -170,12 +171,12 @@ public class HighlightService {
 		private static final long serialVersionUID = 1L;
 		
 		private final Character color;
-		private final String defaultLabel;
+		private final boolean isOn;
 		private final boolean editable;
 		
-		public HighlightType (Character color, String defaultLabel, boolean editable) {
+		public HighlightType (Character color, boolean isOn, boolean editable) {
 			this.color = color;
-			this.defaultLabel = defaultLabel;
+			this.isOn = isOn;
 			this.editable = editable;
 		}
 	}
