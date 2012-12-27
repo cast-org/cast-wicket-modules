@@ -74,13 +74,49 @@ public class EmailService {
 	 * @param recipient
 	 * @param subject
 	 * @param body
+	 * @param mailFromAddress
+	 * @param substitutionVariables
+	 */
+	public void sendMail (String recipient, String subject, String body, String mailFromAddress, Map<String,String> substitutionVariables) {
+		
+		sendMail(recipient, subject, body, mailFromAddress, null,
+				substitutionVariables);
+		
+	}
+
+	/**
+	 * Send a message with the provided fields.  Simple string substitution will be done on 
+	 * the body and subject.
+	 * 
+	 * @param recipient
+	 * @param subject
+	 * @param body
 	 * @param replyToUser
 	 * @param substitutionVariables
 	 */
 	public void sendMail (String recipient, String subject, String body, IModel<User> replyToUser, Map<String,String> substitutionVariables) {
 		
+		sendMail(recipient, subject, body, CwmApplication.get().getMailFromAddress(), replyToUser,
+				substitutionVariables);
+		
+	}
+
+	/**
+	 * Send a message with the provided fields.  Simple string substitution will be done on 
+	 * the body and subject.
+	 * 
+	 * @param recipient
+	 * @param subject
+	 * @param body
+	 * @param mailFromAddress
+	 * @param replyToUser
+	 * @param substitutionVariables
+	 */
+	public void sendMail(String recipient, String subject, String body,
+			String mailFromAddress, IModel<User> replyToUser,
+			Map<String, String> substitutionVariables) {
 		EmailMessage message = new EmailMessage();
-		message.setFrom(CwmApplication.get().getMailFromAddress());
+		message.setFrom(mailFromAddress);
 		message.setTo(recipient);		
 		message.setSubject(substituteVars(subject, substitutionVariables));
 		message.setBody(substituteVars(body, substitutionVariables));
@@ -88,7 +124,6 @@ public class EmailService {
 		if (replyToUser != null && replyToUser.getObject() != null)
 			message.setReplyTo(replyToUser.getObject().getEmail());
 		sendMail(message);
-		
 	}
 	
 	/**
