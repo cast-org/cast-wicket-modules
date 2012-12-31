@@ -42,8 +42,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.string.UrlUtils;
-import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.User;
@@ -103,13 +103,16 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		
 		private static final long serialVersionUID = 1L;
 		
-		@SuppressWarnings("unchecked")
+		@Inject
+		protected IResponseTypeRegistry typeRegistry;
+
+	@SuppressWarnings("unchecked")
 		public HighlightDisplayForm(String id, IModel<Response> model) {
 			super(id, model);
 			
 			// If there are no existing highlights, create new Response
 			if (getModelObject() == null)
-				setModel(responseService.newResponse(mUser, CwmApplication.get().getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
+				setModel(responseService.newResponse(mUser, typeRegistry.getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
 			
 			highlights = HighlightService.get().decodeHighlights(model.getObject() == null ? "" : model.getObject().getResponseData().getText());
 			
