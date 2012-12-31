@@ -38,13 +38,12 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.CwmApplication;
+import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.service.IResponseService;
-import org.cast.cwm.service.ResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +73,9 @@ public class StarPanel extends Panel implements IHeaderContributor {
 	@Inject
 	private IResponseService responseService;
 
+	@Inject
+	protected IResponseTypeRegistry typeRegistry;
+
 	/**
 	 * Constructor.  If the model object is null, this component will be invisible.
 	 * 
@@ -95,7 +97,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 		}
 		
 		
-		if (!model.getObject().getType().equals(CwmApplication.get().getResponseType("STAR_RATING")))
+		if (!model.getObject().getType().equals(typeRegistry.getResponseType("STAR_RATING")))
 			throw new IllegalArgumentException("A Star Rating panel must be attached to a ResponseType.STAR_RATING.");
 		
 		Form<Response> form = new Form<Response>("starForm", getModel()) {

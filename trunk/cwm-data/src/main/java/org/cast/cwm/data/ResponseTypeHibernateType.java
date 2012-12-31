@@ -24,15 +24,26 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.cast.cwm.CwmApplication;
+import org.apache.wicket.injection.web.InjectorHolder;
+import org.cast.cwm.IResponseTypeRegistry;
 import org.hibernate.HibernateException;
 import org.hibernate.type.StringType;
 import org.hibernate.usertype.UserType;
+
+import com.google.inject.Inject;
 
 public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	@Inject
+	private IResponseTypeRegistry typeRegistry;
+
+	public ResponseTypeHibernateType() {
+		super();
+		InjectorHolder.getInjector().inject(this);
+	}
+	
 	public int[] sqlTypes() {
 		return new int[] {		
 				StringType.INSTANCE.sqlType()
@@ -55,7 +66,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 			throws HibernateException, SQLException {
 		assert names.length == 1;
 		String typeName = rs.getString(names[0]);
-		return CwmApplication.get().getResponseType(typeName);
+		return typeRegistry.getResponseType(typeName);
 	}
 
 	public void nullSafeSet(PreparedStatement st, Object value, int index)
