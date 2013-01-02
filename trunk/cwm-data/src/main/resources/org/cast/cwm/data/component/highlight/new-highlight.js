@@ -330,7 +330,7 @@ hintHide    - when a hitn is turned off and no longer visible
                 if (range.startContainer.nodeType == 3) {
                     // Text node
                     parNode = $(range.startContainer).closest(".word");
-                    if (parNode.length < 0) {
+                    if (parNode.length > 0) {
                         parNodeNum = methods.wordGetNum(parNode);
 
                         if (erase) {
@@ -542,7 +542,7 @@ hintHide    - when a hitn is turned off and no longer visible
          */
         wordAddHighlight : function(elem) {
             $(elem).addClass("wordHighlighted");
-            $(elem).children(".word").each(function() {
+            $(elem).find(".word").each(function() {
                 methods.wordAddHighlight($(this));
             });
         },
