@@ -228,8 +228,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 				log.debug("Binding Response Type Registry");
 				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
 				log.debug("Binding CWM Service");
-				// Temporary while we deprecate the singleton get().
-				binder.bind(ICwmService.class).toInstance(CwmService.get());
+				binder.bind(ICwmService.class).to(CwmService.class).in(Scopes.SINGLETON);
 			}
 		});
 		return modules;
