@@ -28,7 +28,6 @@ import java.util.Map;
 import lombok.Data;
 
 import org.apache.wicket.injection.web.InjectorHolder;
-import org.cast.cwm.CwmApplication;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
