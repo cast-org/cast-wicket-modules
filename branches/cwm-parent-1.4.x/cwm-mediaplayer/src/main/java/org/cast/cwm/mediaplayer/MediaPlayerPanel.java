@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.PackageResource;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.protocol.http.RequestUtils;
+import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.util.string.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,8 +147,9 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		if (rr == null)
 			return null;
 		CharSequence url = urlFor(rr);
-		// Since we're going to make the path absolute, get rid of leading ../
-		url = url.toString().replaceAll("\\.\\./", "");
+		// For Ajax requests only, trim leading ../
+		if ((url != null) && (isAjaxRequest()))
+			url = url.toString().replaceAll("\\.\\./", "");
 		if (url == null) {
 			log.error("Could not determine URL for media {}", rr);
 			return "";
@@ -156,7 +158,11 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	}
 
 	
-	// TODO: This is a cheap way of determining whether a source file is external.  We should probabl do something better.
+	private boolean isAjaxRequest() {
+		return ((WebRequest)RequestCycle.get().getRequest()).isAjax();
+	}
+
+	// TODO: This is a cheap way of determining whether a source file is external.  We should probably do something better.
 	protected boolean isExternal(String url) {
 		return url != null && url.startsWith("http://");
 	}
