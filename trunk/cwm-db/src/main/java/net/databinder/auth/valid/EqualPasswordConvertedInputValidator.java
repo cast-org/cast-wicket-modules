@@ -27,6 +27,8 @@ import org.apache.wicket.util.lang.Objects;
 /** Compares post-conversion input, match is valid. */
 public class EqualPasswordConvertedInputValidator extends EqualPasswordInputValidator {
 	
+	private static final long serialVersionUID = 1L;
+
 	public EqualPasswordConvertedInputValidator(FormComponent comp1, FormComponent comp2) {
 		super(comp1, comp2);
 	}

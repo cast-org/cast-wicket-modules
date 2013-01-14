@@ -32,6 +32,7 @@ import org.hibernate.StaleObjectStateException;
  * @author Nathan Hamblen
  */
 public class DataFormBase<T> extends Form<T> {
+	private static final long serialVersionUID = 1L;
 	private Object factoryKey;
 	public DataFormBase(String id) {
 		super(id);
@@ -55,6 +56,7 @@ public class DataFormBase<T> extends Form<T> {
 	}
 	
 	/** Default implementation calls {@link #commitTransactionIfValid()}. */
+	@Override
 	protected void onSubmit() {
 		commitTransactionIfValid();
 	}

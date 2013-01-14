@@ -29,6 +29,7 @@ import org.apache.wicket.model.IModel;
  */
 public abstract class PropertyDataProvider<T> implements IDataProvider<T> {
 
+	private static final long serialVersionUID = 1L;
 	/** Controls wrapping with a compound property model. */
 	private boolean wrapWithPropertyModel = true;
 	

@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Basic implementation of {@link IEventLogger} that logs events as DEBUG messages
  * in the console.
- * 
+ *
  * @author jbrookover
  *
  */
 public class LoggingEventService implements IEventLogger {
 
 	private final static Logger log = LoggerFactory.getLogger(LoggingEventService.class);
-	
+
 	public Object saveEvent(String type, String detail, String location) {
 		log.debug("Event: {}, {}, {}", Arrays.asList(type, detail, location));
 		return null;

@@ -30,7 +30,6 @@ import org.apache.wicket.devutils.inspector.InspectorPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Role;

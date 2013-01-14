@@ -19,9 +19,9 @@
  */
 package org.cast.cwm.data.builders;
 
-import org.hibernate.Criteria;
-
 import net.databinder.models.hib.CriteriaBuilder;
+
+import org.hibernate.Criteria;
 
 /**
  * Convenience class for querying all objects of a certain type, but caching them, too.

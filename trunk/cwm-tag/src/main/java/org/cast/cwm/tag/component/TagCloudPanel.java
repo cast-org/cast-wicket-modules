@@ -103,14 +103,14 @@ public class TagCloudPanel extends Panel {
 				return new ModelIteratorAdapter(getTagsIterator()) {
 					@Override
 					protected IModel model(Object object) {
-						return new CompoundPropertyModel((TagPlusInt) object);
+						return new CompoundPropertyModel(object);
 					}
 				};
 			}
 
 			@Override
 			protected void populateItem(Item<TagPlusInt> item) {
-				TagPlusInt entry = (TagPlusInt) item.getModelObject();
+				TagPlusInt entry = item.getModelObject();
 				
 				WebMarkupContainer link = getLink("link", entry);
 				item.add(link);
@@ -123,6 +123,7 @@ public class TagCloudPanel extends Panel {
 				
 				item.add(new Label("tagFreq", String.valueOf(entry.getInt())) {
 					private static final long serialVersionUID = 1L;
+					@Override
 					public boolean isVisible() { return listView; }
 				});
 			}
@@ -137,6 +138,7 @@ public class TagCloudPanel extends Panel {
 				listView = false;
 				target.addComponent(TagCloudPanel.this);
 			}
+			@Override
 			public boolean isVisible() {
 				return listView && !hideCloudView;
 			}
@@ -148,6 +150,7 @@ public class TagCloudPanel extends Panel {
 				listView = true;
 				target.addComponent(TagCloudPanel.this);
 			}
+			@Override
 			public boolean isVisible() {
 				return !listView;
 			}
@@ -161,6 +164,7 @@ public class TagCloudPanel extends Panel {
 				sortTagList();
 				target.addComponent(TagCloudPanel.this);
 			}
+			@Override
 			public boolean isVisible() {
 				return sortFreq;
 			}
@@ -173,6 +177,7 @@ public class TagCloudPanel extends Panel {
 				sortTagList();
 				target.addComponent(TagCloudPanel.this);
 			}
+			@Override
 			public boolean isVisible() {
 				return !sortFreq;
 			}

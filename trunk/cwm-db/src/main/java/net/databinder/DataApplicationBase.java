@@ -18,15 +18,11 @@
  */
 package net.databinder;
 
-import java.awt.Color;
-import java.net.URI;
-
 import javax.servlet.http.HttpServletResponse;
 
 import net.databinder.components.PageExpiredCookieless;
 import net.databinder.web.NorewriteWebResponse;
 
-import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.Request;
 import org.apache.wicket.RequestCycle;
@@ -35,7 +31,6 @@ import org.apache.wicket.markup.html.pages.PageExpiredErrorPage;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
-import org.apache.wicket.util.convert.ConverterLocator;
 
 /** Common functionality for Databinder applications. */
 public abstract class DataApplicationBase extends WebApplication {

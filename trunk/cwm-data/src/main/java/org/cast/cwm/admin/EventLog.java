@@ -185,7 +185,7 @@ public class EventLog extends AdminPage {
 			}
 
 			public String getItemString(IModel<Event> rowModel) {
-				return ((Event)rowModel.getObject()).getInsertTime().toString(); // TODO: string format?
+				return rowModel.getObject().getInsertTime().toString(); // TODO: string format?
 			}
 		});
 		
@@ -242,7 +242,7 @@ public class EventLog extends AdminPage {
 		public void buildUnordered(Criteria criteria) {
 			
 			// Type check
-			criteria.add(Restrictions.in("type", (List<String>)showEventTypesM.getObject()));
+			criteria.add(Restrictions.in("type", showEventTypesM.getObject()));
 
 			// Site Check
 			List<Site> siteList = showSitesM.getObject();
@@ -261,7 +261,7 @@ public class EventLog extends AdminPage {
 			
 			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
 				Calendar toDate = Calendar.getInstance(); // Set "to" time to end of the day (expressed as <00:00 of the following day)
-				toDate.setTime((Date)toDateM.getObject());
+				toDate.setTime(toDateM.getObject());
 				toDate.add(Calendar.DAY_OF_MONTH, 1);
 				log.debug("Considering events between {} and {}", fromDateM.getObject(), toDate.getTime());
 				criteria.add(Restrictions.between("insertTime", fromDateM.getObject(), toDate.getTime()));

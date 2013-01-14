@@ -21,12 +21,11 @@ package org.cast.cwm.data.builders;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.databinder.models.hib.CriteriaBuilder;
 
 import org.apache.wicket.model.IDetachable;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-
-import net.databinder.models.hib.CriteriaBuilder;
 
 /**
  * A simple CriteriaBuilder that locates a Prompt by its identifier.

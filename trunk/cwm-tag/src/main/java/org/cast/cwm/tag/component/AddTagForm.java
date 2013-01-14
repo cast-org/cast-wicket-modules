@@ -59,7 +59,7 @@ public class AddTagForm extends Form<Object> {
 
 			@Override
 			protected void onSubmit(AjaxRequestTarget ajaxtarget, Form<?> form) {
-				TagService.get().findTaggingCreate(CwmSession.get().getUser(), targetType, targetId, (String)input.getModelObject());
+				TagService.get().findTaggingCreate(CwmSession.get().getUser(), targetType, targetId, input.getModelObject());
 				input.setModelObject(""); // clear input box
 				ajaxtarget.addComponent(input);
 				MarkupContainer tp = findParent(TagPanel.class);

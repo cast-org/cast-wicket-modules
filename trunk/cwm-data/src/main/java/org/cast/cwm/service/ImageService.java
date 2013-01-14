@@ -70,7 +70,7 @@ public class ImageService {
 	protected static Color EDGE_COLOR = new Color(217, 217, 217); // #D9D9D9
 	
 	static {
-		scaledImageCache = Collections.synchronizedMap(new LinkedHashMap<ScaledImageKey, ScaledImage>((int) 500, (float) 0.75, true) {
+		scaledImageCache = Collections.synchronizedMap(new LinkedHashMap<ScaledImageKey, ScaledImage>(500, (float) 0.75, true) {
 
 			private static final long serialVersionUID = 1L;
 			

@@ -28,7 +28,6 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.ICwmService;
 
 import com.google.inject.Inject;

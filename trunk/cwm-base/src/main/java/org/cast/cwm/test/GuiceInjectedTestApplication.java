@@ -29,13 +29,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class GuiceInjectedTestApplication<T> extends DummyWebApplication {
-	
+
 	Map<Class<T>, T> injectionMap;
-	
+
 	public GuiceInjectedTestApplication(Map<Class<T>, T> injectionMap) {
 		this.injectionMap = injectionMap;
 	}
-	
+
 	@Override
 	public void init() {
 		super.init();

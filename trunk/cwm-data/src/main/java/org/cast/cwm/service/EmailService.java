@@ -21,8 +21,8 @@ package org.cast.cwm.service;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -156,6 +156,7 @@ public class EmailService {
 		private String subject;
 		private String body;
 		
+		@Override
 		public String toString() {
 			return "[Email " + (replyTo!=null ? replyTo : from) + "->" + to + " (" + subject + ")]";
 		}

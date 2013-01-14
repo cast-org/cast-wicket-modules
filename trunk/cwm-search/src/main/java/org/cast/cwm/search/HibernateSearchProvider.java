@@ -21,10 +21,13 @@ package org.cast.cwm.search;
 
 import java.util.Iterator;
 
+import net.databinder.hib.Databinder;
+import net.databinder.models.PropertyDataProvider;
+import net.databinder.models.hib.HibernateObjectModel;
+
 import org.apache.commons.collections.iterators.EmptyListIterator;
 import org.apache.lucene.search.Query;
 import org.apache.wicket.model.IModel;
-import org.cast.cwm.search.ISearchBuilder;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -34,10 +37,6 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.databinder.hib.Databinder;
-import net.databinder.models.PropertyDataProvider;
-import net.databinder.models.hib.HibernateObjectModel;
 
 /**
  * A result provider for a DataView of full-text search results.

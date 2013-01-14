@@ -43,6 +43,7 @@ public class TagLabel extends Label {
 			
 	}
 	
+	@Override
 	protected void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag)
 	{
 		Tag tag = (Tag)getDefaultModelObject();

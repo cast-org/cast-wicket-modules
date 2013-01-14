@@ -81,7 +81,7 @@ public class TaggingsListPanel extends Panel {
 					@Override
 					protected IModel model(Object object) {
 						return new CompoundPropertyModel(
-								(Tagging) object);
+								object);
 					}
 				};
 			}

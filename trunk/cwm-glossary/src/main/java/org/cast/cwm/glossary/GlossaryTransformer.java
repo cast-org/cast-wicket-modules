@@ -308,10 +308,10 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 	protected class WordLocComparator implements Comparator<WordLocation> {
 		public int compare(WordLocation o1, WordLocation o2) {
 			// If the locations have the same start point, they overlap - choose the longer word first
-			if (((Integer)o1.start).equals((Integer) o2.start)) {
+			if (((Integer)o1.start).equals(o2.start)) {
 				return o2.length - o1.length;
 			} else {
-				return ((Integer)(o1.start)).compareTo((Integer)(o2.start));
+				return ((Integer)(o1.start)).compareTo((o2.start));
 			}
 		}
 	}

@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 import net.databinder.DataApplicationBase;
 
-import org.apache.wicket.Application;
 import org.apache.wicket.Request;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.Response;
@@ -50,6 +49,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * @see #buildHibernateSessionFactory(Object) aoe
 	 * @see #mountDataBrowser() 
 	 */
+	@Override
 	protected void dataInit() {
 		buildHibernateSessionFactory(null);
 //		if (isDataBrowserAllowed())

@@ -34,6 +34,7 @@ import org.hibernate.Session;
  * @author Nathan Hamblen
  */
 public class HibernateListModel<T> extends LoadableDetachableModel<List<T>> {
+	private static final long serialVersionUID = 1L;
 	private QueryBuilder queryBuilder;
 	private Class objectClass;
 	private CriteriaBuilder criteriaBuilder;
@@ -55,6 +56,8 @@ public class HibernateListModel<T> extends LoadableDetachableModel<List<T>> {
 	 */
 	public HibernateListModel(String queryString, final boolean cacheable) {
 		this(queryString, new QueryBinder() {
+			private static final long serialVersionUID = 1L;
+
 			public void bind(Query query) {
 				query.setCacheable(cacheable);
 			}
