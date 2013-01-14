@@ -26,6 +26,8 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
  * @author Nathan Hamblen
  */
 public class NullPlug extends WebMarkupContainer {
+	private static final long serialVersionUID = 1L;
+
 	public NullPlug(String id) {
 		super(id);
 		setRenderBodyOnly(true);

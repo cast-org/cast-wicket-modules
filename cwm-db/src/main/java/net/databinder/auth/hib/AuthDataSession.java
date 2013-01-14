@@ -35,6 +35,8 @@ import org.apache.wicket.protocol.http.WebApplication;
 
 /** Session to hold DataUser. */
 public class AuthDataSession extends AuthDataSessionBase {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Initialize new session.
 	 * @see WebApplication

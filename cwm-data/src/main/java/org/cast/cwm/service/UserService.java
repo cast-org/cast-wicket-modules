@@ -76,7 +76,7 @@ public class UserService {
 	protected static UserService instance = new UserService();
 	
 	public static UserService get() {
-		return (UserService)instance;
+		return instance;
 	}
 
 	public static void setInstance(UserService instance) {

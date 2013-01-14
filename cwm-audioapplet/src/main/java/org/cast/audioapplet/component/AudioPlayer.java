@@ -68,6 +68,7 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 		this.autoPlay = autoPlay;
 	}
 	
+	@Override
 	public void onInitialize() {
 		super.onInitialize();
 		setOutputMarkupId(true);

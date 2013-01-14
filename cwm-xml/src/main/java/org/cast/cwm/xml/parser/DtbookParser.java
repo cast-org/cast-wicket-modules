@@ -111,6 +111,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
+	@Override
 	public XmlSection parse(InputStream in) {
 		
 		idSerial = 0;

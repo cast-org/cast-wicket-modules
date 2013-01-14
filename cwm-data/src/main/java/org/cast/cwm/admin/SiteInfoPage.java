@@ -390,8 +390,9 @@ public class SiteInfoPage extends AdminPage {
 
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				protected void populateItem(ListItem<String> item) {
-					String value = (String) item.getModelObject();
+					String value = item.getModelObject();
 					item.add(new Label("value", value));
 				}
 			});
@@ -418,7 +419,7 @@ public class SiteInfoPage extends AdminPage {
 
 						@Override
 						protected void populateItem(ListItem<String> item) {
-							String value = (String) item.getModelObject();
+							String value = item.getModelObject();
 							item.add(new Label("value", value));
 						}
 

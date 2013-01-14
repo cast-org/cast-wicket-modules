@@ -61,7 +61,7 @@ public abstract class NavListView extends ChildListView {
 	
 	@Override
 	protected void populateItem(ListItem<XmlSection> item) {
-		XmlSection sec = (XmlSection) item.getModelObject();
+		XmlSection sec = item.getModelObject();
 		item.add( makeLink(sec).add(makeLabel(sec)));
 		String classAttribute = makeAttributeString(item);
 		if (classAttribute != null)
@@ -82,7 +82,7 @@ public abstract class NavListView extends ChildListView {
 		if (item.getIndex() == 0)
 			attString.append("first");
 
-		if (isCurrent((XmlSection) item.getModelObject())) {
+		if (isCurrent(item.getModelObject())) {
 			if (attString.length() > 0)
 				attString.append(" ");
 			attString.append("current");			

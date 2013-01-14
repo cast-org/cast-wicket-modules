@@ -26,6 +26,7 @@ import org.hibernate.Session;
  * be dealt with. 
  */
 public class QueryBinderBuilder implements QueryBuilder {
+	private static final long serialVersionUID = 1L;
 	private String query;
 	private QueryBinder[] binders;
 	public QueryBinderBuilder(String query, QueryBinder... binders) {

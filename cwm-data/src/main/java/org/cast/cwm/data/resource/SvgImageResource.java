@@ -31,7 +31,6 @@ import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.drawtool.SvgEditor;
-import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.ICwmService;
 
 import com.google.inject.Inject;

@@ -125,6 +125,7 @@ public class ShyContainerTest {
 			super(v1, v2);
 		}
 
+		@Override
 		protected void setVisibility(Component component, boolean visibility) {
 			component.setVisible(visibility);
 		}
@@ -137,6 +138,7 @@ public class ShyContainerTest {
 			super(v1, v2);
 		}
 
+		@Override
 		protected void setVisibility(Component component, boolean visibility) {
 			component.setVisibilityAllowed(visibility);
 		}

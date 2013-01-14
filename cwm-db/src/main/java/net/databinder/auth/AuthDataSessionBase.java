@@ -42,6 +42,7 @@ import org.apache.wicket.util.time.Duration;
  * authentication cookies and current user lookup.
  */
 public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession implements AuthSession<T> {
+	private static final long serialVersionUID = 1L;
 	/** Effective signed in state. */
 	private IModel<T> userModel;
 	private static final String CHARACTER_ENCODING = "UTF-8";

@@ -41,6 +41,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
+import org.cast.cwm.service.UserService;
 
 /**
  * This panel creates a table of users.  Each row has an edit user link.
