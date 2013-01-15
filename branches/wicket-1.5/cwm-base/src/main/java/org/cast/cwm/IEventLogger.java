@@ -21,7 +21,7 @@ package org.cast.cwm;
 
 /**
  * Interface for an object that can be used to log events.
- * Exists so that CWM modules can record some user activity without depending on 
+ * Exists so that CWM modules can record some user activity without depending on
  * any more specific functionality; but currently unused.
  *
  */
@@ -29,8 +29,8 @@ public interface IEventLogger {
 
 	/**
 	 * Log an event with the appropriate details.
-	 * 
-	 * @param type The type of event; should be a manageable finite set of types for each application 
+	 *
+	 * @param type The type of event; should be a manageable finite set of types for each application
 	 * @param detail Any additional details about the event
 	 * @param location An indication of the page or area of the application where the event occurred
 	 * @return if an object was created to represent the event, return it.

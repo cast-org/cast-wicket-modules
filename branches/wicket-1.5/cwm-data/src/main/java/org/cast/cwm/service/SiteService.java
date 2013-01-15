@@ -64,7 +64,7 @@ public class SiteService {
 	}
 	
 	public static SiteService get() {
-		return (SiteService) instance;
+		return instance;
 	}
 
 	public static void setInstance(SiteService instance) {

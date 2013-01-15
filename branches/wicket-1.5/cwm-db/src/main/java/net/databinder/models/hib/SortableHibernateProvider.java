@@ -18,8 +18,9 @@
  */
 package net.databinder.models.hib;
 
-import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
-import org.apache.wicket.extensions.markup.html.repeater.data.sort.*;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 
 /**
  * <h1>SortableHibernateProvider</h1>
@@ -32,7 +33,9 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.*;
 
 public class SortableHibernateProvider<T> extends HibernateProvider<T> implements ISortableDataProvider<T> {
 
-    private ISortStateLocator sortStateLocator = null;
+    private static final long serialVersionUID = 1L;
+
+	private ISortStateLocator sortStateLocator = null;
 
     private ISortState sortState;
 

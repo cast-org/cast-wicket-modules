@@ -20,8 +20,8 @@
 package org.cast.cwm.components;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.model.Model;
 
 /**
  * The opposite of {@link AttributeAppender}. Adds the given value 

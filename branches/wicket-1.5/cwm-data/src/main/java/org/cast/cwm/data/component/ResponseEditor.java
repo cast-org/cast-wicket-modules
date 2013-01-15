@@ -347,7 +347,7 @@ public abstract class ResponseEditor extends Panel {
 					onSave(target);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
-					mOriginalResponse = (IModel<Response>) getModel();
+					mOriginalResponse = getModel();
 				}
 				
 				@Override
@@ -563,7 +563,7 @@ public abstract class ResponseEditor extends Panel {
 					onSave(target);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
-					mOriginalResponse = (IModel<Response>) getModel();
+					mOriginalResponse = getModel();
 				}
 				
 				@Override

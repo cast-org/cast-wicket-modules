@@ -39,6 +39,7 @@ import org.hibernate.criterion.Projections;
  * @author Nathan Hamblen
  */
 public class HibernateProvider<T> extends PropertyDataProvider<T> {
+	private static final long serialVersionUID = 1L;
 	private Class objectClass;
 	private OrderingCriteriaBuilder criteriaBuilder;
 	private QueryBuilder queryBuilder, countQueryBuilder;
@@ -61,6 +62,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	public HibernateProvider(Class objectClass, final CriteriaBuilder criteriaBuilder, final CriteriaBuilder criteriaOrderer) {
 		this(objectClass);
 		this.criteriaBuilder = new OrderingCriteriaBuilder() {
+			private static final long serialVersionUID = 1L;
 			public void buildOrdered(Criteria criteria) {
 				criteriaBuilder.build(criteria);
 				criteriaOrderer.build(criteria);
@@ -84,6 +86,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	/** Provides entities of the given class meeting the supplied criteria. */
 	public HibernateProvider(Class objectClass, final CriteriaBuilder criteriaBuilder) {
 		this(objectClass, new OrderingCriteriaBuilder() {
+			private static final long serialVersionUID = 1L;
 			public void buildOrdered(Criteria criteria) {
 				criteriaBuilder.build(criteria);
 			}
@@ -115,6 +118,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	 * the supplied query has a select clause.
 	 * @deprecated because the derived count query is often non-standard, even if it works. Use the longer constructor.
 	 */
+	@Deprecated
 	public HibernateProvider(String query, QueryBinder queryBinder) {
 		this(query, queryBinder, makeCount(query), queryBinder);
 	}
@@ -139,6 +143,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	 * @deprecated
 	 * @return query with select count(*) prepended 
 	 */
+	@Deprecated
 	static protected String makeCount(String query) {
 		return "select count(*) " + query;
 	}
@@ -210,6 +215,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	}
 	
 	/** does nothing */
+	@Override
 	public void detach() {
 	}
 }

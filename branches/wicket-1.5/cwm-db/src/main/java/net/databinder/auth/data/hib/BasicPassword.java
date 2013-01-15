@@ -37,6 +37,7 @@ import org.apache.wicket.util.crypt.Base64;
  */
 @Embeddable
 public class BasicPassword implements DataPassword, Serializable {
+	private static final long serialVersionUID = 1L;
 	private String passwordHash;
 	
 	public BasicPassword() { }

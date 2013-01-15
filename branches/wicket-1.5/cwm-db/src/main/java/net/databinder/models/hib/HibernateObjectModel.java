@@ -43,6 +43,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * @author Nathan Hamblen
  */
 public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements BindingModel<T> {
+	private static final long serialVersionUID = 1L;
 	private Class objectClass;
 	private Serializable objectId;
 	private QueryBuilder queryBuilder;
@@ -157,7 +158,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 			if (sess.contains(object))
 				objectId = sess.getIdentifier(object);
 			else if (retainUnsaved)
-					retainedObject = (T) object;
+					retainedObject = object;
 			setTempModelObject(object);	// skip calling load later
 		}
 	}

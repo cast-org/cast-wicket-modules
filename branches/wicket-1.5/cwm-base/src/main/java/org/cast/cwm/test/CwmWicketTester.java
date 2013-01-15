@@ -19,8 +19,10 @@
  */
 package org.cast.cwm.test;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -102,7 +104,7 @@ public class CwmWicketTester extends WicketTester {
 			assertThat(message, simpleBehavior.getValue().toString(), equalTo(expected));
 			return;
 		}
-		
+
 		fail("Attribute " + attribute + " not found.");
 	}
 
@@ -127,9 +129,9 @@ public class CwmWicketTester extends WicketTester {
 		else {
 			return;
 		}
-		
+
 	}
-	
+
 	private AttributeModifier getAttributeModifier(Component component,
 			String attribute) {
 		List<IBehavior> behaviors = component.getBehaviors();
@@ -142,7 +144,7 @@ public class CwmWicketTester extends WicketTester {
 		}
 		return null;
 	}
-	
+
 	private SimpleAttributeModifier getSimpleAttributeModifier(Component component,
 			String attribute) {
 		List<IBehavior> behaviors = component.getBehaviors();
@@ -152,7 +154,7 @@ public class CwmWicketTester extends WicketTester {
 				if (attribute.equals(attributeModifier.getAttribute()))
 					return attributeModifier;
 			}
-			
+
 		}
 		return null;
 	}

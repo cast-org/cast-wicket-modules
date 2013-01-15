@@ -44,6 +44,7 @@ import org.hibernate.Session;
  * @author Nathan Hamblen
  */
 public class DataForm<T> extends DataFormBase<T> {
+	private static final long serialVersionUID = 1L;
 	/**
 	 * Retains the persistent object's version field (if it has one) between
 	 * requests to detect editing conflicts between users.
@@ -275,6 +276,7 @@ public class DataForm<T> extends DataFormBase<T> {
 	 * on their instantiating DataForm when clicked.
 	 */ 
 	public class ClearLink extends Link {
+		private static final long serialVersionUID = 1L;
 		public ClearLink(String id) {
 			super(id);
 		}

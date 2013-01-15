@@ -70,6 +70,7 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 		return null;
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		// setup a global js variable with the callback URL
 		response.renderJavascript("var logJsEventCallbackUrl = '" + this.getCallbackUrl(false) + "';", "logJsEventCallbackUrl");

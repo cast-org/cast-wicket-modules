@@ -61,6 +61,7 @@ public abstract class AjaxDeletePersistedObjectDialog<T extends PersistedObject>
 	}
 	
 	
+	@Override
 	final protected void deleteObject() {
 		deleteObject(null);
 	}

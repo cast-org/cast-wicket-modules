@@ -27,6 +27,7 @@ import org.apache.wicket.model.IModel;
  */
 public abstract class LoadableWritableModel<T> implements IModel<T> {
 
+	private static final long serialVersionUID = 1L;
 	private transient boolean attached = false;
 	private transient T tempModelObject;
 
@@ -65,6 +66,7 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 		tempModelObject = object;
 	}
 
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer(super.toString());
 		sb.append(":attached=").append(attached).append(":tempModelObject=[")

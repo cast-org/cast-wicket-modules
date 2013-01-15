@@ -258,6 +258,7 @@ public class XmlSection implements IXmlPointer, Serializable, Comparable<XmlSect
 		return list;
 	}
 
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer("[");
 		sb.append(id);
