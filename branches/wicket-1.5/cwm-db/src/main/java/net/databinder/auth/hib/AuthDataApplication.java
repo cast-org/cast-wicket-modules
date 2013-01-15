@@ -21,8 +21,6 @@ package net.databinder.auth.hib;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import net.databinder.auth.AuthApplication;
 import net.databinder.auth.AuthSession;
 import net.databinder.auth.data.DataUser;
@@ -30,20 +28,18 @@ import net.databinder.hib.DataApplication;
 import net.databinder.hib.Databinder;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
 import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.Session;
 import org.apache.wicket.authorization.IUnauthorizedComponentInstantiationListener;
 import org.apache.wicket.authorization.UnauthorizedInstantiationException;
-import org.apache.wicket.authorization.strategies.role.IRoleCheckingStrategy;
-import org.apache.wicket.authorization.strategies.role.RoleAuthorizationStrategy;
-import org.apache.wicket.authorization.strategies.role.Roles;
+import org.apache.wicket.authroles.authorization.strategies.role.IRoleCheckingStrategy;
+import org.apache.wicket.authroles.authorization.strategies.role.RoleAuthorizationStrategy;
+import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.util.crypt.Base64UrlSafe;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -95,7 +91,7 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * Adds to the configuration whatever DataUser class is defined.
 	 */
 	@Override
-	protected void configureHibernate(AnnotationConfiguration config) {
+	protected void configureHibernate(Configuration config) {
 		super.configureHibernate(config);
 		config.addAnnotatedClass(getUserClass());
 	}
@@ -153,23 +149,23 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 		}
 	}
 
-	/**
-	 * Get the restricted token for a user, using IP addresses as location parameter. This implementation
-	 * combines the "X-Forwarded-For" header with the remote address value so that unique
-	 * values result with and without proxying. (The forwarded header is not trusted on its own
-	 * because it can be most easily spoofed.)
-	 * @param user source of token
-	 * @return restricted token
-	 */
-	public String getToken(DataUser user) {
-		HttpServletRequest req = ((WebRequest) RequestCycle.get().getRequest()).getHttpServletRequest();
-		String fwd = req.getHeader("X-Forwarded-For");
-		if (fwd == null)
-			fwd = "nil";
-		MessageDigest digest = getDigest();
-		user.getPassword().update(digest);
-		digest.update((fwd + "-" + req.getRemoteAddr()).getBytes());
-		byte[] hash = digest.digest(user.getUsername().getBytes());
-		return new String(Base64UrlSafe.encodeBase64(hash));
-	}
+//	/**
+//	 * Get the restricted token for a user, using IP addresses as location parameter. This implementation
+//	 * combines the "X-Forwarded-For" header with the remote address value so that unique
+//	 * values result with and without proxying. (The forwarded header is not trusted on its own
+//	 * because it can be most easily spoofed.)
+//	 * @param user source of token
+//	 * @return restricted token
+//	 */
+//	public String getToken(DataUser user) {
+//		HttpServletRequest req = ((WebRequest) RequestCycle.get().getRequest()).getHttpServletRequest();
+//		String fwd = req.getHeader("X-Forwarded-For");
+//		if (fwd == null)
+//			fwd = "nil";
+//		MessageDigest digest = getDigest();
+//		user.getPassword().update(digest);
+//		digest.update((fwd + "-" + req.getRemoteAddr()).getBytes());
+//		byte[] hash = digest.digest(user.getUsername().getBytes());
+//		return new String(Base64UrlSafe.encodeBase64(hash));
+//	}
 }

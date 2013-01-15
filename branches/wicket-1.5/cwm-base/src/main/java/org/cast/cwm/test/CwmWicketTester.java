@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -34,12 +35,12 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
-import org.apache.wicket.behavior.IBehavior;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.WebRequestCycle;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.tester.WicketTester;
 
 public class CwmWicketTester extends WicketTester {
@@ -73,17 +74,19 @@ public class CwmWicketTester extends WicketTester {
 		super(application, path);
 	}
 
-	public void executeAjaxBehavior(String path, String value) {
-		AbstractAjaxBehavior behavior = (AbstractAjaxBehavior) getComponentFromLastRenderedPage(
-				path).getBehaviors().get(0);
-		CharSequence url = behavior.getCallbackUrl(false);
-		WebRequestCycle cycle = setupRequestAndResponse(true);
-		getServletRequest().setRequestToRedirectString(url.toString());
-		String[] ids = path.split(":");
-		String id = ids[ids.length - 1];
-		getServletRequest().setParameter(id, value);
-		processRequestCycle(cycle);
-	}
+// TODO - how to test non-button ajax operations in wicket 1.5+ ?
+// An answer may be here: http://stackoverflow.com/questions/6176615/how-to-test-ajaxformchoicecomponentupdatingbehavior-in-wickettester
+//	public void executeAjaxBehavior(String path, String value) {
+//		AbstractAjaxBehavior behavior = (AbstractAjaxBehavior) getComponentFromLastRenderedPage(
+//				path).getBehaviors().get(0);
+//		CharSequence url = behavior.getCallbackUrl();
+//		RequestCycle cycle = setupRequestAndResponse(true);
+//		getServletRequest().setRequestToRedirectString(url.toString());
+//		String[] ids = path.split(":");
+//		String id = ids[ids.length - 1];
+//		getServletRequest().setParameter(id, value);
+//		processRequestCycle(cycle);
+//	}
 
 	public void assertAttribute(String message, String expected,
 			Component component, String attribute) {
@@ -134,8 +137,8 @@ public class CwmWicketTester extends WicketTester {
 
 	private AttributeModifier getAttributeModifier(Component component,
 			String attribute) {
-		List<IBehavior> behaviors = component.getBehaviors();
-		for (IBehavior behavior : behaviors) {
+		List<? extends Behavior> behaviors = component.getBehaviors();
+		for (Behavior behavior : behaviors) {
 			if (AttributeModifier.class.isAssignableFrom(behavior.getClass())) {
 				AttributeModifier attributeModifier = (AttributeModifier) behavior;
 				if (attribute.equals(attributeModifier.getAttribute()))
@@ -147,8 +150,8 @@ public class CwmWicketTester extends WicketTester {
 
 	private SimpleAttributeModifier getSimpleAttributeModifier(Component component,
 			String attribute) {
-		List<IBehavior> behaviors = component.getBehaviors();
-		for (IBehavior behavior : behaviors) {
+		List<? extends Behavior> behaviors = component.getBehaviors();
+		for (Behavior behavior : behaviors) {
 			if (SimpleAttributeModifier.class.isAssignableFrom(behavior.getClass())) {
 				SimpleAttributeModifier attributeModifier = (SimpleAttributeModifier) behavior;
 				if (attribute.equals(attributeModifier.getAttribute()))

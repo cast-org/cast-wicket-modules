@@ -187,6 +187,7 @@
                         <groupId>org.slf4j</groupId>
                     </exclusion>
                 </exclusions>
+                <type>pom</type>
             </dependency>	  	
             <dependency>
                 <groupId>org.apache.wicket</groupId>
@@ -478,7 +479,7 @@
     </build>
   
     <properties>
-        <wicket.version>1.4.20</wicket.version>
+        <wicket.version>1.5.8</wicket.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
         <copyright.year>2013</copyright.year>

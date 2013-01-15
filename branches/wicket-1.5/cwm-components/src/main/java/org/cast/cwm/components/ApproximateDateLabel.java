@@ -53,14 +53,10 @@ public class ApproximateDateLabel extends DateLabel {
 			super(true);
 		}
 
-		/**
-		 * @see org.apache.wicket.util.convert.IConverter#convertToString(java.lang.Object,
-		 *      java.util.Locale)
-		 */
 		@Override
-		public String convertToString(Object value, Locale locale)
+		public String convertToString(Date value, Locale locale)
 		{
-			DateTime dt = new DateTime(((Date)value).getTime(), getTimeZone());
+			DateTime dt = new DateTime(value.getTime(), getTimeZone());
 			DateTimeFormatter format = getFormat(dt);
 
 			if (getApplyTimeZoneDifference())
@@ -95,12 +91,12 @@ public class ApproximateDateLabel extends DateLabel {
 		}
 
 		@Override
-		public String getDatePattern() {
+		public String getDatePattern(Locale locale) {
 			throw new RuntimeException ("Shouldn't be called");
 		}
 
 		@Override
-		protected DateTimeFormatter getFormat() {
+		protected DateTimeFormatter getFormat(Locale locale) {
 			throw new RuntimeException ("Shouldn't be called");
 		}
 	}	

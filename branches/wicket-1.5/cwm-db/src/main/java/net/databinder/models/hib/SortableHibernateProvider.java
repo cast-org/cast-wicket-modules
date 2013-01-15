@@ -37,7 +37,7 @@ public class SortableHibernateProvider<T> extends HibernateProvider<T> implement
 
 	private ISortStateLocator sortStateLocator = null;
 
-    private ISortState sortState;
+    private ISortState sortState = null;
 
 	public SortableHibernateProvider(Class<T> objectClass, CriteriaBuilder criteriaBuilder, CriteriaBuilder orderingCriteriaBuilder) {
         super(objectClass, criteriaBuilder, orderingCriteriaBuilder);
@@ -56,11 +56,7 @@ public class SortableHibernateProvider<T> extends HibernateProvider<T> implement
     }
 
     public void setSortState(ISortState state) {
-        if (sortStateLocator != null) {
-            sortStateLocator.setSortState(state);
-        }
-        else {
-            this.sortState = state;
-        }
+        sortStateLocator = null;
+        this.sortState = state;
     }
 }

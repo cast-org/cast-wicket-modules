@@ -57,10 +57,10 @@
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 		</dependency>
- 	  	<dependency>
+ 	  	<!-- <dependency>
 	  		<groupId>org.apache.wicket</groupId>
 	  		<artifactId>wicket-datetime</artifactId>
-	  	</dependency>	  	
+	  	</dependency>	 -->  	
 		<dependency>
 			<groupId>org.apache.wicket</groupId>
 			<artifactId>wicket-guice</artifactId>

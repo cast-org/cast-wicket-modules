@@ -18,24 +18,14 @@
  */
 package net.databinder;
 
-import javax.servlet.http.HttpServletResponse;
-
-import net.databinder.components.PageExpiredCookieless;
-import net.databinder.web.NorewriteWebResponse;
-
-import org.apache.wicket.Page;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
-import org.apache.wicket.markup.html.pages.PageExpiredErrorPage;
+import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebResponse;
 
 /** Common functionality for Databinder applications. */
 public abstract class DataApplicationBase extends WebApplication {
-	/** true if cookieless use is supported through URL rewriting(defaults to true). */
-	private boolean cookielessSupported = true;
+	// TODO: I commented out the cookieless support as part of 1.5 migration - bring back if useful.
+	//	/** true if cookieless use is supported through URL rewriting(defaults to true). */	
+	// private boolean cookielessSupported = true;
 
 	/**
 	 * Internal initialization. Client applications should not normally override
@@ -60,55 +50,56 @@ public abstract class DataApplicationBase extends WebApplication {
 //		return converterLocator;
 //	}
 	
-	/**
-	 * If <code>isCookielessSupported()</code> returns false, this method returns
-	 * a custom WebResponse that disables URL rewriting.
-	 */
-	@Override
-	protected WebResponse newWebResponse(final HttpServletResponse servletResponse)
-	{
-		if (isCookielessSupported())
-			return super.newWebResponse(servletResponse);
-		return NorewriteWebResponse.getNew(this, servletResponse);
-	}
+//	/**
+//	 * If <code>isCookielessSupported()</code> returns false, this method returns
+//	 * a custom WebResponse that disables URL rewriting.
+//	 */
+//	@Override
+//	protected WebResponse newWebResponse(WebRequest request, final HttpServletResponse response)
+//	{
+//		if (isCookielessSupported())
+//			return super.newWebResponse(request, response);
+//		return NorewriteWebResponse.getNew(this, response);
+//	}
 	
-	@Override
-	public RequestCycle newRequestCycle(Request request, Response response) {
-		return new CookieRequestCycle(this, (WebRequest) request, (WebResponse) response);
-	}
+// If this turns out to be necessary, it should be re-coded as a RequestCycleListener
+//	@Override
+//	public RequestCycle newRequestCycle(Request request, Response response) {
+//		return new CookieRequestCycle(this, (WebRequest) request, (WebResponse) response);
+//	}
 
-	/**
-	 * @return  true if cookieless use is supported through URL rewriting.
-	 */
-	public boolean isCookielessSupported() {
-		return cookielessSupported;
-	}
+//	/**
+//	 * @return  true if cookieless use is supported through URL rewriting.
+//	 */
+//	public boolean isCookielessSupported() {
+//		return cookielessSupported;
+//	}
 
-	/**
-	 * Set to false to disable URL rewriting and consequentally hamper cookieless 
-	 * browsing.  Users with cookies disabled, and more importantly search engines, 
-	 * will still be able to browse the application through bookmarkable URLs. Because
-	 * rewriting is disabled, these URLs will have no jsessionid appended and will 
-	 * remain static.
-	 * <p> The Application's "page expired" error page will be set to PageExpiredCookieless
-	 * if cookielessSupported is false, unless an alternate error page has already been
-	 * specified. This page will appear when cookieless users try to follow a link or 
-	 * form-submit that requires a session, informing them that cookies are required.
-	 * </p>
-	 * @param cookielessSupported  true if cookieless use is supported through 
-	 * URL rewriting
-	 * @see net.databinder.components.PageExpiredCookieless
-	 */
-	protected void setCookielessSupported(boolean cookielessSupported) {
-		Class<? extends Page> expected = this.cookielessSupported ? 
-				PageExpiredErrorPage.class : PageExpiredCookieless.class;
-		
-		this.cookielessSupported = cookielessSupported;
-		
-		if (getApplicationSettings().getPageExpiredErrorPage().equals(expected))
-			getApplicationSettings().setPageExpiredErrorPage(cookielessSupported ?
-					PageExpiredErrorPage.class : PageExpiredCookieless.class);
-	}
+//	/**
+//	 * Set to false to disable URL rewriting and consequentally hamper cookieless 
+//	 * browsing.  Users with cookies disabled, and more importantly search engines, 
+//	 * will still be able to browse the application through bookmarkable URLs. Because
+//	 * rewriting is disabled, these URLs will have no jsessionid appended and will 
+//	 * remain static.
+//	 * <p> The Application's "page expired" error page will be set to PageExpiredCookieless
+//	 * if cookielessSupported is false, unless an alternate error page has already been
+//	 * specified. This page will appear when cookieless users try to follow a link or 
+//	 * form-submit that requires a session, informing them that cookies are required.
+//	 * </p>
+//	 * @param cookielessSupported  true if cookieless use is supported through 
+//	 * URL rewriting
+//	 * @see net.databinder.components.PageExpiredCookieless
+//	 */
+//	protected void setCookielessSupported(boolean cookielessSupported) {
+//		Class<? extends Page> expected = this.cookielessSupported ? 
+//				PageExpiredErrorPage.class : PageExpiredCookieless.class;
+//		
+//		this.cookielessSupported = cookielessSupported;
+//		
+//		if (getApplicationSettings().getPageExpiredErrorPage().equals(expected))
+//			getApplicationSettings().setPageExpiredErrorPage(cookielessSupported ?
+//					PageExpiredErrorPage.class : PageExpiredCookieless.class);
+//	}
 	
 	/**
 	 * Reports if the program is running in a development environment, as determined by the
@@ -117,6 +108,6 @@ public abstract class DataApplicationBase extends WebApplication {
 	 * @return true if running in a development environment
 	 */
 	protected boolean isDevelopment() {
-		return  getConfigurationType().equalsIgnoreCase(DEVELOPMENT);
+		return  getConfigurationType().equals(RuntimeConfigurationType.DEVELOPMENT);
 	}
 }

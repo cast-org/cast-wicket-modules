@@ -26,6 +26,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.ResourceReference;
+import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.SharedResources;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.ComponentTag;
@@ -34,6 +35,7 @@ import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.resource.ContextRelativeResource;
 import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.value.IValueMap;
@@ -168,7 +170,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	 */
 	public DeployJava(String id, String jarName, String className) {
 		super(id);
-		if (Application.get().getConfigurationType().equals(Application.DEVELOPMENT))
+		if (Application.get().getConfigurationType().equals(RuntimeConfigurationType.DEVELOPMENT))
 			setArchive(getSharedArchiveURL(jarName) + "?" + System.currentTimeMillis());
 		else
 			setArchive(getSharedArchiveURL(jarName));
@@ -187,7 +189,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 		SharedResources sr = Application.get().getSharedResources();
 		
 		// If this jarName is not listed as a shared resource, add it as one.
-		if (sr.get(DeployJava.class, jarName, null, null, false) == null) {
+		if (sr.get(DeployJava.class, jarName, null, null, null, false) == null) {
 			ServletContext sc = WebApplication.get().getServletContext();
 			String path = "/WEB-INF/lib";
 			File jar = findMatchingFile(new Folder(sc.getRealPath(path)), jarName);
@@ -200,11 +202,11 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 			} else {
 				log.debug("Adding JAR to Shared Resources: {}", jar.getAbsolutePath());
 				ContextRelativeResource resource = new ContextRelativeResource(path + "/" + jar.getName());
-				sr.add(DeployJava.class, jarName, null, null, resource);
+				sr.add(DeployJava.class, jarName, null, null, null, resource);
 			}
 		}
 
-		return urlFor(new ResourceReference(DeployJava.class, jarName)).toString();
+		return urlFor(new PackageResourceReference(DeployJava.class, jarName),null).toString();
 	}
 	
 	// Look for a file beginning with the given prefix in the given folder.
@@ -342,7 +344,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	 * @param openTag Tag we are replacing.
 	 */
 	@Override
-	protected void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag) {
+	public void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag) {
 
 		// If this is being directly rendered, use Sun's Deployment Toolkit.
 		if (AjaxRequestTarget.get() == null) {
@@ -393,6 +395,6 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	 */
 	public void renderHead(IHeaderResponse response) {
 		if (AjaxRequestTarget.get() == null)
-			response.renderJavascriptReference(JAVASCRIPT_URL);
+			response.renderJavaScriptReference(JAVASCRIPT_URL);
 	}
 }

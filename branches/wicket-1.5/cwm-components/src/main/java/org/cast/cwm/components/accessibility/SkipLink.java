@@ -19,13 +19,12 @@
  */
 package org.cast.cwm.components.accessibility;
 
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 /**
  * TODO: Use this someday when we can not add two new GET requests to each page load.
@@ -35,7 +34,7 @@ import org.apache.wicket.model.StringResourceModel;
  * @author jbrookover
  *
  */
-public class SkipLink extends Panel implements IHeaderContributor {
+public class SkipLink extends Panel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,8 +44,8 @@ public class SkipLink extends Panel implements IHeaderContributor {
 	}
 
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new ResourceReference(SkipLink.class, "skiplink.css"));
-		response.renderJavascriptReference(new JavascriptResourceReference(SkipLink.class, "skiplink.js"));
+		response.renderCSSReference(new PackageResourceReference(SkipLink.class, "skiplink.css"));
+		response.renderJavaScriptReference(new JavaScriptResourceReference(SkipLink.class, "skiplink.js"));
 		
 	}
 }

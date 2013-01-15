@@ -29,9 +29,9 @@ import net.databinder.auth.AuthDataSessionBase;
 import net.databinder.auth.data.DataUser;
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.wicket.Request;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.Request;
 
 /** Session to hold DataUser. */
 public class AuthDataSession extends AuthDataSessionBase {

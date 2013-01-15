@@ -1,36 +1,13 @@
-/*
- * Databinder: a simple bridge from Wicket to Hibernate
- * Copyright (C) 2008  Nathan Hamblen nathan@technically.us
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
-/*
- * Note: this class contains code adapted from wicket-contrib-database. 
- */
-
-package net.databinder.hib;
+package net.databinder;
 
 import java.util.HashSet;
 
-import net.databinder.CookieRequestCycle;
+import net.databinder.hib.Databinder;
 
-import org.apache.wicket.Page;
-import org.apache.wicket.Response;
-import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.WebRequest;
+import org.apache.wicket.request.IRequestHandler;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.IRequestCycleListener;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.ManagedSessionContext;
@@ -44,15 +21,14 @@ import org.slf4j.LoggerFactory;
  * @see Databinder
  * @author Nathan Hamblen
  */
-public class DataRequestCycle extends CookieRequestCycle implements HibernateRequestCycle {
-	
+public class DBRequestCycleListener implements IRequestCycleListener {
+
 	/** Keys for session factories that have been opened for this request */ 
 	protected HashSet<Object> keys = new HashSet<Object>();
 
-	private static final Logger log = LoggerFactory.getLogger(DataRequestCycle.class);
+	private static final Logger log = LoggerFactory.getLogger(DBRequestCycleListener.class);
 
-	public DataRequestCycle(WebApplication application, WebRequest request, Response response) {
-		super(application, request, response);
+	public DBRequestCycleListener() {
 	}
 
 	/** Roll back active transactions and close session. */
@@ -91,13 +67,16 @@ public class DataRequestCycle extends CookieRequestCycle implements HibernateReq
 		return sess;
 	}
 
+	public void onBeginRequest(RequestCycle cycle) {
+		// no action needed
+	}
+
 	/**
 	 * Closes all Hibernate sessions opened for this request. If a transaction has
 	 * not been committed, it will be rolled back before closing the session.
 	 * @see net.databinder.components.hib.DataForm#onSubmit()
 	 */
-	@Override
-	protected void onEndRequest() {
+	public void onEndRequest(RequestCycle cycle) {
 		for (Object key : keys) {
 			SessionFactory sf = Databinder.getHibernateSessionFactory(key);
 			if (ManagedSessionContext.hasBind(sf)) {
@@ -107,15 +86,38 @@ public class DataRequestCycle extends CookieRequestCycle implements HibernateReq
 		}
 	}
 
+	public void onDetach(RequestCycle cycle) {
+		// no action needed
+	}
+
+	public void onRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler) {
+		// no action needed
+	}
+
+	public void onRequestHandlerScheduled(RequestCycle cycle, IRequestHandler handler) {
+		// no action needed
+	}
+
 	/** 
 	 * Closes and reopens sessions for this request cycle. Unrelated models may try to load 
 	 * themselves after this point. 
 	 */
-	@Override
-	public Page onRuntimeException(Page page, RuntimeException e) {
-		onEndRequest();
-		onBeginRequest();
+	public IRequestHandler onException(RequestCycle cycle, Exception ex) {
+		onEndRequest(cycle);
+		onBeginRequest(cycle);
 		return null;
+	}
+
+	public void onExceptionRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler, Exception exception) {
+		// no action needed
+	}
+
+	public void onRequestHandlerExecuted(RequestCycle cycle, IRequestHandler handler) {
+		// no action needed
+	}
+
+	public void onUrlMapped(RequestCycle cycle, IRequestHandler handler, Url url) {
+		// no action needed
 	}
 
 }

@@ -22,8 +22,8 @@ package net.databinder.hib;
 
 
 import org.apache.wicket.Application;
-import org.apache.wicket.RequestCycle;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.ManagedSessionContext;
 

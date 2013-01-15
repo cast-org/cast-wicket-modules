@@ -41,7 +41,7 @@ public class AttributePrepender extends AttributeModifier {
 	 * @param separator - the separator to insert between the new value and the existing value
 	 */
 	public AttributePrepender(String attribute, String value, String separator) {
-		super(attribute, true, Model.of(value));
+		super(attribute, Model.of(value));
 		this.separator = separator;
 	}
 	@Override
