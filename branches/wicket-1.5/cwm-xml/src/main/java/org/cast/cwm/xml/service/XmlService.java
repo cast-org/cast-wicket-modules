@@ -34,7 +34,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.DomCache;

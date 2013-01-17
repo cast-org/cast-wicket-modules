@@ -31,7 +31,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import lombok.Getter;
 import net.databinder.auth.data.DataUser;
 import net.databinder.auth.hib.AuthDataApplication;
-import net.databinder.hib.DataRequestCycle;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
@@ -42,7 +41,7 @@ import org.apache.wicket.RequestCycle;
 import org.apache.wicket.Response;
 import org.apache.wicket.Session;
 import org.apache.wicket.guice.GuiceComponentInjector;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -72,7 +71,6 @@ import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.IEventService;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,7 +169,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    loadServices();
 
 	    addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
-	    InjectorHolder.getInjector().inject(this);
+	    Injector.get().inject(this);
 
 	    super.internalInit();
 	}

@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Resource;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
@@ -76,7 +77,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	
 	public XmlDocument(String name, Resource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 		this.name = name;
 		this.xmlFile = xmlFile;
 		this.parser = parser;

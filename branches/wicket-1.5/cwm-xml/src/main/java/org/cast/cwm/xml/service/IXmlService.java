@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.xml.FileResource;
 import org.cast.cwm.xml.ICacheableModel;

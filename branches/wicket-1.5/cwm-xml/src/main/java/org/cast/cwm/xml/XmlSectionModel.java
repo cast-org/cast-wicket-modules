@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 import lombok.EqualsAndHashCode;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.service.IXmlService;
@@ -55,7 +55,7 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 
 	public XmlSectionModel (XmlSection s) {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 		setObject(s);
 	}
 

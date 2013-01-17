@@ -214,7 +214,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	 * Get the String representation of the content, as HTML with Wicket IDs, from the XML Section.
 	 * @return
 	 */
-	protected String getMarkup() {
+	protected String getTransformedMarkup() {
 		String content = xmlService.getTransformed(getModel(), transformName, transformParameters).getString();
 		if (content == null)
 			content = "";
@@ -232,7 +232,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	}
 	
 	public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass) {
-		return new StringResourceStream(getMarkup());
+		return new StringResourceStream(getTransformedMarkup());
 	}
 
 	public String getCacheKey(MarkupContainer container, Class<?> containerClass) {

@@ -19,11 +19,11 @@
 
 package net.databinder.hib;
 
-
+import net.databinder.DBRequestCycleListener;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.cycle.IRequestCycleListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.ManagedSessionContext;
 
@@ -89,17 +89,23 @@ public class Databinder {
 	}
 	
 	/**
-	 * Notifies current request cycle that a data session was requested, if a session factory
-	 * was not already bound for this thread and the request cycle is an DataRequestCycle.
+	 * Notifies current request cycle listener that a data session was requested, if a session factory
+	 * was not already bound for this thread and the request cycle listener is found.
+	 * 
+	 * The DBRequestCycleListener should have been added via the application's list of RequestCycleListeners.
+	 * 
+	 * TODO not sure if this is the best way to accomplish this - it used to be simpler when Databinder
+	 * installed its own RequestCycle and you could just check that.
+	 * 
 	 * @param key or null for the default factory
 	 * @see HibernateRequestCycle
 	 */
 	private static void dataSessionRequested(Object key) {
 		if (!hasBoundSession(key)) {
-			// if session is unavailable, it could be a late-loaded conversational cycle
-			RequestCycle cycle = RequestCycle.get();
-			if (cycle instanceof HibernateRequestCycle)
-				((HibernateRequestCycle)cycle).dataSessionRequested(key);
+			for (IRequestCycleListener listener : Application.get().getRequestCycleListeners()) {
+				if (listener instanceof DBRequestCycleListener) 
+					((DBRequestCycleListener)listener).dataSessionRequested(key);
+			}
 		}
 	}
 	
