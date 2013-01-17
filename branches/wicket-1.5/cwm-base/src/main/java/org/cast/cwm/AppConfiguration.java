@@ -25,7 +25,7 @@ public class AppConfiguration {
 	String baseDirectory;
 	Properties properties;
 	
-	private final static Logger log = LoggerFactory.getLogger(ConfigurationService.class);
+	private final static Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
 	/**
 	 * Create a new Configuration from the properties file given.
