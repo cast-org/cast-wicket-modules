@@ -635,7 +635,7 @@ hintHide    - when a hitn is turned off and no longer visible
                 return;
             }
 
-
+/*
             // Turn off any current highlights
             if (settings.currentColor != null) {
                 $("." + settings.currentColor).removeClass(settings.currentColor);
@@ -645,6 +645,7 @@ hintHide    - when a hitn is turned off and no longer visible
             settings.currentScope = null;
             settings.currentRange = null;
             methods.indicatorsBlank();
+*/
 
             // Find scope
             var $scope = (id ? $("#" + id) : $("body"));
