@@ -32,10 +32,8 @@ import com.google.inject.Inject;
 
 /**
  * Database operations on UsersPreferences.
- * This is a singleton Service class. Actions may be overridden with a subclass;
- * use setInstance() to register your alternative version.
- * 
- * Default implementation uses Hibernate.
+ * Default implementation uses Hibernate to save and load preferences.
+ * TODO: consider caching some values in the session or memory-based cache to avoid extra queries.
  * 
  * @author lynnmccormack
  *
