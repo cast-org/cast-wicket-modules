@@ -22,7 +22,6 @@ package org.cast.cwm.data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
-import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -32,11 +31,16 @@ import lombok.Setter;
  *
  */
 @Entity
-@Getter @Setter
+@Setter
 public class UserPreferenceBoolean extends UserPreference {
 	private static final long serialVersionUID = 1L;
 
 	@Column(nullable=false)
 	private boolean booleanValue;
+
+	public boolean getBooleanValue() {
+		return booleanValue;
+	}
+	
 	
 }

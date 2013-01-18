@@ -76,7 +76,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 		if (userPreference == null) {
 			return null;
 		}
-		return userPreference.isBooleanValue();
+		return userPreference.getBooleanValue();
 	}
 	
 	
