@@ -35,6 +35,7 @@ import org.cast.cwm.data.User;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
@@ -42,7 +43,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Getter
 @Setter
-public class UserPreference extends PersistedObject {
+public abstract class UserPreference extends PersistedObject {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -51,8 +52,10 @@ public class UserPreference extends PersistedObject {
 	private Long id;
 	
 	@ManyToOne(optional=false)
+	@NaturalId
 	protected User user;
 	
+	@NaturalId
 	protected String name;  // likely markupId or contentElement for content - static id for sidebar items
 
 	protected UserPreference() { /* No Arg Constructor for DataStore */ }

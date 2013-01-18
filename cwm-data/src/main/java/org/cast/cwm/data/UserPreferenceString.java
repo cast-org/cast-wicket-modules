@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 import lombok.Getter;
@@ -35,6 +36,7 @@ import lombok.Setter;
 public class UserPreferenceString extends UserPreference {
 	private static final long serialVersionUID = 1L;
 
+	@Column(nullable=false)
 	private String stringValue;
 
 }
