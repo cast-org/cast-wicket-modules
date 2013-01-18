@@ -27,8 +27,6 @@ import org.cast.cwm.data.UserPreference;
 import org.cast.cwm.data.UserPreferenceBoolean;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -44,19 +42,12 @@ import com.google.inject.Inject;
  */
 public class UserPreferenceService implements IUserPreferenceService {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
 	@Inject
 	private ICwmService cwmService;
 
 	protected UserPreferenceService() { /* Protected Constructor - use injection */
 	}
-	
-	public static void setInstance(UserService instance) {
-		UserService.instance = instance;
-	}
-	
+		
 	/* (non-Javadoc)
 	 * @see org.cast.isi.service.IUserService#setUserPreference(org.apache.wicket.model.IModel, java.lang.String, org.cast.isi.data.PreferenceType)
 	 */
@@ -85,7 +76,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 		if (userPreference == null) {
 			return null;
 		}
-		return userPreference.getBooleanValue();
+		return userPreference.isBooleanValue();
 	}
 	
 	
