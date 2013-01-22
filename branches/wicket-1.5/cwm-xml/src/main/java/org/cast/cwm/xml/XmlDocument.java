@@ -28,9 +28,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.injection.Injector;
-import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.parser.XmlParser;
@@ -63,7 +61,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	@Getter protected XmlSection tocSection;
 	@Getter protected String documentNamespace;
 
-	@Getter protected Resource xmlFile;
+	@Getter protected IXmlDocumentSource xmlFile;
 	protected XmlParser parser;
 	protected Time lastModified;
 	protected Time lastCheckedTime;
@@ -75,7 +73,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	@Inject
 	private IXmlService xmlService;
 	
-	public XmlDocument(String name, Resource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
+	public XmlDocument(String name, IXmlDocumentSource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
 		super();
 		Injector.get().inject(this);
 		this.name = name;
@@ -94,7 +92,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 		parser.setIdMap(idMap);
 		parser.setDoc(this);
 		try {
-			this.tocSection = parser.parse(this.xmlFile.getResourceStream().getInputStream());
+			this.tocSection = parser.parse(this.xmlFile.getInputStream());
 		} catch (ResourceStreamNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -147,7 +145,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	 */
 	synchronized protected void updateIfModified() {
 		lastCheckedTime = Time.now();
-		Time newLM = xmlFile.getResourceStream().lastModifiedTime();
+		Time newLM = xmlFile.lastModifiedTime();
 		if (lastModified==null || newLM.after(lastModified)) {
 			lastModified = newLM;
 			try {

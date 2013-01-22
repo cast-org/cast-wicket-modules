@@ -37,9 +37,10 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.DomCache;
-import org.cast.cwm.xml.FileResource;
+import org.cast.cwm.xml.FileXmlDocumentSource;
 import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IDocumentObserver;
+import org.cast.cwm.xml.IXmlDocumentSource;
 import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.TransformResult;
 import org.cast.cwm.xml.XmlDocument;
@@ -204,24 +205,24 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#findXslResource(java.lang.String)
 	 */
-	public FileResource findXslResource (String xslFileName) {
+	public FileXmlDocumentSource findXslResource (String xslFileName) {
 		File file = findXslFile(xslFileName);
 		if (file == null)
 			throw new IllegalArgumentException("XSL file " + xslFileName + " not found.");
-		return new FileResource(file);
+		return new FileXmlDocumentSource(file);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXmlDocument(java.lang.String, org.apache.wicket.util.file.File, org.cast.cwm.xml.parser.XmlParser, java.util.List)
 	 */
 	public XmlDocument loadXmlDocument (String name, File file, XmlParser parser, List<IDocumentObserver> observers) {
-		return loadXmlDocument (name, new FileResource(file), parser, observers);
+		return loadXmlDocument (name, new FileXmlDocumentSource(file), parser, observers);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXmlDocument(java.lang.String, org.apache.wicket.Resource, org.cast.cwm.xml.parser.XmlParser, java.util.List)
 	 */
-	public XmlDocument loadXmlDocument (String name, Resource xmlResource, XmlParser parser, List<IDocumentObserver> observers) {
+	public XmlDocument loadXmlDocument (String name, IXmlDocumentSource xmlResource, XmlParser parser, List<IDocumentObserver> observers) {
 		XmlDocument doc = new XmlDocument(name, xmlResource, parser, observers);
 		doc.setSortOrder(documents.size());
 		registerXmlDocument(name, doc);
@@ -241,10 +242,10 @@ public class XmlService implements IXmlService {
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, org.apache.wicket.util.file.File, boolean, org.apache.wicket.util.file.File)
 	 */
 	public IDOMTransformer loadXSLTransformer (String name, File xslFile, boolean forceUniqueWicketIds, File... dependentFiles) {
-		Resource[] resources = new Resource[dependentFiles.length];
+		IXmlDocumentSource[] resources = new IXmlDocumentSource[dependentFiles.length];
 		for (int i=0; i<dependentFiles.length; i++)
-			resources[i] = new FileResource(dependentFiles[i]);
-		return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds, resources);
+			resources[i] = new FileXmlDocumentSource(dependentFiles[i]);
+		return loadXSLTransformer(name, new FileXmlDocumentSource(xslFile), forceUniqueWicketIds, resources);
 	}
 
 
@@ -252,10 +253,10 @@ public class XmlService implements IXmlService {
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, java.lang.String, boolean, java.lang.String)
 	 */
 	public IDOMTransformer loadXSLTransformer (String name, String xslFile, boolean forceUniqueWicketIds, String... dependentFiles) {
-		Resource[] resources = new Resource[dependentFiles.length];
+		IXmlDocumentSource[] resources = new IXmlDocumentSource[dependentFiles.length];
 		for (int i=0; i<dependentFiles.length; i++)
-			resources[i] = new FileResource(new File(dependentFiles[i]));
-		return loadXSLTransformer(name, new FileResource(new File(xslFile)), forceUniqueWicketIds, resources);
+			resources[i] = new FileXmlDocumentSource(new File(dependentFiles[i]));
+		return loadXSLTransformer(name, new FileXmlDocumentSource(new File(xslFile)), forceUniqueWicketIds, resources);
 	}
 
 	/* (non-Javadoc)
@@ -263,16 +264,16 @@ public class XmlService implements IXmlService {
 	 */
 	public IDOMTransformer loadXSLTransformer (String name, String xslFileName, boolean forceUniqueWicketIds) {
 		File xslFile = findXslFile(xslFileName);
-		return loadXSLTransformer(name, new FileResource(xslFile), forceUniqueWicketIds);
+		return loadXSLTransformer(name, new FileXmlDocumentSource(xslFile), forceUniqueWicketIds);
 	}
 
 
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, org.apache.wicket.Resource, boolean, org.apache.wicket.Resource)
 	 */
-	public IDOMTransformer loadXSLTransformer (String name, Resource xslResource, boolean forceUniqueWicketIds, Resource... dependentResources) {
+	public IDOMTransformer loadXSLTransformer (String name, IXmlDocumentSource xslResource, boolean forceUniqueWicketIds, IXmlDocumentSource... dependentResources) {
 		XslTransformer xsl = new XslTransformer(xslResource);
-		for (Resource r : dependentResources)
+		for (IXmlDocumentSource r : dependentResources)
 			xsl.addDependentResources(r);
 		IDOMTransformer transformer;
 		if (forceUniqueWicketIds)
@@ -308,7 +309,7 @@ public class XmlService implements IXmlService {
 		net.sf.ehcache.Element cacheElement = getDomCache().get(mXmlPtr, transformName, params);
 		if (cacheElement != null) {
 			// Compare last-modified times of cache, XML, and transformer.
-			Time cacheTime = Time.valueOf(cacheElement.getLastUpdateTime() != 0 ? cacheElement.getLastUpdateTime() : cacheElement.getCreationTime());
+			Time cacheTime = Time.millis(cacheElement.getLastUpdateTime() != 0 ? cacheElement.getLastUpdateTime() : cacheElement.getCreationTime());
 			// This call to getLastModified() will also update the XML if necessary
 			Time xmlTime = mXmlPtr.getLastModified();
 			Time transTime = transformer.getLastModified(params);

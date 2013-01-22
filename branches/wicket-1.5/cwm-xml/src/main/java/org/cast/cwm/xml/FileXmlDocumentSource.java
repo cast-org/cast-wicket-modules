@@ -19,33 +19,44 @@
  */
 package org.cast.cwm.xml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import lombok.Getter;
 import lombok.ToString;
 
 import org.apache.wicket.request.resource.IResource;
-import org.apache.wicket.request.resource.PackageResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
-import org.apache.wicket.util.lang.Args;
-import org.apache.wicket.util.resource.FileResourceStream;
-import org.apache.wicket.util.resource.IResourceStream;
+import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IRelativeLinkSource;
 
 @ToString
-public class FileResource extends PackageResource implements IRelativeLinkSource {
+public class FileXmlDocumentSource implements IXmlDocumentSource, IRelativeLinkSource {
 
 	private static final long serialVersionUID = 1L;
+	
+	@Getter
 	private File file;
 	
-	public FileResource (File f) {
-		super(FileResource.class, f.getAbsolutePath(), null, null, null);
+	public FileXmlDocumentSource (File f) {
 		file = f;
 	}
 	
-	@Override
-	public IResourceStream getResourceStream () { 
-		return new FileResourceStream(file);
+	public InputStream getInputStream () throws ResourceStreamNotFoundException { 
+		try {
+			return new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new ResourceStreamNotFoundException(e); 
+		}
 	}
 
+	public Time lastModifiedTime() {
+		return file.lastModifiedTime();
+	}
+	
 	/**
 	 * Return a FileResource at a location relative to this one.
 	 */
@@ -61,7 +72,7 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 */
 	public ResourceReference getRelativeReference (final String relativePath) {
 		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
-		return new ResourceReference(FileResource.class, filePath) {
+		return new ResourceReference(FileXmlDocumentSource.class, filePath) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public IResource getResource() {
@@ -69,5 +80,6 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 			}
 		};
 	}
+
 
 }

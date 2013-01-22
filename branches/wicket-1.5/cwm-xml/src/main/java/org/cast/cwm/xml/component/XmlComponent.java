@@ -29,6 +29,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.behavior.AbstractBehavior;
@@ -40,6 +41,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.parser.XmlTag;
+import org.apache.wicket.markup.parser.XmlTag.TagType;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.cast.cwm.xml.ICacheableModel;
@@ -204,9 +206,9 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 
 		// If we found a child, return a container with debugging style.  Otherwise, a generic label.
 		if (isContainer) {
-			return new WebMarkupContainer(wicketId).add(new SimpleAttributeModifier("style", "border: 3px solid red"));
+			return new WebMarkupContainer(wicketId).add(AttributeModifier.replace("style", "border: 3px solid red"));
 		} else {
-			return new Label(wicketId, "[[[Dynamic component with ID " + wicketId + "]]]").add(new SimpleAttributeModifier("style", "border: 3px solid red"));
+			return new Label(wicketId, "[[[Dynamic component with ID " + wicketId + "]]]").add(AttributeModifier.replace("style", "border: 3px solid red"));
 		}
 	}
 
@@ -228,7 +230,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	protected void onComponentTag(ComponentTag tag)
 	{
 		super.onComponentTag(tag);
-		tag.setType(XmlTag.OPEN); // Ensure open/close tags.  Turns <span /> into <span></span>
+		tag.setType(TagType.OPEN); // Ensure open/close tags.  Turns <span /> into <span></span>
 	}
 	
 	public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass) {

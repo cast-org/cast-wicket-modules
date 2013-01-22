@@ -41,7 +41,13 @@
         	<groupId>org.wicketstuff</groupId>
         	<artifactId>wicketstuff-rome</artifactId>
         	<version>1.4</version>
+        	<exclusions>
+        		<exclusion>
+        			<artifactId>wicket</artifactId>
+        			<groupId>org.apache.wicket</groupId>
+        		</exclusion>
+        	</exclusions>
         </dependency>
-    </dependencies>
+     </dependencies>
 
 </project>

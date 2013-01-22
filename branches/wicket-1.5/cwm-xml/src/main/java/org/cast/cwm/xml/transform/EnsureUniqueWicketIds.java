@@ -22,7 +22,7 @@ package org.cast.cwm.xml.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.service.IXmlService;
 import org.w3c.dom.Element;
@@ -39,7 +39,7 @@ public class EnsureUniqueWicketIds implements IDOMTransformer {
 
 	public EnsureUniqueWicketIds() {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 
 	public Element applyTransform(Element elt, TransformParameters params) {

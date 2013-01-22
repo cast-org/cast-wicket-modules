@@ -25,7 +25,6 @@ import java.io.FilenameFilter;
 import javax.servlet.ServletContext;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.SharedResources;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -35,8 +34,8 @@ import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.resource.ContextRelativeResource;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.resource.ContextRelativeResource;
 import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.value.IValueMap;
 import org.apache.wicket.util.value.ValueMap;
