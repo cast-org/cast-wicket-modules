@@ -38,7 +38,6 @@ import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
@@ -57,8 +56,8 @@ import org.hibernate.criterion.Restrictions;
  * @see DataUser
  * @author Nathan Hamblen
  */
-public abstract class AuthDataApplication extends DataApplication 
-implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, AuthApplication {
+public abstract class AuthDataApplication<T extends DataUser> extends DataApplication 
+implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, AuthApplication<T> {
 
 	/**
 	 * Internal initialization. Client applications should not normally override
@@ -72,7 +71,7 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	
 	/**
 	 * Sets Wicket's security strategy for role authorization and appoints this 
-	 * object as the unauthorized instatiation listener. Called automatically on start-up.
+	 * object as the unauthorized instantiation listener. Called automatically on start-up.
 	 */
 	protected void authInit() {
 		getSecuritySettings().setAuthorizationStrategy(new RoleAuthorizationStrategy(this));
@@ -125,8 +124,9 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * if you have a differently named property.
 	 * @return DataUser for the given username. 
 	 */
-	public DataUser getUser(String username) {
-		return (DataUser) Databinder.getHibernateSession().createCriteria(getUserClass())
+	@SuppressWarnings("unchecked")
+	public T getUser(String username) {
+		return (T) Databinder.getHibernateSession().createCriteria(getUserClass())
 			.add(Restrictions.eq("username", username)).uniqueResult();
 	}
 
