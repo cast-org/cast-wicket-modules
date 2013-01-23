@@ -41,7 +41,7 @@ import org.apache.sanselan.Sanselan;
 import org.apache.wicket.Resource;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
@@ -89,7 +89,7 @@ public class ImageService {
 	}
 
 	public ImageService() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	/**

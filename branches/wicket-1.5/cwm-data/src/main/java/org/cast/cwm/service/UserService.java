@@ -32,7 +32,7 @@ import net.databinder.models.hib.SortableHibernateProvider;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.admin.EditUserPanel;
 import org.cast.cwm.data.Period;
@@ -70,7 +70,7 @@ public class UserService {
 	private Class<? extends User> userClass = User.class;
 
 	public UserService() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	protected static UserService instance = new UserService();

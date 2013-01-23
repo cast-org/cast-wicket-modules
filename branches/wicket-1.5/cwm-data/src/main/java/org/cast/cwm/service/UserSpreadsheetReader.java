@@ -36,7 +36,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.databinder.hib.Databinder;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
@@ -91,7 +91,7 @@ public class UserSpreadsheetReader implements Serializable {
 
 
 	public UserSpreadsheetReader() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	/**

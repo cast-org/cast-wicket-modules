@@ -28,7 +28,7 @@ import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.HibernateProvider;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -60,7 +60,7 @@ public class SiteService {
 	private Class<? extends Site> siteClass = Site.class;
 
 	public SiteService() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	public static SiteService get() {
