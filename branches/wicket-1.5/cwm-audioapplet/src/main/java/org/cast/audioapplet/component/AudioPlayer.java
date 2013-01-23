@@ -21,17 +21,18 @@ package org.cast.audioapplet.component;
 
 import java.io.OutputStream;
 
-import org.apache.wicket.IRequestTarget;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.components.DeployJava;
-import org.cast.cwm.components.service.JavascriptService;
+import org.wicketstuff.jslibraries.JSLib;
+import org.wicketstuff.jslibraries.Library;
+import org.wicketstuff.jslibraries.VersionDescriptor;
 
 /**
  * A component that holds the Java audio applet, and HTML to communicate with it for playing audio.
@@ -92,15 +93,15 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 	
 	protected void addButtons() {
 		WebMarkupContainer play = new WebMarkupContainer("playButton");
-		play.add(new SimpleAttributeModifier("onclick", "audioPlay('" + dj.getMarkupId() + "'); return false;"));
+		play.add(AttributeModifier.replace("onclick", "audioPlay('" + dj.getMarkupId() + "'); return false;"));
 		add(play);
 		
 		WebMarkupContainer pause = new WebMarkupContainer("pauseButton");
-		pause.add(new SimpleAttributeModifier("onclick", "audioPause('" + dj.getMarkupId() + "'); return false;"));
+		pause.add(AttributeModifier.replace("onclick", "audioPause('" + dj.getMarkupId() + "'); return false;"));
 		add(pause);
 		
 		WebMarkupContainer stop = new WebMarkupContainer("stopButton");
-		stop.add(new SimpleAttributeModifier("onclick", "audioStop('" + dj.getMarkupId() + "'); return false;"));
+		stop.add(AttributeModifier.replace("onclick", "audioStop('" + dj.getMarkupId() + "'); return false;"));
 		add(stop);
 	}
 
@@ -164,9 +165,10 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 	}
 
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new ResourceReference(AudioPlayer.class, "audio_applet.css"));
-		JavascriptService.get().includeJQuery(response);
-		response.renderJavascriptReference(new ResourceReference(AudioPlayer.class, "audio_applet.js"));
+		response.renderCSSReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.css"));
+		// TODO - centralize JQuery versioning
+		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.JQUERY, 1, 8));
+		response.renderJavaScriptReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.js"));
 	}
 
 	class AudioFileLoadAjaxBehavior extends AbstractAjaxBehavior {
@@ -174,22 +176,15 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 		private static final long serialVersionUID = 1L;
 
 		public void onRequest() {
-			RequestCycle.get().setRequestTarget(new IRequestTarget() {
-
-				public void detach(RequestCycle requestCycle) { }
-
-				public void respond(RequestCycle requestCycle) {
-					try {
-						OutputStream os = requestCycle.getOriginalResponse().getOutputStream();
-						os.write(getModelObject());
-						os.flush();
-						os.close();
-					}
-					catch(Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
+			try {
+				OutputStream os = RequestCycle.get().getOriginalResponse().getOutputStream();
+				os.write(getModelObject());
+				os.flush();
+				os.close();
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

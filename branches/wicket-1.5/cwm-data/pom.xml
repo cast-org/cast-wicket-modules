@@ -95,7 +95,7 @@
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.wicketstuff</groupId>
- 	  		<artifactId>tinymce</artifactId>
+ 	  		<artifactId>wicketstuff-tinymce</artifactId>
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.apache.wicket</groupId>

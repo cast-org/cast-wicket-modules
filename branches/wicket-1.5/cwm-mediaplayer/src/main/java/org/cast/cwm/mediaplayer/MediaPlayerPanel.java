@@ -24,18 +24,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
-import org.apache.wicket.Application;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Resource;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.SharedResources;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.markup.html.PackageResource;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.protocol.http.RequestUtils;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.string.StringValue;
 import org.apache.wicket.util.string.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,12 +77,12 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	
 	protected boolean useLevels = false;
 	
-	protected static Resource playerResource = null;
-	protected static boolean playerResourceStored = false; // has it been stored as a SharedResource?
+//	protected static IResource playerResource = null;
+//	protected static boolean playerResourceStored = false; // has it been stored as a SharedResource?
 	
 	private final static Logger log = LoggerFactory.getLogger(MediaPlayerPanel.class);
 	
-	public MediaPlayerPanel(String id, ResourceReference video, int width, int height) {
+	public MediaPlayerPanel(String id, PackageResourceReference video, int width, int height) {
 		this(id, "", width, height);
 		this.videoHRef = toSiteAbsolutePath(video);
 		if (videoHRef == null)
@@ -94,7 +92,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	public MediaPlayerPanel(String id, String videoHRef, int width, int height) {
 		super(id);
 		this.videoHRef = isExternal(videoHRef) ? videoHRef : toSiteAbsolutePath(videoHRef);
-		this.skinHRef = toSiteAbsolutePath(new ResourceReference(MediaPlayerPanel.class, "skins/five/five.xml"));
+		this.skinHRef = toSiteAbsolutePath(new PackageResourceReference(MediaPlayerPanel.class, "skins/five/five.xml"));
 		this.width = width;
 		this.height = height;
 		setOutputMarkupId(true);
@@ -106,24 +104,24 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	protected void onBeforeRender() {
 		super.onBeforeRender();
 		
-		if (playerResource == null) {
-			// Set default player if none other was set
-			playerResource = PackageResource.get(MediaPlayerPanel.class, "player.swf");
-		}
-		
-		// Save player as an application shared resource, 
-		// so that it has a constant URL and can be cached by browsers
-		if (!playerResourceStored) {
-			SharedResources sr = Application.get().getSharedResources();		
-			sr.add(MediaPlayerPanel.class, "player", null, null, playerResource);
-			playerResourceStored = true;
-			log.debug ("Stored new shared resource for video player: {}", playerResource);
-		}		
+//		if (playerResource == null) {
+//			// Set default player if none other was set
+//			playerResource = new PackageResource(MediaPlayerPanel.class, "player.swf", null, null, null);
+//		}
+//		
+//		// Save player as an application shared resource, 
+//		// so that it has a constant URL and can be cached by browsers
+//		if (!playerResourceStored) {
+//			SharedResources sr = Application.get().getSharedResources();		
+//			sr.add(MediaPlayerPanel.class, "player", null, null, playerResource);
+//			playerResourceStored = true;
+//			log.debug ("Stored new shared resource for video player: {}", playerResource);
+//		}		
 	}
 
-	
+
 	public CharSequence getSourceHRef() {
-		return urlFor(new ResourceReference(MediaPlayerPanel.class, "player"));
+		return RequestCycle.get().urlFor(new PackageResourceReference(MediaPlayerPanel.class, "player"), null);
 	}
 	
 
@@ -132,7 +130,8 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	protected String toSiteAbsolutePath(String p) {
 		try {
 			String path = URLEncoder.encode(p != null ? p : "", "UTF-8");
-			URI url = new URI(RequestUtils.toAbsolutePath(path));
+			// TODO does this work?
+			URI url = new URI(RequestUtils.toAbsolutePath(path, RequestCycle.get().getRequest().getUrl().getPath()));
 			return url.getPath();
 
 		} catch (URISyntaxException e) {
@@ -145,7 +144,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	protected String toSiteAbsolutePath(ResourceReference rr) {
 		if (rr == null)
 			return null;
-		CharSequence url = urlFor(rr);
+		CharSequence url = RequestCycle.get().urlFor(rr, null);
 		// Since we're going to make the path absolute, get rid of leading ../
 		url = url.toString().replaceAll("\\.\\./", "");
 		if (url == null) {
@@ -194,9 +193,9 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 
 			@Override
 			protected void respond(AjaxRequestTarget target) {
-				String status = RequestCycle.get().getRequest().getParameter("status");
+				StringValue status = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("status");
 				if (useOnPlay)
-					onPlay(status);
+					onPlay(status.toString(""));
 			}
 		};
 		add(playResponse);
@@ -204,7 +203,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 
 	public void renderHead(IHeaderResponse r) {
 
-		r.renderJavascriptReference(new ResourceReference(MediaPlayerPanel.class, "jwplayer.js"));
+		r.renderJavaScriptReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js"));
 
 		StringBuffer jsString = new StringBuffer();
 		jsString.append("jwplayer(" + "\"" + getMarkupId() + "\").setup({" +
@@ -238,16 +237,16 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		jsString.append("}"); // end plugins
 
 		jsString.append("});"); // end setup
-		r.renderOnDomReadyJavascript(jsString.toString());
+		r.renderOnDomReadyJavaScript(jsString.toString());
 		
 		if (useOnPlay) {
-			r.renderOnDomReadyJavascript(getEventScript());
+			r.renderOnDomReadyJavaScript(getEventScript());
 		}
 	}
 	
 	protected String getEventScript() {
 		String jsString = 
-				"	var url=\'" + playResponse.getCallbackUrl(false) + "\';\n" +
+				"	var url=\'" + playResponse.getCallbackUrl() + "\';\n" +
 				"   var status;\n" +
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onPlay(function() {" +
 				"      if (status == 'paused') {\n " +
@@ -355,7 +354,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	}
 	
 	public void setSkin(String skinName) {
-		this.skinHRef = toSiteAbsolutePath(new ResourceReference(MediaPlayerPanel.class, skinName));
+		this.skinHRef = toSiteAbsolutePath(new PackageResourceReference(MediaPlayerPanel.class, skinName));
 	}
 	
 	public void setCaptionFile (ResourceReference captionResourceRef) {
@@ -406,9 +405,9 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		this.autostart = autostart;
 	}
 	
-	public void setPlayerResource (Resource playerResource) {
-		MediaPlayerPanel.playerResource = playerResource;
-		MediaPlayerPanel.playerResourceStored = false; // cause new resource to be saved into SharedResources
-	}
+//	public void setPlayerResource (Resource playerResource) {
+//		MediaPlayerPanel.playerResource = playerResource;
+//		MediaPlayerPanel.playerResourceStored = false; // cause new resource to be saved into SharedResources
+//	}
 	
 }

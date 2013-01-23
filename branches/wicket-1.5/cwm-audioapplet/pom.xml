@@ -27,6 +27,10 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+        	<groupId>org.wicketstuff</groupId>
+        	<artifactId>wicketstuff-jslibraries</artifactId>
+        </dependency>
     </dependencies>
     
 </project>
