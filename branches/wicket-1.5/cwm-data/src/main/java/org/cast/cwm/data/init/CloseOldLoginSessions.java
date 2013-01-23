@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import net.databinder.models.hib.HibernateListModel;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
@@ -52,7 +52,7 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 	
 	public CloseOldLoginSessions() {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 
 	public String getName() {

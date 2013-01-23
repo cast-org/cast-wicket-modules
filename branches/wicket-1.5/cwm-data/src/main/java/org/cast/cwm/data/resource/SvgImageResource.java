@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.DynamicWebResource;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
@@ -56,7 +56,7 @@ public class SvgImageResource extends DynamicWebResource {
 
 	public SvgImageResource() {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
 		// date, before the session context has been set up, and this database session can remain unclosed.
 		//setCacheable(true);
