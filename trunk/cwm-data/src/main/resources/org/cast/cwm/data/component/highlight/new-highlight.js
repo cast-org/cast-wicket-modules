@@ -110,8 +110,8 @@ hintHide    - when a hitn is turned off and no longer visible
          * - Selection + Color on: add/revise highlight
          * - Selection + Color on + Erase: remove/revise highlight
          *
-         * @param {Object} clicked - color character, 'E' (erase), or null
-         * @param {Object} id - optional id restriction
+         * @param {String} clicked - color character, 'E' (erase), or null
+         * @param {String} id - optional id restriction
          */
         modify : function(clicked, id) {
 
@@ -145,6 +145,9 @@ hintHide    - when a hitn is turned off and no longer visible
                 settings.currentRange = null;
                 methods.indicatorsBlank();
 
+                // Turn off hints
+                methods.hintDisplay(null, null, null, false, null);
+
                 // Hide higlights
                 methods.wordShowHighlights(null);
 
@@ -161,8 +164,8 @@ hintHide    - when a hitn is turned off and no longer visible
                         methods._trigger("hide");
                     }
 
-                    // Drop any model/hints highlight display
-                    methods.hintDisplay(null, null, false);
+                    // Turn off hints
+                    methods.hintDisplay(null, null, null, false, null);
 
                     // Display highlights for new color
                     methods.wordShowHighlights(clicked, id);
@@ -284,7 +287,7 @@ hintHide    - when a hitn is turned off and no longer visible
                             // Do not highlight previous word that is not visibly selected (Firefox)
                         } else if ((i == ((wordList.length)-1)) && (range.endOffset == 0)) {
                             // Do not highlight next word that is not visibly selected (Firefox)
-                        //} else if (range.startOffset == range.endOffset && !$.browser.msie) {
+                        } else if (range.startOffset == range.endOffset && !$.browser.msie) {
                             // Do not highlight current word that is not visibly selected (Firefox)
                         } else {
                             // Looks good, add to valid word list
@@ -491,8 +494,8 @@ hintHide    - when a hitn is turned off and no longer visible
          * a new set of highlights based on the contents of a hidden
          * form field.  If color is null, simply hides all highlighting.
          *
-         * @param {Object} color - color to display
-         * @param {Object} id - optional restricted scope
+         * @param {String} color - color to display
+         * @param {String} id - optional restricted scope
          */
         wordShowHighlights : function(color, id) {
 
@@ -564,7 +567,7 @@ hintHide    - when a hitn is turned off and no longer visible
          * Read the visible highlighted words and copy their locations
          * into a hidden form field.
          *
-         * @param {Object} id - optional location restriction
+         * @param {String} id - optional location restriction
          */
         wordSaveHighlights : function(id) {
 
@@ -613,106 +616,173 @@ hintHide    - when a hitn is turned off and no longer visible
          * 'hintClass' to given scope (or body).
          * Optional 'show' parameter forces state.
          *
-         * @param {Object} id - restricted scope, or null
-         * @param {Object} compare - color of user highlight to compare against
-         * @param {Object} show - true to display; false to hide; null to toggle
-         * @param {Object} hintClass - className of hint type (eg: "hint" if you want hints, "model" if you want models (default))
+         * @param {String} scope - restricted scope, or null
+         * @param {String} color - color of user highlight to compare against
+         * @param {String} show - true to display; false to hide; null to toggle
+         * @param {String} hintClass - className of hint type (eg: "hint" if you want hints, "model" if you want models (default))
+         * @param {String} btnId - btnId to activate
+         * @param {Boolean} compare - is this a comparison highlight
          */
-        hintDisplay : function(id, compare, show, hintClass) {
-
-            if (id === undefined) { id = null; }
-            if (compare === undefined) {
-                compare = null;
+        hintDisplay : function(e, scope, color, show, hintClass, btnId, compare) {
+            if (scope === undefined) { scope = null; }
+            if (color === undefined) {
+                color = null;
             } else {
                 // Check for valid color
-                compare = ($.inArray(compare, settings.colors) != -1) ? compare : null;
+                color = ($.inArray(color, settings.colors) != -1) ? color : null;
             }
             if (show === undefined) { show = null; }
             if (hintClass === undefined) { hintClass = null; }
 
-            //if (show == false && settings.currentHint == null && settings.currentCompare == null) {
+            if (show == false && hintClass == null) {
+                // All hints being forced off
+                $('.highlightHelper').find(".collapseBox").removeClass("expOpen");
+                $('.highlightHelper').find(".collapseBody").hide();
+                $('.highlightHelper').find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+            }
+
             if (show == false && settings.currentHint == null) {
                 return;
             }
 
-/*
-            // Turn off any current highlights
-            if (settings.currentColor != null) {
-                $("." + settings.currentColor).removeClass(settings.currentColor);
-                methods.wordShowHighlights(null);
-            }
-            settings.currentColor = null;
-            settings.currentScope = null;
-            settings.currentRange = null;
-            methods.indicatorsBlank();
-*/
-
             // Find scope
-            var $scope = (id ? $("#" + id) : $("body"));
+            var $controlScope = (scope ? $("#" + scope) : $("#globalHighlight"));
+            var $controlHelper = ($('.control' + color + '.helper', $controlScope).length > 0) ? true : false;
+            var $highlightScope = (scope ? $("#" + scope) : $("body"));
+
+            if (!$controlHelper) {
+                // Turn off any current highlights
+                if (settings.currentColor != null) {
+                //if (settings.currentColor != color) {
+                    $("." + settings.currentColor).removeClass(settings.currentColor);
+                    methods.wordShowHighlights(null);
+                }
+                settings.currentColor = null;
+                settings.currentScope = null;
+                settings.currentRange = null;
+                methods.indicatorsBlank();
+            }
 
             // Hide all previous hint displays
-	        $("." + settings.currentHint).not($scope).removeClass(settings.currentHint);
-	        $("." + settings.currentCompare).not($scope).removeClass(settings.currentCompare);
+	        $("." + settings.currentHint).not($highlightScope).removeClass(settings.currentHint);
+	        $("." + settings.currentCompare).not($highlightScope).removeClass(settings.currentCompare);
 
 	        // Hide all other hints of same type not in current scope
-            $("." + hintClass).not($scope).removeClass(hintClass);
-            $("." + compare).not($scope).removeClass(compare);
+            $("." + hintClass).not($highlightScope).removeClass(hintClass);
+            $("." + color).not($highlightScope).removeClass(color);
 
-            // Are we toggling or forcing state?
-            var toggle = true;
-            if ((show == true) || (show == false)) {
-                toggle = false;
+            var $currTarget = null;
+            var $btnTarget = ($("#" + btnId).length) ? $("#" + btnId) : null;
+            // Reset all other hint toggle items not the specified button
+            if ($btnTarget != null) {
+                e.stopImmediatePropagation();
+                $('.highlightHelper').find(".collapseBox").not($btnTarget).removeClass("expOpen");
+                $('.highlightHelper').find(".collapseBox").not($btnTarget).find(".collapseBody").hide();
+                $('.highlightHelper').find(".toggle").not($btnTarget).attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+            } else {
+                $('.highlightHelper').find(".collapseBox").not($highlightScope).removeClass("expOpen");
+                $('.highlightHelper').find(".collapseBody").not($highlightScope).hide();
+                $('.highlightHelper').find(".toggle").not($highlightScope).attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
             }
 
             // Is scope currently showing hints?
             if ( settings.currentHint != null && settings.currentHint != hintClass) {
-                var showing = $scope.hasClass(hintClass);
+                var showing = $highlightScope.hasClass(hintClass);
             } else {
-                var showing = $scope.hasClass(settings.currentHint);
+                var showing = $highlightScope.hasClass(settings.currentHint);
             }
 
             // Adjust state, if necessary
             if (showing || show == false) {
                 // Turn off
-                if (toggle || !show) {
-                    if (settings.currentHint != null) {
-                        $scope.removeClass(settings.currentHint);
-                    }
-                    if (settings.currentCompare != null) {
-                        $scope.removeClass(settings.currentCompare);
-                        methods.wordShowHighlights(null);
-                    }
-                    $scope.removeClass(hintClass);
-                    settings.currentHint = null;
-                    settings.currentCompare = null;
-                    methods._trigger("hintHide");
+                if (settings.currentHint != null) {
+                    $highlightScope.removeClass(settings.currentHint);
                 }
+                if ( ((settings.currentCompare != null) && (settings.currentCompare != color)) || ((settings.currentCompare != null) && (color == null)) ) {
+                    // Remove highlight color and disable controls
+                    $highlightScope.removeClass(settings.currentCompare);
+                    methods.wordShowHighlights(null);
+                    $controlScope.find(".control" + color).removeClass("on");
+                    $controlScope.find(".controlE").removeClass("enabled");
+                }
+                // Close specified toggle item
+                if ($("#" + btnId + ".collapseBox.expOpen").length) {
+                    toggleChildBox($("#" + btnId), null);
+                }
+                $highlightScope.removeClass(hintClass);
+                settings.currentColor = color;
+                settings.currentColor = scope;
+                settings.currentHint = null;
+                settings.currentCompare = null;
+                methods._trigger("hintHide");
             } else {
                 // Turn on
-                if (toggle || show) {
-                    if (settings.currentHint != null) {
-                        $scope.removeClass(settings.currentHint);
-                    }
-                    if (settings.currentCompare != null) {
-                        $scope.removeClass(settings.currentCompare);
-                        methods.wordShowHighlights(null);
-                    }
-                    if (compare != null) {
-                        $scope.addClass(compare);
-                        methods.wordShowHighlights(compare, id);
-                    }
-                    $scope.addClass(hintClass);
-                    settings.currentHint = hintClass;
-                    settings.currentCompare = compare;
-                    methods._trigger("hintShow");
+                if (settings.currentHint != null) {
+                    $highlightScope.removeClass(settings.currentHint);
                 }
+                if (settings.currentCompare != null) {
+                    $highlightScope.removeClass(settings.currentCompare);
+                    methods.wordShowHighlights(null);
+                }
+                if (color != null) {
+                    $highlightScope.addClass(color);
+                    methods.wordShowHighlights(color, scope);
+                    // Enable controls (highlighter and eraser)
+                    $controlScope.find(".control" + color).addClass("on");
+                    if (!settings.readonly) {
+                        $controlScope.find(".controlE").addClass("enable");
+                    }
+                }
+                if (compare) {
+                    // Check to see if there are highlights to compare against
+                    if ($('input.' + color + 'highlightedWords').attr('value') == '') {
+                        var modalWin = $('#noHighlightModal');
+                        // Get modal size
+                        modalWin.css("position", "absolute").css("left", "-9999px").css("display", "block");
+                        var modalWidth = modalWin.outerWidth();
+                        var modalHeight = modalWin.outerHeight();
+                        modalWin.css("left", "auto").css("display", "none");
+                        if ($btnTarget != null) {
+                            // Get button offset and width
+    		                var btnOffset = $btnTarget.offset();
+    		                var btnWidth = $btnTarget.outerWidth(true);
+    		                // Position modal
+    		                var newLeft = (btnOffset.left + (btnWidth/2)) - (modalWidth/2);
+    		                modalWin.css("position", "absolute");
+                            modalWin.css("top", btnOffset.top);
+                            modalWin.css("right", "auto");
+                            modalWin.css("left", newLeft + "px");
+                        } else {
+                            // Use center() from DialogBorder.js
+                            modalWin.center();
+                        }
+                        // Store trigger
+		                modalWin.data("detailTrigger", btnId);
+		                // Show modal
+		                modalWin.show();
+		                modalWin.attr("tabindex", "-1");
+	                    modalWin.get(0).focus();
+		                return;
+		            }
+                }
+
+                // Open specified toggle item
+                if ($("#" + btnId + ".collapseBox").not(".expOpen").length) {
+                    toggleChildBox($("#" + btnId), null);
+                }
+                $highlightScope.addClass(hintClass);
+                settings.currentColor = color;
+                settings.currentColor = scope;
+                settings.currentHint = hintClass;
+                settings.currentCompare = color;
+                methods._trigger("hintShow");
             }
         },
 
         /**
          * Callback trigger function
          *
-         * @param {Object} callback function name
+         * @param {String} callback function name
          */
         _trigger : function(callback) {
 
@@ -726,6 +796,9 @@ hintHide    - when a hitn is turned off and no longer visible
                 'currentHint'       : settings.currentHint,
                 'currentCompare'    : settings.currentCompare,
             };
+
+            //console.log(callback);
+            //console.log(settings);
 
             if ($.isFunction(settings[callback])) {
                 settings[callback](options);
