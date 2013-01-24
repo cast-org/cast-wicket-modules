@@ -29,24 +29,19 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
-import net.databinder.auth.data.DataUser;
+import net.databinder.DBRequestCycleListener;
 import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
 import org.apache.wicket.Session;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebResponse;
-import org.apache.wicket.protocol.http.pagestore.DiskPageStore;
-import org.apache.wicket.request.target.coding.QueryStringUrlCodingStrategy;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
 import org.apache.wicket.session.ISessionStore;
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.admin.AdminHome;
@@ -62,6 +57,7 @@ import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.data.User;
 import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
@@ -109,7 +105,7 @@ import com.google.inject.Scopes;
  * @author bgoldowsky
  */
 @SuppressWarnings("deprecation")
-public abstract class CwmApplication extends AuthDataApplication {
+public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Getter
 	protected Properties appProperties;
@@ -168,7 +164,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    
 	    loadServices();
 
-	    addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
+		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getInjectionModuleArray()));
 	    Injector.get().inject(this);
 
 	    super.internalInit();
@@ -187,6 +183,9 @@ public abstract class CwmApplication extends AuthDataApplication {
 	protected void init() {
 		log.debug("Starting CWM Application Init");
 		super.init();
+		
+		
+		getRequestCycleListeners().add(new DBRequestCycleListener());
 		
 		mailHost   = appProperties.getProperty("cwm.mailHost");
 		mailFromAddress = appProperties.getProperty("cwm.mailFromAddress");
@@ -249,16 +248,17 @@ public abstract class CwmApplication extends AuthDataApplication {
 	
 	protected void configureMountPaths() {
 		
-		mountBookmarkablePage("admin", AdminHome.class);
-		mountBookmarkablePage("stats", DatabaseStatisticsPage.class);
-		mountBookmarkablePage("eventlog", EventLog.class);
-		mountBookmarkablePage("sitelist", SiteListPage.class);
-		mountBookmarkablePage("userlist", UserListPage.class);
+		mountPage("admin", AdminHome.class);
+		mountPage("stats", DatabaseStatisticsPage.class);
+		mountPage("eventlog", EventLog.class);
+		mountPage("sitelist", SiteListPage.class);
+		mountPage("userlist", UserListPage.class);
 		
-		mount(new QueryStringUrlCodingStrategy("period", PeriodInfoPage.class));
-		mount(new QueryStringUrlCodingStrategy("sessions", SessionListPage.class));
-		mount(new QueryStringUrlCodingStrategy("site", SiteInfoPage.class));
-		mount(new QueryStringUrlCodingStrategy("edituser", UserFormPage.class));
+		// The following have query parameters
+		mountPage("period", PeriodInfoPage.class);
+		mountPage("sessions", SessionListPage.class);
+		mountPage("site", SiteInfoPage.class);
+		mountPage("edituser", UserFormPage.class);
 	}
 	
 	/** 
@@ -268,16 +268,17 @@ public abstract class CwmApplication extends AuthDataApplication {
 		new DatabaseInitializerRunner(appProperties).run(getDatabaseInitializers());
 	}
 
-	@Override
-	protected ISessionStore newSessionStore() {
-		return new CwmSessionStore(this, new DiskPageStore());
-	}
+// TODO: can't override session store any more - how to get this functionality back?
+//	@Override
+//	protected ISessionStore newSessionStore() {
+//		return new CwmSessionStore(this, new DiskPageStore());
+//	}
 
 	public static CwmApplication get() {
 		return (CwmApplication) Application.get();
 	}
 
-	public Class<? extends DataUser> getUserClass() {
+	public Class<User> getUserClass() {
 		return org.cast.cwm.data.User.class;
 	}
 	
@@ -353,29 +354,18 @@ public abstract class CwmApplication extends AuthDataApplication {
 		return new CwmSession(request);
 	}
 	
-	@Override
-	public RequestCycle newRequestCycle (final Request request, final Response response) {
-		return new DataRequestCycle (this, (WebRequest) request, (WebResponse) response) {
-			
-			@Override
-			public Page onRuntimeException(final Page cause, final RuntimeException e) {
-				super.onRuntimeException(cause, e);  // Executes some methods
-				return CwmApplication.get().getExceptionPage(e);
-			}
-		};
-	}
-	
-	/**
-	 * Mark the given LoginSession as ended due to session expiration.
-	 * 
-	 * This is made available in the Application class so that it can be called from the 
-	 * SessionStore when sessions expire - SessionStore is in a separate thread and
-	 * does not have easy access to service classes.
-	 * @param ID of the loginSession the LoginSession to close
-	 */
-	public void expireLoginSession(Long loginSessionId) {
-		loginSessionCloser.closeQueue.add(loginSessionId);
-	}
+// TODO
+//	/**
+//	 * Mark the given LoginSession as ended due to session expiration.
+//	 * 
+//	 * This is made available in the Application class so that it can be called from the 
+//	 * SessionStore when sessions expire - SessionStore is in a separate thread and
+//	 * does not have easy access to service classes.
+//	 * @param ID of the loginSession the LoginSession to close
+//	 */
+//	public void expireLoginSession(Long loginSessionId) {
+//		loginSessionCloser.closeQueue.add(loginSessionId);
+//	}
 	
 	void initResponseTypes() {
 		/**
@@ -458,15 +448,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 //	}
 	
 	
-	/**
-	 * Override this method to display a custom page when an exception is thrown.
-	 * @param e
-	 * @return
-	 */
-	protected Page getExceptionPage(final RuntimeException e) {
-		return null;
-	}
-
 	public byte[] getSalt() {
 		return "mmmm salt, makes the encryption tasty".getBytes();
 	}
@@ -486,7 +467,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 	@Override
 	protected void onDestroy() {
 		log.debug("Running shutdown steps");
-		loginSessionCloser.interrupt();
+//		loginSessionCloser.interrupt();  // TODO
 		this.getHibernateSessionFactory(null).close();
 		super.onDestroy();
 	}
@@ -502,35 +483,36 @@ public abstract class CwmApplication extends AuthDataApplication {
 		
 		@Override
 		public void run() {
-			Application.set(CwmApplication.this);
-			while(true) {
-				try {
-					final Long loginSessionId = closeQueue.take();
-					Databinder.ensureSession(new SessionUnit() {
-						public Object run(org.hibernate.Session dbSession) {
-							dbSession.beginTransaction();
-							LoginSession loginSession = (LoginSession) dbSession.load(LoginSession.class, loginSessionId);
-							if (loginSession != null) {
-								 if (loginSession.getEndTime() != null) {
-									 log.debug("Closer thread closing login session {}", loginSessionId);
-									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
-								 } else {
-									 // If user logged out normally, login session would already be closed.
-									 log.debug("Login session {} was already closed", loginSessionId);
-								 }
-							} else {
-								log.error("LoginSession ID passed in ({}) was invalid or closed: {}", loginSessionId, loginSession);
-							}
-								dbSession.getTransaction().commit();
-							return null;
-						}						
-					});
-				} catch (InterruptedException e) {
-					log.debug("LoginSessionCloser exiting due to interrupt");
-					break;
-				}
-			}
-
+// TODO - need a new strategy for this.
+//			Application.set(CwmApplication.this);
+//			while(true) {
+//				try {
+//					final Long loginSessionId = closeQueue.take();
+//					Databinder.ensureSession(new SessionUnit() {
+//						public Object run(org.hibernate.Session dbSession) {
+//							dbSession.beginTransaction();
+//							LoginSession loginSession = (LoginSession) dbSession.load(LoginSession.class, loginSessionId);
+//							if (loginSession != null) {
+//								 if (loginSession.getEndTime() != null) {
+//									 log.debug("Closer thread closing login session {}", loginSessionId);
+//									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
+//								 } else {
+//									 // If user logged out normally, login session would already be closed.
+//									 log.debug("Login session {} was already closed", loginSessionId);
+//								 }
+//							} else {
+//								log.error("LoginSession ID passed in ({}) was invalid or closed: {}", loginSessionId, loginSession);
+//							}
+//								dbSession.getTransaction().commit();
+//							return null;
+//						}						
+//					});
+//				} catch (InterruptedException e) {
+//					log.debug("LoginSessionCloser exiting due to interrupt");
+//					break;
+//				}
+//			}
+//
 		}
 	}
 	

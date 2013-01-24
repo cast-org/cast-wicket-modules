@@ -24,6 +24,12 @@
  	  	<dependency>
  	  		<groupId>org.cast.cwm</groupId>
  	  		<artifactId>cwm-drawtool</artifactId>
+ 	  		<exclusions>
+ 	  			<exclusion>
+ 	  				<artifactId>wicket</artifactId>
+ 	  				<groupId>org.apache.wicket</groupId>
+ 	  			</exclusion>
+ 	  		</exclusions>
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.cast.cwm</groupId>
@@ -96,6 +102,12 @@
  	  	<dependency>
  	  		<groupId>org.wicketstuff</groupId>
  	  		<artifactId>wicketstuff-tinymce</artifactId>
+ 	  		<exclusions>
+ 	  			<exclusion>
+ 	  				<artifactId>wicket</artifactId>
+ 	  				<groupId>org.apache.wicket</groupId>
+ 	  			</exclusion>
+ 	  		</exclusions>
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.apache.wicket</groupId>

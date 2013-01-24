@@ -35,8 +35,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.markup.html.DynamicWebResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.resource.UploadedFileResource;
 import org.hibernate.annotations.Cache;

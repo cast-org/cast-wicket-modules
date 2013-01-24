@@ -23,10 +23,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.databinder.auth.AuthDataSessionBase;
 
-import org.apache.wicket.Request;
 import org.apache.wicket.Session;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Request;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
@@ -74,7 +74,7 @@ public class CwmSession extends AuthDataSessionBase<User> {
 
 	public CwmSession(Request request) {
 		super(request);
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	public static CwmSession get() {
@@ -113,7 +113,7 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	}
 	
 	@Override
-	protected void detach() {
+	public void detach() {
 		if (loginSessionModel != null)
 			loginSessionModel.detach();
 		if (currentPeriodModel != null)

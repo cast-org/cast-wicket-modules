@@ -25,7 +25,7 @@ import java.util.Properties;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.service.ICwmService;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ class DatabaseInitializerRunner {
 
 	DatabaseInitializerRunner(Properties appProperties) {
 		this.appProperties = appProperties;
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	void run(final List<IDatabaseInitializer> databaseInitializers) {
