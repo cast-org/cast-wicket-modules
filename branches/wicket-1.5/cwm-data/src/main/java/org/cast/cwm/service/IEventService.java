@@ -22,8 +22,8 @@ package org.cast.cwm.service;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.wicket.Request;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Request;
 import org.cast.cwm.IEventLogger;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;

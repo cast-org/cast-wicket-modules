@@ -19,14 +19,14 @@
  */
 package org.cast.cwm.admin;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
@@ -38,23 +38,26 @@ public class PeriodInfoPage extends AdminPage {
 	private IModel<Period> period = new Model<Period>(null);
 	private IModel<Site> site = new Model<Site>(null);
 	
+	private static final long serialVersionUID = 1L;
+
 	public PeriodInfoPage(PageParameters parameters) {
 		super(parameters);
 		
 		// Get Period, or Site used to create a new period.  Otherwise, redirect
-		if (parameters.containsKey("periodId")) {
-			period = SiteService.get().getPeriodById(parameters.getLong("periodId"));
+		if (!parameters.get("periodId").isEmpty()) {
+			period = SiteService.get().getPeriodById(parameters.get("periodId").toLongObject());
 			site = SiteService.get().getSiteById(period.getObject().getSite().getId());
-		} else if (parameters.containsKey("siteId")) {
-			site = SiteService.get().getSiteById(parameters.getLong("siteId"));
+		} else if (!parameters.get("siteId").isEmpty()) {
+			site = SiteService.get().getSiteById(parameters.get("siteId").toLongObject());
 		} else {
-			setRedirect(true);
 			setResponsePage(SiteListPage.class);
 			return;
 		}
 		
-		add(new BookmarkablePageLink<Void>("siteLink", SiteInfoPage.class).setParameter("siteId", site.getObject().getId()).add(new Label("name", site.getObject().getName())));
-		
+		BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("siteLink", SiteInfoPage.class);
+		link.getPageParameters().set("siteId", site.getObject().getId());
+		add(link);
+		link.add(new Label("name", site.getObject().getName()));		
 
 		if (period.getObject() == null) {
 			add(new Label("instructions", "Create New Period"));
@@ -74,8 +77,14 @@ public class PeriodInfoPage extends AdminPage {
 				
 			}));
 			add(SiteService.get().getPeriodEditForm("form", site, period));
-			add(new BookmarkablePageLink<Void>("newStudentLink", UserFormPage.class).setParameter("periodId", period.getObject().getId()).setParameter("role", Role.STUDENT_ROLENAME));
-			add(new BookmarkablePageLink<Void>("newTeacherLink", UserFormPage.class).setParameter("periodId", period.getObject().getId()).setParameter("role", Role.TEACHER_ROLENAME));
+			
+			link = new BookmarkablePageLink<Void>("newStudentLink", UserFormPage.class);
+			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.STUDENT_ROLENAME);
+			add(link);
+
+			link = new BookmarkablePageLink<Void>("newTeacherLink", UserFormPage.class);
+			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.TEACHER_ROLENAME);
+			add(link);
 		}
 		
 		UserListPanel list = new UserListPanel("userList");

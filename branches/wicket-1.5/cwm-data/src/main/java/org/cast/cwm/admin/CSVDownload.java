@@ -30,9 +30,8 @@ import java.util.Locale;
 import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.markup.html.WebResource;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.IResourceStreamWriter;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;

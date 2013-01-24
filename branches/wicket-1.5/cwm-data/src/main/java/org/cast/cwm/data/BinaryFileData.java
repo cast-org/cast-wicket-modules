@@ -108,39 +108,39 @@ public class BinaryFileData extends PersistedObject {
 		return getPrimaryType().equals("image");
 	}
 	
-	/**
-	 * Deprecated Method.  Instead, use {@link UploadedFileResource}.
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public ResourceReference getResourceReference() {
-		String filename = id + "_" + name;
-
-		if (Application.get().getSharedResources().get(filename) == null) {
-			DynamicWebResource res = new DynamicWebResource(filename) {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected ResourceState getResourceState() {
-					return new ResourceState() {
-
-						@Override
-						public String getContentType() { return mimeType;}
-
-						@Override
-						public byte[] getData() { return BinaryFileData.this.getData();}
-						
-						@Override
-						public Time lastModifiedTime() { return Time.valueOf(lastModified);}
-					};
-				}
-			};
-			res.setCacheable(true); // Not often changed
-			Application.get().getSharedResources().add(filename, res);
-		}
-		
-		return new ResourceReference(filename);
-	}
+//	/**  Trying to remove this since it's deprecated anyway.
+//	 * Deprecated Method.  Instead, use {@link UploadedFileResource}.
+//	 * 
+//	 * @return
+//	 */
+//	@Deprecated
+//	public ResourceReference getResourceReference() {
+//		String filename = id + "_" + name;
+//
+//		if (Application.get().getSharedResources().get(filename) == null) {
+//			DynamicWebResource res = new DynamicWebResource(filename) {
+//
+//				private static final long serialVersionUID = 1L;
+//
+//				@Override
+//				protected ResourceState getResourceState() {
+//					return new ResourceState() {
+//
+//						@Override
+//						public String getContentType() { return mimeType;}
+//
+//						@Override
+//						public byte[] getData() { return BinaryFileData.this.getData();}
+//						
+//						@Override
+//						public Time lastModifiedTime() { return Time.valueOf(lastModified);}
+//					};
+//				}
+//			};
+//			res.setCacheable(true); // Not often changed
+//			Application.get().getSharedResources().add(filename, res);
+//		}
+//		
+//		return new ResourceReference(filename);
+//	}
 }

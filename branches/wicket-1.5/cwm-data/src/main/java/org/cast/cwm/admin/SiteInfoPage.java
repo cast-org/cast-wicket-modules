@@ -27,10 +27,8 @@ import java.util.List;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.RestartResponseAtInterceptPageException;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -50,6 +48,9 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.Files;
 import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.lang.Bytes;
@@ -75,16 +76,18 @@ import org.slf4j.LoggerFactory;
  */
 @AuthorizeInstantiation("ADMIN")
 public class SiteInfoPage extends AdminPage {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(SiteInfoPage.class);
 
 	private IModel<Site> mSite = null;
+
+	private static final long serialVersionUID = 1L;
 
 	public SiteInfoPage(PageParameters param) {
 		super(param);
 
 		// Current Site
-		Long siteId = param.getAsLong("siteId");
+		Long siteId = param.get("siteId").toLongObject();
 		mSite = SiteService.get().getSiteById(siteId); // May create a Transient Instance
 		if (siteId != null && mSite.getObject() == null)
 			throw new RestartResponseAtInterceptPageException(SiteListPage.class);
@@ -141,7 +144,7 @@ public class SiteInfoPage extends AdminPage {
 		add(createNewPeriod);
 
 		// Sample CSV File
-		add(new ResourceLink<Void>("sampleLink", new ResourceReference(SiteInfoPage.class, "sample_class_list.csv")));
+		add(new ResourceLink<Void>("sampleLink", new PackageResourceReference(SiteInfoPage.class, "sample_class_list.csv")));
 		
 		// Upload CSV File to populate Site
 		Folder uploadFolder = new Folder(System.getProperty("java.io.tmpdir"), "wicket-uploads");

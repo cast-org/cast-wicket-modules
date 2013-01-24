@@ -21,13 +21,14 @@ package org.cast.cwm.admin;
 
 import lombok.Getter;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.CwmApplication;
 
 /**
@@ -38,7 +39,9 @@ import org.cast.cwm.CwmApplication;
  */
 public abstract class AdminPage extends WebPage implements IHeaderContributor {
 	
-	public static final ResourceReference admincss = new ResourceReference(AdminPage.class, "admin.css");
+	private static final long serialVersionUID = 1L;
+
+	public static final ResourceReference admincss = new PackageResourceReference(AdminPage.class, "admin.css");
 	
 	@Getter protected String pageTitle = CwmApplication.get().getAppAndInstanceId() + " :: Default Page Title";
 

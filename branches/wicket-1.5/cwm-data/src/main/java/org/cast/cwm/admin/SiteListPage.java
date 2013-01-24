@@ -19,8 +19,7 @@
  */
 package org.cast.cwm.admin;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -28,6 +27,7 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
@@ -50,6 +50,8 @@ public class SiteListPage extends AdminPage {
 	@Inject
 	private ICwmService cwmService;
 
+	private static final long serialVersionUID = 1L;
+
 	public SiteListPage(PageParameters parameters) {
 		super(parameters);
 		
@@ -57,7 +59,6 @@ public class SiteListPage extends AdminPage {
 		
 		// If no sites in datastore, jump directly to creating a site
 		if (siteProvider.size() == 0) {
-			setRedirect(true);
 			setResponsePage(SiteInfoPage.class);
 			return;
 		}

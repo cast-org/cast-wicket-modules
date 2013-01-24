@@ -27,7 +27,7 @@ import java.util.Map;
 
 import lombok.Data;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -60,7 +60,7 @@ public class ResponseMetadata implements Serializable {
 
 	public ResponseMetadata () {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	/** 

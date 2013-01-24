@@ -32,19 +32,19 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.mail.Quota.Resource;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.sanselan.Sanselan;
-import org.apache.wicket.Resource;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.slf4j.Logger;

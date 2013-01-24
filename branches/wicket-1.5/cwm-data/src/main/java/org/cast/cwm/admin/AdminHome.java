@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.devutils.inspector.InspectorPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Role;
 
@@ -40,6 +40,8 @@ import org.cast.cwm.data.Role;
  */
 @AuthorizeInstantiation("RESEARCHER")
 public class AdminHome extends AdminPage {
+
+	private static final long serialVersionUID = 1L;
 
 	public AdminHome(PageParameters parameters) {
 		super(parameters);

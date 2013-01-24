@@ -25,14 +25,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.mail.Quota.Resource;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.models.hib.OrderingCriteriaBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.Resource;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -56,6 +56,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.ResponseData;
@@ -89,6 +90,8 @@ public class EventLog extends AdminPage {
 	private static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 	private static final Logger log = LoggerFactory.getLogger(EventLog.class);
 	
+	private static final long serialVersionUID = 1L;
+
 	@Inject
 	private IEventService eventService;
 

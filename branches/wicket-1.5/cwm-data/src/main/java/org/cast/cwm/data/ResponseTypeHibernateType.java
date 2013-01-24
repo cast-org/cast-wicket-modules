@@ -24,7 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.hibernate.HibernateException;
 import org.hibernate.type.StringType;
@@ -41,7 +41,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	public ResponseTypeHibernateType() {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	public int[] sqlTypes() {

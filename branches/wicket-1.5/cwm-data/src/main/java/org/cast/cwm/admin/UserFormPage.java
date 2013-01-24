@@ -21,8 +21,7 @@ package org.cast.cwm.admin;
 
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -30,6 +29,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -52,18 +52,20 @@ public class UserFormPage extends AdminPage {
 	private IModel<Period> periodModel = new Model<Period>(null);
 	private Role role = null;
 
+	private static final long serialVersionUID = 1L;
+
 	public UserFormPage(final PageParameters parameters) {
 		super(parameters);
 		
 		// The user we're editing, if any
-		if (parameters.containsKey("userId"))
-			userModel = (HibernateObjectModel<User>) UserService.get().getById(parameters.getLong("userId"));
+		if (!parameters.get("userId").isEmpty())
+			userModel = (HibernateObjectModel<User>) UserService.get().getById(parameters.get("userId").toLongObject());
 		// The role of the user to create, if any
-		if (parameters.containsKey("role"))
-			role = Role.forRoleString(parameters.getString("role"));
+		if (!parameters.get("role").isEmpty())
+			role = Role.forRoleString(parameters.get("role").toString());
 		// The period to link back to, if any
-		if (parameters.containsKey("periodId"))
-			periodModel = SiteService.get().getPeriodById(parameters.getLong("periodId"));
+		if (!parameters.get("periodId").isEmpty())
+			periodModel = SiteService.get().getPeriodById(parameters.get("periodId").toLongObject());
 		
 		addBreadcrumbLinks();
 		
