@@ -27,9 +27,9 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.PersistedObject;
 
@@ -62,27 +62,29 @@ public abstract class DeletePersistedObjectDialog<T extends PersistedObject> ext
 
 	public DeletePersistedObjectDialog(String id, IModel<T> model) {
 		super(id, model);
-		
-		
-		
-		add(dialogBorder = new DialogBorder ("dialogBorder", new AbstractReadOnlyModel<String>() {
 
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public String getObject() {
-				return "Delete " + Strings.capitalize(objectName);
-			}
-			
-		}));
-	
+		// Set up models that allow property values to interpolate the type of object being deleted with {0},
+		// and its capitalized form with {1}.
+		Object[] modelParameters = new Object[] {
+				new PropertyModel<String>(DeletePersistedObjectDialog.this, "objectName"),
+				new PropertyModel<String>(DeletePersistedObjectDialog.this, "objectNameCapitalized")
+		};
+		
+		StringResourceModel titleModel = new StringResourceModel("deleteDialogTitle", this, null, modelParameters);
+		add(dialogBorder = new DialogBorder ("dialogBorder", titleModel));
 		dialogBorder.setMoveContainer(this);
 		
-		dialogBorder.getBodyContainer().add(new Label("objectType", new PropertyModel<String>(this, "objectName")));
+		// Set up a model that allows property value to interpolate the type of object being deleted with {0}
+		StringResourceModel messageModel = new StringResourceModel("deleteQuestion", this, null, modelParameters);
+		dialogBorder.getBodyContainer().add(new Label("deleteQuestion", messageModel));
 		
 		dialogBorder.getBodyContainer().add(new WebMarkupContainer("cancelLink").add(dialogBorder.getClickToCloseBehavior()));
 		
 		dialogBorder.getBodyContainer().add(getDeleteLink("deleteLink", model));
+	}
+	
+	public String getObjectNameCapitalized() {
+		return Strings.capitalize(objectName);
 	}
 	
 	@SuppressWarnings("unchecked")
