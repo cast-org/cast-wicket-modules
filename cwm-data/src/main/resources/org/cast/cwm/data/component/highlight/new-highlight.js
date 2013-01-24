@@ -616,6 +616,7 @@ hintHide    - when a hitn is turned off and no longer visible
          * 'hintClass' to given scope (or body).
          * Optional 'show' parameter forces state.
          *
+         * @param {Event}  event - the click that triggered this call
          * @param {String} scope - restricted scope, or null
          * @param {String} color - color of user highlight to compare against
          * @param {String} show - true to display; false to hide; null to toggle
