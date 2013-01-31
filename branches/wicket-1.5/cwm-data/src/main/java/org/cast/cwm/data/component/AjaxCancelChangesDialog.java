@@ -23,7 +23,7 @@ import lombok.Getter;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
-import org.apache.wicket.behavior.IBehavior;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 
@@ -61,11 +61,11 @@ public abstract class AjaxCancelChangesDialog extends Panel {
 
 	protected abstract void onCancel(AjaxRequestTarget target);
 	
-	public IBehavior getClickToCloseBehavior() {
+	public Behavior getClickToCloseBehavior() {
 		return dialogBorder.getClickToCloseBehavior();
 	}
 
-	public IBehavior getClickToOpenBehavior() {
+	public Behavior getClickToOpenBehavior() {
 		return dialogBorder.getClickToOpenBehavior();
 	}
 

@@ -42,7 +42,6 @@ public class LogoutLink extends Link<Page> {
 	@Override
 	public void onClick() {
 		AuthDataSession.get().signOut();
-		getRequestCycle().setRedirect(true);
 		setResponsePage(Application.get().getHomePage());
 	}
 }

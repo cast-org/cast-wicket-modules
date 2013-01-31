@@ -60,7 +60,7 @@ public abstract class DisablingIndicatingAjaxButton extends IndicatingAjaxButton
 	}
 	
 	public void renderHead(final IHeaderResponse response) {
-		response.renderJavascriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	
 	/**

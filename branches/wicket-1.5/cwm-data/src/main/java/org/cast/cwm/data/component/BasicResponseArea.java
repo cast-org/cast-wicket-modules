@@ -31,7 +31,6 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
@@ -47,6 +46,9 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.data.IResponseType;
@@ -316,8 +318,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			
 			if (target != null) {
 				addEditLinksToTarget(target);
-				target.addComponent(controlPanel);
-				target.addComponent(BasicResponseArea.this.get(NEW_RESPONSE_ID));
+				target.add(controlPanel);
+				target.add(BasicResponseArea.this.get(NEW_RESPONSE_ID));
 			}	
 		}
 		
@@ -331,9 +333,9 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			
 			BasicResponseArea.this.replace(new WebMarkupContainer(NEW_RESPONSE_ID).setOutputMarkupPlaceholderTag(true).setVisible(false));
 			if (target != null) {
-				target.addComponent(responseListContainer);
-				target.addComponent(controlPanel);
-				target.addComponent(BasicResponseArea.this.get(NEW_RESPONSE_ID));
+				target.add(responseListContainer);
+				target.add(controlPanel);
+				target.add(BasicResponseArea.this.get(NEW_RESPONSE_ID));
 			}
 		}
 	}
@@ -390,8 +392,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			
 			if (target != null) {
 				addEditLinksToTarget(target);
-				target.addComponent(controlPanel);
-				target.addComponent(getParent().get(EXISTING_RESPONSE_ID));
+				target.add(controlPanel);
+				target.add(getParent().get(EXISTING_RESPONSE_ID));
 			}	
 		}
 
@@ -400,8 +402,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			isEditing = false;
 			getParent().replace(new ResponseViewer(EXISTING_RESPONSE_ID, getModel(), RESPONSE_MAX_WIDTH, null));
 			if (target != null) {
-				target.addComponent(responseListContainer);
-				target.addComponent(controlPanel);
+				target.add(responseListContainer);
+				target.add(controlPanel);
 			}
 		}
 		
@@ -418,13 +420,10 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	 */
 	private void addEditLinksToTarget(final AjaxRequestTarget target) {
 		
-		responseListContainer.visitChildren(EditResponseLink.class, new IVisitor<EditResponseLink>() {
-
-			public Object component(EditResponseLink component) {
-				target.addComponent(component);
-				return IVisitor.CONTINUE_TRAVERSAL;
+		responseListContainer.visitChildren(EditResponseLink.class, new IVisitor<EditResponseLink,Void>() {
+			public void component(EditResponseLink component, IVisit<Void> visit) {
+				target.add(component);
 			}
-			
 		});
 	}
 	
@@ -451,7 +450,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	}
 	
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new ResourceReference(BasicResponseArea.class, "buttons.css"));
+		response.renderCSSReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css"));
 	} 
 	
 	@Override

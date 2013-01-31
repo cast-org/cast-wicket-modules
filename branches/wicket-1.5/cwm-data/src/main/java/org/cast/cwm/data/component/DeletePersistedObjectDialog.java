@@ -22,7 +22,7 @@ package org.cast.cwm.data.component;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.behavior.IBehavior;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
@@ -112,11 +112,11 @@ public abstract class DeletePersistedObjectDialog<T extends PersistedObject> ext
 		};
 	}
 	
-	public IBehavior getClickToOpenBehavior() {
+	public Behavior getClickToOpenBehavior() {
 		return getDialogBorder().getClickToOpenBehavior();
 	}
 	
-	public IBehavior getClickToCloseBehavior() {
+	public Behavior getClickToCloseBehavior() {
 		return getDialogBorder().getClickToCloseBehavior();
 	}
 

@@ -19,13 +19,13 @@
  */
 package org.cast.cwm.data.behavior;
 
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.components.ClassAttributeModifier;
 
 /**
@@ -44,7 +44,7 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 
 	private static final String AUTOSAVE_EVENT = "autosave";
 	
-	public static final ResourceReference AUTOSAVING_JAVASCRIPT = new ResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
+	public static final PackageResourceReference AUTOSAVING_JAVASCRIPT = new PackageResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
 
 	/**
 	 * Constructor - attach to a component INSIDE the form.
@@ -86,25 +86,27 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	@Override
 	protected final void onSubmit(AjaxRequestTarget target) {
 		
-		if (Boolean.valueOf(RequestCycle.get().getRequest().getParameter("autosave"))) {	
+		if (RequestCycle.get().getRequest().getRequestParameters().getParameterValue("autosave").toBoolean()) {	
 			onAutoSave(target);
 		} else {
 			throw new IllegalStateException("Autosaving request expected parameter autosave='true'");
 		}
 		
 	}
+	
+	
 	@Override
 	public void renderHead(final IHeaderResponse response) {
 		super.renderHead(response);
 		
 		// Run once to initialize
-		response.renderJavascriptReference(AUTOSAVING_JAVASCRIPT);
-		response.renderJavascript("AutoSaver.setup(" + updateInterval + ");", "AjaxAutoSavingBehaviorSetup");
+		response.renderJavaScriptReference(AUTOSAVING_JAVASCRIPT);
+		response.renderJavaScript("AutoSaver.setup(" + updateInterval + ");", "AjaxAutoSavingBehaviorSetup");
 		
-		response.renderOnDomReadyJavascript("AutoSaver.makeLinksSafe();");
+		response.renderOnDomReadyJavaScript("AutoSaver.makeLinksSafe();");
 
 		// Run each time to register this Form's default values and call-back URL with the AutoSaver
-		response.renderOnDomReadyJavascript("AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');");		
+		response.renderOnDomReadyJavaScript("AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');");		
 	}
 
 	/**

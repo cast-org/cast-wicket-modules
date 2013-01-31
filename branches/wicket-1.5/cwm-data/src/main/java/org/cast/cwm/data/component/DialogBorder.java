@@ -187,14 +187,14 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * Create and add the overall container for the dialog.
 	 */
 	protected void addContentContainer() {
-		add (contentContainer = new WebMarkupContainer("contentContainer") {
+		addToBorder (contentContainer = new WebMarkupContainer("contentContainer") {
 		    private static final long serialVersionUID = 1L;
 			@Override
 		    protected void onComponentTag(ComponentTag tag) {
 		    	super.onComponentTag(tag);
 		    	tag.put("style", "display:none;" + (zIndex == null ? "" : "z-index: " + zIndex.toString()));
 		    }
-		});		
+		});
 	}
 	
 	/**
@@ -263,7 +263,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 					add(DialogBorder.this.getClickToCloseBehavior());
 			}
 		};
-		add(overlay);
+		addToBorder(overlay);
 		overlay.setOutputMarkupId(true);
 	}
 	

@@ -22,11 +22,10 @@ package org.cast.cwm.data.component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.wicket.Request;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -36,13 +35,14 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.MultiFileUploadField;
-import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.IMultipartWebRequest;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.upload.FileItem;
-
 
 /**
  * This is a re-creation of {@link MultiFileUploadField}.  It references a similar javascript
@@ -92,8 +92,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 	private static final String MAGIC_SEPARATOR = "_mf_";
 
 
-	private static final ResourceReference JS = new JavascriptResourceReference(
-		MultipleFileUploadField.class, "MultipleFileUploadField.js");
+	private static final ResourceReference JS = new PackageResourceReference(MultipleFileUploadField.class, "MultipleFileUploadField.js");
 
 	private final WebComponent upload;
 	private final WebMarkupContainer container;
@@ -205,7 +204,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 	public void renderHead(IHeaderResponse response)
 	{
 		// initialize the (custom) javascript library
-		response.renderJavascriptReference(JS);
+		response.renderJavaScriptReference(JS);
 		
 		StringBuffer js = new StringBuffer();
 		
@@ -227,53 +226,43 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 		js.append(jsVarName + ".addElement(document.getElementById('" + upload.getMarkupId() + "'));");
 
 		// Render
-		response.renderOnDomReadyJavascript(js.toString());
+		response.renderOnDomReadyJavaScript(js.toString());
 	}
 
 	/**
 	 * @see org.apache.wicket.markup.html.form.FormComponent#getInputAsArray()
 	 */
 	@Override
-	public String[] getInputAsArray()
-	{
+	public String[] getInputAsArray() {
 		// fake the input array as if it contained an array of all uploaded file
 		// names
 
-		if (inputArrayCache == null)
-		{
+		if (inputArrayCache == null) {
 			// this array will aggregate all input names
 			ArrayList<String> names = null;
 
-			final Request request = getRequest();
-			if (request instanceof IMultipartWebRequest)
-			{
+			Request request = getRequest();
+			if (request instanceof IMultipartWebRequest) {
 				// retrieve the filename->FileItem map from request
-				final Map<String, FileItem> itemNameToItem = ((IMultipartWebRequest)request).getFiles();
-				Iterator<Entry<String, FileItem>> it = itemNameToItem.entrySet().iterator();
-				while (it.hasNext())
-				{
+				Map<String, List<FileItem>> itemNameToItem = ((IMultipartWebRequest)request).getFiles();
+				Iterator<Entry<String, List<FileItem>>> it = itemNameToItem.entrySet().iterator();
+				while (it.hasNext()) {
 					// iterate over the map and build the list of filenames
-
-					final Entry<String, FileItem> entry = it.next();
-					final String name = entry.getKey();
-					final FileItem item = entry.getValue();
-
-					if (!Strings.isEmpty(name) &&
-						name.startsWith(getInputName() + MAGIC_SEPARATOR) &&
-						!Strings.isEmpty(item.getName()))
-					{
-
-						// make sure the fileitem belongs to this component and
-						// is not empty
-
-						names = (names != null) ? names : new ArrayList<String>();
-						names.add(name);
+					Entry<String, List<FileItem>> entry = it.next();
+					String name = entry.getKey();
+					for (FileItem item : entry.getValue()) {
+						if (!Strings.isEmpty(name) &&
+								name.startsWith(getInputName() + MAGIC_SEPARATOR) &&
+								!Strings.isEmpty(item.getName()))
+						{
+							// make sure the fileitem belongs to this component and is not empty
+							names = (names != null) ? names : new ArrayList<String>();
+							names.add(name);
+						}
 					}
 				}
 			}
-
-			if (names != null)
-			{
+			if (names != null) {
 				inputArrayCache = names.toArray(new String[names.size()]);
 			}
 		}
@@ -288,25 +277,18 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 	protected Collection<FileUpload> convertValue(String[] value) throws ConversionException
 	{
 		// convert the array of filenames into a collection of FileItems
-
 		Collection<FileUpload> uploads = null;
+		String[] filenames = getInputAsArray();
 
-		final String[] filenames = getInputAsArray();
-
-		if (filenames != null)
-		{
-			final IMultipartWebRequest request = (IMultipartWebRequest)getRequest();
-
+		if (filenames != null) {
+			IMultipartWebRequest request = (IMultipartWebRequest)getRequest();
 			uploads = new ArrayList<FileUpload>(filenames.length);
-
-			for (int i = 0; i < filenames.length; i++)
-			{
-				uploads.add(new FileUpload(request.getFile(filenames[i])));
+			for (int i = 0; i < filenames.length; i++) {
+				for (FileItem item : request.getFile(filenames[i]))
+					uploads.add(new FileUpload(item));
 			}
 		}
-
 		return uploads;
-
 	}
 
 	/**

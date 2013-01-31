@@ -70,7 +70,7 @@ implements IAjaxIndicatorAware, IHeaderContributor {
 	}
 	
 	public void renderHead(final IHeaderResponse response) {
-		response.renderJavascriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	
 	/**

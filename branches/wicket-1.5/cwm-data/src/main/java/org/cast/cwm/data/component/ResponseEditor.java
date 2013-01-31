@@ -33,9 +33,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.IRequestTarget;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
@@ -64,6 +61,9 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.protocol.http.RequestUtils;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
@@ -325,7 +325,7 @@ public abstract class ResponseEditor extends Panel {
 						super.renderHead(response);
 						// Ensure TinyMCE saves to form before we check to see if the form changed.
 						if (useWysiwyg)
-							response.renderJavascript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
+							response.renderJavaScript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
 					}
 
 					@Override
@@ -494,7 +494,7 @@ public abstract class ResponseEditor extends Panel {
 				if (templateURL != null) {
 					defaultTableUrl = getUrlFromString(templateURL);
 				} else { //new response with no authored default
-					String defaultTableUrlString = RequestCycle.get().urlFor(new ResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json")).toString();
+					String defaultTableUrlString = RequestCycle.get().urlFor(new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json")).toString();
 					defaultTableUrl = getUrlFromString(defaultTableUrlString);
 				}
 				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
@@ -528,7 +528,7 @@ public abstract class ResponseEditor extends Panel {
 						// Autosave will then submit the form to store the text area back to the db
 						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-						response.renderJavascript(script, "interactiveAutosave-" + textAreaMarkupId);					
+						response.renderJavaScript(script, "interactiveAutosave-" + textAreaMarkupId);					
 					}
 
 					@Override
@@ -864,7 +864,7 @@ public abstract class ResponseEditor extends Panel {
 							"AutoSaver.addOnBeforeSaveCallBack(function() { " +
 							"   $('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString()));" +
 							"});";
-						response.renderJavascript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
+						response.renderJavaScript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
 					}
 
 					@Override
