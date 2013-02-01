@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -20,8 +20,8 @@
 package org.cast.cwm.components;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.behavior.AttributeAppender;
 
 /**
  * The opposite of {@link AttributeAppender}. Adds the given value 

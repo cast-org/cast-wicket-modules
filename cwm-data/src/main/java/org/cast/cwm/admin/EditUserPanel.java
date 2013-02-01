@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,6 +26,7 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.databinder.auth.components.RSAPasswordTextField;
 import net.databinder.auth.valid.EqualPasswordConvertedInputValidator;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
@@ -37,7 +38,6 @@ import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -257,8 +257,8 @@ public class EditUserPanel extends Panel {
 
 		private static final long serialVersionUID = 1L;
 		
-		private PasswordTextField password; // For later conversion
-		private PasswordTextField verifyPassword; // For validation
+		private RSAPasswordTextField password; // For later conversion
+		private RSAPasswordTextField verifyPassword; // For validation
 
 		/**
 		 * Constructor.  Used for creating a new user.
@@ -341,7 +341,7 @@ public class EditUserPanel extends Panel {
 			add(emailContainer);
 			
 			// Primary Password (actually persisted and required or not)
-			password = new PasswordTextField("password", new Model<String>(null));
+			password = new RSAPasswordTextField("password", new Model<String>(null), this);
 			password.add(StringValidator.lengthBetween(4, 32));
 			password.add(new PatternValidator("[\\w!@#$%^&*()=_+\\\\.,;:/-]+"));
 			password.setRequired(getModelObject().isTransient());
@@ -351,7 +351,7 @@ public class EditUserPanel extends Panel {
 			add(passwordContainer);
 			
 			// Verification Password (no validation requirements other than to be equal to password)
-			verifyPassword = new PasswordTextField("verifyPassword", new Model<String>(null));
+			verifyPassword = new RSAPasswordTextField("verifyPassword", new Model<String>(null), this);
 			verifyPassword.setRequired(false); // Does not need an additional error message.
 			
 			// Compensate for Stupid Databinder
@@ -370,7 +370,6 @@ public class EditUserPanel extends Panel {
 
 				private static final long serialVersionUID = 1L;
 				
-				@Override
 				public Object getDisplayValue(Period object) {
 					return "<strong>" + object.getName() + "</strong>" + " (Site: " + object.getSite().getName() + ")";
 				}

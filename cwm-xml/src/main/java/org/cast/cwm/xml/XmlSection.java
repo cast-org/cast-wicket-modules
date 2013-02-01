@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -258,7 +258,6 @@ public class XmlSection implements IXmlPointer, Serializable, Comparable<XmlSect
 		return list;
 	}
 
-	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer("[");
 		sb.append(id);

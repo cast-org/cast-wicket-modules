@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,8 +21,8 @@ package org.cast.cwm.service;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -74,13 +74,49 @@ public class EmailService {
 	 * @param recipient
 	 * @param subject
 	 * @param body
+	 * @param mailFromAddress
+	 * @param substitutionVariables
+	 */
+	public void sendMail (String recipient, String subject, String body, String mailFromAddress, Map<String,String> substitutionVariables) {
+		
+		sendMail(recipient, subject, body, mailFromAddress, null,
+				substitutionVariables);
+		
+	}
+
+	/**
+	 * Send a message with the provided fields.  Simple string substitution will be done on 
+	 * the body and subject.
+	 * 
+	 * @param recipient
+	 * @param subject
+	 * @param body
 	 * @param replyToUser
 	 * @param substitutionVariables
 	 */
 	public void sendMail (String recipient, String subject, String body, IModel<User> replyToUser, Map<String,String> substitutionVariables) {
 		
+		sendMail(recipient, subject, body, CwmApplication.get().getMailFromAddress(), replyToUser,
+				substitutionVariables);
+		
+	}
+
+	/**
+	 * Send a message with the provided fields.  Simple string substitution will be done on 
+	 * the body and subject.
+	 * 
+	 * @param recipient
+	 * @param subject
+	 * @param body
+	 * @param mailFromAddress
+	 * @param replyToUser
+	 * @param substitutionVariables
+	 */
+	public void sendMail(String recipient, String subject, String body,
+			String mailFromAddress, IModel<User> replyToUser,
+			Map<String, String> substitutionVariables) {
 		EmailMessage message = new EmailMessage();
-		message.setFrom(CwmApplication.get().getMailFromAddress());
+		message.setFrom(mailFromAddress);
 		message.setTo(recipient);		
 		message.setSubject(substituteVars(subject, substitutionVariables));
 		message.setBody(substituteVars(body, substitutionVariables));
@@ -88,7 +124,6 @@ public class EmailService {
 		if (replyToUser != null && replyToUser.getObject() != null)
 			message.setReplyTo(replyToUser.getObject().getEmail());
 		sendMail(message);
-		
 	}
 	
 	/**
@@ -156,7 +191,6 @@ public class EmailService {
 		private String subject;
 		private String body;
 		
-		@Override
 		public String toString() {
 			return "[Email " + (replyTo!=null ? replyTo : from) + "->" + to + " (" + subject + ")]";
 		}

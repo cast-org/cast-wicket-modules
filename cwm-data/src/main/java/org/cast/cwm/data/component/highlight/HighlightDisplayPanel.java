@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,7 +27,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.ComponentTag;
@@ -42,8 +41,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.string.UrlUtils;
+import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.User;
@@ -103,16 +102,13 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		
 		private static final long serialVersionUID = 1L;
 		
-		@Inject
-		protected IResponseTypeRegistry typeRegistry;
-
-	@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked")
 		public HighlightDisplayForm(String id, IModel<Response> model) {
 			super(id, model);
 			
 			// If there are no existing highlights, create new Response
 			if (getModelObject() == null)
-				setModel(responseService.newResponse(mUser, typeRegistry.getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
+				setModel(responseService.newResponse(mUser, CwmApplication.get().getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
 			
 			highlights = HighlightService.get().decodeHighlights(model.getObject() == null ? "" : model.getObject().getResponseData().getText());
 			
@@ -167,31 +163,18 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		// FIXME: this is dependent on the named CSS file being supplied by the application in the expected location.
 		// Either a default CSS should be supplied in this package, or a better mechanism devised to have application supply it.
 		response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
-		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js"));
-		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "new-highlight.js"));
+		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "highlight.js"));
 		
-		response.renderOnDomReadyJavascript(getHighlighterInitScript()); 
+		// Initialize the javascript
+		StringBuffer colorArray = new StringBuffer("var colors = new Array(");
+		for (HighlightType type : HighlightService.get().getHighlighters())
+			colorArray.append("'" + type.getColor() + "',");
+		colorArray.deleteCharAt(colorArray.length() - 1); // Remove final comma
+		colorArray.append(");");
+		response.renderJavascript(colorArray.toString(), "colorArray");
+		response.renderOnDomReadyJavascript("initHighlighterTool(" + readOnly + ");");
 	}
 
-	private String getHighlighterInitScript() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("$().CAST_Highlighter({colors:[");
-		sb.append(getColors());
-		sb.append("], readonly: ");
-		sb.append(readOnly);
-		sb.append("});");
-		return sb.toString();
-	}
-
-	private String getColors() {
-		List<HighlightType> highlighters = HighlightService.get().getHighlighters();
-		List<String> colors = new ArrayList<String>();
-		for (HighlightType h: highlighters)
-			colors.add("'" + h.getColor() + "'");
-		return StringUtils.join(colors, ",");
-	}
-
-	
 	/**
 	 * A hidden field that knows what color highlight it is displaying.
 	 * 

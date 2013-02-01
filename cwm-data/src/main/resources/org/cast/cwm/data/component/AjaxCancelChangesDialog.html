@@ -1,21 +1,15 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
   <div wicket:id="dialogBorder">
 	<div class="warning">
-    	<p><wicket:message key="cancelQuestion">Are you sure you want cancel the changes you just made?</wicket:message></p>
+    	<p>Are you sure you want cancel the changes you just made?</p>
     </div>
 
     <div class="actions">
         <div class="actionsLeft">
-            <a wicket:id="cancelLink" href="javascript:void(0);" class="button standard">
-            	<wicket:message key="cancelYes">Yes, Cancel.</wicket:message>
-            </a>
-            <a wicket:id="noCancelLink" href="javascript:void(0);" class="button standard">
-            	<wicket:message key="cancelNo">>No, Don't Cancel</wicket:message>
-            </a>
+            <a wicket:id="cancelLink" href="javascript:void(0);" class="button standard">Yes, Cancel.</a>
+            <a wicket:id="noCancelLink" href="javascript:void(0);" class="button standard">No, Don't Cancel</a>
     	</div>
     </div>
   </div>
 </wicket:panel>
-</html>
+

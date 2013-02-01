@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -188,7 +188,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 		
 		// If this jarName is not listed as a shared resource, add it as one.
 		if (sr.get(DeployJava.class, jarName, null, null, false) == null) {
-			ServletContext sc = WebApplication.get().getServletContext();
+			ServletContext sc = ((WebApplication)WebApplication.get()).getServletContext();
 			String path = "/WEB-INF/lib";
 			File jar = findMatchingFile(new Folder(sc.getRealPath(path)), jarName);
 			if (jar == null) {

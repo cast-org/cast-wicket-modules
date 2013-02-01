@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -30,6 +30,7 @@ import org.apache.wicket.devutils.inspector.InspectorPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Role;
@@ -79,13 +80,13 @@ public class AdminHome extends AdminPage {
 			list.add(new BookmarkablePageLink<Page>("link", SessionListPage.class).add(new Label("label", "Open login sessions")));
 			list.add(new BookmarkablePageLink<Page>("link", InspectorPage.class).add(new Label("label", "Wicket Inspector Page")));
 			// Can't just use a bookmarkable page link for data browser, since it's only bookmarkable in development mode
-//			list.add(new Link<Void>("link") {
-//				private static final long serialVersionUID = 1L;
-//				@Override
-//				public void onClick() {
-//					setResponsePage(new net.databinder.components.hib.DataBrowser<Void>(true));					
-//				}
-//			}.add(new Label("label", "Data browser")));
+			list.add(new Link<Void>("link") {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public void onClick() {
+					setResponsePage(new net.databinder.components.hib.DataBrowser<Void>(true));					
+				}
+			}.add(new Label("label", "Data browser")));
 		}
 		
 		list.add(new BookmarkablePageLink<Page>("link", EventLog.class).add(new Label("label", "Event Log")));

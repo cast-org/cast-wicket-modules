@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -70,7 +70,6 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 		return null;
 	}
 
-	@Override
 	public void renderHead(IHeaderResponse response) {
 		// setup a global js variable with the callback URL
 		response.renderJavascript("var logJsEventCallbackUrl = '" + this.getCallbackUrl(false) + "';", "logJsEventCallbackUrl");

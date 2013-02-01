@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -390,9 +390,8 @@ public class SiteInfoPage extends AdminPage {
 
 				private static final long serialVersionUID = 1L;
 
-				@Override
 				protected void populateItem(ListItem<String> item) {
-					String value = item.getModelObject();
+					String value = (String) item.getModelObject();
 					item.add(new Label("value", value));
 				}
 			});
@@ -419,7 +418,7 @@ public class SiteInfoPage extends AdminPage {
 
 						@Override
 						protected void populateItem(ListItem<String> item) {
-							String value = item.getModelObject();
+							String value = (String) item.getModelObject();
 							item.add(new Label("value", value));
 						}
 

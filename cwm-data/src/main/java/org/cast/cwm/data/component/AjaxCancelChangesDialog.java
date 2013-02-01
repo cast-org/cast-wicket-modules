@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,7 +26,6 @@ import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.behavior.IBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.ResourceModel;
 
 /**
  * TODO: This is too specific.  See DeletePersistedObjectDialog for comments
@@ -44,7 +43,7 @@ public abstract class AjaxCancelChangesDialog extends Panel {
 	public AjaxCancelChangesDialog(String id) {
 		super(id);
 		
-		add(dialogBorder = new DialogBorder ("dialogBorder", new ResourceModel("cancelDialogTitle")));
+		add(dialogBorder = new DialogBorder ("dialogBorder", "Cancel Changes"));
 		
 		dialogBorder.getBodyContainer().add(new WebMarkupContainer("noCancelLink").add(dialogBorder.getClickToCloseBehavior()));
 		

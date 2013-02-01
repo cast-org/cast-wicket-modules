@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Basic implementation of {@link IEventLogger} that logs events as DEBUG messages
  * in the console.
- *
+ * 
  * @author jbrookover
  *
  */
 public class LoggingEventService implements IEventLogger {
 
 	private final static Logger log = LoggerFactory.getLogger(LoggingEventService.class);
-
+	
 	public Object saveEvent(String type, String detail, String location) {
 		log.debug("Event: {}, {}, {}", Arrays.asList(type, detail, location));
 		return null;

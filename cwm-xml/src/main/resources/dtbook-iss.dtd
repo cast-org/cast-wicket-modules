@@ -50,17 +50,12 @@
 
      The "group" attribute can be used to note an association between
      several responsegroups scattered throughout the content.
-
-     The "share" attribute determines who can see responses; normally
-     only the user who created the response and any associated teachers,
-     but share="class" allows classmates to see each others responses.
 -->
 <!ELEMENT responsegroup (prompt?,annotation?,(response*|select|select1|clozepassage))>
 <!ATTLIST responsegroup id ID #IMPLIED>
 <!ATTLIST responsegroup class CDATA #IMPLIED>
 <!ATTLIST responsegroup title CDATA #IMPLIED>
 <!ATTLIST responsegroup group CDATA #IMPLIED>
-<!ATTLIST responsegroup share (none|class) #IMPLIED>
 <!ATTLIST responsegroup %behaviorAttribute; >
 
 <!-- Prompt is the question to which the user is responding. -->

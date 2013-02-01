@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -172,13 +172,6 @@ public class ResponseService implements IResponseService {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setUserModel(u);
-		return new SortableHibernateProvider<Response>(Response.class, c);
-	}
-	
-	public ISortableDataProvider<Response> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod) {
-		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
-		c.setPromptModel(p);
-		c.setPeriodModel(mPeriod);
 		return new SortableHibernateProvider<Response>(Response.class, c);
 	}
 	

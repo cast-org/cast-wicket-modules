@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -65,6 +65,7 @@ public class TagPanel extends Panel {
 	 */
 	public TagPanel(final String id, final PersistedObject target, ITagLinkBuilder linkBuilder, User s) {
 		super(id);
+		this.setOutputMarkupId(true);
 		this.target = target;
 		this.student = s;
 		add(currentListing = new TaggingsListPanel("current", target, linkBuilder, student));

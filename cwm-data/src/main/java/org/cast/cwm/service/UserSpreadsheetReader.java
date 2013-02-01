@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -34,6 +34,7 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import net.databinder.hib.Databinder;
 
 import org.apache.wicket.injection.web.InjectorHolder;

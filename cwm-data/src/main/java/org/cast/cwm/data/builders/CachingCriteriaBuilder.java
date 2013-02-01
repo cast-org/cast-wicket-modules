@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,9 +19,9 @@
  */
 package org.cast.cwm.data.builders;
 
-import net.databinder.models.hib.CriteriaBuilder;
-
 import org.hibernate.Criteria;
+
+import net.databinder.models.hib.CriteriaBuilder;
 
 /**
  * Convenience class for querying all objects of a certain type, but caching them, too.

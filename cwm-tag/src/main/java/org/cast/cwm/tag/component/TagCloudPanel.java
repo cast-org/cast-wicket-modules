@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -103,14 +103,14 @@ public class TagCloudPanel extends Panel {
 				return new ModelIteratorAdapter(getTagsIterator()) {
 					@Override
 					protected IModel model(Object object) {
-						return new CompoundPropertyModel(object);
+						return new CompoundPropertyModel((TagPlusInt) object);
 					}
 				};
 			}
 
 			@Override
 			protected void populateItem(Item<TagPlusInt> item) {
-				TagPlusInt entry = item.getModelObject();
+				TagPlusInt entry = (TagPlusInt) item.getModelObject();
 				
 				WebMarkupContainer link = getLink("link", entry);
 				item.add(link);
@@ -123,7 +123,6 @@ public class TagCloudPanel extends Panel {
 				
 				item.add(new Label("tagFreq", String.valueOf(entry.getInt())) {
 					private static final long serialVersionUID = 1L;
-					@Override
 					public boolean isVisible() { return listView; }
 				});
 			}
@@ -138,7 +137,6 @@ public class TagCloudPanel extends Panel {
 				listView = false;
 				target.addComponent(TagCloudPanel.this);
 			}
-			@Override
 			public boolean isVisible() {
 				return listView && !hideCloudView;
 			}
@@ -150,7 +148,6 @@ public class TagCloudPanel extends Panel {
 				listView = true;
 				target.addComponent(TagCloudPanel.this);
 			}
-			@Override
 			public boolean isVisible() {
 				return !listView;
 			}
@@ -164,7 +161,6 @@ public class TagCloudPanel extends Panel {
 				sortTagList();
 				target.addComponent(TagCloudPanel.this);
 			}
-			@Override
 			public boolean isVisible() {
 				return sortFreq;
 			}
@@ -177,7 +173,6 @@ public class TagCloudPanel extends Panel {
 				sortTagList();
 				target.addComponent(TagCloudPanel.this);
 			}
-			@Override
 			public boolean isVisible() {
 				return !sortFreq;
 			}

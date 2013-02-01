@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -29,13 +29,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class GuiceInjectedTestApplication<T> extends DummyWebApplication {
-
+	
 	Map<Class<T>, T> injectionMap;
-
+	
 	public GuiceInjectedTestApplication(Map<Class<T>, T> injectionMap) {
 		this.injectionMap = injectionMap;
 	}
-
+	
 	@Override
 	public void init() {
 		super.init();

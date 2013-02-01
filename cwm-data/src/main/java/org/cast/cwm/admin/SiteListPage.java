@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -31,6 +31,7 @@ import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
+import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.SiteService;
 

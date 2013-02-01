@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,14 +26,14 @@ import org.apache.wicket.ResourceReference;
  * An object (typically a Resource) that can be used to locate resources via relative links.
  * This is used eg for XML files that contain links to images.  These relative links can be
  * used to obtain a Resource or ResourceReference for those images.
- *
+ * 
  * @author bgoldowsky
  *
  */
 public interface IRelativeLinkSource {
-
+	
 	public Resource getRelativeResource (String relativePath);
-
+	
 	public ResourceReference getRelativeReference (String relativePath);
 
 }

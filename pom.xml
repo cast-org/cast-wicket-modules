@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.cast.cwm</groupId>
     <artifactId>cwm-parent</artifactId>
     <name>CWM parent project</name>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.4.1</version>
     <packaging>pom</packaging>
     
     <url>http://code.google.com/p/cast-wicket-modules</url>
@@ -33,9 +32,9 @@
     </issueManagement>
     
     <scm>
-        <url>http://code.google.com/p/cast-wicket-modules/source</url>
-        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/trunk</connection>
-        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/trunk</developerConnection>
+        <url>http://code.google.com/p/cast-wicket-modules/source/tags/cwm-parent-1.4.1</url>
+        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.4.1</connection>
+        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.4.1</developerConnection>
     </scm>
     
     <distributionManagement>
@@ -57,8 +56,7 @@
         <module>cwm-search</module>
         <module>cwm-tag</module>
         <module>cwm-xml</module>
-    <module>cwm-db</module>
-  </modules>
+    </modules>
 
     <repositories>
         <repository>
@@ -138,7 +136,7 @@
             <dependency>
                 <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-drawtool</artifactId>
-                <version>1.2.2</version>
+                <version>1.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.cast</groupId>
@@ -232,11 +230,6 @@
                 <artifactId>logback-classic</artifactId>
                 <version>1.0.7</version>
             </dependency>
-    		<dependency>
-    			<groupId>javassist</groupId>
-    			<artifactId>javassist</artifactId>
-    			<version>3.4.GA</version>
-    		</dependency>
             <dependency>
                 <groupId>com.visural</groupId>
                 <artifactId>visural-wicket</artifactId>
@@ -375,11 +368,6 @@
             	<artifactId>mockito-all</artifactId>
             	<version>1.9.0</version>
             </dependency>
-            <dependency>
-            	<groupId>org.cast.cwm</groupId>
-            	<artifactId>cwm-db</artifactId>
-            	<version>${project.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -399,9 +387,6 @@
                 <version>1.9.0</version>
                 <configuration>
                     <header>etc/header.txt</header>
-                    <validHeaders>
-                        <validHeader>etc/databinder-header.txt</validHeader>
-                    </validHeaders>
                     <strictCheck>true</strictCheck>
                     <aggregate>true</aggregate>
                     <includes>
@@ -411,7 +396,7 @@
                         <java>SLASHSTAR_STYLE</java>
                     </mapping>
                     <properties>
-                        <year>${project.inceptionYear}-${copyright.year}</year>
+                        <year>${project.inceptionYear}</year>
                     </properties>
                 </configuration>
                 <executions>
@@ -481,7 +466,6 @@
         <wicket.version>1.4.20</wicket.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
-        <copyright.year>2013</copyright.year>
     </properties>
   
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,12 +27,9 @@ import java.util.Map;
 
 import lombok.Data;
 
-import org.apache.wicket.injection.web.InjectorHolder;
-import org.cast.cwm.IResponseTypeRegistry;
+import org.cast.cwm.CwmApplication;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import com.google.inject.Inject;
 
 /**
  * All the data the application needs to know from the XML to set up a response area.
@@ -55,12 +52,7 @@ public class ResponseMetadata implements Serializable {
 	 */
 	protected Map<String,TypeMetadata> typeMap;
 	
-	@Inject
-	protected IResponseTypeRegistry typeRegistry;
-
 	public ResponseMetadata () {
-		super();
-		InjectorHolder.getInjector().inject(this);
 	}
 	
 	/** 
@@ -68,7 +60,7 @@ public class ResponseMetadata implements Serializable {
 	 * @param elt
 	 */
 	public ResponseMetadata (Element elt) {
-		this();
+		
 		if (!elt.getLocalName().equals("responsegroup"))
 			throw new IllegalArgumentException("ResponseMetadata must be initialized with a responsegroup node");
 		
@@ -166,7 +158,7 @@ public class ResponseMetadata implements Serializable {
 	 * @return the TypeMetadata for the given type
 	 */
 	public TypeMetadata addType (String typeName) {
-		return addType (typeRegistry.getResponseType(typeName));
+		return addType (CwmApplication.get().getResponseType(typeName));
 	}
 	
 	@Data

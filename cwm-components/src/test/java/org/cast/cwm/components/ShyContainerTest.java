@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -125,7 +125,6 @@ public class ShyContainerTest {
 			super(v1, v2);
 		}
 
-		@Override
 		protected void setVisibility(Component component, boolean visibility) {
 			component.setVisible(visibility);
 		}
@@ -138,7 +137,6 @@ public class ShyContainerTest {
 			super(v1, v2);
 		}
 
-		@Override
 		protected void setVisibility(Component component, boolean visibility) {
 			component.setVisibilityAllowed(visibility);
 		}

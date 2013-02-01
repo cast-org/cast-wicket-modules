@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -112,12 +112,12 @@ public interface IResponseService {
 	IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p,
 			IModel<Period> period);
 
-	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p);
+	ISortableDataProvider<Response> getResponseProviderForPrompt(
+			IModel<? extends Prompt> p);
 
-	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u);
+	ISortableDataProvider<Response> getResponseProviderForPrompt(
+			IModel<? extends Prompt> p, IModel<User> u);
 
-	public ISortableDataProvider<Response> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod);
-	
 	/**
 	 * Get the total number of valid responses for the given prompt.
 	 * If a response type is specified, only responses of that type will be counted.

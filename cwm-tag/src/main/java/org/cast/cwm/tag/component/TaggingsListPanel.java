@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -81,7 +81,7 @@ public class TaggingsListPanel extends Panel {
 					@Override
 					protected IModel model(Object object) {
 						return new CompoundPropertyModel(
-								object);
+								(Tagging) object);
 					}
 				};
 			}

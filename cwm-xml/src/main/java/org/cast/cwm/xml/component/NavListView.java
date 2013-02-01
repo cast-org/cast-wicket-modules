@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -61,7 +61,7 @@ public abstract class NavListView extends ChildListView {
 	
 	@Override
 	protected void populateItem(ListItem<XmlSection> item) {
-		XmlSection sec = item.getModelObject();
+		XmlSection sec = (XmlSection) item.getModelObject();
 		item.add( makeLink(sec).add(makeLabel(sec)));
 		String classAttribute = makeAttributeString(item);
 		if (classAttribute != null)
@@ -82,7 +82,7 @@ public abstract class NavListView extends ChildListView {
 		if (item.getIndex() == 0)
 			attString.append("first");
 
-		if (isCurrent(item.getModelObject())) {
+		if (isCurrent((XmlSection) item.getModelObject())) {
 			if (attString.length() > 0)
 				attString.append(" ");
 			attString.append("current");			

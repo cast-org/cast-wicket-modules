@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,6 +26,7 @@ import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.string.UrlUtils;
+import org.cast.cwm.components.ImageUrlCodingStrategy;
 
 /**
  * A simple image component that generates URLs targeted at {@link ImageUrlCodingStrategy} directories.

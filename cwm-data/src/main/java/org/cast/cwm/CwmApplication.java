@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,8 +22,10 @@ package org.cast.cwm;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -70,9 +72,7 @@ import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.data.resource.SvgImageResource;
 import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.service.CwmService;
-import org.cast.cwm.service.CwmSessionService;
 import org.cast.cwm.service.ICwmService;
-import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
@@ -87,7 +87,6 @@ import ch.qos.logback.core.util.StatusPrinter;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import com.google.inject.Scopes;
 
 /** 
  * An abstract Application class that CWM-based apps can extend.
@@ -132,9 +131,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 	
 	@Inject
 	private IEventService eventService;
-	
-	@Inject 
-	private IResponseTypeRegistry responseTypeRegistry;
 	
 	private LoginSessionCloser loginSessionCloser;
 	
@@ -227,12 +223,9 @@ public abstract class CwmApplication extends AuthDataApplication {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		modules.add(new Module() {
 			public void configure(Binder binder) {
-				log.debug("Binding Response Type Registry");
-				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
 				log.debug("Binding CWM Service");
-				binder.bind(ICwmService.class).to(CwmService.class).in(Scopes.SINGLETON);
-				log.debug("Binding CWM Session Service");
-				binder.bind(ICwmSessionService.class).to(CwmSessionService.class).in(Scopes.SINGLETON);
+				// Temporary while we deprecate the singleton get().
+				binder.bind(ICwmService.class).toInstance(CwmService.get());
 			}
 		});
 		return modules;
@@ -322,8 +315,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 		c.addAnnotatedClass(org.cast.cwm.data.Site.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Period.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Initialization.class);
-		c.addAnnotatedClass(org.cast.cwm.data.UserPreferenceBoolean.class);
-		c.addAnnotatedClass(org.cast.cwm.data.UserPreferenceString.class);
 	}
 	
 	public void loadAppProperties() {
@@ -384,78 +375,81 @@ public abstract class CwmApplication extends AuthDataApplication {
 		loginSessionCloser.closeQueue.add(loginSessionId);
 	}
 	
+	// TODO: move these to a separate class, injected via Guice
+	private Map<String,IResponseType> legalResponseTypes = new HashMap<String,IResponseType>();
+	
 	void initResponseTypes() {
 		/**
 		 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
 		 */
-		responseTypeRegistry.registerResponseType("TEXT", new ResponseType("TEXT", "Write")); 
+		legalResponseTypes.put("TEXT", new ResponseType("TEXT", "Write")); 
 
 		/**
 		 * Styled HTML text is stored using {@link ResponseData#setText(String)}.
 		 */
-		responseTypeRegistry.registerResponseType("HTML", new ResponseType("HTML", "Write")); 
+		legalResponseTypes.put("HTML", new ResponseType("HTML", "Write")); 
 		
 		/**
 		 * Binary audio data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
 		 */
-		responseTypeRegistry.registerResponseType("AUDIO", new ResponseType("AUDIO", "Record")); 
+		legalResponseTypes.put("AUDIO", new ResponseType("AUDIO", "Record")); 
 		
 		/**
 		 * SVG markup is stored using {@link ResponseData#setText(String)}
 		 */
-		responseTypeRegistry.registerResponseType("SVG", new ResponseType("SVG", "Draw"));
+		legalResponseTypes.put("SVG", new ResponseType("SVG", "Draw"));
 		
 		/**
 		 * Binary data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
 		 */
-		responseTypeRegistry.registerResponseType("UPLOAD", new ResponseType("UPLOAD", "Upload"));
+		legalResponseTypes.put("UPLOAD", new ResponseType("UPLOAD", "Upload"));
 		
 		/**
 		 * Highlight colors and word indexes are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.  
 		 * For example: "R:1,2,3,5,6,7#Y:22,23,25,26"
 		 */
-		responseTypeRegistry.registerResponseType("HIGHLIGHT", new ResponseType("HIGHLIGHT", "Highlight"));
+		legalResponseTypes.put("HIGHLIGHT", new ResponseType("HIGHLIGHT", "Highlight"));
 		
 		/**
 		 * A response to a cloze-type passage (fill in the missing words).  The actual answers
 		 * are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.
 		 */
-		responseTypeRegistry.registerResponseType("CLOZE", new ResponseType("CLOZE", "Cloze Passage")); 
+		legalResponseTypes.put("CLOZE", new ResponseType("CLOZE", "Cloze Passage")); 
 		
 		/**
 		 * A response to a single-select, multiple choice prompt.  Actual answer stored using {@link ResponseData#setText(String)}.
 		 */
-		responseTypeRegistry.registerResponseType("SINGLE_SELECT", new ResponseType("SINGLE_SELECT", "Multiple Choice"));
+		legalResponseTypes.put("SINGLE_SELECT", new ResponseType("SINGLE_SELECT", "Multiple Choice"));
 		
 		/**
 		 * A rating (e.g. 1-5).  The value is stored using {@link ResponseData#setScore(int)}
 		 */
-		responseTypeRegistry.registerResponseType("STAR_RATING", new ResponseType("STAR_RATING", "Rate"));
+		legalResponseTypes.put("STAR_RATING", new ResponseType("STAR_RATING", "Rate"));
 		
 		/**
 		 * A generic score.  
 		 * 
 		 * TODO: Perhaps this can be used to replace Star Rating and combine Cloze/SingleSelect?
 		 */
-		responseTypeRegistry.registerResponseType("SCORE", new ResponseType("SCORE", "Score"));
+		legalResponseTypes.put("SCORE", new ResponseType("SCORE", "Score"));
 		
 		/**
 		 * Applet markup is stored using {@link ResponseData#setText(String)}
 		 */
-		responseTypeRegistry.registerResponseType("APPLET", new ResponseType("APPLET", "Applet"));
+		legalResponseTypes.put("APPLET", new ResponseType("APPLET", "Applet"));
 
 		/**
 		 * Table markup is stored using {@link ResponseData#setText(String)}
 		 */
-		responseTypeRegistry.registerResponseType("TABLE", new ResponseType("TABLE", "Table"));
-	}
+		legalResponseTypes.put("TABLE", new ResponseType("TABLE", "Table"));
+}
 	
 	public IResponseType getResponseType(String name) {
-		return responseTypeRegistry.getResponseType(name);
+		return legalResponseTypes.get(name);
 	}
 	
 	public Collection<IResponseType> getLegalResposeTypes() {
-		return responseTypeRegistry.getLegalResponseTypes();
+		return legalResponseTypes.values();
 	}
 	
 	

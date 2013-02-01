@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Service class used by highlighting controls and display forms.
+ * Service class used by (future) highlighting controls and display forms.
  * 
  * @author jbrookover
  *
@@ -70,10 +70,9 @@ public class HighlightService {
 	 * 
 	 * 
 	 * @param c the style character, e.g. 'Y' tends to be for the color yellow
-	 * @param isOn true if the highlighter is enabled by the application config
-	 * @param editable true if the highlighter name should be editable by the user
+	 * @param label the name of this highlighter
 	 */
-	public void addHighlighter(Character c, boolean isOn, boolean editable) {
+	public void addHighlighter(Character c, String label, boolean editable) {
 		Character key = Character.toUpperCase(c);
 
 		if (key.equals(Character.valueOf('E')))
@@ -82,7 +81,7 @@ public class HighlightService {
 		if (highlighters.containsKey(key))
 			throw new IllegalArgumentException("The character " + c + " is already being used.");
 		
-		highlighters.put(key, new HighlightType(key, isOn, editable));
+		highlighters.put(key, new HighlightType(key, label, editable));
 	}
 	
 	/**
@@ -171,12 +170,12 @@ public class HighlightService {
 		private static final long serialVersionUID = 1L;
 		
 		private final Character color;
-		private final boolean isOn;
+		private final String defaultLabel;
 		private final boolean editable;
 		
-		public HighlightType (Character color, boolean isOn, boolean editable) {
+		public HighlightType (Character color, String defaultLabel, boolean editable) {
 			this.color = color;
-			this.isOn = isOn;
+			this.defaultLabel = defaultLabel;
 			this.editable = editable;
 		}
 	}

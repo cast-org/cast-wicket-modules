@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -76,7 +76,6 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 		this.readOnly = model!=null && model.isReadOnly();
 	}
 	
-	@Override
 	protected void addJavaDeployer(String wicketId) {
 		super.addJavaDeployer(wicketId);
 
@@ -95,7 +94,6 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 		dj.add(notifyBehavior);
 	}
 	
-	@Override
 	protected void addButtons() {
 		super.addButtons();
 		WebMarkupContainer record = new WebMarkupContainer("recordButton");
@@ -149,7 +147,6 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 		return l;
 	}
 	
-	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
 		response.renderJavascript("function save_" + getMarkupId() + "() {" +

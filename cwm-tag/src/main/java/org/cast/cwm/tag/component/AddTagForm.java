@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -59,7 +59,7 @@ public class AddTagForm extends Form<Object> {
 
 			@Override
 			protected void onSubmit(AjaxRequestTarget ajaxtarget, Form<?> form) {
-				TagService.get().findTaggingCreate(CwmSession.get().getUser(), targetType, targetId, input.getModelObject());
+				TagService.get().findTaggingCreate(CwmSession.get().getUser(), targetType, targetId, (String)input.getModelObject());
 				input.setModelObject(""); // clear input box
 				ajaxtarget.addComponent(input);
 				MarkupContainer tp = findParent(TagPanel.class);

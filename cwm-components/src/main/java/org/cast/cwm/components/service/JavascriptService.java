@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -37,7 +37,7 @@ public class JavascriptService {
 	
 	private boolean useCDN = true;
 	
-	private String defaultJQueryVersion = "1.8.3"; 
+	private String defaultJQueryVersion = "1.6.4"; 
 	
 	private ResourceReference currentRR = null;
 	

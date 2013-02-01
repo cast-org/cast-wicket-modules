@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,11 +21,12 @@ package org.cast.cwm.data.builders;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.CriteriaBuilder;
 
 import org.apache.wicket.model.IDetachable;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+
+import net.databinder.models.hib.CriteriaBuilder;
 
 /**
  * A simple CriteriaBuilder that locates a Prompt by its identifier.

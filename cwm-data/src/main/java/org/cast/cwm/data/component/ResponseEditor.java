@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -347,7 +347,7 @@ public abstract class ResponseEditor extends Panel {
 					onSave(target);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
-					mOriginalResponse = getModel();
+					mOriginalResponse = (IModel<Response>) getModel();
 				}
 				
 				@Override
@@ -563,7 +563,7 @@ public abstract class ResponseEditor extends Panel {
 					onSave(target);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
-					mOriginalResponse = getModel();
+					mOriginalResponse = (IModel<Response>) getModel();
 				}
 				
 				@Override

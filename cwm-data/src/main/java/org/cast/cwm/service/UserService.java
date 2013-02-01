@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -76,7 +76,7 @@ public class UserService {
 	protected static UserService instance = new UserService();
 	
 	public static UserService get() {
-		return instance;
+		return (UserService)instance;
 	}
 
 	public static void setInstance(UserService instance) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -41,6 +41,23 @@ public class CwmService implements ICwmService {
 
 	private static final Logger log = LoggerFactory.getLogger(CwmService.class);
 	
+	protected static CwmService instance = new CwmService();
+
+	/**
+	 * @deprecated  This service is now Guice-injected.
+	 * 
+	 * Use the @Inject annotation on a field to have it injected in a Wicket Component or
+	 * call InjectorHolder.getInjector().inject(this) from a constructor to have it
+	 * injected in something that's not a Wicket Component.
+	 * 
+	 * After all calls to this are removed, we'll make this service stop being a singleton.
+	 * 
+	 */
+	@Deprecated
+	public static CwmService get() {
+		return instance;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#confirmDatastoreModel(org.apache.wicket.model.IModel)
 	 */

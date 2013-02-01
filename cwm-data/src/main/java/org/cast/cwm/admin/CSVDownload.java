@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -70,7 +70,6 @@ class CSVDownload extends WebResource {
 	/**
 	 * @see org.apache.wicket.markup.html.WebResource#setHeaders(org.apache.wicket.protocol.http.WebResponse)
 	 */
-	@Override
 	protected void setHeaders(WebResponse response)
 	{
 		super.setHeaders(response);

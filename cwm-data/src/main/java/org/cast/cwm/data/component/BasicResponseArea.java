@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,8 +35,8 @@ import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.datetime.PatternDateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
+import org.apache.wicket.datetime.PatternDateConverter;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -47,15 +47,19 @@ import org.apache.wicket.markup.repeater.RefreshingView;
 import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
+import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.models.ResponseModel;
 import org.cast.cwm.service.IResponseService;
+import org.cast.cwm.service.ResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 import wicket.contrib.tinymce.settings.AutoResizePlugin;
 import wicket.contrib.tinymce.settings.Button;
@@ -64,8 +68,6 @@ import wicket.contrib.tinymce.settings.TinyMCESettings.Align;
 import wicket.contrib.tinymce.settings.TinyMCESettings.Location;
 import wicket.contrib.tinymce.settings.TinyMCESettings.Theme;
 import wicket.contrib.tinymce.settings.TinyMCESettings.Toolbar;
-
-import com.google.inject.Inject;
 
 /**
  * A basic panel that provides a location to create responses to a prompt and
@@ -133,9 +135,6 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	@Inject
 	protected IResponseService responseService;
 
-	@Inject
-	protected IResponseTypeRegistry typeRegistry;
-
 	public BasicResponseArea(String id, IModel<? extends Prompt> model) {
 		this(id, model, false);
 	}
@@ -184,10 +183,11 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		add(controlPanel);
 		
 		// Links for creating a new response
-		controlPanel.add(new NewResponseLink("xmlText", typeRegistry.getResponseType("HTML")));
-		controlPanel.add(new NewResponseLink("audio", typeRegistry.getResponseType("AUDIO")));
-		controlPanel.add(new NewResponseLink("upload", typeRegistry.getResponseType("UPLOAD")));
-		controlPanel.add(new NewResponseLink("draw", typeRegistry.getResponseType("SVG")));
+		CwmApplication app = CwmApplication.get();
+		controlPanel.add(new NewResponseLink("xmlText", app.getResponseType("HTML")));
+		controlPanel.add(new NewResponseLink("audio", app.getResponseType("AUDIO")));
+		controlPanel.add(new NewResponseLink("upload", app.getResponseType("UPLOAD")));
+		controlPanel.add(new NewResponseLink("draw", app.getResponseType("SVG")));
 				
 		// Placeholder for a new response editor
 		add(new WebMarkupContainer(NEW_RESPONSE_ID).setOutputMarkupPlaceholderTag(true).setVisible(false));
@@ -436,7 +436,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	}
 	
 	public BasicResponseArea setAllDisabled() {
-		for(IResponseType type : typeRegistry.getLegalResponseTypes()) {
+		for(IResponseType type : CwmApplication.get().getLegalResposeTypes()) {
 			disabled.add(type);
 		}
 		return this;

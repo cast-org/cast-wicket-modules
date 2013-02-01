@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 CAST, Inc.
+ * Copyright 2011 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,11 @@
  */
 package org.cast.cwm.admin;
 
+import net.databinder.auth.components.RSAPasswordTextField;
+
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentLabel;
-import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -57,7 +58,7 @@ public class SignInFormPanel extends Panel {
 	private static final Logger log = LoggerFactory.getLogger(SignInForm.class);
 	
 	private RequiredTextField<String> username;
-	private PasswordTextField password;
+	private RSAPasswordTextField password;
 	
 	@Inject
 	private IEventService eventService;
@@ -77,7 +78,7 @@ public class SignInFormPanel extends Panel {
 			add(new FeedbackPanel("feedback", new ContainerFeedbackMessageFilter(this)));
 			
 			add((new FeedbackBorder("usernameBorder")).add(username = new RequiredTextField<String>("username", new Model<String>())));
-			add((new FeedbackBorder("passwordBorder")).add(password = new PasswordTextField("password", new Model<String>())));
+			add((new FeedbackBorder("passwordBorder")).add(password = new RSAPasswordTextField("password", new Model<String>(), this)));
 			
 			add(new FormComponentLabel("usernameLabel", username));
 			add(new FormComponentLabel("passwordLabel", password));
