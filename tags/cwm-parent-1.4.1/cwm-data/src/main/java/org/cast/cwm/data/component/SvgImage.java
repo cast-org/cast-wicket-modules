@@ -1,0 +1,83 @@
+/*
+ * Copyright 2011 CAST, Inc.
+ *
+ * This file is part of the CAST Wicket Modules:
+ * see <http://code.google.com/p/cast-wicket-modules>.
+ *
+ * The CAST Wicket Modules are free software: you can redistribute and/or
+ * modify them under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The CAST Wicket Modules are distributed in the hope that they will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.cast.cwm.data.component;
+
+import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.model.IModel;
+import org.cast.cwm.data.Response;
+import org.cast.cwm.data.resource.SvgImageResource;
+import org.cast.cwm.drawtool.SvgEditor;
+
+/**
+ * Display an SVG Image.  This must be attached to an iFrame since most browsers don't 
+ * like to mix SVG and HTML.
+ * 
+ * @author jbrookover
+ *
+ */
+public class SvgImage extends WebMarkupContainer {
+
+	private static final long serialVersionUID = 1L;	
+	
+	private String imageUrl;
+	private int width = SvgEditor.CANVAS_WIDTH;
+	private int height = SvgEditor.CANVAS_HEIGHT;
+	private Integer maxWidth;
+	private Integer maxHeight;
+		
+	public SvgImage(String id, IModel<? extends Response> model, Integer maxWidth, Integer maxHeight) {
+		super(id, model);
+		this.maxWidth = maxWidth;
+		this.maxHeight = maxHeight;
+	}
+	
+	@Override
+	public void onBeforeRender() {
+		super.onBeforeRender();
+		if (maxWidth != null && width > maxWidth) {
+			float ratio = (float)maxWidth/(float)width;
+			height = Math.round(height * ratio);
+			width = Math.round(width * ratio);
+		}
+		if (maxHeight != null && height > maxHeight) {
+			float ratio = (float)maxHeight/(float)height;
+			height = Math.round(height * ratio);
+			width = Math.round(width * ratio);
+		}
+		
+		Response response = (Response)getDefaultModel().getObject();
+		if (response.getText() != null)
+			imageUrl = SvgImageResource.constructUrl(response.getResponseData(), width, height);
+	}
+	
+	@Override
+	protected final void onComponentTag(final ComponentTag tag) {
+		checkComponentTag(tag, "iframe");
+		if (imageUrl != null)
+			tag.put("src", imageUrl);
+		tag.put("style", "background:#FFFFFF");
+		tag.put("width", width);
+		tag.put("height", height);
+		tag.put("title", "Image Container");
+		super.onComponentTag(tag);
+	}
+	
+}
