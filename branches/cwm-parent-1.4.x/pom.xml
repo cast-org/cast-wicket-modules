@@ -4,7 +4,7 @@
     <groupId>org.cast.cwm</groupId>
     <artifactId>cwm-parent</artifactId>
     <name>CWM parent project</name>
-    <version>1.4.1</version>
+    <version>1.4.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     
     <url>http://code.google.com/p/cast-wicket-modules</url>
@@ -32,9 +32,9 @@
     </issueManagement>
     
     <scm>
-        <url>http://code.google.com/p/cast-wicket-modules/source/tags/cwm-parent-1.4.1</url>
-        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.4.1</connection>
-        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.4.1</developerConnection>
+        <url>http://code.google.com/p/cast-wicket-modules/source/tags/cwm-parent-1.4</url>
+        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-1.4</connection>
+        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/branches/cwm-parent-1.4.x</developerConnection>
     </scm>
     
     <distributionManagement>
