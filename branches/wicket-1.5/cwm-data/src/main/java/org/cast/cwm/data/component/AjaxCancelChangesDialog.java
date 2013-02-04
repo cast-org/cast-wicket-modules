@@ -26,6 +26,7 @@ import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.ResourceModel;
 
 /**
  * TODO: This is too specific.  See DeletePersistedObjectDialog for comments
@@ -43,7 +44,7 @@ public abstract class AjaxCancelChangesDialog extends Panel {
 	public AjaxCancelChangesDialog(String id) {
 		super(id);
 		
-		add(dialogBorder = new DialogBorder ("dialogBorder", "Cancel Changes"));
+		add(dialogBorder = new DialogBorder ("dialogBorder", new ResourceModel("cancelDialogTitle")));
 		
 		dialogBorder.getBodyContainer().add(new WebMarkupContainer("noCancelLink").add(dialogBorder.getClickToCloseBehavior()));
 		
