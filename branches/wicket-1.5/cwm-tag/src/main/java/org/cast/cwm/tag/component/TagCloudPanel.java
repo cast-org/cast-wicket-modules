@@ -23,11 +23,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -37,6 +36,7 @@ import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
@@ -92,7 +92,7 @@ public class TagCloudPanel extends Panel {
 		
 		WebMarkupContainer container = new WebMarkupContainer("container");
 		add(container);
-		container.add(new SimpleAttributeModifier("class", listView ? "tagList" : "tagCloud"));
+		container.add(AttributeModifier.replace("class", listView ? "tagList" : "tagCloud"));
 
 		RefreshingView<TagPlusInt> tagView = new RefreshingView<TagPlusInt>("tagView") {
 			private static final long serialVersionUID = 1L;

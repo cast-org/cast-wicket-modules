@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 
 import net.databinder.hib.Databinder;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.IEventService;
@@ -64,7 +64,7 @@ public class TagService implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public TagService() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	public static TagService get() { 

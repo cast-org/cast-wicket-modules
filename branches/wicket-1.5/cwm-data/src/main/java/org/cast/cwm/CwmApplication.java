@@ -31,8 +31,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import lombok.Getter;
 import net.databinder.DBRequestCycleListener;
 import net.databinder.auth.hib.AuthDataApplication;
-import net.databinder.hib.Databinder;
-import net.databinder.hib.SessionUnit;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
@@ -42,7 +40,6 @@ import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
-import org.apache.wicket.session.ISessionStore;
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.admin.AdminHome;
 import org.cast.cwm.admin.DatabaseStatisticsPage;
@@ -54,7 +51,6 @@ import org.cast.cwm.admin.SiteListPage;
 import org.cast.cwm.admin.UserFormPage;
 import org.cast.cwm.admin.UserListPage;
 import org.cast.cwm.data.IResponseType;
-import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -62,8 +58,6 @@ import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
-import org.cast.cwm.data.resource.SvgImageResource;
-import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.CwmSessionService;
 import org.cast.cwm.service.ICwmService;
@@ -106,7 +100,6 @@ import com.google.inject.Scopes;
  * 
  * @author bgoldowsky
  */
-@SuppressWarnings("deprecation")
 public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Getter
@@ -197,10 +190,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		initResponseTypes();
 		runDatabaseInitializers();
 		configureMountPaths();
-		
-		// Mount Resource Handlers
-		UploadedFileResource.mount(this);
-		SvgImageResource.mount(this);
 		
 		loginSessionCloser = new LoginSessionCloser();
 		loginSessionCloser.start();

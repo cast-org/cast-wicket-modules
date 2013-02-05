@@ -25,8 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.mail.Quota.Resource;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.models.hib.OrderingCriteriaBuilder;
@@ -40,6 +38,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
@@ -103,15 +102,17 @@ public class EventLog extends AdminPage {
 		
 		OrderingCriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
-		IDataColumn[] columns = makeColumns().toArray(new IDataColumn[0]);
-		DataTable<Event> table = new DataTable<Event>("eventtable", columns, eventsprovider, 30);
+		List<IDataColumn> columns = makeColumns();
+		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
+		ArrayList<IColumn<Event>> colList = new ArrayList<IColumn<Event>>(columns);
+		DataTable<Event> table = new DataTable<Event>("eventtable", colList, eventsprovider, 30);
 		table.addTopToolbar(new HeadersToolbar(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
 		add(table);
 
-		Resource download = new CSVDownload(columns, eventsprovider);
+		CSVDownload download = new CSVDownload(columns, eventsprovider);
 		add(new ResourceLink<Object>("downloadLink", download));
 
 	}

@@ -21,8 +21,8 @@ package org.cast.cwm.tag;
 
 import java.io.Serializable;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.tag.model.Tag;
 
 public interface ITagLinkBuilder extends Serializable {

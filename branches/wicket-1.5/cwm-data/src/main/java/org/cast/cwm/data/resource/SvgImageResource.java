@@ -19,15 +19,17 @@
  */
 package org.cast.cwm.data.resource;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.wicket.Application;
 import org.apache.wicket.injection.Injector;
-import org.apache.wicket.markup.html.DynamicWebResource;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
+import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.DynamicImageResource;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.drawtool.SvgEditor;
@@ -44,10 +46,7 @@ import com.google.inject.Inject;
  *
  */
 @Slf4j
-public class SvgImageResource extends DynamicWebResource {
-	
-	public static final String SVG_PATH = "svg";
-	private static boolean mounted = false;
+public class SvgImageResource extends DynamicImageResource {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -57,90 +56,74 @@ public class SvgImageResource extends DynamicWebResource {
 	public SvgImageResource() {
 		super();
 		Injector.get().inject(this);
+		setFormat("svg+xml");
+
+		// TODO: see how this old comment translates into Wicket 1.5:
 		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
 		// date, before the session context has been set up, and this database session can remain unclosed.
 		//setCacheable(true);
 	}
 	
 	@Override
-	protected ResourceState getResourceState() {
-		// Check ID parameter; throw 404 if invalid
-		Long id = getParameters().getAsLong("id");		
-		if (id == null) {
-			log.warn("Invalid SVG request: null id");
-			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Invalid Svg Id");	
-		}
-		ResponseData rd = cwmService.getById(ResponseData.class, id).getObject();
+    protected byte[] getImageData(Attributes attributes) {
+        PageParameters parameters = attributes.getParameters();
+        long id = parameters.get("id").toLong();
+        Integer width = parameters.get("width").toOptionalInteger();
+        Integer height = parameters.get("height").toOptionalInteger();
+		log.debug("Getting SVG data for {} at width {}", id, width);
+        
+        ResponseData rd = cwmService.getById(ResponseData.class, id).getObject();
 		if (rd == null) {
 			log.warn("Invalid SVG request, id {} does not exist", id);
-			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [id=" + id + "]");
+			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [id=" + id + "]");
 		}
+		String svg = rd.getText();
 		
-		Integer width = getParameters().getAsInteger("width", SvgEditor.CANVAS_WIDTH);
-		Integer height = getParameters().getAsInteger("height", SvgEditor.CANVAS_HEIGHT);
+		setLastModifiedTime(Time.valueOf(rd.getCreateDate()));
+        
+        return buildSvgData(svg, width, height);
+	}
+	
+	protected byte[] buildSvgData(String svgBase, Integer width, Integer height) {
+        if (width==null) width=SvgEditor.CANVAS_WIDTH;
+        if (height==null) height=SvgEditor.CANVAS_HEIGHT;
 		boolean needsScaling = (width < SvgEditor.CANVAS_WIDTH || height < SvgEditor.CANVAS_HEIGHT);
 
-		log.debug("Getting SVG data for {} at width {}", id, width);
-		String svg = rd.getText();
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<?xml version='1.0' encoding='UTF-8' ?>");
 		// TODO: Should this be "StartsWith" ?
-		if (svg == null || !svg.contains("<svg")) {
+		if (svgBase == null || !svgBase.contains("<svg")) {
 			buffer.append("<svg width='" + width + "' height='" + height + "' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'><g><title>Blank Image</title></g></svg>");
 		} else {
 			if (needsScaling) {
-				svg = svg.replaceFirst("<svg +width=\"[0-9]*\" +height=\"[0-9]*\"", 
+				svgBase = svgBase.replaceFirst("<svg +width=\"[0-9]*\" +height=\"[0-9]*\"", 
 						"<svg viewBox='0 0 " + SvgEditor.CANVAS_WIDTH + " " + SvgEditor.CANVAS_HEIGHT + "' "
 						+ "width='" + width + "' height='" + height + "' "
 						+ "xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
 			} else {
-				svg = svg.replaceFirst("<svg ", "<svg xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
+				svgBase = svgBase.replaceFirst("<svg ", "<svg xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
 			}
-			buffer.append(svg);
+			buffer.append(svgBase);
 		}
-		
-		return new SvgResourceState(Time.valueOf(rd.getCreateDate()), buffer.toString().getBytes());
-	}
-
-	public static void mount(WebApplication app) {
-		app.getSharedResources().add(SVG_PATH, new SvgImageResource());
-		app.mountSharedResource("/" + SVG_PATH, Application.class.getName() + "/" + SVG_PATH);
-		mounted = true;
+		try {
+			return buffer.toString().getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Character code error");
+		}
 	}
 	
-	public static String constructUrl(ResponseData rd, Integer width, Integer height) {
-		if (!mounted)
-			throw new IllegalStateException("SvgImageResource has not been mounted in the application.");
-		StringBuffer url = new StringBuffer(WebApplication.get().getServletContext().getContextPath() + "/" + SVG_PATH + "/id/" + rd.getId());
-		url.append("?width=" + width + "&height=" + height);
-		return url.toString();
-	}
-	
-	
-	protected class SvgResourceState extends ResourceState {
-		private Time createDate;
-		private byte[] svgData;
+    @Override
+    public boolean equals(Object that) {
+        return that instanceof SvgImageResource;
+    }
 
-		protected SvgResourceState (Time createDate, byte[] svgData) {
-			this.createDate = createDate;
-			this.svgData = svgData;
-		}
-
-		@Override
-		public String getContentType() { 
-			return "image/svg+xml";
-		}
-
-		@Override
-		public byte[] getData() { 
-			return svgData;
-		}
-		
-		@Override
-		public Time lastModifiedTime() { 
-			return createDate;
-		}
-
-	}
+//	public static String constructUrl(ResponseData rd, Integer width, Integer height) {
+//		if (!mounted)
+//			throw new IllegalStateException("SvgImageResource has not been mounted in the application.");
+//		StringBuffer url = new StringBuffer(WebApplication.get().getServletContext().getContextPath() + "/" + SVG_PATH + "/id/" + rd.getId());
+//		url.append("?width=" + width + "&height=" + height);
+//		return url.toString();
+//	}
+//	
 
 }

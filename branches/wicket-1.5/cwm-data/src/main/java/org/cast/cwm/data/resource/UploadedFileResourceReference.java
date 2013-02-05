@@ -17,23 +17,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.behavior;
+package org.cast.cwm.data.resource;
 
-import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
 
 /**
- * A very simple extension of SimpleAttributeModifier that takes an integer
- * and adds it as a 'maxlength' attribute.  A null or negative maxlength
- * is converted to zero.
+ * Mountable reference to the {@link UploadedFileResource} class.
+ * UploadedFileResource expects an id parameter, so mount it like this:
+ * <pre>
+ *     mountResource("/uploads/${id}", new SvgImageResourceReference());
+ * </pre>
  * 
- * @author jbrookover
+ * @author bgoldowsky
  *
  */
-public class MaxLengthAttribute extends AttributeModifier {
+public class UploadedFileResourceReference extends ResourceReference {
 
 	private static final long serialVersionUID = 1L;
 	
-	public MaxLengthAttribute(Integer maxLength) {
-		super("maxlength", (maxLength == null || maxLength < 0) ? "0" : maxLength.toString());
+	public UploadedFileResourceReference() {
+		// These arguments create a key that should be unique
+		super(UploadedFileResourceReference.class, "file");
 	}
+
+	@Override
+	public IResource getResource() {
+		return new UploadedFileResource();
+	}
+
 }

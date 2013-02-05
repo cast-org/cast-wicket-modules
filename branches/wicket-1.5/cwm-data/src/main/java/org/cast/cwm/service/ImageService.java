@@ -32,7 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.mail.Quota.Resource;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -44,6 +43,7 @@ import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
@@ -308,11 +308,10 @@ public class ImageService {
 		
 		public ScaledImageResource(ScaledImageKey lookupKey) {
 			this.lookupKey = lookupKey;
-			setCacheable(true);
 		}
 
 		@Override
-		protected byte[] getImageData() {
+		protected byte[] getImageData(Attributes attributes) {
 			ScaledImage image = ImageService.get().getScaledImage(lookupKey);
 			setFormat(image.getType() == null ? "jpg" : image.getType());
 			setLastModifiedTime(image.getLastModified());
@@ -322,6 +321,7 @@ public class ImageService {
 		public BufferedImage getBufferedImage() {
 			return ImageService.get().getScaledImage(lookupKey).getImage();
 		}
+
 	}
 	
 	public static class ScaledImageResourceReference extends ResourceReference {
@@ -335,7 +335,7 @@ public class ImageService {
 		}
 		
 		@Override
-		protected Resource newResource() {
+		public IResource getResource() {
 			return new ScaledImageResource(lookupKey);
 		}	
 	}

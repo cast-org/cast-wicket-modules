@@ -28,8 +28,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -41,7 +39,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.util.string.UrlUtils;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.data.Prompt;
@@ -56,7 +56,9 @@ import com.google.inject.Inject;
 
 /**
  * A panel that outputs several hidden input fields for each registered highlighter.  These
- * forms are updated via javascript and saved automatically, if applicable
+ * forms are updated via javascript and saved automatically, if applicable.
+ * 
+ * NOTE: CSS for the field is not supplied by this component.
  * 
  * @author jbrookover
  *
@@ -136,17 +138,15 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 			final List<Character> colors = new ArrayList<Character>();
 			final List<String> highlightsToSave = new ArrayList<String>();
 			
-			HighlightDisplayForm.this.visitChildren(HiddenHighlightField.class, new IVisitor<HiddenHighlightField>() {
+			HighlightDisplayForm.this.visitChildren(HiddenHighlightField.class, new IVisitor<HiddenHighlightField,Void>() {
 
-				public Object component(HiddenHighlightField component) {
+				public void component(HiddenHighlightField component, IVisit<Void> visit) {
 					String s = component.getModelObject();
 					if (s != null &&! s.isEmpty()) {
 						colors.add(component.getColorCode().getObject());
 						highlightsToSave.add(s);
 					}
-					return CONTINUE_TRAVERSAL;
 				}
-				
 			});
 						
 			String encodedString = HighlightService.get().encodeHighlights(colors, highlightsToSave);
@@ -164,13 +164,13 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	}
 	
 	public void renderHead(IHeaderResponse response) {
-		// FIXME: this is dependent on the named CSS file being supplied by the application in the expected location.
-		// Either a default CSS should be supplied in this package, or a better mechanism devised to have application supply it.
-		response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
-		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js"));
-		response.renderJavascriptReference(new ResourceReference(HighlightDisplayPanel.class, "new-highlight.js"));
+		// FIXME: used to refer to, but not supply, a CSS file.  That's not really helpful.
+		// Caller should supply any necessary CSS.
+		// response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
+		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js"));
+		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "new-highlight.js"));
 		
-		response.renderOnDomReadyJavascript(getHighlighterInitScript()); 
+		response.renderOnDomReadyJavaScript(getHighlighterInitScript()); 
 	}
 
 	private String getHighlighterInitScript() {

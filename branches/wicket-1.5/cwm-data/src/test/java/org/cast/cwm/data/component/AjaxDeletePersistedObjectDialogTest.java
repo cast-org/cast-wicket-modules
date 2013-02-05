@@ -20,24 +20,30 @@
 package org.cast.cwm.data.component;
 
 import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
 import lombok.Getter;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.data.Response;
+import org.cast.cwm.test.CwmWicketTester;
 import org.junit.Before;
 import org.junit.Test;
 
 public class AjaxDeletePersistedObjectDialogTest {
 
-	private WicketTester tester;
+	private CwmWicketTester tester;
 
 	@Before
 	public void setUp() {
-		tester = new WicketTester();
+		tester = new CwmWicketTester();
 	}
 	
 	@Test
@@ -52,23 +58,22 @@ public class AjaxDeletePersistedObjectDialogTest {
 	@Test
 	public void canDelete() {
 		tester.startComponentInPage(getResponseDeletingDialog());
-		tester.debugComponentTrees();
+		//tester.debugComponentTrees();
 		tester.assertComponent("dialog:dialogBorder:contentContainer", WebMarkupContainer.class);
 		tester.clickLink("dialog:dialogBorder:contentContainer:dialogBorder_body:deleteLink");
 		assertEquals("Delete should have been called", 1,
 				((TestDeletePersistedObjectDialog) tester.getComponentFromLastRenderedPage("dialog")).getDeleteCount());
 	}
 
-// TODO proper test for this?  cancel is not a Link
-//	@Test
-//	public void doesNotDeleteIfCanceled() {
-//		tester.startComponentInPage(getResponseDeletingDialog());
-//		tester.debugComponentTrees();
-//		tester.assertComponent("dialog:dialogBorder:contentContainer", WebMarkupContainer.class);
-//		tester.clickLink("dialog:dialogBorder:contentContainer:dialogBorder_body:cancelLink");
-//		assertEquals("Delete should not have been called", 0,
-//				((TestDeletePersistedObjectDialog) tester.getComponentFromLastRenderedPage("dialog")).getDeleteCount());
-//	}
+	
+	public void cancelLinkHasProperBehavior() {
+		tester.startComponentInPage(getResponseDeletingDialog());
+		tester.assertComponent("dialog:dialogBorder:contentContainer:dialogBorder_body:cancelLink", WebMarkupContainer.class);
+		Component cancel = tester.getComponentFromLastRenderedPage("dialog:dialogBorder:contentContainer:dialogBorder_body:cancelLink");
+		List<? extends Behavior> behaviors = cancel.getBehaviors();
+		assertEquals("Should only have one behavior", 1, behaviors.size());
+		// TODO - the Behavior should be replaced by an AttributeModifier for easier testing.
+	}
 	
 	private AjaxDeletePersistedObjectDialog<Response> getResponseDeletingDialog() {
 		return new TestDeletePersistedObjectDialog("dialog", getResponseModelToDelete());

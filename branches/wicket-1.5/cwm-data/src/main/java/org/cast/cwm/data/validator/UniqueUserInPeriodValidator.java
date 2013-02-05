@@ -22,12 +22,13 @@ package org.cast.cwm.data.validator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.Component.IVisitor;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.UserService;
@@ -73,14 +74,13 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 	 */
 	public static TextField<String> findFieldInForm(Form<?> form, final String wicketId) {
 		final List<TextField<String>> list = new ArrayList<TextField<String>>();
-		form.visitChildren(TextField.class, new IVisitor<TextField<String>>() {
+		form.visitChildren(TextField.class, new IVisitor<TextField<String>,Void>() {
 
-			public Object component(TextField<String> component) {
+			public void component(TextField<String> component, IVisit<Void> visit) {
 				if (component.getId().equals(wicketId)) {
 					list.add(component);
-					return IVisitor.STOP_TRAVERSAL;
+					visit.stop();
 				}
-				return IVisitor.CONTINUE_TRAVERSAL;
 			}
 			
 		});

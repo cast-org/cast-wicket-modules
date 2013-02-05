@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data.behavior;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.markup.ComponentTag;
@@ -96,8 +97,8 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	
 	
 	@Override
-	public void renderHead(final IHeaderResponse response) {
-		super.renderHead(response);
+	public void renderHead(Component component, final IHeaderResponse response) {
+		super.renderHead(component, response);
 		
 		// Run once to initialize
 		response.renderJavaScriptReference(AUTOSAVING_JAVASCRIPT);

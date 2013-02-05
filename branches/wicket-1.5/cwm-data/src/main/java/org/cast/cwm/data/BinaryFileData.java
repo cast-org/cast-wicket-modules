@@ -34,10 +34,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import org.apache.wicket.Application;
-import org.apache.wicket.request.resource.ResourceReference;
-import org.apache.wicket.util.time.Time;
-import org.cast.cwm.data.resource.UploadedFileResource;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;

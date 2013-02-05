@@ -21,7 +21,9 @@ package org.cast.cwm.data.behavior;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
+import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.http.WebResponse;
 
 public class ChromeFrameUtils {
 
@@ -32,10 +34,9 @@ public class ChromeFrameUtils {
 	 * This will only use Chrome Frame for that page; IE will regain control if you leave the page.
 	 */
 	public static void useChromeFrame() {
-		// FIXME - best way to set headers?
-		// maybe this: RequestCycle.get().getResponse().getContainerResponse();
-		
-		((WebRequestCycle)WebRequestCycle.get()).getWebResponse().setHeader("X-UA-Compatible", "chrome=1");
+		Response response = RequestCycle.get().getResponse();
+		if (response instanceof WebResponse)
+			((WebResponse)response).setHeader("X-UA-Compatible", "chrome=1");
 	}
 
 	/**

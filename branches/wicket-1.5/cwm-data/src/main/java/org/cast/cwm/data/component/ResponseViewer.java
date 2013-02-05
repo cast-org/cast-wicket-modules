@@ -19,8 +19,6 @@
  */
 package org.cast.cwm.data.component;
 
-import java.io.PrintStream;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,9 +35,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
 import org.cast.cwm.data.IResponseType;
@@ -47,8 +45,6 @@ import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.service.ImageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A simple panel for viewing a response.
@@ -59,7 +55,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ResponseViewer extends Panel {
 
-	private static final Logger log = LoggerFactory.getLogger(ResponseViewer.class);
 	private static final long serialVersionUID = 1L;
 	
 	@Getter
@@ -174,29 +169,6 @@ public class ResponseViewer extends Panel {
 			return (loadBehavior.getCallbackUrl());				
 		}
 
-		// this behavior enables the data stored in the database to be streamed via a url
-		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
-			private static final long serialVersionUID = 1L;
-
-			public void onRequest() {
-				RequestCycle.get().setRequestTarget(new IRequestTarget() {
-
-					public void detach(RequestCycle requestCycle) { }
-					public void respond(RequestCycle requestCycle) {
-						try {
-							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
-							ps.print(getModel().getObject().getText());
-							ps.flush();
-							ps.close();
-						}
-						catch(Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-		}
-		
 		@Override
 		public void onBeforeRender() {
 			tableUrl = getDataUrl();
@@ -215,6 +187,24 @@ public class ResponseViewer extends Panel {
 			// once the text for the grid is available in the hidden text field make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
 			response.renderOnDomReadyJavaScript(jsString);			
+		}
+	}
+
+	
+	// this behavior enables the data stored in the database to be streamed via a url
+	class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
+		private static final long serialVersionUID = 1L;
+
+		public void onRequest() {
+			getRequestCycle().scheduleRequestHandlerAfterCurrent(
+					new ResourceStreamRequestHandler(
+							new AbstractStringResourceStream() {
+								private static final long serialVersionUID = 1L;
+								@Override
+								protected String getString() {
+									return getModel().getObject().getText();
+								}
+							}));
 		}
 	}
 
