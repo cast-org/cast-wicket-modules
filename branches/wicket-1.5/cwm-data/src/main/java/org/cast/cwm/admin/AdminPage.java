@@ -30,6 +30,9 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.CwmApplication;
+import org.wicketstuff.jslibraries.JSLib;
+import org.wicketstuff.jslibraries.Library;
+import org.wicketstuff.jslibraries.VersionDescriptor;
 
 /**
  * Base for all Admin Pages.
@@ -52,6 +55,7 @@ public abstract class AdminPage extends WebPage implements IHeaderContributor {
 	}
 
 	public void renderHead(IHeaderResponse response) {
+		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatest(Library.JQUERY)).renderHead(response);
 		response.renderCSSReference(admincss);
 	}
 	

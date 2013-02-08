@@ -25,6 +25,7 @@ import java.util.Properties;
 import net.databinder.models.hib.HibernateListModel;
 
 import org.apache.wicket.injection.Injector;
+import org.cast.cwm.AppConfiguration;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
@@ -63,7 +64,7 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 		return false;
 	}
 
-	public boolean run(Properties appProperties) {
+	public boolean run(AppConfiguration appProperties) {
 		boolean changesMade = false;
 		Date now = new Date();
 		long expiryTime = now.getTime() - CwmApplication.get().getSessionTimeout()*1000;

@@ -45,9 +45,12 @@ public class DatabaseStatisticsPage extends AdminPage {
 			add(new Label("qcmiss", String.valueOf(stats.getQueryCacheMissCount())));
 		} else {
 			stats.setStatisticsEnabled(true);
-			add (new Label("count", "--"));
-			add (new Label("worst", "--"));
-			add (new Label("worsttime", "--"));
+			add(new Label("count",     "--"));
+			add(new Label("cloads",    "--"));
+			add(new Label("worst",     "--"));
+			add(new Label("worsttime", "--"));
+			add(new Label("qchit",     "--"));
+			add(new Label("qcmiss",    "--"));
 		}
 		stats.clear();
 		

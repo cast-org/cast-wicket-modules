@@ -19,11 +19,10 @@
  */
 package org.cast.cwm.data.init;
 
-import java.util.Properties;
-
 import net.databinder.hib.Databinder;
 
 import org.apache.wicket.util.string.Strings;
+import org.cast.cwm.AppConfiguration;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.UserService;
@@ -56,7 +55,7 @@ public class CreateAdminUser implements IDatabaseInitializer {
 		return false;
 	}
 
-	public boolean run(Properties props) {
+	public boolean run(AppConfiguration props) {
 		String username = props.getProperty("cwm.adminUsername");
 		if (Strings.isEmpty(username))
 			username = DEFAULT_ADMIN_USERNAME;

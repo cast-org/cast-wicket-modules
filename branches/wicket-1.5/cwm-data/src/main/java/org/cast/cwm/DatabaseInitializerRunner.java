@@ -20,7 +20,6 @@
 package org.cast.cwm;
 
 import java.util.List;
-import java.util.Properties;
 
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
@@ -37,13 +36,13 @@ class DatabaseInitializerRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(CwmApplication.class);
 
-	private Properties appProperties;
+	private AppConfiguration appProperties;
 
 	@Inject
 	private ICwmService cwmService;
 
-	DatabaseInitializerRunner(Properties appProperties) {
-		this.appProperties = appProperties;
+	DatabaseInitializerRunner(AppConfiguration configuration) {
+		this.appProperties = configuration;
 		Injector.get().inject(this);
 	}
 	

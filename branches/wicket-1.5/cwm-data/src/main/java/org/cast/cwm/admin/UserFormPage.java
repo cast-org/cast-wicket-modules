@@ -21,6 +21,7 @@ package org.cast.cwm.admin;
 
 import net.databinder.models.hib.HibernateObjectModel;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -111,7 +112,7 @@ public class UserFormPage extends AdminPage {
 			period.add(new BookmarkablePageLink<Void>("link", PeriodInfoPage.class)
 					.setParameter("periodId", periodModel.getObject().getId())
 					.add(new Label("label", periodModel.getObject().getName())));
-			period.add(new SimpleAttributeModifier("class", "addSeparator"));
+			period.add(AttributeModifier.replace("class", "addSeparator"));
 
 		// Breadcrumb link back to List of Users
 		}  else {

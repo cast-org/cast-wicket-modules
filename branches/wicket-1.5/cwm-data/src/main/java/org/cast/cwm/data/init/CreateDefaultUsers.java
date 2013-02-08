@@ -21,9 +21,10 @@ package org.cast.cwm.data.init;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Properties;
+import java.io.IOException;
 
 import org.apache.wicket.util.string.Strings;
+import org.cast.cwm.AppConfiguration;
 import org.cast.cwm.service.UserSpreadsheetReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 		return true;
 	}
 
-	public boolean run(Properties appProperties) {
+	public boolean run(AppConfiguration appProperties) {
 		String userSpreadsheet = appProperties.getProperty("cwm.defaultUserFile");
 		if (userSpreadsheet != null) {
 			log.debug("Reading {}", userSpreadsheet);
@@ -58,6 +59,7 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 				UserSpreadsheetReader usr = new UserSpreadsheetReader();
 				if (usr.readInput(file)) {
 					usr.save();
+					file.close();
 					return true;
 				} else {
 					log.error("User spreadsheet contained errors: {}", usr.getGlobalError());
@@ -69,6 +71,8 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 				}
 			} catch (FileNotFoundException e) {
 				log.error("cwm.defaultUserFile not found: {}", userSpreadsheet);
+			} catch (IOException e) {
+				throw new RuntimeException("I/O Exception while reading file: {}", e);
 			}
 		}
 		return false;

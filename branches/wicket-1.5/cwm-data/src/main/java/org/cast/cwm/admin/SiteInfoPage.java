@@ -50,7 +50,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.Files;
 import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.lang.Bytes;
@@ -87,7 +86,7 @@ public class SiteInfoPage extends AdminPage {
 		super(param);
 
 		// Current Site
-		Long siteId = param.get("siteId").toLongObject();
+		Long siteId = param.get("siteId").toOptionalLong();
 		mSite = SiteService.get().getSiteById(siteId); // May create a Transient Instance
 		if (siteId != null && mSite.getObject() == null)
 			throw new RestartResponseAtInterceptPageException(SiteListPage.class);
@@ -117,9 +116,10 @@ public class SiteInfoPage extends AdminPage {
 
 			@Override
 			protected void populateItem(ListItem<Period> item) {
-				item.add(new BookmarkablePageLink<Void>("periodLink", PeriodInfoPage.class)
-						.setParameter("periodId", item.getModelObject().getId())
-						.add(new Label("name", item.getModelObject().getName())));
+				BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("periodLink", PeriodInfoPage.class);
+				link.getPageParameters().add("periodId", item.getModelObject().getId());
+				item.add(link);
+				link.add(new Label("name", item.getModelObject().getName()));
 
 				DeletePersistedObjectDialog<Period> dialog = new DeletePersistedObjectDialog<Period>("deletePeriodModal", item.getModel()) {
 
@@ -139,7 +139,7 @@ public class SiteInfoPage extends AdminPage {
 		// Link to create a new Period
 		BookmarkablePageLink<Void> createNewPeriod = new BookmarkablePageLink<Void>("createNewPeriod", PeriodInfoPage.class);
 		if (siteId != null)
-			createNewPeriod.setParameter("siteId", siteId);
+			createNewPeriod.getPageParameters().add("siteId", siteId);
 		createNewPeriod.setVisible(!mSite.getObject().isTransient()); // For Enclosure Visibility
 		add(createNewPeriod);
 
@@ -428,7 +428,7 @@ public class SiteInfoPage extends AdminPage {
 
 					});
 					if (!pe.getError().matches("")) {
-						item.add(new AttributeAppender("style", true, new Model<String>("color:red"), ";"));
+						item.add(new AttributeAppender("style", new Model<String>("color:red"), ";"));
 					}
 				}
 			});

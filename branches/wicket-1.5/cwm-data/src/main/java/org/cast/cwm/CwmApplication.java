@@ -19,12 +19,10 @@
  */
 package org.cast.cwm;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -103,13 +101,14 @@ import com.google.inject.Scopes;
 public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Getter
-	protected Properties appProperties;
+	protected AppConfiguration configuration;
 	
 	@Getter 
 	protected String appInstanceId;
 
 	@Getter 
-	protected int sessionTimeout = 90*60; // Session timeout, in seconds.  Defaults to 90 minutes
+	protected int sessionTimeout; // Session timeout, in seconds.  
+	protected final int DEFAULT_SESSION_TIMEOUT = 90*60; // Defaults to 90 minutes
 	
 	@Getter 
 	private String mailHost;
@@ -133,13 +132,12 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		log.debug("Starting CWM Application Internal Init");
 		log.debug("Application Class is " + getClass().getName());
 		
-		if(appProperties == null) {
-			loadAppProperties();		
-		}
+		loadAppProperties();
 
 		// If using Logback as the logger, and we have a logConfig property,
 		// then read that configuration.
-		String logConfig = appProperties.getProperty("cwm.logConfig");
+		// TODO make the configuration optional
+		File logConfig = configuration.getFile("cwm.logConfig");
 	    if (logConfig != null
 	    		&& LoggerFactory.getILoggerFactory() instanceof LoggerContext) { 
 			log.info("Log Configuration: {}", logConfig);
@@ -158,11 +156,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	    }
 	    
 	    loadServices();
-
 		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getInjectionModuleArray()));
-	    Injector.get().inject(this);
 
-	    super.internalInit();
+		super.internalInit();
 	}
 
 	/**
@@ -179,11 +175,12 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		log.debug("Starting CWM Application Init");
 		super.init();
 		
+	    Injector.get().inject(this);
 		
 		getRequestCycleListeners().add(new DBRequestCycleListener());
 		
-		mailHost   = appProperties.getProperty("cwm.mailHost");
-		mailFromAddress = appProperties.getProperty("cwm.mailFromAddress");
+		mailHost   = configuration.getProperty("cwm.mailHost");
+		mailFromAddress = configuration.getProperty("cwm.mailFromAddress");
 		
 		getDebugSettings().setOutputMarkupContainerClassName(true);		
 
@@ -258,7 +255,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 * Execute database initialization objects given by {@link #getDatabaseInitializers()}.
 	 */
 	private void runDatabaseInitializers () {
-		new DatabaseInitializerRunner(appProperties).run(getDatabaseInitializers());
+		new DatabaseInitializerRunner(configuration).run(getDatabaseInitializers());
 	}
 
 // TODO: can't override session store any more - how to get this functionality back?
@@ -293,11 +290,11 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		// We don't actually want the defaults that Databinder sets.
 		// super.configureHibernate(ac);
 		
-		String configFile = appProperties.getProperty("cwm.hibernateConfig");
+		File configFile = configuration.getFile("cwm.hibernateConfig");
 		if (configFile == null)
 			throw new RuntimeException ("Hibernate config file must be specified with cwm.hibernateConfig property.");
 		
-		c.configure(new File(configFile));
+		c.configure(configFile);
 
 		c.addAnnotatedClass(org.cast.cwm.data.Event.class);
 		c.addAnnotatedClass(org.cast.cwm.data.BinaryFileData.class);
@@ -314,32 +311,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	}
 	
 	public void loadAppProperties() {
-		appProperties = new Properties();
-		String propPath = getServletContext().getInitParameter("propertiesFile");
-		if(propPath == null)
-			throw new RuntimeException("No configuration properties file path set");
-		log.info("Loading App Properties from {}", propPath);
-		try {
-			appProperties.load(new FileInputStream(propPath));
-		} catch(Exception e) {
-			throw new RuntimeException("Error configuring application", e);
-		}
-		appInstanceId = appProperties.getProperty("cwm.instanceId");
-		
-		// Look up sessionTimeout value
-		String stString = appProperties.getProperty("cwm.sessionTimeout", "0");
-		try {
-			int st = Integer.valueOf(stString);
-			if (st > 0)
-				sessionTimeout = st;
-			else if (st == 0)
-				log.debug("SessionTimeout not specified, defaulting to {}", sessionTimeout);
-			else {
-				log.warn("SesstionTimeout invalid: {}", stString);
-			}
-		} catch (NumberFormatException e) {
-			log.error("SessionTimeout invalid, must be an integer number of seconds: {}", stString);
-		}
+		configuration = AppConfiguration.loadFor(this);
+		appInstanceId = configuration.getString("cwm.instanceId", "unknown");
+		sessionTimeout = configuration.getInteger("cwm.sessionTimeout", DEFAULT_SESSION_TIMEOUT);
 	}
 	
 	@Override
