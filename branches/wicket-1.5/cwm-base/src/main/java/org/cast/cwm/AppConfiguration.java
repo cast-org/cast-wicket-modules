@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author bgoldowsky
  *
  */
-public class AppConfiguration {
+public class AppConfiguration implements IAppConfiguration {
 	
 	String baseDirectory;
 	Properties properties;
@@ -51,7 +51,7 @@ public class AppConfiguration {
 	 * @param filePath file to load
 	 * @return the resulting AppConfiguration
 	 */
-	public static AppConfiguration loadFor (WebApplication app) {
+	public static IAppConfiguration loadFor (WebApplication app) {
 		String propPath = app.getServletContext().getInitParameter("propertiesFile");
 		if(propPath == null)
 			throw new RuntimeException("No configuration properties file path set");
@@ -66,7 +66,7 @@ public class AppConfiguration {
 	 * @param application the WebApplication for which to load configuration information
 	 * @return the resulting AppConfiguration
 	 */
-	public static AppConfiguration loadFrom (String filePath) {
+	public static IAppConfiguration loadFrom (String filePath) {
 		File file = new File(filePath);
 		Properties appProperties = new Properties();
 		try {
@@ -85,23 +85,16 @@ public class AppConfiguration {
 		this.properties = properties;
 	}
 
-	/**
-	 * Basic method to look up and return the configuration value specified in the configuration file.
-	 * @param key name of the configuration property
-	 * @return value as a string
-	 * @throws ConfigurationException if key is not found
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getProperty(java.lang.String)
 	 */
 	public String getProperty (String key) {
 		String value = properties.getProperty(key);
 		return value==null ? null : value.trim();
 	}
 	
-	/**
-	 * Find and return an optional string-valued configuration property.
-	 * If the property is not specified, the given defaultValue is returned instead.
-	 * @param key name of the configuration property
-	 * @param defaultValue value to return if not found
-	 * @return the specified or default value
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getString(java.lang.String, java.lang.String)
 	 */
 	public String getString (String key, String defaultValue) {
 		String value = getProperty(key);
@@ -110,11 +103,8 @@ public class AppConfiguration {
 		return value;
 	}
 
-	/**
-	 * Find and return a required string-valued configuration property.
-	 * If the property is not set, and exception will be thrown.
-	 * @param key name of the configuration property
-	 * @return the specified property value
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getString(java.lang.String)
 	 */
 	public String getString (String key) {
 		String value = getProperty(key);
@@ -123,14 +113,8 @@ public class AppConfiguration {
 		return value;
 	}
 	
-	/**
-	 * Find and return an optional integer-type configuration property.
-	 * If the property is not found, the given defaultValue will be returned instead. 
-	 * @param key name of the configuration property
-	 * @param defaultValue value to return if not found
-	 * @return specified or default value.
-	 * 
-	 * @throws ConfigurationException if the property value can't be converted to an integer
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getInteger(java.lang.String, java.lang.Integer)
 	 */
 	public Integer getInteger (String key, Integer defaultValue) {
 		String value = properties.getProperty(key);
@@ -145,13 +129,8 @@ public class AppConfiguration {
 		}		
 	}
 	
-	/**
-	 * Find and return a required integer-type configuration property.
-	 * If the property is not set, and exception will be thrown.
-	 * @param key name of the configuration property
-	 * @return the specified property value
-	 * 
- 	 * @throws ConfigurationException if the property value can't be converted to an integer
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getInteger(java.lang.String)
 	 */
 	public int getInteger (String key) {
 		Integer value = getInteger(key, null);
@@ -161,13 +140,8 @@ public class AppConfiguration {
 		return value;			
 	}
 	
-	/**
-	 * Return optional property value, which should be a filename, as a File.
-	 * Filenames can either be absolute, or relative to this AppConfiguration's base directory
-	 * (which is generally the directory in which the properties file is located).
-	 * @param key name of the configuration property
-	 * @return value as a File, or null
-	 * @throws ConfigurationException if property value is not a path to a readable file
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getOptionalFile(java.lang.String)
 	 */	
 	public File getOptionalFile (String key) {
 		String fileName = getProperty(key);
@@ -185,13 +159,8 @@ public class AppConfiguration {
 		return file;		
 	}
 	
-	/**
-	 * Return required property value, which should be a filename, as a File.
-	 * Filenames can either be absolute, or relative to this AppConfiguration's base directory
-	 * (which is generally the directory in which the properties file is located).
-	 * @param key name of the configuration property
-	 * @return value as a File
-	 * @throws ConfigurationException if key is not found or is not the path to a readable file.
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getFile(java.lang.String)
 	 */
 	public File getFile (String key) {
 		File file = getOptionalFile(key);

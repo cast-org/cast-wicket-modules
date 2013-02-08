@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.init;
 
-import org.cast.cwm.AppConfiguration;
+import org.cast.cwm.IAppConfiguration;
 
 public interface IDatabaseInitializer {
 	
@@ -44,6 +44,6 @@ public interface IDatabaseInitializer {
 	 * @param appProperties the application properties object, which may provide configuration information to the initializer.
 	 * @returns true if a database change was made
 	 */
-	public boolean run(AppConfiguration appProperties);
+	public boolean run(IAppConfiguration appProperties);
 
 }

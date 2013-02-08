@@ -21,6 +21,7 @@ package org.cast.cwm.admin;
 
 import lombok.Getter;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
@@ -30,9 +31,12 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.CwmApplication;
+import org.cast.cwm.IAppConfiguration;
 import org.wicketstuff.jslibraries.JSLib;
 import org.wicketstuff.jslibraries.Library;
 import org.wicketstuff.jslibraries.VersionDescriptor;
+
+import com.google.inject.Inject;
 
 /**
  * Base for all Admin Pages.
@@ -46,10 +50,16 @@ public abstract class AdminPage extends WebPage implements IHeaderContributor {
 
 	public static final ResourceReference admincss = new PackageResourceReference(AdminPage.class, "admin.css");
 	
-	@Getter protected String pageTitle = CwmApplication.get().getAppAndInstanceId() + " :: Default Page Title";
+	@Getter protected String pageTitle;
+	
+	@Inject
+	IAppConfiguration configuration;
 
 	public AdminPage (final PageParameters parameters) {
 		super(parameters);
+		
+		pageTitle = getDefaultPageTitle();
+		
 		add(new Label("pageTitle", new PropertyModel<String>(this, "pageTitle")));
 		add(new AdminHeaderPanel("header"));
 	}
@@ -59,8 +69,22 @@ public abstract class AdminPage extends WebPage implements IHeaderContributor {
 		response.renderCSSReference(admincss);
 	}
 	
+	protected String getDefaultPageTitle() {
+		return getPageTitleBase() + "Default Page Title";
+	}
+	
+	protected String getPageTitleBase() {
+		StringBuffer t = new StringBuffer();
+		if (Application.get() instanceof CwmApplication) {
+			t.append(CwmApplication.get().getAppId());
+			t.append("/"); 
+		}
+		t.append(configuration.getString("instanceId", "?"));
+		return t.toString();
+	}
+	
 	public void setPageTitle(String pageTitle) {
-		this.pageTitle = CwmApplication.get().getAppAndInstanceId() + " :: " + pageTitle;
+		this.pageTitle = getPageTitleBase() + pageTitle;
 	}
 
 }

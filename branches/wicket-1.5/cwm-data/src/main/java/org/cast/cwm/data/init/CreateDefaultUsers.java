@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.wicket.util.string.Strings;
-import org.cast.cwm.AppConfiguration;
+import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.service.UserSpreadsheetReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 		return true;
 	}
 
-	public boolean run(AppConfiguration appProperties) {
+	public boolean run(IAppConfiguration appProperties) {
 		String userSpreadsheet = appProperties.getProperty("cwm.defaultUserFile");
 		if (userSpreadsheet != null) {
 			log.debug("Reading {}", userSpreadsheet);

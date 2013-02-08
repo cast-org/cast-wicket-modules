@@ -101,7 +101,7 @@ import com.google.inject.Scopes;
 public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Getter
-	protected AppConfiguration configuration;
+	protected IAppConfiguration configuration;
 	
 	@Getter 
 	protected String appInstanceId;
@@ -210,12 +210,11 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		modules.add(new Module() {
 			public void configure(Binder binder) {
-				log.debug("Binding Response Type Registry");
+				log.debug("Binding CWM Services");
 				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
-				log.debug("Binding CWM Service");
 				binder.bind(ICwmService.class).to(CwmService.class).in(Scopes.SINGLETON);
-				log.debug("Binding CWM Session Service");
 				binder.bind(ICwmSessionService.class).to(CwmSessionService.class).in(Scopes.SINGLETON);
+				binder.bind(IAppConfiguration.class).toInstance(configuration);
 			}
 		});
 		return modules;

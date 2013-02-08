@@ -24,8 +24,14 @@ import net.databinder.auth.hib.AuthDataSession;
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.link.Link;
+import org.cast.cwm.service.ICwmSessionService;
+
+import com.google.inject.Inject;
 
 public class LogoutLink extends Link<Page> {
+	
+	@Inject
+	ICwmSessionService cwmSessionService;
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,7 +42,7 @@ public class LogoutLink extends Link<Page> {
 	@Override
 	protected void onConfigure() {
 		super.onConfigure();
-		setVisible (AuthDataSession.get().isSignedIn());
+		setVisible (cwmSessionService.isSignedIn());
 	}
 
 	@Override

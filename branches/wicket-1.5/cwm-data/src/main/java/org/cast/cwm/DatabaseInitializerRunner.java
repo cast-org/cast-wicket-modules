@@ -36,12 +36,12 @@ class DatabaseInitializerRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(CwmApplication.class);
 
-	private AppConfiguration appProperties;
+	private IAppConfiguration appProperties;
 
 	@Inject
 	private ICwmService cwmService;
 
-	DatabaseInitializerRunner(AppConfiguration configuration) {
+	DatabaseInitializerRunner(IAppConfiguration configuration) {
 		this.appProperties = configuration;
 		Injector.get().inject(this);
 	}

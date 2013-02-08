@@ -31,8 +31,10 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.service.ICwmSessionService;
+
+import com.google.inject.Inject;
 
 /**
  * This is the home page for the ADMIN users.
@@ -40,6 +42,9 @@ import org.cast.cwm.data.Role;
  */
 @AuthorizeInstantiation("RESEARCHER")
 public class AdminHome extends AdminPage {
+	
+	@Inject
+	ICwmSessionService cwmSessionService;
 
 	private static final long serialVersionUID = 1L;
 
@@ -74,7 +79,7 @@ public class AdminHome extends AdminPage {
 		LinkedList<Component> list = new LinkedList<Component>(); 
 			
 		// Links for users with full admin rights
-		if (CwmSession.get().getUser().hasRole(Role.ADMIN)) {
+		if (cwmSessionService.getUser().hasRole(Role.ADMIN)) {
 			list.add(new BookmarkablePageLink<Page>("link", UserListPage.class).add(new Label("label", "Create/Edit Users")));
 			list.add(new BookmarkablePageLink<Page>("link", SiteListPage.class).add(new Label("label", "Create/Edit Sites")));
 			list.add(new BookmarkablePageLink<Page>("link", DatabaseStatisticsPage.class).add(new Label("label", "Database Statistics")));
