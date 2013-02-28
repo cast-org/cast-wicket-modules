@@ -90,7 +90,6 @@ public class ResourceDirectory extends AbstractResource {
 
 		String absolutePath = new File(resourceDirectory, name)
 				.getAbsolutePath();
-		log.debug("Sending RR for path={}", absolutePath);
 
 		final ResourceResponse resourceResponse = new ResourceResponse();
 

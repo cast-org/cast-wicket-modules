@@ -17,26 +17,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cwm.db.service;
+package net.databinder.models.hib;
 
-import java.io.Serializable;
-
-import net.databinder.hib.SessionUnit;
-
-import org.hibernate.Session;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
 
 /**
- * An injectable service for interacting with Hibernate and cwm-db classes.
+ * A simple implementation of a CriteriaBuilder that applies some given Restrictions.
+ * 
+ * Example usage:
+ * 
+ * {@code new BasicCriteriaBuilder(Restrictions.eq("name", "bob")) }
  * 
  * @author bgoldowsky
  *
  */
-public interface IDBService {
-	
-	public abstract Session getHibernateSession();
+public class BasicCriteriaBuilder implements CriteriaBuilder {
 
-	public abstract Object ensureHibernateSession(SessionUnit unit);
+	private static final long serialVersionUID = 1L;
 	
-	public abstract Serializable save(Object persistableObject);
+	private Criterion[] requestedCriteria;
+	
+	public BasicCriteriaBuilder(Criterion... criteria) {
+		this.requestedCriteria = criteria;
+	}
+
+	public void build(Criteria query) {
+		for (int i=0; i<requestedCriteria.length; i++)
+			query.add(requestedCriteria[i]);
+	}
 
 }
