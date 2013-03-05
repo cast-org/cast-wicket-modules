@@ -24,36 +24,43 @@ import java.io.Serializable;
 import org.hibernate.proxy.HibernateProxy;
 
 /**
- * <p>
- * A base class that all persisted objects extend.  It
- * provides {@link #equals(Object)} and {@link PersistedObject#hashCode()}
- * methods that use the datastore ID for comparison purposes.  
- * </p>
- * <p>
+ * A base class that persisted objects can extend.  
+ * It provides reasonable implementations of 
+ * {@link #equals(Object)} and {@link #hashCode()} for this type of object,
+ * using the primary key ID for comparison purposes.
+ *
  * It also considers hibernate proxies when comparing class types.
  * 
- * TODO: Shouldn't reference hibernate!
- * </p>
  */
 public abstract class PersistedObject implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
   
+	/**
+	 * Return the primary key ID that will be used for equality comparisons.
+	 * @return the id
+	 */
+	public abstract Long getId();
+
   /**
    * Returns true if this object has not yet been
    * persisted to the datastore.
    * 
    * TODO: Fails if an object is attached to another Persistent
-   * object, but then not saved and held over to another request.
-   * @return
+   * object, but then not saved and held over to another 
+   * @return true if object is transient (not yet persisted)
    */
   public boolean isTransient() {
 	  return getId() == null || getId() == 0;
   }
 
   /**
-   * only returns true if the objects are of the same class and the ids are equal
+   * Equality comparison based on only returns true if the objects are of the same class and the ids are equal.
+   * The class comparison handles the case where one or both of the objects may be Hibernate proxies.
+   * Note that any two distinct transient objects will not be considered equal.
+   * 
    * @param obj - the object to compare against
+   * @return true if equal
    */
   @Override
   public boolean equals(Object obj) {
@@ -65,9 +72,6 @@ public abstract class PersistedObject implements Serializable {
 	  Class<?> otherClass;
 	  Class<?> thisClass;
 	  
-	  
-	  // TODO: Is a reference to Hibernate really necessary?
-	  // Can we just be better about using models?
 	  if (obj instanceof HibernateProxy)
 		  otherClass = ((HibernateProxy) obj).getHibernateLazyInitializer().getPersistentClass();
 	  else
@@ -81,28 +85,29 @@ public abstract class PersistedObject implements Serializable {
 	  
 	  PersistedObject other = (PersistedObject) obj;
 	 
-	  return getId() != null && getId().equals(other.getId());
+	  if (isTransient() || other.isTransient())
+		  return false;
+
+	  return getId().equals(other.getId());
   }
   
   /**
-   * if the object has a valid id that is returned as the hashcode
-   * otherwise uses super.hashCode()
-   * TODO:  This is bad, and not evenly distributed over ints.  BAD HASH!
-   * 
+   * Hash is based on the ID of the object if it has one.
+   * Otherwise, since transient objects will not compare as equal,
+   * we can use the super implementation, {@link Object#hashCode()}.
    */
   @Override
   public int hashCode() {
-    if(getId() != null && !getId().equals(new Long(0)))
-      return getId().intValue();
-    return super.hashCode();
+		Long id = getId();
+		if (id != null && id.longValue() != 0L)
+			return id.hashCode();
+		else
+			return super.hashCode();
   }
-  
-  
+    
   @Override
   public String toString() {
 	  return this.getClass().toString() + "[" + this.getId() + "]";
   }
-  
-  public abstract Long getId();
 
 }
