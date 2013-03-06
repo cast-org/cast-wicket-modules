@@ -29,12 +29,13 @@ import lombok.ToString;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.InputStreamNotFoundException;
 
 @ToString
-public class FileXmlDocumentSource implements IXmlDocumentSource, IRelativeLinkSource {
+public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLinkSource {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -45,11 +46,11 @@ public class FileXmlDocumentSource implements IXmlDocumentSource, IRelativeLinkS
 		file = f;
 	}
 	
-	public InputStream getInputStream () throws ResourceStreamNotFoundException { 
+	public InputStream getInputStream () throws InputStreamNotFoundException { 
 		try {
 			return new FileInputStream(file);
 		} catch (FileNotFoundException e) {
-			throw new ResourceStreamNotFoundException(e); 
+			throw new InputStreamNotFoundException(e); 
 		}
 	}
 

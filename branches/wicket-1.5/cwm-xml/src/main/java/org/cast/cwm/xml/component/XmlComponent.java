@@ -32,15 +32,13 @@ import lombok.Setter;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.behavior.AbstractBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.IMarkupCacheKeyProvider;
 import org.apache.wicket.markup.IMarkupResourceStreamProvider;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.parser.XmlTag;
 import org.apache.wicket.markup.parser.XmlTag.TagType;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
@@ -120,7 +118,8 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 	 * 
 	 */
 	protected void addDynamicComponents() {
-		Element dom = xmlService.getTransformed(getModel(), transformName, transformParameters).getElement();
+		TransformResult transformResult = xmlService.getTransformed(getModel(), transformName, transformParameters);
+		Element dom = transformResult.getElement();
 		NodeList componentNodes = xmlService.getWicketNodes(dom, true);
 		Map<Element,Component> componentMap = new HashMap<Element,Component>(); // Mapping of Nodes to Components; used for nesting
 		final Set<String> wicketIds = new HashSet<String>();
@@ -286,7 +285,7 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 //		}
 //	}
 //	
-	public static class AttributeRemover extends AbstractBehavior {
+	public static class AttributeRemover extends Behavior {
 		
 		private String[] atts;
 

@@ -24,10 +24,10 @@ import java.util.List;
 import javax.xml.namespace.NamespaceContext;
 
 import org.apache.wicket.util.file.File;
+import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.xml.FileXmlDocumentSource;
 import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IDocumentObserver;
-import org.cast.cwm.xml.IXmlDocumentSource;
 import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.TransformResult;
 import org.cast.cwm.xml.XmlDocument;
@@ -126,7 +126,7 @@ public interface IXmlService {
 			List<IDocumentObserver> observers);
 
 	/** 
-	 * Read an XML document from the given Resource.
+	 * Read an XML document from the given source.
 	 * It will be remembered by this service class and can thereafter be referred to by the given name.
 	 *  
 	 * @param name name for this XML document (must be globally unique)
@@ -135,7 +135,7 @@ public interface IXmlService {
 	 * @param observers (optional) list of initial document observers
 	 * @return the XmlDocument
 	 */
-	XmlDocument loadXmlDocument(String name, IXmlDocumentSource xmlSource,
+	XmlDocument loadXmlDocument(String name, IInputStreamProvider xmlSource,
 			XmlParser parser, List<IDocumentObserver> observers);
 
 	/** 
@@ -191,8 +191,8 @@ public interface IXmlService {
 	 * @param dependentDocuments list of other included XSL documents to be checked for updates
 	 * @return the transformer
 	 */
-	IDOMTransformer loadXSLTransformer(String name, IXmlDocumentSource xslSource,
-			boolean forceUniqueWicketIds, IXmlDocumentSource... dependentDocuments);
+	IDOMTransformer loadXSLTransformer(String name, IInputStreamProvider xslSource,
+			boolean forceUniqueWicketIds, IInputStreamProvider... dependentDocuments);
 
 	/**
 	 * Register the provided DOM Transformer under the name provided.

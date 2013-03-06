@@ -36,7 +36,9 @@ import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.resource.AbstractResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.InputStreamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +54,7 @@ import com.xmlmind.davclient.PropertyList;
  * @author bgoldowsky
  *
  */
-public class DavResource extends AbstractResource implements IRelativeLinkSource {
+public class DavResource extends AbstractResource implements IInputStreamProvider, IRelativeLinkSource {
 
 	protected final String clientName;
 	protected final String path;
@@ -88,7 +90,7 @@ public class DavResource extends AbstractResource implements IRelativeLinkSource
 		final ResourceResponse response = new ResourceResponse();
 		
 		// Set last modified time so that response can determine if data needs to be written.
-		response.setLastModified(getLastModified());
+		response.setLastModified(lastModifiedTime());
 		
 		if (response.dataNeedsToBeWritten(attributes)) {
 			DavResourceStream resourceStream = new DavResourceStream();
@@ -129,7 +131,7 @@ public class DavResource extends AbstractResource implements IRelativeLinkSource
 		return DavClientManager.get().getClient(clientName);
 	}
 
-	public Time getLastModified() {
+	public Time lastModifiedTime() {
 		retrieveProperties();
 		return lastModified;
 	}
@@ -139,6 +141,14 @@ public class DavResource extends AbstractResource implements IRelativeLinkSource
 		return fileSize;
 	}
 	
+	public InputStream getInputStream() throws InputStreamNotFoundException {
+		try {
+			return new DavResourceStream().getInputStream();
+		} catch (ResourceStreamNotFoundException e) {
+			throw new InputStreamNotFoundException(e);
+		}
+	}
+
 	/** Return a ResourceReference to a relatively-addressed item
 	 * 
 	 * @param relativePath path relative to the path of this Resource

@@ -29,8 +29,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.injection.Injector;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IInputStreamProvider;
+import org.cast.cwm.InputStreamNotFoundException;
 import org.cast.cwm.xml.parser.XmlParser;
 import org.cast.cwm.xml.service.IXmlService;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	@Getter protected XmlSection tocSection;
 	@Getter protected String documentNamespace;
 
-	@Getter protected IXmlDocumentSource xmlFile;
+	@Getter protected IInputStreamProvider xmlFile;
 	protected XmlParser parser;
 	protected Time lastModified;
 	protected Time lastCheckedTime;
@@ -73,7 +74,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	@Inject
 	private IXmlService xmlService;
 	
-	public XmlDocument(String name, IXmlDocumentSource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
+	public XmlDocument(String name, IInputStreamProvider xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
 		super();
 		Injector.get().inject(this);
 		this.name = name;
@@ -93,7 +94,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 		parser.setDoc(this);
 		try {
 			this.tocSection = parser.parse(this.xmlFile.getInputStream());
-		} catch (ResourceStreamNotFoundException e) {
+		} catch (InputStreamNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		// FIXME put LD processing back in?
