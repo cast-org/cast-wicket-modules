@@ -24,13 +24,23 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
 
 /**
- * ResourceReference for a ResourceDirectory.
- * For example, to make all the files in an "images" directory available under the URL path "img", 
- * you can mount this as follows:
- * <blockquote><code>
- *    mountResource("img/${name}", new ResourceDirectoryReference(themeDirectory, "images"));
- * </code></blockquote>
- * @author borisgoldowsky
+ * Mountable {@link ResourceReference} for a {@link ResourceDirectory}.
+ * 
+ * <p>Examples:</P
+ * 
+ * <ul>
+ * <li><code>mountResource("img", new ResourceDirectoryReference(themeDir));</code><br />
+ * maps {@code http://host/context/img/foo.png} to {@code themeDir/img/foo.png} ; that is,
+ * all files in the "img" directory are available under the "img" top-level URL path.</li>
+ * 
+ * <li><code>mountResource("static", new ResourceDirectoryReference(themeDir, "static"));</code><br />
+ * maps {@code http://host/context/static/foo.png} to {@code themeDir/foo.png} .
+ * This form is useful if your directory name doesn't match the URL you want to mount it on.</li>
+ * </ul>
+ *
+ * @see ResourceDirectory
+ * 
+ * @author bgoldowsky
  *
  */
 public class ResourceDirectoryReference extends ResourceReference {
@@ -38,14 +48,15 @@ public class ResourceDirectoryReference extends ResourceReference {
 	private static final long serialVersionUID = 1L;
 	
 	private final File resourceDirectory;
+	
+	private final String removePrefix;
 
 	/**
 	 * Construct for a given directory.
-	 * @param directory
+	 * @param themeDirectory
 	 */
-	public ResourceDirectoryReference(File directory) {
-		super(directory.getAbsolutePath());  // Use pathname as ResourceReference key
-		resourceDirectory = directory;
+	public ResourceDirectoryReference(File themeDirectory) {
+		this(themeDirectory, "");
 	}
 
 	/**
@@ -54,13 +65,15 @@ public class ResourceDirectoryReference extends ResourceReference {
 	 * @param themeDir base directory within which the resources directory is found
 	 * @param subdirectory name of the subdirectory
 	 */
-	public ResourceDirectoryReference (File themeDir, String subdirectory) {
-		this(new File(themeDir, subdirectory));
+	public ResourceDirectoryReference (File directory, String removePrefix) {
+		super(directory.getAbsolutePath());  // Use pathname as ResourceReference key
+		resourceDirectory = directory;
+		this.removePrefix = removePrefix;
 	}
 	
 	@Override
 	public IResource getResource() {
-		return new ResourceDirectory(resourceDirectory);
+		return new ResourceDirectory(resourceDirectory, removePrefix);
 
 	}
 

@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.PackageResource.PackageResourceBlockedException;
 import org.apache.wicket.util.file.File;
@@ -38,19 +37,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a directory in which all of the files can be used as resources
+ * <p>Represents a directory in which all of the files can be used as resources
  * (eg, images). Which file to send in response to a particular request is based
- * on the "name" parameter. That is, if this is initialized with
- * ThemeFileResource("/path/to", "images"), and then reqested with a "name"
- * parameter of "logo.png", the file delivered to the browser will be
- * "/path/to/images/logo.gif".
+ * on the URL, which is appended to the given resource directory path.
+ * If there is an extra prefix in the URL that should <em>not</em> be used in the
+ * path name, it can be specified as a second argument to the constructor.</p>
  * 
- * The installed PackageResourceGuard will be checked to make sure the file is
- * ok to send.
+ * <p>See {@link ResourceDirectoryReference} for usage examples.</p>
+
+ * <p>The installed PackageResourceGuard will be checked to make sure the file is
+ * ok to send.</p>
  * 
- * Heavily based on the
+ * <p>Heavily based on the
  * {@link org.apache.wicket.request.resource.PackageResource} class, but with
- * different logic to locate the file to send.
+ * different logic to locate the file to send.</p>
  * 
  * @see ResourceDirectoryReference
  * 
@@ -66,6 +66,8 @@ public class ResourceDirectory extends AbstractResource {
 	 * The path to the directory of resources
 	 */
 	private final File resourceDirectory;
+	
+	private final String removePrefix;
 
 	/**
 	 * Construct a with a given directory of resource files.
@@ -73,7 +75,12 @@ public class ResourceDirectory extends AbstractResource {
 	 * @param directory
 	 */
 	public ResourceDirectory(File directory) {
+		this(directory, "");
+	}
+	
+	public ResourceDirectory(File directory, String removePrefix) {
 		this.resourceDirectory = directory;
+		this.removePrefix = removePrefix;
 	}
 
 	/**
@@ -85,10 +92,14 @@ public class ResourceDirectory extends AbstractResource {
 	 */
 	@Override
 	protected ResourceResponse newResourceResponse(Attributes attributes) {
-		PageParameters parameters = attributes.getParameters();
-		String name = parameters.get("name").toString();
-
-		String absolutePath = new File(resourceDirectory, name)
+		String relativePath = attributes.getRequest().getUrl().toString();
+		if (relativePath.startsWith(removePrefix)) {
+			relativePath = relativePath.substring(removePrefix.length());
+		} else {
+			return sendResourceError(relativePath, null,
+					HttpServletResponse.SC_NOT_FOUND, "URL does not start with expected prefix");			
+		}
+		String absolutePath = new File(resourceDirectory, relativePath)
 				.getAbsolutePath();
 
 		final ResourceResponse resourceResponse = new ResourceResponse();
