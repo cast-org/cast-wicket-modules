@@ -39,6 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.cast.cwm.JQueryHeaderContributor;
 import org.cast.cwm.components.ShyLabel;
 import org.cast.cwm.service.IEventService;
 
@@ -388,7 +389,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
     }
 
 	public void renderHead(final IHeaderResponse response) {
-        
+
+		new JQueryHeaderContributor().renderHead(response);
 		response.renderJavaScriptReference(JS_REFERENCE);
         response.renderCSSReference(BLOCKING_CSS_REFERENCE);
 

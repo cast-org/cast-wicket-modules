@@ -27,6 +27,7 @@ import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.JQueryHeaderContributor;
 
 /**
  * An instance of {@link IndicatingAjaxLink} that can disable components during
@@ -54,6 +55,7 @@ public abstract class DisablingIndicatingAjaxLink<T> extends IndicatingAjaxLink<
 	}
 	
 	public void renderHead(final IHeaderResponse response) {
+		new JQueryHeaderContributor().renderHead(response);
 		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	

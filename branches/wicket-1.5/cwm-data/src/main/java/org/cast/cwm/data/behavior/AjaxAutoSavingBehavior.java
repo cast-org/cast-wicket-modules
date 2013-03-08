@@ -27,6 +27,7 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.cast.cwm.JQueryHeaderContributor;
 import org.cast.cwm.components.ClassAttributeModifier;
 
 /**
@@ -98,6 +99,7 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	
 	@Override
 	public void renderHead(Component component, final IHeaderResponse response) {
+		new JQueryHeaderContributor().renderHead(response);
 		super.renderHead(component, response);
 		
 		// Run once to initialize
