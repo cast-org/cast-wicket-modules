@@ -100,6 +100,8 @@ public class ImageService {
 	 * @param maxH
 	 * @param exact if exact, will force the image to be the provided size; gaps filled in with gray
 	 * @return
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 */
 	public BufferedImage resizeToBufferedImage(BufferedImage original, Integer maxW, Integer maxH, boolean exact) {
 
@@ -215,6 +217,7 @@ public class ImageService {
 	 * @param w
 	 * @param h
 	 * @return
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 */
 	public ScaledImage getScaledImage(ScaledImageKey key) {
 		ScaledImage thumb = scaledImageCache.get(key);
@@ -300,7 +303,12 @@ public class ImageService {
 			this.height = h;
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 *
+	 */
 	public static class ScaledImageResource extends DynamicImageResource {
 
 		private static final long serialVersionUID = 1L;
@@ -323,7 +331,11 @@ public class ImageService {
 		}
 
 	}
-	
+
+	/**
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 * 
+	 */
 	public static class ScaledImageResourceReference extends ResourceReference {
 
 		private static final long serialVersionUID = 1L;
@@ -340,6 +352,11 @@ public class ImageService {
 		}	
 	}
 
+	/**
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 *
+	 */
 	public static class ScaledImageComponent extends Image {
 		
 		private static final long serialVersionUID = 1L;
@@ -361,6 +378,12 @@ public class ImageService {
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 *
+	 */
 	@Getter
 	@Setter
 	public static class ScaledImage {

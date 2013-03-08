@@ -36,6 +36,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.cast.audioapplet.component.AudioPlayer;
@@ -44,7 +45,8 @@ import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
-import org.cast.cwm.service.ImageService;
+import org.cast.cwm.data.resource.ThumbnailUploadedImageResourceReference;
+import org.cast.cwm.data.resource.UploadedFileResourceReference;
 
 /**
  * A simple panel for viewing a response.
@@ -261,9 +263,22 @@ public class ResponseViewer extends Panel {
 			
 			//Displayed Image			
 			if (getModel().getObject().getResponseData().getBinaryFileData().getPrimaryType().equals("image")) {
-				Image displayImage = ImageService.get().getScaledImageComponent("imageDisplay", new PropertyModel<Long>(mResponse, "responseData.binaryFileData.id").getObject(), maxWidth, maxHeight);
+				Image displayImage;
+				PageParameters pp = new PageParameters()
+					.add("id", mResponse.getObject().getResponseData().getBinaryFileData().getId());
+				if (maxWidth==null && maxHeight==null) {
+					// no scaling
+					displayImage = new Image("imageDisplay", new UploadedFileResourceReference(), pp);
+				} else {
+					// Thumbnail class just takes a single dimension, so
+					// scale to minimum of maxWidth or maxHeight
+					Integer maxSize = maxWidth;
+					if (maxHeight != null && (maxSize==null || maxHeight < maxSize))
+						maxSize = maxHeight;
+					displayImage = new Image("imageDisplay", new ThumbnailUploadedImageResourceReference(maxSize), pp);
+				}
 				this.replace(displayImage);					
-				super.onBeforeRender();				
+				super.onBeforeRender();
 			}
 			else {
 				EmptyPanel displayImage = new EmptyPanel("imageDisplay");
