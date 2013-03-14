@@ -34,6 +34,7 @@ import lombok.Setter;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
+import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
@@ -289,6 +290,7 @@ public abstract class ResponseEditor extends Panel {
 	protected class TextFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;
+		TextArea<String> textArea;
 		private DropDownChoice<String> choiceList;
 
 		public TextFragment(String id, IModel<Response> model) {
@@ -380,7 +382,7 @@ public abstract class ResponseEditor extends Panel {
 
 			// if you are editing an existing model use that one, otherwise use the new model
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
-			TextArea<String> textArea = new TextArea<String>("message", textModel);
+			textArea = new TextArea<String>("message", textModel);
 			textArea.setEscapeModelStrings(false);
 			if (useWysiwyg) {
 				textArea.add(new TinyMceBehavior(getTinyMCESettings()));
@@ -412,11 +414,29 @@ public abstract class ResponseEditor extends Panel {
 				public void onClick(AjaxRequestTarget target) {
 					onStarterAdded(target);
 				}
+
+				@Override
+				protected IAjaxCallDecorator getAjaxCallDecorator() {
+					return new AjaxCallDecorator() {
+						private static final long serialVersionUID = 1L;
+						public CharSequence decorateScript(Component c, CharSequence script) {
+							// The Javascript to actually add the sentence starter into the text area. 
+							String adder;
+							if (useWysiwyg)
+								adder = String.format("tinyMCE.get('%s').setContent(tinyMCE.get('%s').getContent() + $('#%s').val());",
+										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
+							else
+								adder = String.format("$('#%s').val($('#%s').val() + $('#%s').val());",
+										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
+
+							return adder + script; 
+						}						
+					};
+				}
 			};
 			add(addStarterLink);
 			
 			// add the sentence starter chosen to the text area response
-			addStarterLink.add(new AttributePrepender("onclick", "tinyMCE.get('" + textArea.getMarkupId() + "').setContent(tinyMCE.get('" + textArea.getMarkupId() + "').getContent() + $('#" + choiceList.getMarkupId(true) + "').val());", ";"));
 
 	         // label is linked to the sentence starter dropdown		
 			FormComponentLabel choiceListLabel = (new FormComponentLabel("sentenceStartersLabel", choiceList));

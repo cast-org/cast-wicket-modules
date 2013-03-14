@@ -104,7 +104,7 @@ public class ResponseMetadata implements Serializable {
 			typeMD.fragments = new ArrayList<String>(6);
 			NodeList starters = relt.getElementsByTagNameNS(elt.getNamespaceURI(), "fragment");
 			for (int j=0; j<starters.getLength(); j++)
-				typeMD.fragments.add(starters.item(j).getTextContent().trim());
+				typeMD.fragments.add(normalizeWhitespace(starters.item(j).getTextContent()));
 			
 			// FIXME - remove interactive applet?
 			// determine a way for this to be set to the default response types set by the application  - ldm			
@@ -167,6 +167,15 @@ public class ResponseMetadata implements Serializable {
 	 */
 	public TypeMetadata addType (String typeName) {
 		return addType (typeRegistry.getResponseType(typeName));
+	}
+	
+	/**
+	 * Trim string and collapse any sequences of spaces or other whitespace into just one space.
+	 * This cleans up strings from XML which may have arbitrary whitespace inserted.
+	 * @return the string with cleaned-up whitespace.
+	 */
+	private String normalizeWhitespace (String s) {
+		return s.replaceAll("\\s+", " ").trim();
 	}
 	
 	@Data
