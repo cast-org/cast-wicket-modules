@@ -22,13 +22,12 @@ package org.cast.cwm.data.component;
 import net.databinder.auth.hib.AuthDataSession;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.Page;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.link.StatelessLink;
 import org.cast.cwm.service.ICwmSessionService;
 
 import com.google.inject.Inject;
 
-public class LogoutLink extends Link<Page> {
+public class LogoutLink extends StatelessLink<Void> {
 	
 	@Inject
 	ICwmSessionService cwmSessionService;
