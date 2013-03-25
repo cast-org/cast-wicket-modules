@@ -177,8 +177,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		
 	    Injector.get().inject(this);
 		
-		getRequestCycleListeners().add(new DBRequestCycleListener());
-		
 		mailHost   = configuration.getProperty("cwm.mailHost");
 		mailFromAddress = configuration.getProperty("cwm.mailFromAddress");
 		
