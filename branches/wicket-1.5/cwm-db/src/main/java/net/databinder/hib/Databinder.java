@@ -140,10 +140,12 @@ public class Databinder {
 	 * @see SessionUnit
 	 */
 	public static Object ensureSession(SessionUnit unit, Object key) {
-		dataSessionRequested(key);
+		// See if a Hibernate session is already open; if so, use it.
 		SessionFactory sf = getHibernateSessionFactory(key);
 		if (ManagedSessionContext.hasBind(sf))
 			return unit.run(getHibernateSession(key));
+		
+		// Otherwise, create one and close it afterwards
 		org.hibernate.classic.Session sess = sf.openSession();
 		try {
 			sess.beginTransaction();
