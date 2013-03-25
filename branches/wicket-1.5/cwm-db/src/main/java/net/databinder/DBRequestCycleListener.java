@@ -87,7 +87,7 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 	}
 
 	public void onBeginRequest(RequestCycle cycle) {
-		// no action needed
+		log.debug("onBeginRequest: {}", cycle.getRequest().getUrl());
 	}
 
 	/**
@@ -103,6 +103,7 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 				ManagedSessionContext.unbind(sf);
 			}
 		}
+		log.debug("onEndRequest complete {}", cycle.getRequest().getUrl());
 	}
 
 	public void onDetach(RequestCycle cycle) {
