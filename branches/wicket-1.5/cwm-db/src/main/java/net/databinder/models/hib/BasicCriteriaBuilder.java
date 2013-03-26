@@ -21,6 +21,7 @@ package net.databinder.models.hib;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 
 /**
  * A simple implementation of a CriteriaBuilder that applies some given Restrictions.
@@ -38,13 +39,29 @@ public class BasicCriteriaBuilder implements CriteriaBuilder {
 	
 	private Criterion[] requestedCriteria;
 	
+	private Order requestedOrder = null;
+	
+	/**
+	 * Construct a simple CriteriaBuidler from a list of criteria
+	 * @param criteria
+	 */
 	public BasicCriteriaBuilder(Criterion... criteria) {
+		this.requestedCriteria = criteria;
+	}
+	
+	/**
+	 * Construct from a list of criteria and an ordering instruction. 
+	 */
+	public BasicCriteriaBuilder(Order order, Criterion... criteria) {
+		this.requestedOrder = order;
 		this.requestedCriteria = criteria;
 	}
 
 	public void build(Criteria query) {
 		for (int i=0; i<requestedCriteria.length; i++)
 			query.add(requestedCriteria[i]);
+		if (requestedOrder != null)
+			query.addOrder(requestedOrder);
 	}
 
 }
