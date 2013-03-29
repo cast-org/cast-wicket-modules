@@ -60,7 +60,7 @@ public abstract class BaseGlossaryPanel extends Panel {
 	 * @return the page class for glossary - expected to be implemented in the
 	 * application file
 	 */
-	abstract protected Class<WebPage> getGlossaryPageClass();
+	abstract protected Class<? extends WebPage> getGlossaryPageClass();
 		
 	/**
 	 * Implementer must define this to create and return an XmlComponent for the given
