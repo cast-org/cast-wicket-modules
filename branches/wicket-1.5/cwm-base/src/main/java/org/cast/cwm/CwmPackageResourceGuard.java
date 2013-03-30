@@ -27,6 +27,7 @@ public class CwmPackageResourceGuard extends SecurePackageResourceGuard {
                 super(new SimpleCache(100));
                 addPattern("+*.pdf");
                 addPattern("+**/mediaplayer/skins/**/*.xml");
+                addPattern("+**/mediaplayer/player.swf");
                 addPattern("+*.htm");
                 addPattern("+*.csv");
         }
