@@ -22,13 +22,14 @@ package org.cast.cwm.glossary;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
@@ -82,7 +83,14 @@ public abstract class BaseGlossaryPanel extends Panel {
 	 */
 	public BaseGlossaryPanel (String id, IModel<? extends IGlossaryEntry> mEntry) {
 		super(id, mEntry);
+	}
+	
+	@Override
+	public void onInitialize() {
+		super.onInitialize();
 		
+		@SuppressWarnings("unchecked")
+		IModel<? extends IGlossaryEntry> mEntry = (IModel<? extends IGlossaryEntry>) getDefaultModel();
 		add (newTopNav(mEntry==null ? null : mEntry.getObject()));
 		add (newLeftNav(mEntry==null ? null :mEntry.getObject()));
 		add (newDefinitionContainer(mEntry==null ? null : mEntry.getObject()));
@@ -127,13 +135,13 @@ public abstract class BaseGlossaryPanel extends Panel {
 				if (letter == '#')
 					topli.setVisible(false);
 				else
-					topli.add(new SimpleAttributeModifier("class", "empty"));
+					topli.add(AttributeModifier.replace("class", "empty"));
 			} else if (list.contains(current)) {
-				topli.add(new SimpleAttributeModifier("class", "current"));
+				topli.add(AttributeModifier.replace("class", "current"));
 			}
 			
 			topli.add(new Label("toplink", letter.toString().toUpperCase())
-				.add(new SimpleAttributeModifier("href", "#"+letter))
+				.add(AttributeModifier.replace("href", "#"+letter))
 			);
 		}
 	}
@@ -178,7 +186,7 @@ public abstract class BaseGlossaryPanel extends Panel {
 				this.setVisible(false);
 				return;
 			}
-			add (new WebMarkupContainer("anchor").add(new SimpleAttributeModifier("name", letter.toString())));
+			add (new WebMarkupContainer("anchor").add(AttributeModifier.replace("name", letter.toString())));
 			add (new Label("letter", letter.toString().toUpperCase()));
 			add (new LetterListView ("list", letter, current));
 		}
@@ -201,18 +209,11 @@ public abstract class BaseGlossaryPanel extends Panel {
 				add(container);
 				
 				IGlossaryEntry e = mEntry.getObject();
-				BookmarkablePageLink<WebPage> link = new BookmarkablePageLink<WebPage>("link", getGlossaryPageClass()) {
-					private static final long serialVersionUID = 1L;
-					@Override
-					protected CharSequence appendAnchor(ComponentTag tag, CharSequence url) {
-						return url + "#" + letter;
-					}
-				};
-				link.setParameter("word", e.getIdentifier());
-				link.add(new Label("label", e.getHeadword()));
-				container.add(link);
+				
+				container.add(newLink(letter, e));
+
 				if (e.equals(current))
-					container.add(new SimpleAttributeModifier("class", "current"));
+					container.add(AttributeModifier.replace("class", "current"));
 				if (getGlossary().getEntryById(e.getIdentifier()) != null) {
 					container.add(new WebMarkupContainer("wordCardIcon").setVisible(false));
 				} else {
@@ -251,6 +252,24 @@ public abstract class BaseGlossaryPanel extends Panel {
 		}
 		
 		return wmc;
+	}
+
+	/**
+	 * Constuct and return an appropriate Link element for the given glossary entry.
+	 * @param e
+	 * @return
+	 */
+	public Link<?> newLink(final Character letter, IGlossaryEntry e) {
+		BookmarkablePageLink<WebPage> link = new BookmarkablePageLink<WebPage>("link", getGlossaryPageClass()) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			protected CharSequence appendAnchor(ComponentTag tag, CharSequence url) {
+				return url + "#" + letter;
+			}
+		};
+		link.getPageParameters().set("word", e.getIdentifier());
+		link.add(new Label("label", e.getHeadword()));
+		return link;
 	}
 
 	/**
