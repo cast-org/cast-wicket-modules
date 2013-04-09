@@ -87,6 +87,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	@Getter @Setter
 	private boolean showMoveLink = false;
 
+	@Getter @Setter
+	private boolean autoSave = false; // autosave on close
+
 	/**
 	 * If true, DOM contents will be erased by the close javascript.
 	 * Useful if, for instance, there are videos or other active components in the modal that must be stopped.
@@ -379,6 +382,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
         result.append(String.format("$('#%s').hide()%s;", 
         		contentContainer.getMarkupId(), 
         		emptyOnClose ? ".empty()" : ""));
+        if (autoSave)
+        	result.append("AutoSaver.autoSaveMaybeSave(null);");
         if (masking)
         	result.append("$('#" + overlay.getMarkupId() + "').hide();");
         if (returnFocus)
