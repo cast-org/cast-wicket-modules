@@ -19,13 +19,14 @@
  */
 package org.cast.cwm.search;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import net.databinder.hib.Databinder;
 import net.databinder.models.PropertyDataProvider;
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.commons.collections.iterators.EmptyListIterator;
 import org.apache.lucene.search.Query;
 import org.apache.wicket.model.IModel;
 import org.hibernate.Session;
@@ -70,7 +71,8 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	public Iterator<? extends T> iterator(int first, int count) {
 		FullTextQuery query = getQuery();
 		if (query == null) {
-			return EmptyListIterator.INSTANCE;
+			List<T> empty = Collections.emptyList();
+			return empty.iterator();
 		}
 		query.setFirstResult(first);
 		query.setMaxResults(count);

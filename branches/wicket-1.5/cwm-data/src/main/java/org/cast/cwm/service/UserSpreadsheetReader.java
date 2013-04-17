@@ -44,7 +44,7 @@ import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.models.UserModel;
 import org.hibernate.Criteria;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

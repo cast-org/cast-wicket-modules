@@ -27,6 +27,7 @@ import org.apache.wicket.WicketRuntimeException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 /**
  * Optional Databinder base Application class for configuration and session management. 
@@ -96,7 +97,8 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	final public void buildHibernateSessionFactory(Object key, Configuration config) {
 		configureHibernateEssentials(config);
 		configureHibernate(config, key);
-		setHibernateSessionFactory(key, config.buildSessionFactory());
+		ServiceRegistryBuilder regBuilder = new ServiceRegistryBuilder().applySettings(config.getProperties());
+		setHibernateSessionFactory(key, config.buildSessionFactory(regBuilder.buildServiceRegistry()));
 	}
 	
 	/**

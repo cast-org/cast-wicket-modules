@@ -35,8 +35,8 @@ import org.cast.cwm.tag.model.Tag;
 import org.cast.cwm.tag.model.TagPlusInt;
 import org.cast.cwm.tag.model.Tagging;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
