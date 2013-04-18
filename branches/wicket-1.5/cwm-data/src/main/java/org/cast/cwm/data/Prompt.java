@@ -37,6 +37,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.Audited;
 
 /**
  * <p>
@@ -56,6 +57,7 @@ import org.hibernate.annotations.GenericGenerator;
  *
  */
 @Entity
+@Audited
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
@@ -70,9 +72,5 @@ public abstract class Prompt extends PersistedObject {
 	private Long id;
 
 	protected Prompt() { /* No Arg Constructor for DataStore */ }
-	
-	@OneToMany(mappedBy="prompt")
-	@Cascade(value={CascadeType.DELETE}) // if you delete a prompt, the responses have to go too.
-	protected Set<Response> responses;
 	
 }

@@ -37,6 +37,7 @@ import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.Audited;
 
 /**
  * An object that holds a binary file, such as an image
@@ -46,6 +47,7 @@ import org.hibernate.annotations.GenericGenerator;
  *
  */
 @Entity
+@Audited
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")

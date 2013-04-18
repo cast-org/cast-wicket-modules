@@ -48,12 +48,15 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 /**
  * A UserContent object represents a single chunk of user input.
  * Most often it is a response to a {@link Prompt} object.
  */
 @Entity
+@Audited
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
@@ -136,6 +139,7 @@ public class UserContent extends PersistedObject {
 	 * Related event - eg the "post" or "save" that resulted in this contnet getting stored or updated.
 	 */
 	@ManyToOne(optional=true, fetch=FetchType.LAZY)
+	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	private Event event;
 	
 	public UserContent() { /* No Arg Constructor for DataStore */ }

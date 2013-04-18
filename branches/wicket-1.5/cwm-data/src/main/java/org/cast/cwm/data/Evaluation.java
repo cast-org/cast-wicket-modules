@@ -19,6 +19,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
+import org.hibernate.envers.Audited;
 
 /**
  * Information related to scoring of a UserContent or other content object.
@@ -26,6 +27,7 @@ import org.hibernate.annotations.Index;
  * or more than one Evaluation related to a specific content object.
  */
 @Entity
+@Audited
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
@@ -55,6 +57,7 @@ public class Evaluation extends PersistedObject{
 	 * UserContent object that is the target of this Evaluation.
 	 * May be null if some other type of thing is being evaluated.
 	 */
+	@ManyToOne
 	@Index(name="evaluation_usercontent_idx")
 	private UserContent userContent;
 	

@@ -53,6 +53,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
+import org.hibernate.envers.Audited;
 
 /**
  * A person who uses the application.  Almost all persistent data in the application
@@ -63,6 +64,7 @@ import org.hibernate.annotations.SortType;
  *
  */
 @Entity
+@Audited
 @Table(name="Users") // Necessary since "user" is a reserved word in SQL
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
