@@ -379,11 +379,11 @@ public class DialogBorder extends Border implements IHeaderContributor {
      */
     public String getCloseString(boolean returnFocus) {
     	StringBuffer result = new StringBuffer();
+        if (autoSave)
+        	result.append("AutoSaver.autoSaveMaybeSave(null);");
         result.append(String.format("$('#%s').hide()%s;", 
         		contentContainer.getMarkupId(), 
         		emptyOnClose ? ".empty()" : ""));
-        if (autoSave)
-        	result.append("AutoSaver.autoSaveMaybeSave(null);");
         if (masking)
         	result.append("$('#" + overlay.getMarkupId() + "').hide();");
         if (returnFocus)
