@@ -27,7 +27,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
-import net.databinder.DBRequestCycleListener;
 import net.databinder.auth.hib.AuthDataApplication;
 
 import org.apache.wicket.Application;
@@ -331,7 +330,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 //		loginSessionCloser.closeQueue.add(loginSessionId);
 //	}
 	
-	void initResponseTypes() {
+	protected void initResponseTypes() {
 		/**
 		 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
 		 */
