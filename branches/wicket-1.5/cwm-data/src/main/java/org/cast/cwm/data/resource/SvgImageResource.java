@@ -32,6 +32,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.DynamicImageResource;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.ResponseData;
+import org.cast.cwm.data.UserContent;
 import org.cast.cwm.drawtool.SvgEditor;
 import org.cast.cwm.service.ICwmService;
 
@@ -41,6 +42,9 @@ import com.google.inject.Inject;
  * A simple resource that accepts an "id" parameter and serves up
  * the ResponseData svg file with the matching ID in the database.  
  * If the file is not found, this will throw a 404 Not Found Error.
+ * 
+ * For use with UserContent rather than Response, send a "uid" parameter 
+ * instead of "id".
  * 
  * @author jbrookover
  *
@@ -67,19 +71,37 @@ public class SvgImageResource extends DynamicImageResource {
 	@Override
     protected byte[] getImageData(Attributes attributes) {
         PageParameters parameters = attributes.getParameters();
-        long id = parameters.get("id").toLong();
+        Long id = parameters.get("id").toOptionalLong();
+        Long uid = parameters.get("uid").toOptionalLong();
         Integer width = parameters.get("width").toOptionalInteger();
         Integer height = parameters.get("height").toOptionalInteger();
-		log.debug("Getting SVG data for {} at width {}", id, width);
         
-        ResponseData rd = cwmService.getById(ResponseData.class, id).getObject();
-		if (rd == null) {
-			log.warn("Invalid SVG request, id {} does not exist", id);
-			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [id=" + id + "]");
-		}
-		String svg = rd.getText();
-		
-		setLastModifiedTime(Time.valueOf(rd.getCreateDate()));
+        String svg;
+        if (id != null) {
+        	log.debug("Getting SVG Response data for id={} at width {}", id, width);
+        	ResponseData rd = cwmService.getById(ResponseData.class, id).getObject();
+        	if (rd == null) {
+        		log.warn("Invalid SVG request, id {} does not exist", id);
+        		throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [id=" + id + "]");
+        	}
+        	svg = rd.getText();
+    		setLastModifiedTime(Time.valueOf(rd.getCreateDate()));
+        } else if (uid != null) {
+        	log.debug("Getting SVG UserContent data for id={} at width {}", uid, width);
+        	UserContent uc = cwmService.getById(UserContent.class, uid).getObject();
+        	if (uc == null) {
+        		log.warn("Invalid SVG request, uid {} does not exist", id);
+        		throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [uid=" + uid + "]");
+        	}
+        	svg = uc.getText();
+        	setLastModifiedTime(Time.now()); // FIXME last updated is not getting updated!
+//        	if (uc.getLastUpdated() != null)
+//        		setLastModifiedTime(Time.valueOf(uc.getLastUpdated()));
+//        	else
+//        		setLastModifiedTime(Time.valueOf(uc.getCreateDate()));
+        } else {
+    		throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found; no ID in URL");        	
+        }
         
         return buildSvgData(svg, width, height);
 	}
