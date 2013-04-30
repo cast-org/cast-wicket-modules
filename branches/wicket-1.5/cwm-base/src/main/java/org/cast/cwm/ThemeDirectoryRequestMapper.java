@@ -20,6 +20,7 @@
 package org.cast.cwm;
 
 import java.io.File;
+import java.net.URLConnection;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
@@ -67,7 +68,7 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 		this.themeDirectory = themeDirectory.getAbsolutePath();
 		if (prefixes == null)
 			throw new IllegalArgumentException("List of prefixes cannot be empty");
-		this.prefixes = prefixes;
+		this.prefixes = prefixes;		
 	}
 
 	// Mapper is compatible with any URL that starts with one of the prefixes
@@ -107,8 +108,23 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 							+ absolutePath + ". See IPackageResourceGuard");
 		}
 		File file = new File(absolutePath);
-		if (file.canRead())
-			return new FileResourceStream(file);
+		if (file.canRead()) {
+			// The standard contentType determination shockingly fails to recognize CSS and JS
+			// TODO: should we report this fix upstream to Wicket?
+			FileResourceStream rs = new FileResourceStream(file) {
+				private static final long serialVersionUID = 1L;
+				@Override
+				public String getContentType() {
+					String fileName = getFile().getName();
+					if (fileName.endsWith(".css"))
+						return "text/css";
+					if (fileName.endsWith(".js"))
+						return "text/javascript";
+					return super.getContentType();
+				}
+			};
+			return rs;
+		}
 		log.warn("Nonexistent theme file requested: {}", file);
 		return null;
 	}
