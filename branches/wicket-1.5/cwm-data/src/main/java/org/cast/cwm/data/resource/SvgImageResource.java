@@ -94,11 +94,10 @@ public class SvgImageResource extends DynamicImageResource {
         		throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found [uid=" + uid + "]");
         	}
         	svg = uc.getText();
-        	setLastModifiedTime(Time.now()); // FIXME last updated is not getting updated!
-//        	if (uc.getLastUpdated() != null)
-//        		setLastModifiedTime(Time.valueOf(uc.getLastUpdated()));
-//        	else
-//        		setLastModifiedTime(Time.valueOf(uc.getCreateDate()));
+        	if (uc.getLastUpdated() != null)
+        		setLastModifiedTime(Time.valueOf(uc.getLastUpdated()));
+        	else
+        		setLastModifiedTime(Time.now());
         } else {
     		throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Svg not found; no ID in URL");        	
         }

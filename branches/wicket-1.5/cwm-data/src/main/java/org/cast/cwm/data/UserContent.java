@@ -44,6 +44,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.wicket.util.string.Strings;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
@@ -87,8 +89,15 @@ public class UserContent extends PersistedObject {
 	@Type(type="org.cast.cwm.data.ResponseTypeHibernateType")
 	private IResponseType dataType;
 	
+	/**
+	 * Date when content was originally created.
+	 */
 	private Date createDate;
 	
+	/**
+	 * Date of last change to the actual content.
+	 * This field will be updated to the current time when certain other fields are modified. 
+	 */
 	private Date lastUpdated;
 	
 	/**
@@ -154,6 +163,50 @@ public class UserContent extends PersistedObject {
 		this.dataType = dataType;
 		this.prompt = prompt;
 		this.createDate = new Date();
+	}
+	
+	/**
+	 * Sets the createDate field, as well as the lastUpdated field.
+	 * This is because lastUpdated should never be earlier than createDate and should always be set.
+	 * @param createDate
+	 */
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+		if (lastUpdated == null || (createDate != null && createDate.after(lastUpdated)))
+			lastUpdated = createDate;
+	}
+	
+	/**
+	 * Sets the text value, as well as the lastUpdated field if the text has changed.
+	 * This enforces that lastUpdated will track any changes to the text.
+	 * @param text
+	 */
+	public void setText(String text) {
+		if (!Strings.isEqual(this.text, text))
+			this.lastUpdated = new Date();
+		this.text = text;
+	}
+
+	/**
+	 * Sets the title value, as well as the lastUpdated field if the title has changed.
+	 * This enforces that lastUpdated will track any changes to the title.
+	 * @param text
+	 */
+	public void setTitle(String title) {
+		if (!Strings.isEqual(this.title, title))
+			this.lastUpdated = new Date();
+		this.title = title;
+	}
+
+	/**
+	 * Sets the primaryFile value, as well as the lastUpdated field if the file has changed.
+	 * This enforces that lastUpdated will track any changes to the primaryFile.
+	 * @param text
+	 */
+	public void setPrimaryFile(BinaryFileData primaryFile) {
+		if (!ObjectUtils.equals(this.primaryFile, primaryFile))
+			this.lastUpdated = new Date();
+		this.primaryFile = primaryFile;
 	}
 
 }
