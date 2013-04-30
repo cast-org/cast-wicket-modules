@@ -330,7 +330,7 @@ public class XmlService implements IXmlService {
 		} else {
 			// TODO: What if mXmlPtr is now pointing to null due to a change in the XML document?
 			tr = null;
-			log.warn("XmlPointer points to nothing: {}", xmlObj);
+			log.warn("XmlPointer points to nothing: {}", mXmlPtr);
 		}
 		domCache.put(mXmlPtr, transformName, tr, params);
 		return (tr);

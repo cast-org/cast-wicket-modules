@@ -87,4 +87,8 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 	
 	public void detach() {		
 	}
+	
+	public String toString() {
+		return "XmlSectionModel[" + getKey() + "]";
+	}
 }
