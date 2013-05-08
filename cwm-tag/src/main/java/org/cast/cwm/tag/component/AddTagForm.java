@@ -42,6 +42,7 @@ public class AddTagForm extends Form<Object> {
 	protected Long targetId;
 	
 	private static final long serialVersionUID = 1L;
+	private RequiredTextField<String> input;
 
 	public AddTagForm(String id, PersistedObject target) {
 		super(id);
@@ -49,7 +50,7 @@ public class AddTagForm extends Form<Object> {
 		targetType = target.getClass();
 		targetId = target.getId();
 		
-		final RequiredTextField<String> input = new RequiredTextField<String>("term", new Model<String>(""));
+		input = new RequiredTextField<String>("term", new Model<String>(""));
 		input.setOutputMarkupId(true);
 		input.add(new SimpleAttributeModifier("maxlength", Integer.toString(TagService.get().getMaxTagLength())));
 		add(input);
@@ -58,18 +59,17 @@ public class AddTagForm extends Form<Object> {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void onSubmit(AjaxRequestTarget ajaxtarget, Form<?> form) {
+			protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 				TagService.get().findTaggingCreate(CwmSession.get().getUser(), targetType, targetId, input.getModelObject());
 				input.setModelObject(""); // clear input box
-				ajaxtarget.addComponent(input);
+				target.addComponent(input);
 				MarkupContainer tp = findParent(TagPanel.class);
 				if (tp != null) {
-					ajaxtarget.addChildren(tp, TaggingsListPanel.class);
-					ajaxtarget.addChildren(tp, TagList.class);
+					target.addChildren(tp, TaggingsListPanel.class);
+					target.addChildren(tp, TagList.class);
 				}
 			}
-			
 		});
 	}
-
+	
 }
