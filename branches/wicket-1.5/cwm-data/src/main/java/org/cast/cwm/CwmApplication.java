@@ -430,7 +430,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	@Override
 	protected void onDestroy() {
 		log.debug("Running shutdown steps");
-//		loginSessionCloser.interrupt();  // TODO
+		loginSessionCloser.interrupt();  // TODO
 		this.getHibernateSessionFactory(null).close();
 		super.onDestroy();
 	}
