@@ -77,10 +77,6 @@ public class UserContent extends PersistedObject {
 	@Id @GeneratedValue(generator = "my_generator")
 	@Setter(AccessLevel.NONE) 
 	private Long id;
-
-	@Index(name="usercontent_prompt_idx")
-	@ManyToOne
-	private Prompt prompt;
 	
 	@Index(name="usercontent_user_idx")
 	@ManyToOne(optional=false)
@@ -158,10 +154,9 @@ public class UserContent extends PersistedObject {
 	
 	public UserContent() { /* No Arg Constructor for DataStore */ }
 	
-	public UserContent(User author, IResponseType dataType, Prompt prompt) {
+	public UserContent(User author, IResponseType dataType) {
 		this.user = author;
 		this.dataType = dataType;
-		this.prompt = prompt;
 		this.createDate = new Date();
 	}
 	

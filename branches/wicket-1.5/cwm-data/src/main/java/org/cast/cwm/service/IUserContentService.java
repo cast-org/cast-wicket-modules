@@ -35,7 +35,7 @@ public interface IUserContentService {
 	 * All service methods will call this, rather than instantiating objects in any other way.
 	 * @return an instance of UserContent
 	 */
-	public UserContent newUserContent (User author, IResponseType dataType, Prompt prompt);
+	public UserContent newUserContent (User author, IResponseType dataType);
 
 	/**
 	 * Get a single UserContent by a given user for a given prompt.  This assumes that only

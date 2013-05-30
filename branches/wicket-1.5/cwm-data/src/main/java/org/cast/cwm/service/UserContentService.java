@@ -35,8 +35,8 @@ import org.hibernate.criterion.Restrictions;
 
 public class UserContentService implements IUserContentService {
 	
-	public UserContent newUserContent (User author, IResponseType dataType, Prompt prompt) {
-		return new UserContent(author, dataType, prompt);
+	public UserContent newUserContent (User author, IResponseType dataType) {
+		return new UserContent(author, dataType);
 	}
 
 
