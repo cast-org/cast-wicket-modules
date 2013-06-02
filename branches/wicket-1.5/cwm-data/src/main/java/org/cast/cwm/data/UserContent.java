@@ -158,6 +158,7 @@ public class UserContent extends PersistedObject {
 		this.user = author;
 		this.dataType = dataType;
 		this.createDate = new Date();
+		this.lastUpdated = this.createDate;
 	}
 	
 	/**
