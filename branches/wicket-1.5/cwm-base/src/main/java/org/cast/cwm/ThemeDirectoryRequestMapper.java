@@ -20,7 +20,6 @@
 package org.cast.cwm;
 
 import java.io.File;
-import java.net.URLConnection;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
@@ -81,10 +80,10 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 	}
 
 	public IRequestHandler mapRequest(Request request) {
-		String url = request.getUrl().toString();
+		String path = request.getUrl().getPath();
 		for (String prefix : prefixes) {
-			if (url.startsWith(prefix)) {
-				IResourceStream stream = getResourceStream(themeDirectory + "/" + url);
+			if (path.startsWith(prefix)) {
+				IResourceStream stream = getResourceStream(themeDirectory + "/" + path);
 				if (stream==null)
 					return null;
 				ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(stream);
