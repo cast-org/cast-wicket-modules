@@ -26,6 +26,7 @@ import java.util.TimeZone;
 import org.apache.wicket.datetime.DateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -37,6 +38,10 @@ public class ApproximateDateLabel extends DateLabel {
 
 	public ApproximateDateLabel(String id, IModel<Date> mDate) {
 		super(id, mDate, new ApproximateDateConverter());
+	}
+
+	public ApproximateDateLabel(String id, Date date) {
+		this(id, Model.of(date));
 	}
 
 	protected static class ApproximateDateConverter extends DateConverter {
