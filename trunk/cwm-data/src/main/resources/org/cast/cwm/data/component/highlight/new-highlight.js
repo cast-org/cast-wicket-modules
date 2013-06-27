@@ -640,6 +640,12 @@ hintHide    - when a hitn is turned off and no longer visible
                 $('.highlightHelper').find(".collapseBox").removeClass("expOpen");
                 $('.highlightHelper').find(".collapseBody").hide();
                 $('.highlightHelper').find(".toggle").attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+                /* OR */
+                $('.highlightHelper').find(".linkToggle").each(function() {
+                    var regExMatch = $(this).attr("class").match(/\blinkToggleBtn_[\w-]*\b/);
+                    var classMatch = regExMatch[0].substring(regExMatch[0].lastIndexOf('_') + 1);
+                    linkToggleHide(classMatch, null, false);
+                });
             }
 
             if (show == false && settings.currentHint == null) {
@@ -680,10 +686,22 @@ hintHide    - when a hitn is turned off and no longer visible
                 $('.highlightHelper').find(".collapseBox").not($btnTarget).removeClass("expOpen");
                 $('.highlightHelper').find(".collapseBox").not($btnTarget).find(".collapseBody").hide();
                 $('.highlightHelper').find(".toggle").not($btnTarget).attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+                /* OR */
+                $('.highlightHelper').find(".linkToggle").not($btnTarget).each(function() {
+                    var regExMatch = $(this).attr("class").match(/\blinkToggleBtn_[\w-]*\b/);
+                    var classMatch = regExMatch[0].substring(regExMatch[0].lastIndexOf('_') + 1);
+                    linkToggleHide(classMatch, null, false);
+                });
             } else {
                 $('.highlightHelper').find(".collapseBox").not($highlightScope).removeClass("expOpen");
                 $('.highlightHelper').find(".collapseBody").not($highlightScope).hide();
                 $('.highlightHelper').find(".toggle").not($highlightScope).attr("alt", lang['EXPAND']).attr("title", lang['EXPAND']).removeClass("expOpen");
+                /* OR */
+                $('.highlightHelper').find(".linkToggle").not($highlightScope).each(function() {
+                    var regExMatch = $(this).attr("class").match(/\blinkToggleBtn_[\w-]*\b/);
+                    var classMatch = regExMatch[0].substring(regExMatch[0].lastIndexOf('_') + 1);
+                    linkToggleHide(classMatch, null, false);
+                });
             }
 
             // Is scope currently showing hints?
