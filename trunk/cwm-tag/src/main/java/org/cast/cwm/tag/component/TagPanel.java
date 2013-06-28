@@ -74,9 +74,9 @@ public class TagPanel extends Panel {
 		else
 			add(new WebMarkupContainer("form").setVisible(false));
 		if (student == null)
-			add(new Label("tagsSubHeader", "Add Tags:"));
+			add(new Label("tagsSubHeader", "Add page tags:"));
 		else
-			add(new Label("tagsSubHeader", "Available Tags:"));
+			add(new Label("tagsSubHeader", "Available tags:"));
 		
 	}
 
