@@ -100,15 +100,15 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#saveLoginEvent()
 	 */
-	public void saveLoginEvent() {
-		saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
+	public IModel<? extends Event> saveLoginEvent() {
+		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#savePageViewEvent(java.lang.String, java.lang.String)
 	 */
-	public void savePageViewEvent (String detail, String pageName) {
-		saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
+	public IModel<? extends Event> savePageViewEvent (String detail, String pageName) {
+		return saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
 	}
 	
 	/* (non-Javadoc)

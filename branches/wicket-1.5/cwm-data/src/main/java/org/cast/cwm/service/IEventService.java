@@ -49,7 +49,7 @@ public interface IEventService extends IEventLogger {
 	 * Save a login event.
 	 * 
 	 */
-	public abstract void saveLoginEvent();
+	public abstract IModel<? extends Event> saveLoginEvent();
 
 	/**
 	 * Save a page view event.
@@ -57,7 +57,7 @@ public interface IEventService extends IEventLogger {
 	 * @param detail
 	 * @param pageName
 	 */
-	public abstract void savePageViewEvent(String detail, String pageName);
+	public abstract IModel<? extends Event> savePageViewEvent(String detail, String pageName);
 
 	/**
 	 * Save a post event.  If this event has an accompanying {@link ResponseData} object,
