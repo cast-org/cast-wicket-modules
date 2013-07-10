@@ -21,6 +21,7 @@ package org.cast.cwm.xml.component;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.cast.cwm.IRelativeLinkSource;
@@ -62,6 +63,11 @@ public class DefaultDynamicComponentHandler implements IDynamicComponentHandler 
 	@Inject
 	IXmlService xmlService;
 	
+	public DefaultDynamicComponentHandler() {
+		super();
+		Injector.get().inject(this);
+	}
+
 	public Component getComponent(String wicketId, Element element,
 			IRelativeLinkSource linkSource) {
 		boolean isContainer = false;
