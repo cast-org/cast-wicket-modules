@@ -65,7 +65,7 @@ public class DefaultDynamicComponentHandler implements IDynamicComponentHandler 
 	
 	public DefaultDynamicComponentHandler() {
 		super();
-//		Injector.get().inject(this);
+		Injector.get().inject(this);
 	}
 
 	public Component getComponent(String wicketId, Element element,
