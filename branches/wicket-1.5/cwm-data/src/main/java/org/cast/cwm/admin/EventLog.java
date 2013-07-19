@@ -86,7 +86,7 @@ public class EventLog extends AdminPage {
 	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<Boolean> showNoSite;
 	
-	private static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
+	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 	private static final Logger log = LoggerFactory.getLogger(EventLog.class);
 	
 	private static final long serialVersionUID = 1L;
