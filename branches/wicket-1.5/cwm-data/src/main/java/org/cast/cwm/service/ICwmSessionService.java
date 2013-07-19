@@ -37,6 +37,7 @@ public interface ICwmSessionService {
 	IModel<LoginSession> getLoginSessionModel();
 	IModel<Site> getCurrentSiteModel();
 	IModel<Period> getCurrentPeriodModel();
+	void setCurrentPeriodModel (IModel<Period> model);
 	Long getLoginSessionId();
 	LoginSession getLoginSession();
 	void setLoginSessionModel (IModel<LoginSession> model);
