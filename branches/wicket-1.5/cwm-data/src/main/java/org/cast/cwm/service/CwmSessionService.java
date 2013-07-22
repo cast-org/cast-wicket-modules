@@ -87,4 +87,8 @@ public class CwmSessionService implements ICwmSessionService {
 		CwmSession.get().signOut();
 	}
 
+	public void setCurrentPeriodModel(IModel<Period> model) {
+		CwmSession.get().setCurrentPeriodModel(model);
+	}
+
 }
