@@ -108,22 +108,17 @@ public class SvgImageResource extends DynamicImageResource {
 	protected byte[] buildSvgData(String svgBase, Integer width, Integer height) {
         if (width==null) width=SvgEditor.CANVAS_WIDTH;
         if (height==null) height=SvgEditor.CANVAS_HEIGHT;
-		boolean needsScaling = (width < SvgEditor.CANVAS_WIDTH || height < SvgEditor.CANVAS_HEIGHT);
 
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<?xml version='1.0' encoding='UTF-8' ?>");
 		// TODO: Should this be "StartsWith" ?
 		if (svgBase == null || !svgBase.contains("<svg")) {
-			buffer.append("<svg width='" + width + "' height='" + height + "' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'><g><title>Blank Image</title></g></svg>");
+			buffer.append("<svg width='100%' height='100%' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'><g><title>Blank Image</title></g></svg>");
 		} else {
-			if (needsScaling) {
 				svgBase = svgBase.replaceFirst("<svg +width=\"[0-9]*\" +height=\"[0-9]*\"", 
-						"<svg viewBox='0 0 " + SvgEditor.CANVAS_WIDTH + " " + SvgEditor.CANVAS_HEIGHT + "' "
-						+ "width='" + width + "' height='" + height + "' "
+						"<svg viewBox='0 0 " + width + " " + height + "' "
+						+ "width='100%' height='100%' "
 						+ "xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
-			} else {
-				svgBase = svgBase.replaceFirst("<svg ", "<svg xml:base=\"" + WebApplication.get().getServletContext().getContextPath() + "/\" ");
-			}
 			buffer.append(svgBase);
 		}
 		try {
@@ -137,14 +132,4 @@ public class SvgImageResource extends DynamicImageResource {
     public boolean equals(Object that) {
         return that instanceof SvgImageResource;
     }
-
-//	public static String constructUrl(ResponseData rd, Integer width, Integer height) {
-//		if (!mounted)
-//			throw new IllegalStateException("SvgImageResource has not been mounted in the application.");
-//		StringBuffer url = new StringBuffer(WebApplication.get().getServletContext().getContextPath() + "/" + SVG_PATH + "/id/" + rd.getId());
-//		url.append("?width=" + width + "&height=" + height);
-//		return url.toString();
-//	}
-//	
-
 }
