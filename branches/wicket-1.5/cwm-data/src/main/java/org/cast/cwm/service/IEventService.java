@@ -89,6 +89,14 @@ public interface IEventService extends IEventLogger {
 	public abstract LoginSession createLoginSession(Request r);
 
 	/**
+	 * Lookup a LoginSession by the HTTP ID assigned to it by the web application container.
+	 * 
+	 * @param httpSessionId
+	 * @return model of the LoginSession (model object may be null if no such LoginSession exists)
+	 */
+	public IModel<LoginSession> getLoginSessionBySessionId(String httpSessionId);
+	
+	/**
 	 * Mark the LoginSession as having ended at the given time.
 	 * @param loginSession
 	 * @param closeTime

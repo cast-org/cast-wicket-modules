@@ -28,10 +28,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
 import net.databinder.auth.hib.AuthDataApplication;
+import net.databinder.hib.Databinder;
+import net.databinder.hib.SessionUnit;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
+import org.apache.wicket.ThreadContext;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
@@ -48,6 +51,7 @@ import org.cast.cwm.admin.SiteListPage;
 import org.cast.cwm.admin.UserFormPage;
 import org.cast.cwm.admin.UserListPage;
 import org.cast.cwm.data.IResponseType;
+import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -135,7 +139,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 
 		// If using Logback as the logger, and we have a logConfig property,
 		// then read that configuration.
-		// TODO make the configuration optional
 		File logConfig = configuration.getFile("cwm.logConfig");
 	    if (logConfig != null
 	    		&& LoggerFactory.getILoggerFactory() instanceof LoggerContext) { 
@@ -155,8 +158,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	    }
 	    
 	    loadServices();
+	    
 		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getInjectionModuleArray()));
-
+		
 		super.internalInit();
 	}
 
@@ -185,7 +189,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		runDatabaseInitializers();
 		configureMountPaths();
 		
-		loginSessionCloser = new LoginSessionCloser();
+		loginSessionCloser = new LoginSessionCloser(this);
 		loginSessionCloser.start();
 		
 		log.debug("Finished CWM Application Init");
@@ -309,27 +313,24 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	public void loadAppProperties() {
 		configuration = AppConfiguration.loadFor(this);
 		appInstanceId = configuration.getString("cwm.instanceId", "unknown");
+		// TODO: sessionTimeout is not used anywhere yet
 		sessionTimeout = configuration.getInteger("cwm.sessionTimeout", DEFAULT_SESSION_TIMEOUT);
 	}
 	
+	// Called to create a session
 	@Override
 	public Session newSession(Request request, Response response) {
 		return new CwmSession(request);
 	}
 	
-// TODO
-//	/**
-//	 * Mark the given LoginSession as ended due to session expiration.
-//	 * 
-//	 * This is made available in the Application class so that it can be called from the 
-//	 * SessionStore when sessions expire - SessionStore is in a separate thread and
-//	 * does not have easy access to service classes.
-//	 * @param ID of the loginSession the LoginSession to close
-//	 */
-//	public void expireLoginSession(Long loginSessionId) {
-//		loginSessionCloser.closeQueue.add(loginSessionId);
-//	}
-	
+	// Called when a session is ending
+	@Override
+	public void sessionUnbound(final String sessionId) {
+		super.sessionUnbound(sessionId);
+		log.debug("sessionUnbound called: {}", sessionId);
+		loginSessionCloser.closeQueue.add(sessionId);
+	}
+
 	protected void initResponseTypes() {
 		/**
 		 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
@@ -404,13 +405,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		return responseTypeRegistry.getLegalResponseTypes();
 	}
 	
-	
-//	public Component getReponseViewer (org.cast.cwm.data.Response r) {
-//		if (r.getType().equals(.r..r.))
-//			return ResponseViewer.class;
-//	}
-	
-	
 	public byte[] getSalt() {
 		return "mmmm salt, makes the encryption tasty".getBytes();
 	}
@@ -430,7 +424,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	@Override
 	protected void onDestroy() {
 		log.debug("Running shutdown steps");
-		loginSessionCloser.interrupt();  // TODO
+		loginSessionCloser.interrupt();
 		this.getHibernateSessionFactory(null).close();
 		super.onDestroy();
 	}
@@ -442,40 +436,48 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 */
 	protected class LoginSessionCloser extends Thread {
 		
-		private BlockingQueue<Long> closeQueue = new LinkedBlockingQueue<Long>();
+		private BlockingQueue<String> closeQueue = new LinkedBlockingQueue<String>();
+		private Application application;
+		
+		protected LoginSessionCloser (Application app) {
+			super("LoginSessionCloser");
+			this.application = app;
+			this.setDaemon(true);
+		}
 		
 		@Override
 		public void run() {
-// TODO - need a new strategy for this.
-//			Application.set(CwmApplication.this);
-//			while(true) {
-//				try {
-//					final Long loginSessionId = closeQueue.take();
-//					Databinder.ensureSession(new SessionUnit() {
-//						public Object run(org.hibernate.Session dbSession) {
-//							dbSession.beginTransaction();
-//							LoginSession loginSession = (LoginSession) dbSession.load(LoginSession.class, loginSessionId);
-//							if (loginSession != null) {
-//								 if (loginSession.getEndTime() != null) {
-//									 log.debug("Closer thread closing login session {}", loginSessionId);
-//									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
-//								 } else {
-//									 // If user logged out normally, login session would already be closed.
-//									 log.debug("Login session {} was already closed", loginSessionId);
-//								 }
-//							} else {
-//								log.error("LoginSession ID passed in ({}) was invalid or closed: {}", loginSessionId, loginSession);
-//							}
-//								dbSession.getTransaction().commit();
-//							return null;
-//						}						
-//					});
-//				} catch (InterruptedException e) {
-//					log.debug("LoginSessionCloser exiting due to interrupt");
-//					break;
-//				}
-//			}
-//
+			ThreadContext.setApplication(application);
+			log.debug("LoginSessionCloser thread {} starting with application: {}", this, Application.get());
+
+			while(true) {
+				try {
+					final String loginSessionId = closeQueue.take();
+					Databinder.ensureSession(new SessionUnit() {
+						public Object run(org.hibernate.Session dbSession) {
+							LoginSession loginSession = eventService.getLoginSessionBySessionId(loginSessionId).getObject();
+							if (loginSession != null) {
+								 if (loginSession.getEndTime() == null) {
+									 log.debug("Closer thread closing login session {}", loginSessionId);
+									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
+								 } else {
+									 // If user logged out normally, login session would already be closed.
+									 log.debug("Login session {} was already closed", loginSessionId);
+								 }
+							} else {
+								// This is probably a web session where the user never logged in.
+								log.debug("No LoginSession corresponds to session ID {}", loginSessionId, loginSession);
+							}
+							dbSession.getTransaction().commit();
+							return null;
+						}						
+					});
+				} catch (InterruptedException e) {
+					log.debug("LoginSessionCloser exiting due to interrupt");
+					break;
+				}
+			}
+
 		}
 	}
 	

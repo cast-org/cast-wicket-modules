@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.databinder.hib.Databinder;
+import net.databinder.models.hib.BasicCriteriaBuilder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 
@@ -194,6 +195,14 @@ public class EventService implements IEventService {
 		}
 		// saveEvent will commit the transaction
 		saveEvent(LOGOUT_TYPE_NAME, sesLength, null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#getLoginSessionBySessionId(java.lang.String)
+	 */
+	public IModel<LoginSession> getLoginSessionBySessionId(String httpSessionId) {
+		return new HibernateObjectModel<LoginSession>(LoginSession.class,
+				new BasicCriteriaBuilder(Restrictions.eq("sessionId", httpSessionId)));
 	}
 
 	/* (non-Javadoc)
