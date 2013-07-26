@@ -20,6 +20,7 @@
 package org.cast.cwm;
 
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.wicket.protocol.http.WebApplication;
@@ -44,29 +45,44 @@ public class AppConfiguration implements IAppConfiguration {
 	String baseDirectory;
 	Properties properties;
 	
+	private static final String errorMessage = 
+			"Could not configure the application\n"
+			+ "Please do one of the following:\n"
+			+ "   Set an \"appConfig\" parameter in your servlet configuration, or\n"
+			+ "   Create a file named \"app.config\" in the classpath.\n";
+	
 	private final static Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
 	/**
-	 * Create a new Configuration from the properties file given.
-	 * @param filePath file to load
-	 * @return the resulting AppConfiguration
+	 * Create a new IAppConfiguration in the default manner for the given WebApplication.
+	 * Looks for servlet init parameters "appConfig" or "propertiesFile";
+	 * failing that, looks in the classpath for a file named "app.config".
+	 *  
+	 * @param application the WebApplication for which to load configuration information
+	 * @return the resulting IAppConfiguration
 	 */
-	public static IAppConfiguration loadFor (WebApplication app) {
-		String propPath = app.getServletContext().getInitParameter("propertiesFile");
-		if(propPath == null)
-			throw new RuntimeException("No configuration properties file path set");
-		return loadFrom(propPath);
+	public static IAppConfiguration loadFor (WebApplication application) {
+		// Loading from specified properties file, if one is given.
+		String propPath = application.getServletContext().getInitParameter("appConfig");
+		if (propPath==null)
+			propPath = application.getServletContext().getInitParameter("propertiesFile");
+		if (propPath != null)
+			return loadFrom(propPath);
+		// Try loading from a file named "app.config" in the classpath
+		URL url = AppConfiguration.class.getClassLoader().getResource("app.config");
+		if (url != null && url.getProtocol().equals("file"))
+			return loadFrom(url.getFile());
+		throw new AppConfiguration.ConfigurationException(errorMessage);
 	}
 
 	/**
-	 * Create a new Configuration in the default manner for the given WebApplication.
-	 * In our standard setup, this looks up the "propertiesFile" init parameter and 
-	 * loads properties from the location.
+	 * Create an IAppConfiguration from information in the given file.
 	 * 
-	 * @param application the WebApplication for which to load configuration information
-	 * @return the resulting AppConfiguration
+	 * @param filePath the path for the app config file.
+	 * @return the resulting IAppConfiguration
 	 */
 	public static IAppConfiguration loadFrom (String filePath) {
+		log.info("Loading App Properties from {}", filePath);
 		File file = new File(filePath);
 		Properties appProperties = new Properties();
 		try {
@@ -74,8 +90,6 @@ public class AppConfiguration implements IAppConfiguration {
 		} catch(Exception e) {
 			throw new AppConfiguration.ConfigurationException("Error configuring application", e);
 		}
-
-		log.info("Loading App Properties from {}", filePath);
 		return new AppConfiguration(file.getParent(), appProperties);
 	}
 

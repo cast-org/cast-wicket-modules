@@ -139,7 +139,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 
 		// If using Logback as the logger, and we have a logConfig property,
 		// then read that configuration.
-		File logConfig = configuration.getFile("cwm.logConfig");
+		File logConfig = configuration.getOptionalFile("cwm.logConfig");
 	    if (logConfig != null
 	    		&& LoggerFactory.getILoggerFactory() instanceof LoggerContext) { 
 			log.info("Log Configuration: {}", logConfig);
