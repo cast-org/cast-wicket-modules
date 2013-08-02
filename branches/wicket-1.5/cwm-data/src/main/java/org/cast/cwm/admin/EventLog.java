@@ -118,15 +118,16 @@ public class EventLog extends AdminPage {
 	}
 
 	protected OrderingCriteriaBuilder makeCriteriaBuilder() {
-		return new EventCriteriaBuilder();
+		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
+		SingleSortState defaultSort = new SingleSortState();
+		defaultSort.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
+		eventCriteriaBuilder.setSortState(defaultSort);
+		return eventCriteriaBuilder;
 	}
 
 	protected SortableHibernateProvider<Event> makeHibernateProvider(OrderingCriteriaBuilder builder) {
 		SortableHibernateProvider<Event> provider = new SortableHibernateProvider<Event>(Event.class, builder);
 		provider.setWrapWithPropertyModel(false);
-		SingleSortState ss = new SingleSortState();
-		ss.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
-		provider.setSortState(ss);
 		return provider;
 	}
 
@@ -241,7 +242,8 @@ public class EventLog extends AdminPage {
 	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator {
 
 		private static final long serialVersionUID = 1L;
-		@Getter @Setter private ISortState sortState = new SingleSortState();
+		@Getter @Setter private ISortState sortState;
+;
 		
 		public void buildUnordered(Criteria criteria) {
 			
