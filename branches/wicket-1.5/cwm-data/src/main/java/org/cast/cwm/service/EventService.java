@@ -55,6 +55,7 @@ public class EventService implements IEventService {
 	public static final String LOGOUT_TYPE_NAME = "logout";
 	public static final String TIMEOUT_TYPE_NAME = "logout:forced";
 	public static final String PAGEVIEW_TYPE_NAME = "pageview";
+	public static final String COMPREHENSIONCHECK_TYPE_NAME = "comprehensioncheck";
 	public static final String POST_TYPE_NAME = "post";
 	public static final String AUTOSAVE_POST_TYPE_NAME = "post:autosave";
 	public static final String AGENTVIEW_TYPE_NAME = "agent:animate";
