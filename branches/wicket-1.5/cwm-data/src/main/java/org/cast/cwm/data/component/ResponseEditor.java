@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,6 +65,7 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.resource.AbstractStringResourceStream;
@@ -70,7 +73,6 @@ import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.components.AttributePrepender;
 import org.cast.cwm.components.UrlStreamedToString;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
@@ -1118,11 +1120,12 @@ public abstract class ResponseEditor extends Panel {
 	 * @param stringUrl
 	 * @return
 	 */
+
 	public URL getUrlFromString(String stringUrl) {
 		URL url = null;
 		if (stringUrl != null) {
 			try {
-				url = new URI(RequestUtils.toAbsolutePath(stringUrl, getRequestCycle().getRequest().getUrl().getPath())).toURL();
+				url = new URI(toAbsolutePath(stringUrl)).toURL();
 				return url;
 			} catch (MalformedURLException e) {
 				log.error("There is a problem with the Authored Data:  {}", stringUrl);
@@ -1135,6 +1138,13 @@ public abstract class ResponseEditor extends Panel {
 		return null;
 	}	
 
+	
+	public final static String toAbsolutePath(final String relativePagePath) {
+	       HttpServletRequest req = (HttpServletRequest)((WebRequest)RequestCycle.get().getRequest()).getContainerRequest();
+	       return RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
+	}
+
+	
 	public class DefaultSvgModel extends AbstractReadOnlyModel<String> implements IDetachable {
 		private static final long serialVersionUID = 1L;
 		private IModel<Response> model;
