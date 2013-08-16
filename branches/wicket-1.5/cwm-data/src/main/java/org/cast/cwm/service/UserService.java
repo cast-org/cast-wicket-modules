@@ -34,7 +34,6 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
-import org.cast.cwm.admin.EditUserPanel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -58,7 +57,7 @@ import com.google.inject.Inject;
  * @author bgoldowsky
  *
  */
-public class UserService {
+public class UserService implements IUserService {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -96,15 +95,8 @@ public class UserService {
 		}
 	}
 	
-	/**
-	 * Mark a user as valid in the database.  Commits changes
-	 * to the database at the end of the call.  Any methods
-	 * that override this should call the super method at
-	 * the end. 
-	 * 
-	 * see: {@link EditUserPanel#setAutoConfirmNewUser(boolean)}
-	 *
-	 * @param user
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#confirmUser(org.cast.cwm.data.User)
 	 */
 	public void confirmUser(User user) {
 		user.setValid(true);
@@ -112,32 +104,50 @@ public class UserService {
 		cwmService.flushChanges();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#generateSecurityToken(org.apache.wicket.model.IModel)
+	 */
 	public void generateSecurityToken(IModel<User> mUser) {
 		mUser.getObject().generateSecurityToken();
 		cwmService.flushChanges();
 	}
 
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getAllUsers()
+	 */
 	public IModel<List<User>> getAllUsers() {
 		return new UserListModel();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getById(long)
+	 */
 	public IModel<User> getById(long userId) {
 		return new UserModel(userId);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getByUsername(java.lang.String)
+	 */
 	public IModel<User> getByUsername (String username) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setUsername(username);
 		return new UserModel(c);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getBySubjectId(java.lang.String)
+	 */
 	public IModel<User> getBySubjectId (String subjectId) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setSubjectId(subjectId);
 		return new UserModel(c);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getByEmail(java.lang.String)
+	 */
 	public IModel<User> getByEmail (String email) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setEmail(email);
@@ -145,6 +155,9 @@ public class UserService {
 	}
 	
 	// gets both valid and invalid users
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getAllByEmail(java.lang.String)
+	 */
 	public IModel<User> getAllByEmail (String email) {
 
 		// Sort valid users to the top
@@ -163,6 +176,9 @@ public class UserService {
 		return mUser;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getByFullnameFromPeriod(java.lang.String, java.lang.String, org.apache.wicket.model.IModel)
+	 */
 	public IModel<User> getByFullnameFromPeriod(String firstName, String lastName, IModel<Period> period) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setFirstName(firstName);
@@ -172,22 +188,34 @@ public class UserService {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getByRole(org.cast.cwm.data.Role)
+	 */
 	public UserListModel getByRole(Role role) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setRole(role);
 		return new UserListModel(c);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getUserListProvider()
+	 */
 	public ISortableDataProvider<User> getUserListProvider() {
 		return getUserListProvider(null);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getUserListProvider(org.apache.wicket.model.IModel)
+	 */
 	public ISortableDataProvider<User> getUserListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
 		return new SortableHibernateProvider<User>(User.class, c);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getUncachedUserListProvider(org.apache.wicket.model.IModel)
+	 */
 	public ISortableDataProvider<User> getUncachedUserListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
@@ -195,13 +223,8 @@ public class UserService {
 		return new SortableHibernateProvider<User>(User.class, c);
 	}
 
-	/**
-	 * Get an object that will give the total number of logins
-	 * and the latest login date for a particular user.  This is a
-	 * (somewhat) efficient query.
-	 * 
-	 * @param user
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getLoginSessions(org.apache.wicket.model.IModel)
 	 */
 	public LoginData getLoginSessions(IModel<User> user) {
 		return new LoginData(user);
