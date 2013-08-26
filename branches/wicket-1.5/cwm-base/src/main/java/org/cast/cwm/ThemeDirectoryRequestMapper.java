@@ -52,11 +52,11 @@ import org.slf4j.LoggerFactory;
  */
 public class ThemeDirectoryRequestMapper extends AbstractMapper {
 
-	private final String themeDirectory;
+	protected final String themeDirectory;
 	
-	private final String[] prefixes;
+	protected final String[] prefixes;
 	
-	private Duration cacheDuration = null;
+	protected Duration cacheDuration = null;
 	
 	protected static final int COMPATIBILITY_SCORE = 7;
 
