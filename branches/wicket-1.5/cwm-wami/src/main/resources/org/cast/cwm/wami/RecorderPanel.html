@@ -6,10 +6,10 @@
         <div class="status"><div class="msg0">Loading...</div><div class="msg1"></div></div>
         <div class="indicator indicator_busy"><div class="mask"></div></div>
         <div class="actions">
-            <a href="#" onclick="CastRecorder.record();" class="record"><span>Record</span></a>
-            <a href="#" onclick="CastRecorder.play();" class="play"><span>Play</span></a>
-            <a href="#" onclick="CastRecorder.togglePause();" class="pause"><span>Pause</span></a>
-            <a href="#" onclick="CastRecorder.stop();" class="stop"><span>Stop</span></a>
+            <a href="#" onclick="CastRecorder.record(this); return false;" class="record"><span>Record</span></a>
+            <a href="#" onclick="CastRecorder.play(this); return false;" class="play"><span>Play</span></a>
+            <a href="#" onclick="CastRecorder.togglePause(this); return false;" class="pause"><span>Pause</span></a>
+            <a href="#" onclick="CastRecorder.stop(this); return false;" class="stop"><span>Stop</span></a>
         </div>
         <div class="audio_modal">
             <p>
@@ -22,9 +22,8 @@
                 <a href="#" class="button">yes</a>
             </div>
         </div>
+	    <div class="audio_applet_wami" wicket:id="wami"></div>
     </div>
-
-    <div id="wami"></div>
 
 </wicket:panel>
 

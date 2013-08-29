@@ -8,6 +8,7 @@ import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
@@ -48,6 +49,8 @@ public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implem
 	public static final String BINARY_FILE_DATA_MAPPER_PREFIX = "userdata";
 	
 	private AbstractAjaxBehavior listener;
+	
+	private String appletContainerId;
 
 	private static final long serialVersionUID = 1L;
 
@@ -55,6 +58,11 @@ public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implem
 		super(id, mUserContent);
 		listener = new AudioDataListenerBehavior();
 		add(listener);
+		
+		WebMarkupContainer appletContainer = new WebMarkupContainer("wami");
+		appletContainer.setOutputMarkupId(true);
+		add(appletContainer);
+		appletContainerId = appletContainer.getMarkupId();
 	}
 
 	@Override
@@ -80,6 +88,7 @@ public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implem
 		String wamiURL = urlFor(wamiRR, null).toString();
 
         RecorderOptions recorderOptions = new RecorderOptions(
+        		appletContainerId,
                 wamiURL,
                 listener.getCallbackUrl().toString(),
                 BINARY_FILE_DATA_MAPPER_PREFIX + "/",
@@ -152,13 +161,15 @@ public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implem
      *
      */
 	static class RecorderOptions {
+		String id;
         String swfUrl;
         String recordUrl;
         String playPrefix;
         Long userContentId;
         Long binaryFileId;
 
-        RecorderOptions(String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
+        RecorderOptions(String id, String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
+        	this.id = id;
             this.swfUrl = swfUrl;
             this.recordUrl = recordUrl;
             this.playPrefix = playPrefix;

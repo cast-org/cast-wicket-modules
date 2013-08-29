@@ -1,5 +1,6 @@
 var CastRecorder = (function () {
     //Private variables
+	var appletId;
     var recordUrl;
     var playPrefix;
     var userContentId;
@@ -11,7 +12,13 @@ var CastRecorder = (function () {
     var isRecording = false;
     var isLoadingPlay = false;
     var recordingStart;
-
+    
+    var setAppletId = function (id) {
+    	appletId = id;
+    };
+    var getAppletId = function() {
+    	return appletId;
+    };
     var setUserContentId = function (id) {
         userContentId = id;
     };
@@ -47,9 +54,10 @@ var CastRecorder = (function () {
     	// setupRecorder is called at page load time.
         setupRecorder: function (castRecorder) {
             Wami.setup({
-                id: "wami",
+                id: castRecorder.id,
                 swfUrl: castRecorder.swfUrl
             });
+            setAppletId(castRecorder.id);
             setRecordUrl(castRecorder.recordUrl);
             setPlayPrefix(castRecorder.playPrefix);
             setUserContentId(castRecorder.userContentId);
@@ -127,8 +135,9 @@ var CastRecorder = (function () {
         },
         
         // Called by the GUI "Play" button
-        play: function () {
-            CastRecorder.status("PLAY button pressed");
+        play: function (button) {
+        	var applet = $(button).parent('.audio_applet').find('object').get();
+            CastRecorder.status("PLAY button pressed: " + applet);
             if ( isPaused ) {
                 CastRecorder.togglePause();
             } else {
