@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+
+    <div class="audio_applet" id="aa_0">
+        <div class="status"><div class="msg0">Loading...</div><div class="msg1"></div></div>
+        <div class="indicator indicator_busy"><div class="mask"></div></div>
+        <div class="actions">
+            <a href="#" onclick="CastRecorder.record();" class="record"><span>Record</span></a>
+            <a href="#" onclick="CastRecorder.play();" class="play"><span>Play</span></a>
+            <a href="#" onclick="CastRecorder.togglePause();" class="pause"><span>Pause</span></a>
+            <a href="#" onclick="CastRecorder.stop();" class="stop"><span>Stop</span></a>
+        </div>
+        <div class="audio_modal">
+            <p>
+                Would you like to make a new recording?
+                <br />
+                This will erase your old recording.
+            </p>
+            <div class="audio_modal_btn">
+                <a href="#" class="button">no, go back</a>
+                <a href="#" class="button">yes</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="wami"></div>
+
+</wicket:panel>
+
+</html>

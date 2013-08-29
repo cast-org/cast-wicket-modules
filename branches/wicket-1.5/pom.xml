@@ -58,7 +58,8 @@
         <module>cwm-tag</module>
         <module>cwm-xml</module>
     <module>cwm-db</module>
-  </modules>
+    <module>cwm-wami</module>
+    </modules>
 
     <repositories>
         <repository>
