@@ -1,15 +1,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns:wicket="http://wicket.apache.org">
 <wicket:panel>
-
-    <div class="audio_applet" id="aa_0">
+    <div class="audio_applet">
         <div class="status"><div class="msg0">Loading...</div><div class="msg1"></div></div>
         <div class="indicator indicator_busy"><div class="mask"></div></div>
         <div class="actions">
-            <a href="#" onclick="CastRecorder.record(this); return false;" class="record"><span>Record</span></a>
-            <a href="#" onclick="CastRecorder.play(this); return false;" class="play"><span>Play</span></a>
-            <a href="#" onclick="CastRecorder.togglePause(this); return false;" class="pause"><span>Pause</span></a>
-            <a href="#" onclick="CastRecorder.stop(this); return false;" class="stop"><span>Stop</span></a>
+            <a href="#" onclick="getEnclosingCastRecorder(this).record(); return false;" class="record"><span>Record</span></a>
+            <a href="#" onclick="getEnclosingCastRecorder(this).play(); return false;" class="play"><span>Play</span></a>
+            <a href="#" onclick="getEnclosingCastRecorder(this).togglePause(); return false;" class="pause"><span>Pause</span></a>
+            <a href="#" onclick="getEnclosingCastRecorder(this).stop(); return false;" class="stop"><span>Stop</span></a>
+			<a href="#" class="settings" title="Settings"><span>Settings</span></a>
         </div>
         <div class="audio_modal">
             <p>

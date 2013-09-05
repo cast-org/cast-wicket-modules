@@ -115,7 +115,8 @@ public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implem
                 (hasExistingContent ? getModelObject().getPrimaryFile().getId() : 0) );
 
         Gson gson = new Gson();
-        response.renderOnLoadJavaScript("CastRecorder.setupRecorder( " + gson.toJson(recorderOptions) +  " );" );
+        response.renderOnLoadJavaScript(String.format("createCastRecorder('%s', %s);", 
+        		this.getMarkupId(), gson.toJson(recorderOptions)));
 	}
 
 	/**
