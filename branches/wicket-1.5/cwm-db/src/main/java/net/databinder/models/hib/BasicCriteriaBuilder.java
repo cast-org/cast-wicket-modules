@@ -24,7 +24,10 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 
 /**
- * A simple implementation of a CriteriaBuilder that applies some given Restrictions.
+ * A simple implementation of a CriteriaBuilder that applies some given Restrictions
+ * and, optionally, an Order.
+ * 
+ * This does not set the query to be cachable; if it should be, use {@link BasicCachableCriteriaBuilder}.
  * 
  * Example usage:
  * 
@@ -33,7 +36,7 @@ import org.hibernate.criterion.Order;
  * @author bgoldowsky
  *
  */
-public class BasicCriteriaBuilder implements CriteriaBuilder {
+public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -57,11 +60,19 @@ public class BasicCriteriaBuilder implements CriteriaBuilder {
 		this.requestedCriteria = criteria;
 	}
 
-	public void build(Criteria query) {
+	public void buildUnordered(Criteria criteria) {
 		for (int i=0; i<requestedCriteria.length; i++)
-			query.add(requestedCriteria[i]);
+			criteria.add(requestedCriteria[i]);
+	}
+
+	public void buildOrdered(Criteria criteria) {
+		buildUnordered(criteria);
 		if (requestedOrder != null)
-			query.addOrder(requestedOrder);
+			criteria.addOrder(requestedOrder);
+	}
+
+	public void build(Criteria criteria) {
+		buildOrdered(criteria);
 	}
 
 }
