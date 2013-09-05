@@ -27,7 +27,7 @@ import org.hibernate.criterion.Order;
  * A simple implementation of a CriteriaBuilder that applies some given Restrictions
  * and, optionally, an Order.
  * 
- * This does not set the query to be cachable; if it should be, use {@link BasicCachableCriteriaBuilder}.
+ * This does not set the query to be cachable; if it should be, use {@link BasicCacheableCriteriaBuilder}.
  * 
  * Example usage:
  * 
