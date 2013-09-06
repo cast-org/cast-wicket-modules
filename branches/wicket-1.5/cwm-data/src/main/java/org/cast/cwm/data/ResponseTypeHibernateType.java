@@ -67,6 +67,8 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 			throws HibernateException, SQLException {
 		assert names.length == 1;
 		String typeName = rs.getString(names[0]);
+		if (typeName == null)
+			return null;
 		return typeRegistry.getResponseType(typeName);
 	}
 
