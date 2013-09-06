@@ -96,7 +96,7 @@ function castRecorderBuilder () {
     	// setupRecorder is called at page load time.
         setupRecorder: function (id, config) {
             Wami.setup({
-                id:id,
+                id:config.swfId,
                 swfUrl: config.swfUrl
             });
             setAppletId(id);
@@ -175,9 +175,9 @@ function castRecorderBuilder () {
             } else {
             	this.status("Playing with url: " + getPlayUrl());
                 Wami.startPlaying(getPlayUrl(), 
-                		null, 
+                		null,  // start playing callback
                 		Wami.nameCallback(function() { getCastRecorder(appletId).playComplete(); }), 
-                		null, 
+                		null,  // play error callback
                 		Wami.nameCallback(function() { getCastRecorder(appletId).paused(); }), 
                 		Wami.nameCallback(function() { getCastRecorder(appletId).resumed() }));
                 this.playIntervalStart();

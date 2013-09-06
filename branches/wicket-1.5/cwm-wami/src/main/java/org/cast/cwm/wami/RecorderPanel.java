@@ -19,32 +19,27 @@
  */
 package org.cast.cwm.wami;
 
-import com.google.gson.Gson;
-import com.google.inject.Inject;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.TextRequestHandler;
-import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.io.IOUtils;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.UserContent;
 import org.cast.cwm.service.ICwmService;
-import org.wicketstuff.jslibraries.JSLib;
-import org.wicketstuff.jslibraries.Library;
-import org.wicketstuff.jslibraries.VersionDescriptor;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.inject.Inject;
 
 /**
  * An audio recorder and player.
@@ -60,63 +55,32 @@ import java.io.IOException;
  *
  */
 @Slf4j
-public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implements IHeaderContributor {
+public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> implements IHeaderContributor {
 
 	@Inject
 	private ICwmService cwmService;
-
-	public static final String BINARY_FILE_DATA_MAPPER_PREFIX = "userdata";
 	
 	private AbstractAjaxBehavior listener;
 	
-	private String appletContainerId;
-
 	private static final long serialVersionUID = 1L;
+
+	public RecorderPanel(String id, IModel<T> mUserContent, WamiAppletHolder appletHolder) {
+		super(id, mUserContent, appletHolder);
+		listener = new AudioDataListenerBehavior();
+		add(listener);
+	}
 
 	public RecorderPanel(String id, IModel<T> mUserContent) {
 		super(id, mUserContent);
 		listener = new AudioDataListenerBehavior();
 		add(listener);
-		
-		WebMarkupContainer appletContainer = new WebMarkupContainer("wami");
-		appletContainer.setOutputMarkupId(true);
-		add(appletContainer);
-		appletContainerId = appletContainer.getMarkupId();
 	}
 
 	@Override
-	public void renderHead(IHeaderResponse response) {
-		super.renderHead(response);
-		
-		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.SWFOBJECT, 2)).renderHead(response);
-
-//        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "normalize.css"));
-//        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "edit.css"));
-
-        response.renderJavaScriptReference(new PackageResourceReference(RecorderPanel.class, "audio_applet.js"));
-        response.renderJavaScriptReference(new PackageResourceReference(RecorderPanel.class, "wami-recorder.js"));
-        response.renderJavaScriptReference(new PackageResourceReference(RecorderPanel.class, "castrecorder.js"));
-
-        configureRecorder(response);
-	}
-
-	protected void configureRecorder(IHeaderResponse response) {
-		boolean hasExistingContent = getModelObject().getPrimaryFile() != null;
-		
-		PackageResourceReference wamiRR = new PackageResourceReference(RecorderPanel.class, "Wami2.swf");
-		String wamiURL = urlFor(wamiRR, null).toString();
-
-        RecorderOptions recorderOptions = new RecorderOptions(
-        		appletContainerId,
-                wamiURL,
-                listener.getCallbackUrl().toString(),
-                BINARY_FILE_DATA_MAPPER_PREFIX + "/",
-                getModelObject().getId(),
-                (hasExistingContent ? getModelObject().getPrimaryFile().getId() : 0) );
-
-        Gson gson = new Gson();
-        response.renderOnLoadJavaScript(String.format("createCastRecorder('%s', %s);", 
-        		this.getMarkupId(), gson.toJson(recorderOptions)));
+	protected RecorderOptions getRecorderOptions() {
+		RecorderOptions options = super.getRecorderOptions();
+		options.recordUrl = listener.getCallbackUrl().toString();
+		return options;
 	}
 
 	/**
@@ -174,30 +138,6 @@ public class RecorderPanel<T extends UserContent> extends GenericPanel<T> implem
 	    }
 		
 	}
-
-    /**
-     * Configuration information sent to the recorder javascript.
-     * This is a structure to be rendered as a JSON configuration argument. 
-     *
-     */
-	static class RecorderOptions {
-		String id;
-        String swfUrl;
-        String recordUrl;
-        String playPrefix;
-        Long userContentId;
-        Long binaryFileId;
-
-        RecorderOptions(String id, String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
-        	this.id = id;
-            this.swfUrl = swfUrl;
-            this.recordUrl = recordUrl;
-            this.playPrefix = playPrefix;
-            this.userContentId = userContentId;
-            this.binaryFileId = binaryFileId;
-        }
-    }
-
 	
 	/**
 	 * The response information sent back to the recorder javascript after a save.
