@@ -394,10 +394,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
     }
 
 	public void renderHead(final IHeaderResponse response) {
-
-		new JQueryHeaderContributor().renderHead(response);
-		response.renderJavaScriptReference(JS_REFERENCE);
-        response.renderCSSReference(BLOCKING_CSS_REFERENCE);
+		renderJSinclusions(response);
+        renderCSSinclusions(response);
 
         // Move dialog components out of any containers on the page so that page CSS doesn't interfere with proper display
         // and so that they display on top of other content in older IE versions that don't respect z-index.
@@ -409,13 +407,22 @@ public class DialogBorder extends Border implements IHeaderContributor {
 				"$('#" + contentContainer.getMarkupId() + "').detach().appendTo('body');"
 				+ (masking ? "$('#" + overlay.getMarkupId() + "').detach().appendTo('body');" : ""));
         }
+	}
+	
+	protected void renderJSinclusions(final IHeaderResponse response) {
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(JS_REFERENCE);
+	}
+
+	protected void renderCSSinclusions(final IHeaderResponse response) {
+		response.renderCSSReference(BLOCKING_CSS_REFERENCE);
 		if (styleReferences == null)
 			response.renderCSSReference(new PackageResourceReference(DialogBorder.class, "modal.css"));
 		else
 			for (ResourceReference ref : styleReferences)
 				response.renderCSSReference(ref);
 	}
-
+	
 	/**
 	 * Set the list of CSS style resource references that this dialog should
 	 * render.  Use this to override the default styles.
