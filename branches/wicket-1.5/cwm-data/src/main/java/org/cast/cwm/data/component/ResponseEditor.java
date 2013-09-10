@@ -348,7 +348,6 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
-					onSave(target);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
 					mOriginalResponse = getModel();
@@ -367,7 +366,14 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public boolean isVisible() {
 					return saveVisible;
-				}				
+				}	
+
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+								
 			};
 			add(save);
 			
@@ -582,7 +588,6 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
-					onSave(target);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
 					mOriginalResponse = getModel();
@@ -602,6 +607,13 @@ public abstract class ResponseEditor extends Panel {
 				public boolean isVisible() {
 					return saveVisible;
 				}				
+
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+
 			};
 			add(save);			
 
@@ -809,7 +821,6 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
-					onSave(target);			
 				}
 				
 				@Override
@@ -821,6 +832,13 @@ public abstract class ResponseEditor extends Panel {
 				protected Collection<? extends Component> getComponents() {
 					return Arrays.asList(this, cancelButton, deleteButton);
 				}
+
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+
 			};
 			add(save);
 		}
@@ -912,15 +930,13 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
-					onSave(target);		
 				}
 				
 				@Override
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
 				}
-				
-	
+					
 				@Override
 				protected IAjaxCallDecorator getAjaxCallDecorator() {
 					return new DisablingAjaxCallDecorator(getComponents()) {
@@ -942,7 +958,14 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public boolean isVisible() {
 					return saveVisible;
-				}				
+				}	
+				
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+				
 			};
 			add(save);
 		}
