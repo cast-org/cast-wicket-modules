@@ -22,6 +22,9 @@ package org.cast.cwm.xml.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cast.cwm.xml.handler.DefaultDynamicComponentHandler;
+import org.cast.cwm.xml.handler.IDynamicComponentHandler;
+
 import lombok.Getter;
 import lombok.Setter;
 

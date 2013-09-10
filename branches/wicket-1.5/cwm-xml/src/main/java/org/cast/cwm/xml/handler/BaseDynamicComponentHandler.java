@@ -17,9 +17,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.xml.component;
+package org.cast.cwm.xml.handler;
 
-import org.cast.cwm.xml.component.IDynamicComponentHandler;
 
 /**
  * An abstract basic Component Handler specifying a wicketId prefix that it can handle.

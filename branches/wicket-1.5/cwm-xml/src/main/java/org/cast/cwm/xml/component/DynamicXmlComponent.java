@@ -25,6 +25,7 @@ import org.cast.cwm.IRelativeLinkSource;
 import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.XmlSection;
+import org.cast.cwm.xml.handler.IDynamicComponentHandler;
 import org.w3c.dom.Element;
 
 import com.google.inject.Inject;

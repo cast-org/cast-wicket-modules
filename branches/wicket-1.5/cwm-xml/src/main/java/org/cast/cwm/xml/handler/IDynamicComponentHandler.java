@@ -17,10 +17,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.xml.component;
+package org.cast.cwm.xml.handler;
 
 import org.apache.wicket.Component;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.xml.component.IDynamicComponentResolver;
 import org.w3c.dom.Element;
 
 /**

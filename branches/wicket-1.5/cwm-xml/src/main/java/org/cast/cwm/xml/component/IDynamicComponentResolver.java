@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.xml.component;
 
+import org.cast.cwm.xml.handler.IDynamicComponentHandler;
+
 /**
  * A service to locate the handler for a given wicketId.
  * 
