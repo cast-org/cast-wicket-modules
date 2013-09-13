@@ -46,7 +46,7 @@ public class DynamicXmlComponent extends XmlComponent {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private IDynamicComponentResolver resolver;
+	protected IDynamicComponentResolver resolver;
 
 	public DynamicXmlComponent(String id,
 			ICacheableModel<? extends IXmlPointer> secMod, String transformName) {
@@ -60,7 +60,7 @@ public class DynamicXmlComponent extends XmlComponent {
 		return handler.getComponent(wicketId, elt, getLinkSource());
 	}
 
-	private IRelativeLinkSource getLinkSource() {
+	protected IRelativeLinkSource getLinkSource() {
 		IXmlPointer pointer = getModel().getObject();
 		if (!(pointer instanceof XmlSection))
 			throw new IllegalStateException("Can't find file reference for xml element");
