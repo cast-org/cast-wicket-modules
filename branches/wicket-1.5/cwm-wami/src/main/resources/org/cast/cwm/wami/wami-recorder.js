@@ -82,13 +82,11 @@ Wami.setup = function(options) {
 		// Start with default options
 		_options = {
 			swfUrl : "Wami.swf",
-			onReady : function() {
-				Wami.hide();
-			},
-			onSecurity : checkSecurity,
-			onError : function(error) {
-				alert(error);
-			}
+            delaySecurity : true,
+			onReady : function() { Wami.hide(); },
+			onError : function(error) { alert(error); },
+			onBeforeSecurityShown: function() { },
+			onAfterSecurityShown: function() { }
 		};
 
 		if (typeof options == 'undefined') {
@@ -113,14 +111,17 @@ Wami.setup = function(options) {
 			_options.onLoaded = options.onLoaded;
 		}
 
-		if (options.onSecurity) {
-			_options.onSecurity = options.onSecurity;
-		}
-
 		if (options.onError) {
 			_options.onError = options.onError;
 		}
+		
+		if (options.onBeforeSecurityShown) {
+			_options.onBeforeSecurityShown = options.onBeforeSecurityShown;
+		}
 
+		if (options.onAfterSecurityShown) {
+			_options.onAfterSecurityShown = options.onAfterSecurityShown;
+		}
 		// Create a DIV for the SWF under _options.id
 
 		var container = document.createElement('div');
@@ -138,19 +139,17 @@ Wami.setup = function(options) {
 		_options.id = id;
 	}
 
-	function checkSecurity() {
+	function checkSecurity(ifGrantedAction) {
 		var settings = Wami.getSettings();
 		if (settings.microphone.granted) {
-			_options.onReady();
+			ifGrantedAction();
 		} else {
-			// Show any Flash settings panel you want:
-			// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/SecurityPanel.html
-			Wami.showSecurity(
+        	Wami.showSecurity(
                 "privacy",
-                "Wami.show",
-                Wami.nameCallback(_options.onSecurity),
+                null, // before
+                Wami.nameCallback(function() { if (Wami.getSettings().microphone.granted) { ifGrantedAction(); } }),
                 Wami.nameCallback(_options.onError));
-		}
+        }
 	}
 
 	// Embed the WAMI SWF and call the named callback function when loaded.
@@ -213,12 +212,11 @@ Wami.setup = function(options) {
 
 		function delegate(name) {
 			Wami[name] = function() {
-				return recorder[name].apply(recorder, arguments);
+                return recorder[name].apply(recorder, arguments);
 			}
 		}
 		delegate('startPlaying');
 		delegate('stopPlaying');
-		delegate('startRecording');
 		delegate('stopRecording');
 		delegate('startListening');
 		delegate('stopListening');
@@ -227,6 +225,10 @@ Wami.setup = function(options) {
         delegate('getPlayingPercentComplete');
 		delegate('setSettings');
         delegate('togglePause');
+        
+        Wami.startRecording = function(url, startfn, finishedfn, failedfn) {
+            checkSecurity(function() { recorder.startRecording(url, startfn, finishedfn, failedfn); });
+        }
 
 		// Append extra information about whether mic settings are sticky
 		Wami.getSettings = function() {
@@ -236,16 +238,20 @@ Wami.setup = function(options) {
 		}
 
 		Wami.showSecurity = function(panel, startfn, finishedfn, failfn) {
+        	// Show any Flash settings panel you want:
+        	// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/SecurityPanel.html
 			// Flash must be on top for this.
 			var container = document.getElementById(_options.cid);
-
-			var augmentedfn = Wami.nameCallback(function() {
-				checkRemembered(finishedfn);
-				container.style.cssText = "position: absolute;";
-			});
-
 			container.style.cssText = "position: absolute; z-index: 99999";
-
+			Wami.show();
+			_options.onBeforeSecurityShown();
+			
+			var augmentedfn = Wami.nameCallback(function() {
+				container.style.cssText = "position: absolute;";
+				_options.onAfterSecurityShown();
+				checkRemembered(finishedfn);
+			});
+			
 			recorder.showSecurity(panel, startfn, augmentedfn, failfn);
 		}
 
@@ -270,8 +276,10 @@ Wami.setup = function(options) {
 			_options.onLoaded();
 		}
 
-		if (!_options.noSecurityCheck) {
+		if (!_options.noSecurityCheck && !_options.delaySecurity) {
 			checkSecurity();
 		}
+
+		_options.onReady();
 	}
 }
