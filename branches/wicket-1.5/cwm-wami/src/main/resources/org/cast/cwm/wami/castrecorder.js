@@ -1,17 +1,22 @@
 var castRecorderInstances = new Object();
 
+var castRecorderLatest = null; // name of the one that is currently active
+
 // Create a new CAST Audio Recorder object, suitable as the backend of a new set of GUI controls.
 // The ID must be the ID of some HTML element wrapping the controls, so that the buttons and indicators
 // can be found and manipulated by the Javascript.
 function createCastRecorder (id, configuration) {
 	var instance = castRecorderBuilder();
-	instance.setupRecorder(id, configuration);
 	castRecorderInstances[id] = instance;
+	castRecorderLatest = id;
+	instance.setupRecorder(id, configuration);
 	console.log("Created CastRecorder " + id);
 }
 
 // Retrive a recorder object by the name that was given when it was set up.
 function getCastRecorder (name) {
+	if(!castRecorderInstances[name])
+		console.log("getCastRecorder lookup failed, no such name " + name);
 	return castRecorderInstances[name];
 }
 
@@ -38,9 +43,11 @@ function elapsed_time_string (total_seconds) {
     return padTime(minutes) + ":" + padTime(seconds);
 };
 
-// Moves and sizes the SWF to match the GUI
-function beforeSecurityCallback (swfId, guiId) {
+// Moves and sizes the SWF to match the castRecorderLatest GUI
+function beforeSecurityCallback (swfId) {
+	var guiId = castRecorderLatest;
 	var gui = $("#"+guiId).find(".audio_applet").get(0);
+	console.log("For " + guiId + ", found " + gui);
 	var guiO = $(gui).offset();
 
 	var swf = $("#"+swfId); 
@@ -56,7 +63,7 @@ function beforeSecurityCallback (swfId, guiId) {
 	//	alert ("Before security.  SWF ID is " + swfId + "; GUI ID is " + guiId);
 }
 
-function afterSecurityCallback (swfId, guiId, perm) {
+function afterSecurityCallback (swfId, perm) {
 	// alert ("After security.  SWF ID is " + swfId + "; GUI ID is " + guiId + "; permission=" + perm);
 }
 
@@ -117,18 +124,18 @@ function castRecorderBuilder () {
     	
     	// setupRecorder is called at page load time.
         setupRecorder: function (id, config) {
-            Wami.setup({
-                id:config.swfId,
-                swfUrl: config.swfUrl,
-                onReady: function() { getCastRecorder(id).ready(); },
-                onBeforeSecurityShown: function() { beforeSecurityCallback(config.swfId, getAppletId()); },
-                onAfterSecurityShown: function() { afterSecurityCallback(config.swfId, getAppletId(), Wami.getSettings().microphone.granted); }
-            });
             setAppletId(id);
             setRecordUrl(config.recordUrl);
             setPlayPrefix(config.playPrefix);
             setUserContentId(config.userContentId);
             setBinaryFileId(config.binaryFileId);
+            Wami.setup({
+                id:config.swfId,
+                swfUrl: config.swfUrl,
+                onReady: function() { getCastRecorder(getAppletId()).ready(); },
+                onBeforeSecurityShown: function() { beforeSecurityCallback(config.swfId); },
+                onAfterSecurityShown: function() { afterSecurityCallback(config.swfId, Wami.getSettings().microphone.granted); }
+            });
         },
         
         ready: function () {
@@ -144,10 +151,18 @@ function castRecorderBuilder () {
             }        	
         },
         
+        // Called by the GUI "settings" button
+        settings: function() {
+        	this.status("SETTINGS button pressed");
+        	castRecorderLatest = appletId;
+        	Wami.showSecurity('privacy');
+        },
+        
         // Called by the GUI "record" button
         record: function () {
             this.status("RECORD button pressed");
             this.status("Recording with url: " + getRecordUrl());
+            castRecorderLatest = appletId;
             Wami.startRecording(getRecordUrl(), 
             		Wami.nameCallback(function() { getCastRecorder(appletId).recordingStart(); }),
             		Wami.nameCallback(function(data) { getCastRecorder(appletId).recordingComplete(data); }), 
