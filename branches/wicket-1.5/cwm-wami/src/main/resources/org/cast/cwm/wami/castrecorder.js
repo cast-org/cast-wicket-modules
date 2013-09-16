@@ -251,6 +251,7 @@ function castRecorderBuilder () {
                 }
                 if ( !isLoadingPlay ) {
                     audioSlider(appletId,complete);
+                    audioStatus(appletId, 'playback', complete, '100');
                 }
             }, 200);
         },
