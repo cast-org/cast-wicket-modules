@@ -45,6 +45,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.util.string.Strings;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -203,6 +204,39 @@ public class UserContent extends PersistedObject {
 		if (!ObjectUtils.equals(this.primaryFile, primaryFile))
 			this.lastUpdated = new Date();
 		this.primaryFile = primaryFile;
+	}
+	
+	public boolean isEmpty() {
+						
+		if (this.getDataType().getName().equals(("TEXT"))) {
+			if (this.getText() == null || (StringUtils.isBlank(this.getText()))) {
+					return true;
+			}
+			return false;
+		}
+		else if (this.getDataType().getName().equals(("SVG"))) {
+			if (this.getText() == null ||
+				(StringUtils.isBlank(text))  ||  
+				(this.getText().trim().replaceAll("\\s[\\s]*", "").equals("<svgwidth=\"535\"height=\"325\"xmlns=\"http://www.w3.org/2000/svg\"><gdisplay=\"inline\"><title>Layer1</title></g></svg>")) || 
+				(this.getText().trim().replaceAll("\\s[\\s]*", "").equals("<svgwidth=\"535\"height=\"325\"xmlns=\"http://www.w3.org/2000/svg\"><!--CreatedwithSVG-edit-http://svg-edit.googlecode.com/--><g><title>Layer1</title></g></svg>"))
+				) {		
+				return true;
+			}
+			return false;
+		}
+		else if (this.getDataType().getName().equals(("AUDIO"))) {
+			if (this.getPrimaryFile() == null) {
+					return true;
+			}
+			return false;
+		}
+		else if (this.getDataType().getName().equals(("ARTIMAGE"))) {
+			return false;
+		}
+		else {
+			return true;
+		}
+		
 	}
 
 }
