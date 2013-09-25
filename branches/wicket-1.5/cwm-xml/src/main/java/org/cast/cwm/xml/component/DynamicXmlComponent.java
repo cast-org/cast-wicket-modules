@@ -20,6 +20,7 @@
 package org.cast.cwm.xml.component;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.model.IModel;
 import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
 import org.cast.cwm.xml.ICacheableModel;
@@ -53,11 +54,15 @@ public class DynamicXmlComponent extends XmlComponent {
 		super(id, secMod, transformName);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Component getDynamicComponent(String wicketId, Element elt) {
 	
 		IDynamicComponentHandler handler = resolver.getHandler(wicketId);
-		return handler.getComponent(wicketId, elt, getLinkSource());
+		return handler.getComponent(wicketId, 
+				elt, 
+				getLinkSource(), 
+				(IModel<? extends IXmlPointer>) getDefaultModel());
 	}
 
 	protected IRelativeLinkSource getLinkSource() {

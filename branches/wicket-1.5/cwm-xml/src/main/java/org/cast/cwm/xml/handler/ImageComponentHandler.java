@@ -21,8 +21,10 @@ package org.cast.cwm.xml.handler;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.xml.IXmlPointer;
 import org.w3c.dom.Element;
 
 public class ImageComponentHandler extends BaseDynamicComponentHandler implements IDynamicComponentHandler {
@@ -32,7 +34,7 @@ public class ImageComponentHandler extends BaseDynamicComponentHandler implement
 	}
 
 	public Component getComponent(String wicketId, Element element,
-			IRelativeLinkSource linkSource) {
+			IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod) {
 		String src = element.getAttribute("src");
 		ResourceReference imgRef = linkSource.getRelativeReference(src);
 		return new Image(wicketId, imgRef);

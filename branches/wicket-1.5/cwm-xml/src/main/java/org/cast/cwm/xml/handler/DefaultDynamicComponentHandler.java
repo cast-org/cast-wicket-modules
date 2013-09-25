@@ -24,7 +24,9 @@ import org.apache.wicket.Component;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.IModel;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.service.IXmlService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -69,7 +71,7 @@ public class DefaultDynamicComponentHandler implements IDynamicComponentHandler 
 	}
 
 	public Component getComponent(String wicketId, Element element,
-			IRelativeLinkSource linkSource) {
+			IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod ) {
 		boolean isContainer = false;
 		
 		// Check to see if this element has any Wicket Children.

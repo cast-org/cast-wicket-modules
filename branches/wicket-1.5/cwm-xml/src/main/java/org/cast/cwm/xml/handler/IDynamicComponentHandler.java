@@ -20,7 +20,9 @@
 package org.cast.cwm.xml.handler;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.model.IModel;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.component.IDynamicComponentResolver;
 import org.w3c.dom.Element;
 
@@ -40,9 +42,10 @@ public interface IDynamicComponentHandler {
 	 * @param wicketId wicket id for component
 	 * @param element xml markup for component
 	 * @param linkSource sometime needed for resolution of links relative to input xml.
+	 * @param secMod access to the source xml
 	 * @return a Component with given wicket Id using the Xml of the element as markup.
 	 */
-	Component getComponent(String wicketId, Element element, IRelativeLinkSource linkSource);
+	Component getComponent(String wicketId, Element element, IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod);
 
 	/**
 	 * Is this the appropriate handler for a given fragment identified by wicketId?
