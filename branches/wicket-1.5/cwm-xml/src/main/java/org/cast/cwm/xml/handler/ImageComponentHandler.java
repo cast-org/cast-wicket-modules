@@ -35,7 +35,7 @@ public class ImageComponentHandler extends BaseDynamicComponentHandler implement
 
 	public Component getComponent(String wicketId, Element element,
 			IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod) {
-		String src = element.getAttribute("src");
+		String src = element.getAttributeNS(null, "src");
 		ResourceReference imgRef = linkSource.getRelativeReference(src);
 		return new Image(wicketId, imgRef);
 	}

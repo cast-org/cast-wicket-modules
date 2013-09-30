@@ -34,6 +34,8 @@ import com.google.inject.Inject;
 
 /**
  * A Resource that serves a single BinaryFileData object.
+ * 
+ * TODO: reconcile this with the almost-identical UploadedFileResource
  */
 public class BinaryFileDataResource extends AbstractResource {
 

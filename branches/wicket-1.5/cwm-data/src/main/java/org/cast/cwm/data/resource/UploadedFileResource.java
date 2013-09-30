@@ -36,6 +36,8 @@ import com.google.inject.Inject;
  * the file with the matching ID in the database.  If the file is
  * not found, this will throw a 404 Not Found Error.
  * 
+ * TODO: reconcile this with the almost-identical BinaryFileDataResource
+ * 
  * @author jbrookover
  *
  */
@@ -87,6 +89,7 @@ public class UploadedFileResource extends AbstractResource {
 		return response;
 	}
 
+	// FIXME this can't be right
 	@Override
 	public boolean equals(Object that) {
 		return that instanceof SvgImageResource;

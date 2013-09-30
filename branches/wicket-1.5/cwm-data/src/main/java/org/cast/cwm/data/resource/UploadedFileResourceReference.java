@@ -26,7 +26,7 @@ import org.apache.wicket.request.resource.ResourceReference;
  * Mountable reference to the {@link UploadedFileResource} class.
  * UploadedFileResource expects an id parameter, so mount it like this:
  * <pre>
- *     mountResource("/uploads/${id}", new SvgImageResourceReference());
+ *     mountResource("/uploads/${id}", new UploadedFileResourceReference());
  * </pre>
  * 
  * @author bgoldowsky
