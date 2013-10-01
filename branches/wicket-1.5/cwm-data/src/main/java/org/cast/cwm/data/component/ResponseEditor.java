@@ -78,7 +78,6 @@ import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
-import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.drawtool.SvgEditor;
@@ -970,12 +969,6 @@ public abstract class ResponseEditor extends Panel {
 			add(save);
 		}
 		
-		@Override
-		protected void onBeforeRender() {
-			if (ChromeFrameUtils.isBareIE())
-				replaceWith(new SvgNotSupportedFragment(this.getId()));
-			super.onBeforeRender();
-		}
 	}
 	
 	protected class SvgNotSupportedFragment extends Fragment {

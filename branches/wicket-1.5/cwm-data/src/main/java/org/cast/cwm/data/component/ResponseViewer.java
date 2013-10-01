@@ -43,7 +43,6 @@ import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.data.resource.ThumbnailUploadedImageResourceReference;
 import org.cast.cwm.data.resource.UploadedFileResourceReference;
@@ -220,12 +219,6 @@ public class ResponseViewer extends Panel {
 			add(new SvgImage("drawing", model, maxWidth, maxHeight));
 		}
 		
-		@Override
-		protected void onBeforeRender() {
-			if (ChromeFrameUtils.isBareIE())
-				replaceWith(new SvgNotSupportedFragment(this.getId()));
-			super.onBeforeRender();
-		}
 	}
 	
 	public class AudioFragment extends Fragment {
