@@ -61,6 +61,9 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 	protected static final int COMPATIBILITY_SCORE = 7;
 
 	private static final Logger log = LoggerFactory.getLogger(ThemeDirectoryRequestMapper.class);
+	
+	// flag to ignore warning when using a custom directory mapper with this standard mapper
+	protected boolean logWarning = true;
 
 	public ThemeDirectoryRequestMapper(File themeDirectory, String... prefixes) {
 		super();
@@ -124,7 +127,8 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 			};
 			return rs;
 		}
-		log.warn("Nonexistent theme file requested: {}", file);
+		if (logWarning)
+			log.warn("Nonexistent theme file requested: {}", file);
 		return null;
 	}
 
