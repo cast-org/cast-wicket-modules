@@ -34,20 +34,12 @@
     	<scope>provided</scope>
     </dependency>
     <dependency>
-    	<groupId>javassist</groupId>
-    	<artifactId>javassist</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>org.hibernate</groupId>
     	<artifactId>hibernate-c3p0</artifactId>
     </dependency>
     <dependency>
     	<groupId>org.hibernate</groupId>
     	<artifactId>hibernate-ehcache</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>net.sf.ehcache</groupId>
-    	<artifactId>ehcache-core</artifactId>
     </dependency>
   </dependencies>
   
