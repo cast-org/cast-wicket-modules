@@ -85,17 +85,11 @@ public class AdminHome extends AdminPage {
 			list.add(new BookmarkablePageLink<Page>("link", DatabaseStatisticsPage.class).add(new Label("label", "Database Statistics")));
 			list.add(new BookmarkablePageLink<Page>("link", SessionListPage.class).add(new Label("label", "Open login sessions")));
 			list.add(new BookmarkablePageLink<Page>("link", InspectorPage.class).add(new Label("label", "Wicket Inspector Page")));
-			// Can't just use a bookmarkable page link for data browser, since it's only bookmarkable in development mode
-//			list.add(new Link<Void>("link") {
-//				private static final long serialVersionUID = 1L;
-//				@Override
-//				public void onClick() {
-//					setResponsePage(new net.databinder.components.hib.DataBrowser<Void>(true));					
-//				}
-//			}.add(new Label("label", "Data browser")));
 		}
 		
+		// Links for admins and researchers
 		list.add(new BookmarkablePageLink<Page>("link", EventLog.class).add(new Label("label", "Event Log")));
+		list.add(new BookmarkablePageLink<Page>("link", UserContentLogPage.class).add(new Label("label", "User Content Log")));
 		
 		return list;
 	}
