@@ -216,6 +216,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	public void detach() {
 		if (userModel != null)
 			userModel.detach();
+		super.detach();
 	}
 	
 	/** Nullifies userModela nd clears authentication cookies. */
