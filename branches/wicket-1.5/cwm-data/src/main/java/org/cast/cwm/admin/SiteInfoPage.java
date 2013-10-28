@@ -387,7 +387,7 @@ public class SiteInfoPage extends AdminPage {
 			List<String> headers = new ArrayList<String>();
 			headers.add("Line");  headers.add("SubjectID"); headers.add("Type"); 
 			headers.add("Period"); headers.add("Username"); headers.add("Password"); 
-			headers.add("Full Name"); headers.add("Email");
+			headers.add("Full Name"); headers.add("Email"); headers.add("Permission");
 
 			resultsContainer.add(new ListView<String>("headers", headers) {
 
@@ -416,6 +416,7 @@ public class SiteInfoPage extends AdminPage {
 					values.add(p.getUsername()); values.add("********");
 					values.add(p.getFullName());
 					values.add(p.getEmail());
+					values.add(String.valueOf(p.isPermission()));
 					item.add(new ListView<String>("data-columns", values) {
 
 						private static final long serialVersionUID = 1L;

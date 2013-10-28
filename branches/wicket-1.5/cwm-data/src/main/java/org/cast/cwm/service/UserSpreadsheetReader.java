@@ -320,6 +320,16 @@ public class UserSpreadsheetReader implements Serializable {
   			user.getObject().setLastName(map.get("lastname"));
   		else
   			errors += "Must specify \"lastname.\" \n";
+
+  		// Set Permission
+  		boolean permission = false;
+		if (map.containsKey("permission") && !map.get("permission").isEmpty()) {
+			if (map.get("permission").trim().toLowerCase().equals("true") || map.get("permission").trim().equals("1") ) {
+				permission = true;
+			}
+  		}
+		user.getObject().setPermission(permission);
+
   		
   		// Set Type
   		if(map.containsKey("type")) {
