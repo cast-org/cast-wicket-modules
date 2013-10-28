@@ -85,7 +85,8 @@ public class EventLog extends AdminPage {
 	protected IModel<List<Site>> showSitesM;
 	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<Boolean> showNoSite;
-	
+	protected IModel<Boolean> showPermissionUsers;
+
 	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 	private static final Logger log = LoggerFactory.getLogger(EventLog.class);
 	
@@ -172,7 +173,12 @@ public class EventLog extends AdminPage {
 	
 	protected void addOtherFilters(Form<Object> form) {
 		showNoSite = new Model<Boolean>(false);
-		form.add(new CheckBox("showNoSite", showNoSite));
+		form.add(new CheckBox("showNoSite", showNoSite));		
+
+		showPermissionUsers = new Model<Boolean>(true);
+		form.add(new CheckBox("showPermissionUsers", showPermissionUsers));
+		
+		
 	}
 
 	protected List<IDataColumn> makeColumns() {
@@ -271,6 +277,11 @@ public class EventLog extends AdminPage {
 				toDate.add(Calendar.DAY_OF_MONTH, 1);
 				log.debug("Considering events between {} and {}", fromDateM.getObject(), toDate.getTime());
 				criteria.add(Restrictions.between("insertTime", fromDateM.getObject(), toDate.getTime()));
+			}
+
+			//set permission check
+			if (showPermissionUsers.getObject()) {
+				criteria.add(Restrictions.eq("user.permission", true));
 			}
 			
 			// Also load ResponseData elements in the same query, to avoid thousands of subsequent queries.
