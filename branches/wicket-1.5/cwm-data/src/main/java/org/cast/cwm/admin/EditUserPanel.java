@@ -33,6 +33,8 @@ import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Check;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -45,6 +47,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.EmailAddressValidator;
 import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
@@ -363,6 +366,13 @@ public class EditUserPanel extends Panel {
 			
 			// Passwords have to match
 			add(new EqualPasswordConvertedInputValidator(password, verifyPassword));
+			
+			// Permission
+			CheckBox permission = new CheckBox("permission", new PropertyModel<Boolean>(this.getDefaultModel(), "permission"));
+			FormComponentContainer permissionContainer = new FormComponentContainer("permissionEnclosure", permission).setLabel("Permission:");
+			components.put("permission", permissionContainer);
+			add(permissionContainer);
+
 			
 			// Periods
 			CheckBoxMultipleChoice<Period> periods = new CheckBoxMultipleChoice<Period>("periods", SiteService.get().listPeriods());

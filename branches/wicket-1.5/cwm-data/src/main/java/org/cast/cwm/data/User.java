@@ -82,6 +82,9 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	@Column(unique=true)
 	protected String subjectId;
 	
+	@Column(nullable=false, columnDefinition="boolean default false")
+	protected boolean permission = false;
+	
 	@Column(unique=true, nullable=false)
 	@Index(name="person_username_idx")
 	//@NaturalId(mutable=true)  TODO:Investigate
