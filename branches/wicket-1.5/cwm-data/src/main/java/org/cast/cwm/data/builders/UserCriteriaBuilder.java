@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.data.builders;
 
+import java.util.Collection;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.models.hib.CriteriaBuilder;
@@ -32,6 +34,7 @@ import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -55,13 +58,14 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 
 	private static final long serialVersionUID = 1L;
 	private Role role = null;
-	private boolean getAllUsers = true;
+	private boolean getAllUsers = true; // should users with valid=false be included?
 	private String username;
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String subjectId;
 	private IModel<Period> period;
+	private IModel<? extends Collection<Site>> sites;
 	private ISortState sortState = new SingleSortState();
 	private boolean cacheResults = true;
 	
@@ -98,12 +102,23 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 			criteria.add(Restrictions.eq("email", email).ignoreCase());
 		if (subjectId != null)
 			criteria.add(Restrictions.eq("subjectId", subjectId).ignoreCase());
-		if (period != null && period.getObject() != null)
-			criteria.createAlias("periods", "p").add(Restrictions.eq("p.id", period.getObject().getId()));
 		if (firstName != null)
 			criteria.add(Restrictions.eq("firstName", firstName).ignoreCase());
 		if (lastName != null)
 			criteria.add(Restrictions.eq("lastName", lastName).ignoreCase());
+		if (period != null && period.getObject() != null)
+			criteria.createAlias("periods", "p").add(Restrictions.eq("p.id", period.getObject().getId()));
+		
+		if (sites != null && sites.getObject() != null) {
+			// Restricted by site membership
+			criteria.createAlias("periods", "p");
+			if (!sites.getObject().isEmpty())
+				criteria.add(Restrictions.in("p.site", sites.getObject().toArray()));
+			else
+				criteria.add(Restrictions.idEq(0L));  // no sites selected, return no users
+			// TODO should allow queries for users with no site at all, like @EventLog .
+		}
+
 		if (cacheResults)
 			criteria.setCacheable(true);	
 	}

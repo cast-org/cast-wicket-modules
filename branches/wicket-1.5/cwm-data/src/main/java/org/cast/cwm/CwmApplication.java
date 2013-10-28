@@ -48,6 +48,8 @@ import org.cast.cwm.admin.PeriodInfoPage;
 import org.cast.cwm.admin.SessionListPage;
 import org.cast.cwm.admin.SiteInfoPage;
 import org.cast.cwm.admin.SiteListPage;
+import org.cast.cwm.admin.UserContentLogPage;
+import org.cast.cwm.admin.UserContentViewPage;
 import org.cast.cwm.admin.UserFormPage;
 import org.cast.cwm.admin.UserListPage;
 import org.cast.cwm.data.IResponseType;
@@ -240,9 +242,11 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		
 		mountPage("admin", AdminHome.class);
 		mountPage("stats", DatabaseStatisticsPage.class);
-		mountPage("eventlog", EventLog.class);
 		mountPage("sitelist", SiteListPage.class);
 		mountPage("userlist", UserListPage.class);
+		mountPage("eventlog", EventLog.class);
+		mountPage("uclog", UserContentLogPage.class);
+		mountPage("ucview", UserContentViewPage.class);
 		
 		// The following have query parameters
 		mountPage("period", PeriodInfoPage.class);

@@ -67,6 +67,7 @@ import org.hibernate.FetchMode;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,7 @@ public class EventLog extends AdminPage {
 		
 		OrderingCriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
-		List<IDataColumn> columns = makeColumns();
+		List<IDataColumn<Event>> columns = makeColumns();
 		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
 		ArrayList<IColumn<Event>> colList = new ArrayList<IColumn<Event>>(columns);
 		DataTable<Event> table = new DataTable<Event>("eventtable", colList, eventsprovider, 30);
@@ -113,7 +114,7 @@ public class EventLog extends AdminPage {
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
 		add(table);
 
-		CSVDownload download = new CSVDownload(columns, eventsprovider);
+		CSVDownload<Event> download = new CSVDownload<Event>(columns, eventsprovider);
 		add(new ResourceLink<Object>("downloadLink", download));
 
 	}
@@ -181,12 +182,12 @@ public class EventLog extends AdminPage {
 		
 	}
 
-	protected List<IDataColumn> makeColumns() {
-		List<IDataColumn> columns = new ArrayList<IDataColumn>();
+	protected List<IDataColumn<Event>> makeColumns() {
+		List<IDataColumn<Event>> columns = new ArrayList<IDataColumn<Event>>();
 		
-		columns.add(new PropertyDataColumn("EventID", "id", "id"));
+		columns.add(new PropertyDataColumn<Event>("EventID", "id", "id"));
 
-		columns.add(new AbstractDataColumn("Date/Time", "insertTime") {
+		columns.add(new AbstractDataColumn<Event>("Date/Time", "insertTime") {
 
 			private static final long serialVersionUID = 1L;
 
@@ -200,11 +201,11 @@ public class EventLog extends AdminPage {
 			}
 		});
 		
-		columns.add(new PropertyDataColumn("User", "user.subjectId", "user.subjectId"));
-		columns.add(new PropertyDataColumn("Event Type", "type", "type"));
-		columns.add(new PropertyDataColumn("Details", "detail"));
-		columns.add(new PropertyDataColumn("Page", "page"));
-		columns.add(new AbstractDataColumn("Response") {
+		columns.add(new PropertyDataColumn<Event>("User", "user.subjectId", "user.subjectId"));
+		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type"));
+		columns.add(new PropertyDataColumn<Event>("Details", "detail"));
+		columns.add(new PropertyDataColumn<Event>("Page", "page"));
+		columns.add(new AbstractDataColumn<Event>("Response") {
 			
 			private static final long serialVersionUID = 1L;
 
@@ -258,7 +259,7 @@ public class EventLog extends AdminPage {
 
 			// Site Check
 			List<Site> siteList = showSitesM.getObject();
-			criteria.createAlias("user", "user").createAlias("user.periods", "period", Criteria.LEFT_JOIN);
+			criteria.createAlias("user", "user").createAlias("user.periods", "period", JoinType.LEFT_OUTER_JOIN);
 			Disjunction siteRestriction = Restrictions.disjunction();
 			if (showNoSite.getObject())
 				siteRestriction.add(Restrictions.isEmpty("user.periods")); // Show users with no periods

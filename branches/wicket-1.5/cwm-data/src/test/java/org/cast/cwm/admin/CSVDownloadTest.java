@@ -41,25 +41,25 @@ public class CSVDownloadTest {
 	
 	@Test
 	public void oneCellTable() {
-		tester.startResource(new CSVDownload(getDataColumns(1), getDataProvider(1)));
+		tester.startResource(new CSVDownload<Event>(getDataColumns(1), getDataProvider(1)));
 		tester.assertContains("^Column0\ndata\n$");
 	}
 	
 	@Test
 	public void twoCellTable() {
-		tester.startResource(new CSVDownload(getDataColumns(1), getDataProvider(2)));
+		tester.startResource(new CSVDownload<Event>(getDataColumns(1), getDataProvider(2)));
 		tester.assertContains("^Column0\ndata\ndata\n$");
 	}
 	
 	@Test
 	public void fourCellTable() {
-		tester.startResource(new CSVDownload(getDataColumns(2), getDataProvider(2)));
+		tester.startResource(new CSVDownload<Event>(getDataColumns(2), getDataProvider(2)));
 		tester.assertContains("^Column0,Column1\ndata,data\ndata,data\n$");
 	}
 
 	
-	private List<IDataColumn> getDataColumns(int nColumns) {
-		List<IDataColumn> cols = new ArrayList<IDataColumn>(nColumns);
+	private List<IDataColumn<Event>> getDataColumns(int nColumns) {
+		List<IDataColumn<Event>> cols = new ArrayList<IDataColumn<Event>>(nColumns);
 		for (int i=0; i<nColumns; i++) 
 			cols.add(new StringDataColumn("Column" + i));
 		return cols;
@@ -72,7 +72,7 @@ public class CSVDownloadTest {
 		return new ListDataProvider<Event>(list);
 	}
 	
-	private class StringDataColumn extends AbstractDataColumn {
+	private class StringDataColumn extends AbstractDataColumn<Event> {
 
 		private static final long serialVersionUID = 1L;
 
