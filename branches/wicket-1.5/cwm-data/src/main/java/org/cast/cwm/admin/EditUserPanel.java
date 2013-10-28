@@ -335,7 +335,6 @@ public class EditUserPanel extends Panel {
 
 			// E-mail Address
 			TextField<String> email = new TextField<String>("email");
-			email.setRequired(true);
 			email.add(EmailAddressValidator.getInstance());
 			email.add(new UniqueUserFieldValidator(getModel(), Field.EMAIL));
 
@@ -373,6 +372,11 @@ public class EditUserPanel extends Panel {
 			components.put("permission", permissionContainer);
 			add(permissionContainer);
 
+			// active
+			CheckBox active = new CheckBox("valid", new PropertyModel<Boolean>(this.getDefaultModel(), "valid"));
+			FormComponentContainer activeContainer = new FormComponentContainer("validEnclosure", active).setLabel("Valid:");
+			components.put("valid", activeContainer);
+			add(activeContainer);
 			
 			// Periods
 			CheckBoxMultipleChoice<Period> periods = new CheckBoxMultipleChoice<Period>("periods", SiteService.get().listPeriods());
