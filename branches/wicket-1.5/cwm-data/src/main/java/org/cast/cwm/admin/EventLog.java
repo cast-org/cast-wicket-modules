@@ -85,7 +85,7 @@ public class EventLog extends AdminPage {
 	protected IModel<List<String>> showEventTypesM;
 	protected IModel<List<Site>> showSitesM;
 	protected IModel<Date> fromDateM, toDateM;
-	protected IModel<Boolean> showNoSite;
+	protected IModel<Boolean> inAPeriod;
 	protected IModel<Boolean> showPermissionUsers;
 
 	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -173,8 +173,8 @@ public class EventLog extends AdminPage {
 	}
 	
 	protected void addOtherFilters(Form<Object> form) {
-		showNoSite = new Model<Boolean>(false);
-		form.add(new CheckBox("showNoSite", showNoSite));		
+		inAPeriod = new Model<Boolean>(true);
+		form.add(new CheckBox("showNoSite", inAPeriod));		
 
 		showPermissionUsers = new Model<Boolean>(true);
 		form.add(new CheckBox("showPermissionUsers", showPermissionUsers));
@@ -261,11 +261,11 @@ public class EventLog extends AdminPage {
 			List<Site> siteList = showSitesM.getObject();
 			criteria.createAlias("user", "user").createAlias("user.periods", "period", JoinType.LEFT_OUTER_JOIN);
 			Disjunction siteRestriction = Restrictions.disjunction();
-			if (showNoSite.getObject())
+			if (!inAPeriod.getObject())
 				siteRestriction.add(Restrictions.isEmpty("user.periods")); // Show users with no periods
 			if (!siteList.isEmpty())
 				siteRestriction.add(Restrictions.in("period.site",siteList)); // Show users with matching periods
-			if (!showNoSite.getObject() && siteList.isEmpty()) {
+			if (inAPeriod.getObject() && siteList.isEmpty()) {
 				siteRestriction.add(Restrictions.idEq(-1L)); // Halt query early; don't show anyone.
 				criteria.setMaxResults(0);
 			}
