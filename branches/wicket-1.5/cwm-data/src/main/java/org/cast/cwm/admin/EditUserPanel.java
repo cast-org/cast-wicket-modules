@@ -33,7 +33,6 @@ import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Check;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
@@ -57,8 +56,10 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.UserService;
+
+import com.google.inject.Inject;
 
 /**
  * A panel for editing a user.  
@@ -73,6 +74,9 @@ import org.cast.cwm.service.UserService;
 public class EditUserPanel extends Panel {
 
 	private static final long serialVersionUID = 1L;
+	
+	@Inject
+	protected ISiteService siteService;
 	
 	private Form<User> userForm;
 	private Map<String, FormComponentContainer> components = new HashMap<String, FormComponentContainer>();
@@ -379,7 +383,7 @@ public class EditUserPanel extends Panel {
 			add(activeContainer);
 			
 			// Periods
-			CheckBoxMultipleChoice<Period> periods = new CheckBoxMultipleChoice<Period>("periods", SiteService.get().listPeriods());
+			CheckBoxMultipleChoice<Period> periods = new CheckBoxMultipleChoice<Period>("periods", siteService.listPeriods());
 			periods.setChoiceRenderer(new ChoiceRenderer<Period>() {
 
 				private static final long serialVersionUID = 1L;

@@ -66,6 +66,8 @@ import org.cast.cwm.service.CwmSessionService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
+import org.cast.cwm.service.ISiteService;
+import org.cast.cwm.service.SiteService;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,6 +219,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
 				binder.bind(ICwmService.class).to(CwmService.class).in(Scopes.SINGLETON);
 				binder.bind(ICwmSessionService.class).to(CwmSessionService.class).in(Scopes.SINGLETON);
+				binder.bind(ISiteService.class).to(SiteService.class).in(Scopes.SINGLETON);
 				binder.bind(IAppConfiguration.class).toInstance(configuration);
 			}
 		});

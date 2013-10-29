@@ -62,11 +62,13 @@ import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.UserSpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Page for editing an individual site.  Link to periods and allows uploading files of users
@@ -79,6 +81,9 @@ public class SiteInfoPage extends AdminPage {
 	private static final Logger log = LoggerFactory.getLogger(SiteInfoPage.class);
 
 	private IModel<Site> mSite = null;
+	
+	@Inject
+	protected ISiteService siteService;
 
 	private static final long serialVersionUID = 1L;
 
@@ -87,7 +92,7 @@ public class SiteInfoPage extends AdminPage {
 
 		// Current Site
 		Long siteId = param.get("siteId").toOptionalLong();
-		mSite = SiteService.get().getSiteById(siteId); // May create a Transient Instance
+		mSite = siteService.getSiteById(siteId); // May create a Transient Instance
 		if (siteId != null && mSite.getObject() == null)
 			throw new RestartResponseAtInterceptPageException(SiteListPage.class);
 
@@ -127,7 +132,7 @@ public class SiteInfoPage extends AdminPage {
 
 					@Override
 					protected void deleteObject() {
-						SiteService.get().deletePeriod(getModel());
+						siteService.deletePeriod(getModel());
 					}
 				};
 				item.add(dialog);

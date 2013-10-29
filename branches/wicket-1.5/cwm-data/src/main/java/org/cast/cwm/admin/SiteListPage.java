@@ -32,7 +32,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
 import org.cast.cwm.service.ICwmService;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 
 import com.google.inject.Inject;
 
@@ -48,13 +48,16 @@ public class SiteListPage extends AdminPage {
 	
 	@Inject
 	private ICwmService cwmService;
+	
+	@Inject
+	private ISiteService siteService;
 
 	private static final long serialVersionUID = 1L;
 
 	public SiteListPage(PageParameters parameters) {
 		super(parameters);
 		
-		IDataProvider<Site> siteProvider = SiteService.get().listSitesPageable();
+		IDataProvider<Site> siteProvider = siteService.listSitesPageable();
 		
 		// If no sites in datastore, jump directly to creating a site
 		if (siteProvider.size() == 0) {

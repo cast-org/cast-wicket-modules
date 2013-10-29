@@ -30,10 +30,15 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
+
+import com.google.inject.Inject;
 
 @AuthorizeInstantiation("ADMIN")
 public class PeriodInfoPage extends AdminPage {
+	
+	@Inject
+	protected ISiteService siteService;
 
 	private IModel<Period> period = new Model<Period>(null);
 	private IModel<Site> site = new Model<Site>(null);
@@ -45,10 +50,10 @@ public class PeriodInfoPage extends AdminPage {
 		
 		// Get Period, or Site used to create a new period.  Otherwise, redirect
 		if (!parameters.get("periodId").isEmpty()) {
-			period = SiteService.get().getPeriodById(parameters.get("periodId").toLongObject());
-			site = SiteService.get().getSiteById(period.getObject().getSite().getId());
+			period = siteService.getPeriodById(parameters.get("periodId").toLongObject());
+			site = siteService.getSiteById(period.getObject().getSite().getId());
 		} else if (!parameters.get("siteId").isEmpty()) {
-			site = SiteService.get().getSiteById(parameters.get("siteId").toLongObject());
+			site = siteService.getSiteById(parameters.get("siteId").toLongObject());
 		} else {
 			setResponsePage(SiteListPage.class);
 			return;
@@ -61,7 +66,7 @@ public class PeriodInfoPage extends AdminPage {
 
 		if (period.getObject() == null) {
 			add(new Label("instructions", "Create New Period"));
-			add(SiteService.get().getPeriodEditForm("form", site));
+			add(siteService.getPeriodEditForm("form", site));
 			// TODO: Cleaner way to do this?
 			add(new WebMarkupContainer("newStudentLink").setVisible(false));
 			add(new WebMarkupContainer("newTeacherLink").setVisible(false));
@@ -76,7 +81,7 @@ public class PeriodInfoPage extends AdminPage {
 				}
 				
 			}));
-			add(SiteService.get().getPeriodEditForm("form", site, period));
+			add(siteService.getPeriodEditForm("form", site, period));
 			
 			link = new BookmarkablePageLink<Void>("newStudentLink", UserFormPage.class);
 			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.STUDENT_ROLENAME);

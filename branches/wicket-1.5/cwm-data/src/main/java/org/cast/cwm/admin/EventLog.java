@@ -61,6 +61,7 @@ import org.cast.cwm.data.Event;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.SiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -94,7 +95,10 @@ public class EventLog extends AdminPage {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	private IEventService eventService;
+	protected IEventService eventService;
+	
+	@Inject
+	protected ISiteService siteService;
 
 	public EventLog(final PageParameters params) {
 		super(params);
@@ -162,7 +166,7 @@ public class EventLog extends AdminPage {
 	}
 	
 	protected void addSiteFilter(Form<Object> form) {
-		IModel<List<Site>> allSites = SiteService.get().listSites();
+		IModel<List<Site>> allSites = siteService.listSites();
 		List<Site> sites = new ArrayList<Site>();
 		sites.addAll(allSites.getObject());
 		showSitesM = new ListModel<Site>(sites);

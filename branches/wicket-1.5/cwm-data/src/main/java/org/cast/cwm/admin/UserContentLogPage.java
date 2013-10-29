@@ -27,6 +27,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.models.hib.HibernateListModel;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.extensions.markup.html.form.DateTextField;
@@ -61,14 +62,20 @@ import org.cast.cwm.data.builders.UserContentAuditQueryBuilder;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.SiteService;
 import org.hibernate.envers.DefaultRevisionEntity;
+
+import com.google.inject.Inject;
 
 @AuthorizeInstantiation("RESEARCHER")
 @Slf4j
 public class UserContentLogPage extends AdminPage {
 
 	private static final long serialVersionUID = 1L;
+	
+	@Inject
+	ISiteService siteService;
 	
 	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<List<Site>> showSitesM;
@@ -103,8 +110,10 @@ public class UserContentLogPage extends AdminPage {
 		
 		// Look for a configuration variable with site's URL, called either cwm.url or app.url.
 		// If it is set, it is used to make URLs absolute in the downloaded file
-		IAppConfiguration config = CwmApplication.get().getConfiguration();
-		urlPrefix = config.getString("cwm.url", config.getString("app.url", ""));
+		if (Application.get() instanceof CwmApplication) {
+			IAppConfiguration config = CwmApplication.get().getConfiguration();
+			urlPrefix = config.getString("cwm.url", config.getString("app.url", ""));
+		}
 	}
 
 	protected void addFilterForm() {
@@ -116,7 +125,7 @@ public class UserContentLogPage extends AdminPage {
 	}
 	
 	protected void addSiteFilter(Form<Object> form) {
-		IModel<List<Site>> allSites = SiteService.get().listSites();
+		IModel<List<Site>> allSites = siteService.listSites();
 		List<Site> sites = new ArrayList<Site>();
 		sites.addAll(allSites.getObject());
 		showSitesM = new ListModel<Site>(sites);

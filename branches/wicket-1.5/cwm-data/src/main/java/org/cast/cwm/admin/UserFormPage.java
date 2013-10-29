@@ -23,7 +23,6 @@ import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -34,11 +33,13 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.UserService;
 import org.cast.cwm.service.UserService.LoginData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Page for adding a new or editing existing user.
@@ -46,6 +47,9 @@ import org.slf4j.LoggerFactory;
  */
 @AuthorizeInstantiation("ADMIN")
 public class UserFormPage extends AdminPage {
+	
+	@Inject
+	ISiteService siteService;
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserFormPage.class);
@@ -66,7 +70,7 @@ public class UserFormPage extends AdminPage {
 			role = Role.forRoleString(parameters.get("role").toString());
 		// The period to link back to, if any
 		if (!parameters.get("periodId").isEmpty())
-			periodModel = SiteService.get().getPeriodById(parameters.get("periodId").toLongObject());
+			periodModel = siteService.getPeriodById(parameters.get("periodId").toLongObject());
 		
 		addBreadcrumbLinks();
 		
