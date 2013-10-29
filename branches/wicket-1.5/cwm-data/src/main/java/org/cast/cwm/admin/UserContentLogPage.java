@@ -207,7 +207,7 @@ public class UserContentLogPage extends AdminPage {
 					String componentId,
 					IModel<AuditTriple<UserContent, DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
-				if (uc.getDataType().getName().equals("TEXT"))
+				if (uc!= null && uc.getDataType() != null && uc.getDataType().getName().equals("TEXT"))
 					item.add(new Label(componentId, new PropertyModel<String>(rowModel, "entity.text")));
 				else
 					item.add(new ContentLinkPanel(componentId, rowModel.getObject().getEntity().getId(), rowModel.getObject().getInfo().getId()));
