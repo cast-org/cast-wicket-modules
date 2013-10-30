@@ -21,6 +21,7 @@ package org.cast.cwm.test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -38,6 +39,7 @@ import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.FeedbackMessage;
+import org.apache.wicket.markup.html.form.LabeledWebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -184,6 +186,11 @@ public class CwmWicketTester extends WicketTester {
 		}
 		assertTrue("Messages do not contain expected string '"
 				+ expectedMessage + "'", msgs.contains(expectedMessage));
+	}
+
+	public void assertLabeledWebMarkupContainer(String expectedMessage, String path, String labelText) {
+		LabeledWebMarkupContainer component = (LabeledWebMarkupContainer) getComponentFromLastRenderedPage(path);
+		assertThat(expectedMessage, component.getLabel().getObject(), is(labelText));
 	}
 
 }
