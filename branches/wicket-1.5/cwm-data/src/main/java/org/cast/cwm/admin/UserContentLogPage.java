@@ -44,6 +44,7 @@ import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ResourceLink;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -65,6 +66,7 @@ import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.SiteService;
 import org.hibernate.envers.DefaultRevisionEntity;
+import org.hibernate.envers.RevisionType;
 
 import com.google.inject.Inject;
 
@@ -216,10 +218,15 @@ public class UserContentLogPage extends AdminPage {
 					String componentId,
 					IModel<AuditTriple<UserContent, DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
-				if (uc!= null && uc.getDataType() != null && uc.getDataType().getName().equals("TEXT"))
-					item.add(new Label(componentId, new PropertyModel<String>(rowModel, "entity.text")));
-				else
-					item.add(new ContentLinkPanel(componentId, rowModel.getObject().getEntity().getId(), rowModel.getObject().getInfo().getId()));
+				if (!rowModel.getObject().getType().equals(RevisionType.DEL)) {
+					if (uc.getDataType().getName().equals("TEXT"))
+						item.add(new Label(componentId, new PropertyModel<String>(rowModel, "entity.text")));
+					else
+						item.add(new ContentLinkPanel(componentId, rowModel.getObject().getEntity().getId(), rowModel.getObject().getInfo().getId()));					
+				}
+				else {
+					item.add(new EmptyPanel(componentId));										
+				}
 			}
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
