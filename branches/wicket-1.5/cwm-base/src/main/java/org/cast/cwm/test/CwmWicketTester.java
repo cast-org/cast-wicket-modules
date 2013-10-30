@@ -188,7 +188,11 @@ public class CwmWicketTester extends WicketTester {
 				+ expectedMessage + "'", msgs.contains(expectedMessage));
 	}
 
-	public void assertLabeledWebMarkupContainer(String expectedMessage, String path, String labelText) {
+	public void assertLabeledWebMarkupContainerLabel(String path, String labelText) {
+		assertLabeledWebMarkupContainerLabel("", path, labelText);
+	}
+
+	public void assertLabeledWebMarkupContainerLabel(String expectedMessage, String path, String labelText) {
 		LabeledWebMarkupContainer component = (LabeledWebMarkupContainer) getComponentFromLastRenderedPage(path);
 		assertThat(expectedMessage, component.getLabel().getObject(), is(labelText));
 	}
