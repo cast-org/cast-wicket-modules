@@ -30,21 +30,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserContent;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ICwmSessionService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.test.GuiceInjectedTestApplication;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
@@ -65,6 +70,10 @@ public class TestUserContentLogPage {
 		ICwmSessionService cwmSessionService = mock(ICwmSessionService.class);
         when(cwmSessionService.getUser()).thenReturn(new User(Role.ADMIN));
 		injectionMap.put(ICwmSessionService.class, cwmSessionService);
+
+		ISiteService siteService = mock(ISiteService.class);
+		when(siteService.listSites()).thenReturn(getMockSiteList());
+		injectionMap.put(ISiteService.class,  siteService);
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		GuiceInjectedTestApplication application = new GuiceInjectedTestApplication(injectionMap);
@@ -96,6 +105,17 @@ public class TestUserContentLogPage {
 		
 	}
 	
+	public IModel<List<Site>> getMockSiteList() {
+		return new AbstractReadOnlyModel<List<Site>>() {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public List<Site> getObject() {
+				return new ArrayList<Site>();
+			}
+		};
+	}
+	
+
 	public static class MockUserContentLogPage extends UserContentLogPage {
 		
 		private static final long serialVersionUID = 1L;
@@ -121,7 +141,7 @@ public class TestUserContentLogPage {
 			UserContent userContent = mock(UserContent.class);
 			when(userContent.getId()).thenReturn(1L);
 			when(userContent.getUser()).thenReturn(mockUser);
-			when(userContent.getDataType()).thenReturn(new ResponseType("type", "type"));
+			when(userContent.getDataType()).thenReturn(new ResponseType("TEXT", "Text"));
 			when(userContent.getSortOrder()).thenReturn(1);
 			when(userContent.getTitle()).thenReturn("title");
 			when(userContent.getText()).thenReturn("sample usercontent text");

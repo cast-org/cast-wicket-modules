@@ -62,7 +62,6 @@ import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.SiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Disjunction;
