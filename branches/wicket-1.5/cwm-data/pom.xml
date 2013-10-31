@@ -90,6 +90,12 @@
  	  	<dependency>
  	  		<groupId>org.hibernate</groupId>
  	  		<artifactId>hibernate-core</artifactId>
+ 	  		<exclusions>
+	 	  		<exclusion>
+ 		  			<artifactId>ehcache-core</artifactId>
+ 	  				<groupId>net.sf.ehcache</groupId>
+ 	  			</exclusion>
+ 	  		</exclusions>
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.hibernate</groupId>
@@ -98,6 +104,10 @@
  	  	<dependency>
  	  		<groupId>org.hibernate</groupId>
  	  		<artifactId>hibernate-envers</artifactId>
+ 	  	</dependency>
+ 	  	<dependency>
+ 	  		<groupId>net.sf.ehcache</groupId>
+ 	  		<artifactId>ehcache-core</artifactId>
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.wicketstuff</groupId>

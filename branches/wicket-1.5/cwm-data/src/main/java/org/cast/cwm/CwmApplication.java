@@ -42,6 +42,7 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.admin.AdminHome;
+import org.cast.cwm.admin.CacheManagementPage;
 import org.cast.cwm.admin.DatabaseStatisticsPage;
 import org.cast.cwm.admin.EventLog;
 import org.cast.cwm.admin.PeriodInfoPage;
@@ -245,6 +246,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		
 		mountPage("admin", AdminHome.class);
 		mountPage("stats", DatabaseStatisticsPage.class);
+		mountPage("cache", CacheManagementPage.class);
 		mountPage("sitelist", SiteListPage.class);
 		mountPage("userlist", UserListPage.class);
 		mountPage("eventlog", EventLog.class);

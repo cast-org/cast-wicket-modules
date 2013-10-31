@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.admin;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.devutils.inspector.InspectorPage;
@@ -63,35 +63,38 @@ public class AdminHome extends AdminPage {
 	 * Each repeater item has a "link" with a "label".
 	 */
 	protected void addLinks(RepeatingView repeater) {
-		for (Component c : homePageComponents()) {
+		for (Entry<String, Class<? extends Page>> e : getHomePageLinkMap().entrySet()) {
 			WebMarkupContainer container = new WebMarkupContainer(repeater.newChildId());
-			container.add(c);
+			BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("link", e.getValue());
+			link.add(new Label("label", e.getKey()));
+			container.add(link);
 			repeater.add(container);
 		}
 	}
 	
 	/**
-	 * Return a list of components to be added to the list on the home page.
+	 * Return a map of components to be added to the list on the home page.
 	 * This is usually a list of links.
 	 * @return 
 	 */
-	protected List<Component> homePageComponents() {
-		LinkedList<Component> list = new LinkedList<Component>(); 
+	protected Map<String,Class<? extends Page>> getHomePageLinkMap() {
+		Map<String,Class<? extends Page>> map = new LinkedHashMap<String,Class<? extends Page>>();
 			
 		// Links for users with full admin rights
 		if (cwmSessionService.getUser().hasRole(Role.ADMIN)) {
-			list.add(new BookmarkablePageLink<Page>("link", UserListPage.class).add(new Label("label", "Create/Edit Users")));
-			list.add(new BookmarkablePageLink<Page>("link", SiteListPage.class).add(new Label("label", "Create/Edit Sites")));
-			list.add(new BookmarkablePageLink<Page>("link", DatabaseStatisticsPage.class).add(new Label("label", "Database Statistics")));
-			list.add(new BookmarkablePageLink<Page>("link", SessionListPage.class).add(new Label("label", "Open login sessions")));
-			list.add(new BookmarkablePageLink<Page>("link", InspectorPage.class).add(new Label("label", "Wicket Inspector Page")));
+			map.put("Create/Edit Users", UserListPage.class);
+			map.put("Create/Edit Sites", SiteListPage.class);
+			map.put("Database Statistics", DatabaseStatisticsPage.class);
+			map.put("Cache Management", CacheManagementPage.class);
+			map.put("Open login sessions", SessionListPage.class);
+			map.put("Wicket Inspector Page", InspectorPage.class);
 		}
 		
 		// Links for admins and researchers
-		list.add(new BookmarkablePageLink<Page>("link", EventLog.class).add(new Label("label", "Event Log")));
-		list.add(new BookmarkablePageLink<Page>("link", UserContentLogPage.class).add(new Label("label", "User Content Log")));
+		map.put("Event Log", EventLog.class);
+		map.put("User Content Log", UserContentLogPage.class);
 		
-		return list;
+		return map;
 	}
 
 }
