@@ -48,8 +48,8 @@ import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
-import org.cast.cwm.service.HighlightService;
 import org.cast.cwm.service.HighlightService.HighlightType;
+import org.cast.cwm.service.IHighlightService;
 import org.cast.cwm.service.IResponseService;
 
 import com.google.inject.Inject;
@@ -81,6 +81,9 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 
 	@Inject
 	protected IResponseService responseService;
+	
+	@Inject
+	protected IHighlightService highlightService;
 	
 	public HighlightDisplayPanel(String id, IModel<Prompt> model) {
 		this(id, model, null);
@@ -116,10 +119,10 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 			if (getModelObject() == null)
 				setModel(responseService.newResponse(mUser, typeRegistry.getResponseType("HIGHLIGHT"), (IModel<Prompt>) HighlightDisplayPanel.this.getDefaultModel()));
 			
-			highlights = HighlightService.get().decodeHighlights(model.getObject() == null ? "" : model.getObject().getResponseData().getText());
+			highlights = highlightService.decodeHighlights(model.getObject() == null ? "" : model.getObject().getResponseData().getText());
 			
 			// Add list of pre-defined highlighters
-			add(new ListView<HighlightType>("colorDisplayList", HighlightService.get().getHighlighters()) {
+			add(new ListView<HighlightType>("colorDisplayList", highlightService.getHighlighters()) {
 
 				private static final long serialVersionUID = 1L;
 
@@ -149,7 +152,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 				}
 			});
 						
-			String encodedString = HighlightService.get().encodeHighlights(colors, highlightsToSave);
+			String encodedString = highlightService.encodeHighlights(colors, highlightsToSave);
 
 			// TODO: Need a page name...how?
 			responseService.saveTextResponse(this.getModel(), encodedString, null);
@@ -184,7 +187,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	}
 
 	private String getColors() {
-		List<HighlightType> highlighters = HighlightService.get().getHighlighters();
+		List<HighlightType> highlighters = highlightService.getHighlighters();
 		List<String> colors = new ArrayList<String>();
 		for (HighlightType h: highlighters)
 			colors.add("'" + h.getColor() + "'");
