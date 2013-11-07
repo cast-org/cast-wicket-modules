@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 /**
  * Disable the provided components during an ajax call.  This decorator will remove all 'click' type
@@ -38,13 +38,13 @@ import org.apache.wicket.ajax.IAjaxCallDecorator;
 public class DisablingAjaxCallDecorator implements IAjaxCallDecorator {
 
 	private static final long serialVersionUID = 1L;
-	private static final ResourceReference blockingJavascriptReference = 
-		new ResourceReference(DisablingAjaxCallDecorator.class, "disablingAjaxCallDecorator.js");
+	private static final PackageResourceReference blockingJavascriptReference = 
+		new PackageResourceReference(DisablingAjaxCallDecorator.class, "disablingAjaxCallDecorator.js");
 
 	private String selector;
 	private List<Component> blockedComponents;
 	
-	public static ResourceReference getJSResourceReference() {
+	public static PackageResourceReference getJSResourceReference() {
 		return blockingJavascriptReference;
 	}
 	
@@ -57,15 +57,15 @@ public class DisablingAjaxCallDecorator implements IAjaxCallDecorator {
 		}
 	}
 	
-	public CharSequence decorateScript(CharSequence script) {
+	public CharSequence decorateScript(Component component, CharSequence script) {
 		return "$('" + generateSelector() + "').ajaxDisable(); " + script;
 	}
 
-	public CharSequence decorateOnFailureScript(CharSequence script) {
+	public CharSequence decorateOnFailureScript(Component component,CharSequence script) {
 		return "$('" + generateSelector() + "').ajaxEnable(); " + script;
 	}
 
-	public CharSequence decorateOnSuccessScript(CharSequence script) {
+	public CharSequence decorateOnSuccessScript(Component component,CharSequence script) {
 		return "$('" + generateSelector() + "').ajaxEnable(); " + script;
 	}
 	
@@ -81,4 +81,5 @@ public class DisablingAjaxCallDecorator implements IAjaxCallDecorator {
 		}
 		return selector;
 	}
+
 }

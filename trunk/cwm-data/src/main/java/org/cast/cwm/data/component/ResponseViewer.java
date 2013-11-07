@@ -19,15 +19,10 @@
  */
 package org.cast.cwm.data.component;
 
-import java.io.PrintStream;
-
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.IRequestTarget;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -40,15 +35,17 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.components.FileDownloadLink;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
-import org.cast.cwm.service.ImageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.cast.cwm.data.resource.ThumbnailUploadedImageResourceReference;
+import org.cast.cwm.data.resource.UploadedFileResourceReference;
 
 /**
  * A simple panel for viewing a response.
@@ -59,7 +56,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ResponseViewer extends Panel {
 
-	private static final Logger log = LoggerFactory.getLogger(ResponseViewer.class);
 	private static final long serialVersionUID = 1L;
 	
 	@Getter
@@ -174,29 +170,6 @@ public class ResponseViewer extends Panel {
 			return (loadBehavior.getCallbackUrl());				
 		}
 
-		// this behavior enables the data stored in the database to be streamed via a url
-		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
-			private static final long serialVersionUID = 1L;
-
-			public void onRequest() {
-				RequestCycle.get().setRequestTarget(new IRequestTarget() {
-
-					public void detach(RequestCycle requestCycle) { }
-					public void respond(RequestCycle requestCycle) {
-						try {
-							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
-							ps.print(getModel().getObject().getText());
-							ps.flush();
-							ps.close();
-						}
-						catch(Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-		}
-		
 		@Override
 		public void onBeforeRender() {
 			tableUrl = getDataUrl();
@@ -204,17 +177,35 @@ public class ResponseViewer extends Panel {
 		}
 
 		public void renderHead(IHeaderResponse response) {
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
 
-			response.renderCSSReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
+			response.renderCSSReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
-			response.renderOnDomReadyJavascript(jsString);			
+			response.renderOnDomReadyJavaScript(jsString);			
+		}
+	}
+
+	
+	// this behavior enables the data stored in the database to be streamed via a url
+	class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
+		private static final long serialVersionUID = 1L;
+
+		public void onRequest() {
+			getRequestCycle().scheduleRequestHandlerAfterCurrent(
+					new ResourceStreamRequestHandler(
+							new AbstractStringResourceStream() {
+								private static final long serialVersionUID = 1L;
+								@Override
+								protected String getString() {
+									return getModel().getObject().getText();
+								}
+							}));
 		}
 	}
 
@@ -228,12 +219,6 @@ public class ResponseViewer extends Panel {
 			add(new SvgImage("drawing", model, maxWidth, maxHeight));
 		}
 		
-		@Override
-		protected void onBeforeRender() {
-			if (ChromeFrameUtils.isBareIE())
-				replaceWith(new SvgNotSupportedFragment(this.getId()));
-			super.onBeforeRender();
-		}
 	}
 	
 	public class AudioFragment extends Fragment {
@@ -271,9 +256,22 @@ public class ResponseViewer extends Panel {
 			
 			//Displayed Image			
 			if (getModel().getObject().getResponseData().getBinaryFileData().getPrimaryType().equals("image")) {
-				Image displayImage = ImageService.get().getScaledImageComponent("imageDisplay", new PropertyModel<Long>(mResponse, "responseData.binaryFileData.id").getObject(), maxWidth, maxHeight);
+				Image displayImage;
+				PageParameters pp = new PageParameters()
+					.add("id", mResponse.getObject().getResponseData().getBinaryFileData().getId());
+				if (maxWidth==null && maxHeight==null) {
+					// no scaling
+					displayImage = new Image("imageDisplay", new UploadedFileResourceReference(), pp);
+				} else {
+					// Thumbnail class just takes a single dimension, so
+					// scale to minimum of maxWidth or maxHeight
+					Integer maxSize = maxWidth;
+					if (maxHeight != null && (maxSize==null || maxHeight < maxSize))
+						maxSize = maxHeight;
+					displayImage = new Image("imageDisplay", new ThumbnailUploadedImageResourceReference(maxSize), pp);
+				}
 				this.replace(displayImage);					
-				super.onBeforeRender();				
+				super.onBeforeRender();
 			}
 			else {
 				EmptyPanel displayImage = new EmptyPanel("imageDisplay");

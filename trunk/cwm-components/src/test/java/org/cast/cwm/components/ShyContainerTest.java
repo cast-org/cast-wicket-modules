@@ -22,7 +22,6 @@ package org.cast.cwm.components;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.util.tester.ITestPanelSource;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,44 +37,44 @@ public class ShyContainerTest {
 	
 	@Test
 	public void canRenderWithAllContentShown() {
-		wicketTester.startPanel(new VisibilityBasedTestPanelSource(true, true));
+		wicketTester.startComponentInPage(new VisibilityBasedTestPanelSource(true, true).getTestPanel("panel"));
 		wicketTester.assertComponent("panel:shy", ShyContainer.class);
 		wicketTester.assertVisible("panel:shy");
 	}
 
 	@Test
 	public void hiddenWithAllContentHidden() {
-		wicketTester.startPanel(new VisibilityBasedTestPanelSource(false, false));
+		wicketTester.startComponentInPage(new VisibilityBasedTestPanelSource(false, false).getTestPanel("panel"));
 		wicketTester.assertInvisible("panel:shy");
 	}
 
 	@Test
 	public void visibleWithFirstContentShown() {
-		wicketTester.startPanel(new VisibilityBasedTestPanelSource(true, false));
+		wicketTester.startComponentInPage(new VisibilityBasedTestPanelSource(true, false).getTestPanel("panel"));
 		wicketTester.assertVisible("panel:shy");
 	}
 
 	@Test
 	public void visibleWithSecondContentShown() {
-		wicketTester.startPanel(new VisibilityBasedTestPanelSource(false, true));
+		wicketTester.startComponentInPage(new VisibilityBasedTestPanelSource(false, true).getTestPanel("panel"));
 		wicketTester.assertVisible("panel:shy");
 	}
 
 	@Test
 	public void hiddenWithAllContentVisibilityDisallowed() {
-		wicketTester.startPanel(new VisibilityAllowedBasedTestPanelSource(false, false));
+		wicketTester.startComponentInPage(new VisibilityAllowedBasedTestPanelSource(false, false).getTestPanel("panel"));
 		wicketTester.assertInvisible("panel:shy");
 	}
 
 	@Test
 	public void visibleWithFirstContentVisibilityAllowed() {
-		wicketTester.startPanel(new VisibilityAllowedBasedTestPanelSource(true, false));
+		wicketTester.startComponentInPage(new VisibilityAllowedBasedTestPanelSource(true, false).getTestPanel("panel"));
 		wicketTester.assertVisible("panel:shy");
 	}
 
 	@Test
 	public void visibleWithSecondContentVisibilityAllowed() {
-		wicketTester.startPanel(new VisibilityAllowedBasedTestPanelSource(false, true));
+		wicketTester.startComponentInPage(new VisibilityAllowedBasedTestPanelSource(false, true).getTestPanel("panel"));
 		wicketTester.assertVisible("panel:shy");
 	}
 
@@ -90,8 +89,7 @@ public class ShyContainerTest {
 
 	}
 
-	private abstract class TestPanelSource implements ITestPanelSource {
-		private static final long serialVersionUID = 1L;
+	private abstract class TestPanelSource {
 
 		protected boolean v1;
 		protected boolean v2;
@@ -119,7 +117,6 @@ public class ShyContainerTest {
 	}
 	
 	private class VisibilityBasedTestPanelSource extends TestPanelSource {
-		private static final long serialVersionUID = 1L;
 
 		public VisibilityBasedTestPanelSource(boolean v1, boolean v2) {
 			super(v1, v2);
@@ -132,7 +129,6 @@ public class ShyContainerTest {
 	}
 
 	private class VisibilityAllowedBasedTestPanelSource extends TestPanelSource {
-		private static final long serialVersionUID = 1L;
 
 		public VisibilityAllowedBasedTestPanelSource(boolean v1, boolean v2) {
 			super(v1, v2);

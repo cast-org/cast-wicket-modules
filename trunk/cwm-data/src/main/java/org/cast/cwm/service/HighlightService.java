@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author jbrookover
  *
  */
-public class HighlightService {
+public class HighlightService implements IHighlightService {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(HighlightService.class);
@@ -45,16 +45,9 @@ public class HighlightService {
 	private static final String CHARACTERSPACER = ":";
 	private static final String HIGHLIGHTINGSPACER = "#";
 	
-	/**
-	 * This is the html ID that the client-side javascript uses to update
-	 * page-wide controls.  Set your markup ID to this value if you hlde
-	 * page-wide highlight controls.
-	 */
-	public static final String GLOBAL_CONTROL_ID = "globalHighlight";
-
-	private static HighlightService instance = new HighlightService();
+	private static IHighlightService instance = new HighlightService();
 	
-	public static HighlightService get() {
+	public static IHighlightService get() {
 		return instance;
 	}
 	
@@ -63,16 +56,10 @@ public class HighlightService {
 	 */
 	private Map<Character, HighlightType> highlighters = new HashMap<Character, HighlightType>();
 	
-	/**
-	 * Register a highlighter for this application.  The character key will determine how
-	 * the CSS styles and javascript function.  This method does not check to see
-	 * if an appropriate style exists.
-	 * 
-	 * 
-	 * @param c the style character, e.g. 'Y' tends to be for the color yellow
-	 * @param isOn true if the highlighter is enabled by the application config
-	 * @param editable true if the highlighter name should be editable by the user
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IHighlightService#addHighlighter(java.lang.Character, boolean, boolean)
 	 */
+	@Override
 	public void addHighlighter(Character c, boolean isOn, boolean editable) {
 		Character key = Character.toUpperCase(c);
 
@@ -85,30 +72,27 @@ public class HighlightService {
 		highlighters.put(key, new HighlightType(key, isOn, editable));
 	}
 	
-	/**
-	 * Get a higlighter associated with this character
-	 * @param c
-	 * @return the highlighter, or null if not found
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IHighlightService#getHighlighter(java.lang.Character)
 	 */
+	@Override
 	public HighlightType getHighlighter(Character c) {
 		Character key = Character.toUpperCase(c);
 		return highlighters.get(key);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IHighlightService#getHighlighters()
+	 */
+	@Override
 	public List<HighlightType> getHighlighters() {
 		return new ArrayList<HighlightType>(highlighters.values());
 	}
 
-	/**
-	 * Converts a list of color characters (R = Red, B = Blue, etc) and their corresponding
-	 * highlighted words into a single, encoded string to be stored in the database.
-	 * 
-	 * @param colors a list of color characters
-	 * @param highlights a list of highlighted words (default: CSV of word indexes)
-	 * @return the encoded string.  
-	 * 
-	 * @see #decodeHighlights(String)
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IHighlightService#encodeHighlights(java.util.List, java.util.List)
 	 */
+	@Override
 	public String encodeHighlights(List<Character> colors, List<String> highlights) {
 		
 		String s = "";
@@ -127,20 +111,10 @@ public class HighlightService {
 		return s;
 	}
 	
-	/**
-	 * Converts an encoded highlighting string into a map of Color to CSV of words.  By
-	 * default, the string is in the format:<br />
-	 * <br />
-	 * R:1,2,3#B:12,13,14,15#Y:22,23,24<br/>
-	 * <br />
-	 * In the above example, the first three words are highlighted with Red and the twelfth
-	 * through fifteenth words are highlighted with Blue, etc.
-	 * 
-	 * @param s the encoded string
-	 * @return the map of color letters to CSV defined highlighting.
-	 * 
-	 * @see #encodeHighlights(List, List)
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IHighlightService#decodeHighlights(java.lang.String)
 	 */
+	@Override
 	public Map<Character,String> decodeHighlights(String s) {
 		
 		Map<Character,String> highlights = new HashMap<Character,String>();

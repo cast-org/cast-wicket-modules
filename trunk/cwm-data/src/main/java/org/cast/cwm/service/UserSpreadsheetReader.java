@@ -36,7 +36,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.databinder.hib.Databinder;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
@@ -44,7 +44,7 @@ import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.models.UserModel;
 import org.hibernate.Criteria;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +62,9 @@ public class UserSpreadsheetReader implements Serializable {
 	
 	@Inject
 	private ICwmService cwmService;
+	
+	@Inject
+	private ISiteService siteService;
 
 	@Getter @Setter
 	protected IModel<Site> defaultSite;
@@ -91,7 +94,7 @@ public class UserSpreadsheetReader implements Serializable {
 
 
 	public UserSpreadsheetReader() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	/**
@@ -320,6 +323,16 @@ public class UserSpreadsheetReader implements Serializable {
   			user.getObject().setLastName(map.get("lastname"));
   		else
   			errors += "Must specify \"lastname.\" \n";
+
+  		// Set Permission
+  		boolean permission = false;
+		if (map.containsKey("permission") && !map.get("permission").isEmpty()) {
+			if (map.get("permission").trim().toLowerCase().equals("true") || map.get("permission").trim().equals("1") ) {
+				permission = true;
+			}
+  		}
+		user.getObject().setPermission(permission);
+
   		
   		// Set Type
   		if(map.containsKey("type")) {
@@ -370,12 +383,12 @@ public class UserSpreadsheetReader implements Serializable {
   		Site site = potentialSites.get(siteName);
   		if (site == null) {
   			// try database
-  			site = SiteService.get().getSiteByName(siteName).getObject();
+  			site = siteService.getSiteByName(siteName).getObject();
   			potentialSites.put(siteName, site);
   		}
   		if (site == null) {
   			// its a new one
-  			site = SiteService.get().newSite();
+  			site = siteService.newSite();
   			site.setName(siteName);
   			potentialSites.put(siteName, site);
   		}
@@ -395,7 +408,7 @@ public class UserSpreadsheetReader implements Serializable {
   		}
   		if (period == null) {
   			// create a new one
-  			period = SiteService.get().newPeriod();
+  			period = siteService.newPeriod();
   			period.setSite(site);
   			period.setName(periodName);
   	  		potentialPeriods.get(site).put(periodName, period);

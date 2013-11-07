@@ -21,14 +21,15 @@ package org.cast.cwm.admin;
 
 import java.util.Arrays;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class UserListPage extends AdminPage {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserListPage.class);
+
+	private static final long serialVersionUID = 1L;
 
 	public UserListPage(final PageParameters parameters) {
 		super(parameters);
@@ -62,7 +65,7 @@ public class UserListPage extends AdminPage {
 						.setParameter("role", item.getModelObject().getRoleString())
 						.add(new Label("role", item.getModelObject().toString())));
 				if (item.getIndex() != 0)
-					item.add(new SimpleAttributeModifier("class", "addSeparator"));
+					item.add(AttributeModifier.replace("class", "addSeparator"));
 			}
 		};
 		

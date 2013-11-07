@@ -22,10 +22,15 @@ package org.cast.cwm.data.component;
 import net.databinder.auth.hib.AuthDataSession;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.Page;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.link.StatelessLink;
+import org.cast.cwm.service.ICwmSessionService;
 
-public class LogoutLink extends Link<Page> {
+import com.google.inject.Inject;
+
+public class LogoutLink extends StatelessLink<Void> {
+	
+	@Inject
+	ICwmSessionService cwmSessionService;
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,13 +41,12 @@ public class LogoutLink extends Link<Page> {
 	@Override
 	protected void onConfigure() {
 		super.onConfigure();
-		setVisible (AuthDataSession.get().isSignedIn());
+		setVisible (cwmSessionService.isSignedIn());
 	}
 
 	@Override
 	public void onClick() {
 		AuthDataSession.get().signOut();
-		getRequestCycle().setRedirect(true);
 		setResponsePage(Application.get().getHomePage());
 	}
 }

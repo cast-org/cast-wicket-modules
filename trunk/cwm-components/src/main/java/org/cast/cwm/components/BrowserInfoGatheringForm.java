@@ -19,17 +19,16 @@
  */
 package org.cast.cwm.components;
 
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.markup.html.form.StatelessForm;
 import org.apache.wicket.markup.html.form.HiddenField;
+import org.apache.wicket.markup.html.form.StatelessForm;
 import org.apache.wicket.markup.html.pages.BrowserInfoForm.ClientPropertiesBean;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.ClientProperties;
-import org.apache.wicket.protocol.http.WebRequestCycle;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.request.ClientInfo;
+import org.apache.wicket.request.cycle.RequestCycle;
 
 /**
  * A stateless form component that will, as a side effect, gather extended browser information.
@@ -78,25 +77,21 @@ public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
 	 */
 	@Override
 	protected void onSubmit() {
-		RequestCycle rc = getRequestCycle();
-		if (rc instanceof WebRequestCycle) {
-			WebRequestCycle requestCycle = (WebRequestCycle) rc;
-			WebSession session = (WebSession)getSession();
-			ClientInfo ci = session.getClientInfo();
+		RequestCycle requestCycle = getRequestCycle();
+		WebSession session = (WebSession)getSession();
+		ClientInfo ci = session.getClientInfo();
 
-			if (ci == null) {
-				ci = new WebClientInfo(requestCycle);
-				getSession().setClientInfo(ci);
-			} else {
-				if (!(ci instanceof WebClientInfo))
-					throw new RuntimeException ("ClientInfo is not of expected type");
-			}
-			WebClientInfo clientInfo = (WebClientInfo) ci;
-			
-			ClientProperties properties = clientInfo.getProperties();
-			bean.merge(properties);
+		if (ci == null) {
+			ci = new WebClientInfo(requestCycle);
+			getSession().setClientInfo(ci);
+		} else {
+			if (!(ci instanceof WebClientInfo))
+				throw new RuntimeException ("ClientInfo is not of expected type");
 		}
+		WebClientInfo clientInfo = (WebClientInfo) ci;
 
+		ClientProperties properties = clientInfo.getProperties();
+		bean.merge(properties);
 	}
 
 	public ClientPropertiesBean getBean() {

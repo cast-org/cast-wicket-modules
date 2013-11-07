@@ -25,7 +25,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.data.Event;
 
 /**
  * Default implementation of IDataColumn.
@@ -36,7 +35,7 @@ import org.cast.cwm.data.Event;
  * @author bgoldowsky
  *
  */
-public abstract class AbstractDataColumn extends AbstractColumn<Event> implements IDataColumn {
+public abstract class AbstractDataColumn<E> extends AbstractColumn<E> implements IDataColumn<E> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -53,7 +52,7 @@ public abstract class AbstractDataColumn extends AbstractColumn<Event> implement
 	}
 	
 	// Default implementation
-	public void populateItem(Item<ICellPopulator<Event>> cellItem, String componentId, IModel<Event> rowModel) {
+	public void populateItem(Item<ICellPopulator<E>> cellItem, String componentId, IModel<E> rowModel) {
 		cellItem.add(new Label(componentId, getItemString(rowModel)));
 	}
 }

@@ -19,62 +19,56 @@
  */
 package org.cast.cwm;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
-import net.databinder.auth.data.DataUser;
 import net.databinder.auth.hib.AuthDataApplication;
-import net.databinder.hib.DataRequestCycle;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
 import org.apache.wicket.Session;
+import org.apache.wicket.ThreadContext;
 import org.apache.wicket.guice.GuiceComponentInjector;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebResponse;
-import org.apache.wicket.protocol.http.pagestore.DiskPageStore;
-import org.apache.wicket.request.target.coding.QueryStringUrlCodingStrategy;
-import org.apache.wicket.session.ISessionStore;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.admin.AdminHome;
+import org.cast.cwm.admin.CacheManagementPage;
 import org.cast.cwm.admin.DatabaseStatisticsPage;
 import org.cast.cwm.admin.EventLog;
 import org.cast.cwm.admin.PeriodInfoPage;
 import org.cast.cwm.admin.SessionListPage;
 import org.cast.cwm.admin.SiteInfoPage;
 import org.cast.cwm.admin.SiteListPage;
+import org.cast.cwm.admin.UserContentLogPage;
+import org.cast.cwm.admin.UserContentViewPage;
 import org.cast.cwm.admin.UserFormPage;
 import org.cast.cwm.admin.UserListPage;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.data.User;
 import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
-import org.cast.cwm.data.resource.SvgImageResource;
-import org.cast.cwm.data.resource.UploadedFileResource;
 import org.cast.cwm.service.CwmService;
 import org.cast.cwm.service.CwmSessionService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.cast.cwm.service.ISiteService;
+import org.cast.cwm.service.SiteService;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,17 +106,17 @@ import com.google.inject.Scopes;
  * 
  * @author bgoldowsky
  */
-@SuppressWarnings("deprecation")
-public abstract class CwmApplication extends AuthDataApplication {
+public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Getter
-	protected Properties appProperties;
+	protected IAppConfiguration configuration;
 	
 	@Getter 
 	protected String appInstanceId;
 
 	@Getter 
-	protected int sessionTimeout = 90*60; // Session timeout, in seconds.  Defaults to 90 minutes
+	protected int sessionTimeout; // Session timeout, in seconds.  
+	protected final int DEFAULT_SESSION_TIMEOUT = 90*60; // Defaults to 90 minutes
 	
 	@Getter 
 	private String mailHost;
@@ -146,13 +140,11 @@ public abstract class CwmApplication extends AuthDataApplication {
 		log.debug("Starting CWM Application Internal Init");
 		log.debug("Application Class is " + getClass().getName());
 		
-		if(appProperties == null) {
-			loadAppProperties();		
-		}
+		loadAppProperties();
 
 		// If using Logback as the logger, and we have a logConfig property,
 		// then read that configuration.
-		String logConfig = appProperties.getProperty("cwm.logConfig");
+		File logConfig = configuration.getOptionalFile("cwm.logConfig");
 	    if (logConfig != null
 	    		&& LoggerFactory.getILoggerFactory() instanceof LoggerContext) { 
 			log.info("Log Configuration: {}", logConfig);
@@ -171,11 +163,10 @@ public abstract class CwmApplication extends AuthDataApplication {
 	    }
 	    
 	    loadServices();
-
-	    addComponentInstantiationListener(new GuiceComponentInjector(this, getInjectionModuleArray()));
-	    InjectorHolder.getInjector().inject(this);
-
-	    super.internalInit();
+	    
+		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getInjectionModuleArray()));
+		
+		super.internalInit();
 	}
 
 	/**
@@ -192,8 +183,10 @@ public abstract class CwmApplication extends AuthDataApplication {
 		log.debug("Starting CWM Application Init");
 		super.init();
 		
-		mailHost   = appProperties.getProperty("cwm.mailHost");
-		mailFromAddress = appProperties.getProperty("cwm.mailFromAddress");
+	    Injector.get().inject(this);
+		
+		mailHost   = configuration.getProperty("cwm.mailHost");
+		mailFromAddress = configuration.getProperty("cwm.mailFromAddress");
 		
 		getDebugSettings().setOutputMarkupContainerClassName(true);		
 
@@ -201,11 +194,7 @@ public abstract class CwmApplication extends AuthDataApplication {
 		runDatabaseInitializers();
 		configureMountPaths();
 		
-		// Mount Resource Handlers
-		UploadedFileResource.mount(this);
-		SvgImageResource.mount(this);
-		
-		loginSessionCloser = new LoginSessionCloser();
+		loginSessionCloser = new LoginSessionCloser(this);
 		loginSessionCloser.start();
 		
 		log.debug("Finished CWM Application Init");
@@ -227,12 +216,12 @@ public abstract class CwmApplication extends AuthDataApplication {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		modules.add(new Module() {
 			public void configure(Binder binder) {
-				log.debug("Binding Response Type Registry");
+				log.debug("Binding CWM Services");
 				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
-				log.debug("Binding CWM Service");
 				binder.bind(ICwmService.class).to(CwmService.class).in(Scopes.SINGLETON);
-				log.debug("Binding CWM Session Service");
 				binder.bind(ICwmSessionService.class).to(CwmSessionService.class).in(Scopes.SINGLETON);
+				binder.bind(ISiteService.class).to(SiteService.class).in(Scopes.SINGLETON);
+				binder.bind(IAppConfiguration.class).toInstance(configuration);
 			}
 		});
 		return modules;
@@ -255,35 +244,40 @@ public abstract class CwmApplication extends AuthDataApplication {
 	
 	protected void configureMountPaths() {
 		
-		mountBookmarkablePage("admin", AdminHome.class);
-		mountBookmarkablePage("stats", DatabaseStatisticsPage.class);
-		mountBookmarkablePage("eventlog", EventLog.class);
-		mountBookmarkablePage("sitelist", SiteListPage.class);
-		mountBookmarkablePage("userlist", UserListPage.class);
+		mountPage("admin", AdminHome.class);
+		mountPage("stats", DatabaseStatisticsPage.class);
+		mountPage("cache", CacheManagementPage.class);
+		mountPage("sitelist", SiteListPage.class);
+		mountPage("userlist", UserListPage.class);
+		mountPage("eventlog", EventLog.class);
+		mountPage("uclog", UserContentLogPage.class);
+		mountPage("ucview", UserContentViewPage.class);
 		
-		mount(new QueryStringUrlCodingStrategy("period", PeriodInfoPage.class));
-		mount(new QueryStringUrlCodingStrategy("sessions", SessionListPage.class));
-		mount(new QueryStringUrlCodingStrategy("site", SiteInfoPage.class));
-		mount(new QueryStringUrlCodingStrategy("edituser", UserFormPage.class));
+		// The following have query parameters
+		mountPage("period", PeriodInfoPage.class);
+		mountPage("sessions", SessionListPage.class);
+		mountPage("site", SiteInfoPage.class);
+		mountPage("edituser", UserFormPage.class);
 	}
 	
 	/** 
 	 * Execute database initialization objects given by {@link #getDatabaseInitializers()}.
 	 */
 	private void runDatabaseInitializers () {
-		new DatabaseInitializerRunner(appProperties).run(getDatabaseInitializers());
+		new DatabaseInitializerRunner(configuration).run(getDatabaseInitializers());
 	}
 
-	@Override
-	protected ISessionStore newSessionStore() {
-		return new CwmSessionStore(this, new DiskPageStore());
-	}
+// TODO: can't override session store any more - how to get this functionality back?
+//	@Override
+//	protected ISessionStore newSessionStore() {
+//		return new CwmSessionStore(this, new DiskPageStore());
+//	}
 
 	public static CwmApplication get() {
 		return (CwmApplication) Application.get();
 	}
 
-	public Class<? extends DataUser> getUserClass() {
+	public Class<User> getUserClass() {
 		return org.cast.cwm.data.User.class;
 	}
 	
@@ -301,16 +295,15 @@ public abstract class CwmApplication extends AuthDataApplication {
 	}
 	
 	@Override
-	protected void configureHibernate(AnnotationConfiguration ac) {
+	protected void configureHibernate(Configuration c) {
 		// We don't actually want the defaults that Databinder sets.
 		// super.configureHibernate(ac);
-		Configuration c = ac;
 		
-		String configFile = appProperties.getProperty("cwm.hibernateConfig");
+		File configFile = configuration.getFile("cwm.hibernateConfig");
 		if (configFile == null)
 			throw new RuntimeException ("Hibernate config file must be specified with cwm.hibernateConfig property.");
 		
-		c.configure(new File(configFile));
+		c.configure(configFile);
 
 		c.addAnnotatedClass(org.cast.cwm.data.Event.class);
 		c.addAnnotatedClass(org.cast.cwm.data.BinaryFileData.class);
@@ -327,64 +320,27 @@ public abstract class CwmApplication extends AuthDataApplication {
 	}
 	
 	public void loadAppProperties() {
-		appProperties = new Properties();
-		String propPath = getServletContext().getInitParameter("propertiesFile");
-		if(propPath == null)
-			throw new RuntimeException("No configuration properties file path set");
-		log.info("Loading App Properties from {}", propPath);
-		try {
-			appProperties.load(new FileInputStream(propPath));
-		} catch(Exception e) {
-			throw new RuntimeException("Error configuring application", e);
-		}
-		appInstanceId = appProperties.getProperty("cwm.instanceId");
-		
-		// Look up sessionTimeout value
-		String stString = appProperties.getProperty("cwm.sessionTimeout", "0");
-		try {
-			int st = Integer.valueOf(stString);
-			if (st > 0)
-				sessionTimeout = st;
-			else if (st == 0)
-				log.debug("SessionTimeout not specified, defaulting to {}", sessionTimeout);
-			else {
-				log.warn("SesstionTimeout invalid: {}", stString);
-			}
-		} catch (NumberFormatException e) {
-			log.error("SessionTimeout invalid, must be an integer number of seconds: {}", stString);
-		}
+		configuration = AppConfiguration.loadFor(this);
+		appInstanceId = configuration.getString("cwm.instanceId", "unknown");
+		// TODO: sessionTimeout is not used anywhere yet
+		sessionTimeout = configuration.getInteger("cwm.sessionTimeout", DEFAULT_SESSION_TIMEOUT);
 	}
 	
+	// Called to create a session
 	@Override
 	public Session newSession(Request request, Response response) {
 		return new CwmSession(request);
 	}
 	
+	// Called when a session is ending
 	@Override
-	public RequestCycle newRequestCycle (final Request request, final Response response) {
-		return new DataRequestCycle (this, (WebRequest) request, (WebResponse) response) {
-			
-			@Override
-			public Page onRuntimeException(final Page cause, final RuntimeException e) {
-				super.onRuntimeException(cause, e);  // Executes some methods
-				return CwmApplication.get().getExceptionPage(e);
-			}
-		};
+	public void sessionUnbound(final String sessionId) {
+		super.sessionUnbound(sessionId);
+		log.debug("sessionUnbound called: {}", sessionId);
+		loginSessionCloser.closeQueue.add(sessionId);
 	}
-	
-	/**
-	 * Mark the given LoginSession as ended due to session expiration.
-	 * 
-	 * This is made available in the Application class so that it can be called from the 
-	 * SessionStore when sessions expire - SessionStore is in a separate thread and
-	 * does not have easy access to service classes.
-	 * @param ID of the loginSession the LoginSession to close
-	 */
-	public void expireLoginSession(Long loginSessionId) {
-		loginSessionCloser.closeQueue.add(loginSessionId);
-	}
-	
-	void initResponseTypes() {
+
+	protected void initResponseTypes() {
 		/**
 		 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
 		 */
@@ -458,22 +414,6 @@ public abstract class CwmApplication extends AuthDataApplication {
 		return responseTypeRegistry.getLegalResponseTypes();
 	}
 	
-	
-//	public Component getReponseViewer (org.cast.cwm.data.Response r) {
-//		if (r.getType().equals(.r..r.))
-//			return ResponseViewer.class;
-//	}
-	
-	
-	/**
-	 * Override this method to display a custom page when an exception is thrown.
-	 * @param e
-	 * @return
-	 */
-	protected Page getExceptionPage(final RuntimeException e) {
-		return null;
-	}
-
 	public byte[] getSalt() {
 		return "mmmm salt, makes the encryption tasty".getBytes();
 	}
@@ -505,20 +445,28 @@ public abstract class CwmApplication extends AuthDataApplication {
 	 */
 	protected class LoginSessionCloser extends Thread {
 		
-		private BlockingQueue<Long> closeQueue = new LinkedBlockingQueue<Long>();
+		private BlockingQueue<String> closeQueue = new LinkedBlockingQueue<String>();
+		private Application application;
+		
+		protected LoginSessionCloser (Application app) {
+			super("LoginSessionCloser");
+			this.application = app;
+			this.setDaemon(true);
+		}
 		
 		@Override
 		public void run() {
-			Application.set(CwmApplication.this);
+			ThreadContext.setApplication(application);
+			log.debug("LoginSessionCloser thread {} starting with application: {}", this, Application.get());
+
 			while(true) {
 				try {
-					final Long loginSessionId = closeQueue.take();
+					final String loginSessionId = closeQueue.take();
 					Databinder.ensureSession(new SessionUnit() {
 						public Object run(org.hibernate.Session dbSession) {
-							dbSession.beginTransaction();
-							LoginSession loginSession = (LoginSession) dbSession.load(LoginSession.class, loginSessionId);
+							LoginSession loginSession = eventService.getLoginSessionBySessionId(loginSessionId).getObject();
 							if (loginSession != null) {
-								 if (loginSession.getEndTime() != null) {
+								 if (loginSession.getEndTime() == null) {
 									 log.debug("Closer thread closing login session {}", loginSessionId);
 									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
 								 } else {
@@ -526,9 +474,10 @@ public abstract class CwmApplication extends AuthDataApplication {
 									 log.debug("Login session {} was already closed", loginSessionId);
 								 }
 							} else {
-								log.error("LoginSession ID passed in ({}) was invalid or closed: {}", loginSessionId, loginSession);
+								// This is probably a web session where the user never logged in.
+								log.debug("No LoginSession corresponds to session ID {}", loginSessionId, loginSession);
 							}
-								dbSession.getTransaction().commit();
+							dbSession.getTransaction().commit();
 							return null;
 						}						
 					});

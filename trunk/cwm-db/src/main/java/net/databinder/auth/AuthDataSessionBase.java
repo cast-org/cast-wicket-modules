@@ -19,22 +19,20 @@
 package net.databinder.auth;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import javax.servlet.http.Cookie;
 
-import net.databinder.CookieRequestCycle;
 import net.databinder.auth.data.DataUser;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.protocol.http.WebSession;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.util.time.Duration;
 
 /**
@@ -94,8 +92,8 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	 * @return true if signed in or cookie sign in is possible and successful
 	 */
 	public boolean isSignedIn() {
-		if (userModel == null)
-			cookieSignIn();
+//		if (userModel == null)
+//			cookieSignIn();
 		return userModel != null; 
 	}
 	
@@ -131,30 +129,30 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 			setCookie();
 	}
 		
-	/**
-	 * Attempts cookie sign in, which will set usename field but not user.
-	 * @return true if signed in, false if credentials incorrect or unavailable
-	 */
-	protected boolean cookieSignIn() {
-		CookieRequestCycle requestCycle = (CookieRequestCycle) RequestCycle.get();
-		Cookie userCookie = requestCycle.getCookie(getUserCookieName()),
-			token = requestCycle.getCookie(getAuthCookieName());
-
-		if (userCookie != null && token != null) {
-			T potential;
-			try {
-				potential = getUser(URLDecoder.decode(userCookie.getValue(), CHARACTER_ENCODING));
-			} catch (UnsupportedEncodingException e) {
-				throw new WicketRuntimeException(e);
-			}
-			if (potential != null && potential instanceof DataUser) {
-				String correctToken = getApp().getToken(potential);
-				if (correctToken.equals(token.getValue()))
-					signIn(potential, false);
-			}
-		}
-		return userModel != null;
-	}
+//	/**
+//	 * Attempts cookie sign in, which will set usename field but not user.
+//	 * @return true if signed in, false if credentials incorrect or unavailable
+//	 */
+//	protected boolean cookieSignIn() {
+//		CookieRequestCycle requestCycle = (CookieRequestCycle) RequestCycle.get();
+//		Cookie userCookie = requestCycle.getCookie(getUserCookieName()),
+//			token = requestCycle.getCookie(getAuthCookieName());
+//
+//		if (userCookie != null && token != null) {
+//			T potential;
+//			try {
+//				potential = getUser(URLDecoder.decode(userCookie.getValue(), CHARACTER_ENCODING));
+//			} catch (UnsupportedEncodingException e) {
+//				throw new WicketRuntimeException(e);
+//			}
+//			if (potential != null && potential instanceof DataUser) {
+//				String correctToken = getApp().getToken(potential);
+//				if (correctToken.equals(token.getValue()))
+//					signIn(potential, false);
+//			}
+//		}
+//		return userModel != null;
+//	}
 		
 	/**
 	 * Looks for a persisted DataUser object matching the given username. Uses the user class
@@ -200,12 +198,12 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 		name.setMaxAge(maxAge);
 		auth.setMaxAge(maxAge);
 
-		RequestCycle rc = RequestCycle.get();
-		if (rc instanceof CookieRequestCycle) {
-			CookieRequestCycle cookieRc = (CookieRequestCycle) rc;
-			cookieRc.applyScope(name);
-			cookieRc.applyScope(auth);
-		}
+//		RequestCycle rc = RequestCycle.get();
+//		if (rc instanceof CookieRequestCycle) {
+//			CookieRequestCycle cookieRc = (CookieRequestCycle) rc;
+//			cookieRc.applyScope(name);
+//			cookieRc.applyScope(auth);
+//		}
 		
 		resp.addCookie(name);
 		resp.addCookie(auth);
@@ -215,17 +213,18 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	 * Detach userModel manually, as it isnt' attached to any component.
 	 */
 	@Override
-	protected void detach() {
+	public void detach() {
 		if (userModel != null)
 			userModel.detach();
+		super.detach();
 	}
 	
 	/** Nullifies userModela nd clears authentication cookies. */
 	protected void clearUser() {
 		userModel = null;
-		CookieRequestCycle requestCycle = (CookieRequestCycle) RequestCycle.get();
-		requestCycle.clearCookie(getUserCookieName());
-		requestCycle.clearCookie(getAuthCookieName());
+//		CookieRequestCycle requestCycle = (CookieRequestCycle) RequestCycle.get();
+//		requestCycle.clearCookie(getUserCookieName());
+//		requestCycle.clearCookie(getAuthCookieName());
   }	  
 
   /** Signs out and invalidates session. */	

@@ -38,13 +38,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.sanselan.Sanselan;
-import org.apache.wicket.Resource;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class ImageService {
 	}
 
 	public ImageService() {
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	/**
@@ -100,6 +100,8 @@ public class ImageService {
 	 * @param maxH
 	 * @param exact if exact, will force the image to be the provided size; gaps filled in with gray
 	 * @return
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 */
 	public BufferedImage resizeToBufferedImage(BufferedImage original, Integer maxW, Integer maxH, boolean exact) {
 
@@ -215,6 +217,7 @@ public class ImageService {
 	 * @param w
 	 * @param h
 	 * @return
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 */
 	public ScaledImage getScaledImage(ScaledImageKey key) {
 		ScaledImage thumb = scaledImageCache.get(key);
@@ -300,7 +303,12 @@ public class ImageService {
 			this.height = h;
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 *
+	 */
 	public static class ScaledImageResource extends DynamicImageResource {
 
 		private static final long serialVersionUID = 1L;
@@ -308,11 +316,10 @@ public class ImageService {
 		
 		public ScaledImageResource(ScaledImageKey lookupKey) {
 			this.lookupKey = lookupKey;
-			setCacheable(true);
 		}
 
 		@Override
-		protected byte[] getImageData() {
+		protected byte[] getImageData(Attributes attributes) {
 			ScaledImage image = ImageService.get().getScaledImage(lookupKey);
 			setFormat(image.getType() == null ? "jpg" : image.getType());
 			setLastModifiedTime(image.getLastModified());
@@ -322,8 +329,13 @@ public class ImageService {
 		public BufferedImage getBufferedImage() {
 			return ImageService.get().getScaledImage(lookupKey).getImage();
 		}
+
 	}
-	
+
+	/**
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 * 
+	 */
 	public static class ScaledImageResourceReference extends ResourceReference {
 
 		private static final long serialVersionUID = 1L;
@@ -335,11 +347,16 @@ public class ImageService {
 		}
 		
 		@Override
-		protected Resource newResource() {
+		public IResource getResource() {
 			return new ScaledImageResource(lookupKey);
 		}	
 	}
 
+	/**
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 *
+	 */
 	public static class ScaledImageComponent extends Image {
 		
 		private static final long serialVersionUID = 1L;
@@ -361,6 +378,12 @@ public class ImageService {
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
+	 *
+	 */
 	@Getter
 	@Setter
 	public static class ScaledImage {

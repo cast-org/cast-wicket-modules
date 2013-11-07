@@ -23,9 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -38,6 +37,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.Response;
@@ -167,10 +168,10 @@ public class StarPanel extends Panel implements IHeaderContributor {
 	
 	public void renderHead(IHeaderResponse response) {
 		
-		response.renderJavascriptReference(new ResourceReference(StarPanel.class, "star_rating.js"), "StarRating");
+		response.renderJavaScriptReference(new PackageResourceReference(StarPanel.class, "star_rating.js"), "StarRating");
 		response.renderCSSReference(getStarCSSReference());
 		
-		response.renderOnDomReadyJavascript("starRating.create('#" + getMarkupId() + " .stars')");
+		response.renderOnDomReadyJavaScript("starRating.create('#" + getMarkupId() + " .stars')");
 	}
 	
 	/**
@@ -178,8 +179,8 @@ public class StarPanel extends Panel implements IHeaderContributor {
 	 * to provide different color stars/styles/etc.
 	 * @return
 	 */
-	public ResourceReference getStarCSSReference() {
-		return new ResourceReference(StarPanel.class, "star_rating.css");
+	public PackageResourceReference getStarCSSReference() {
+		return new PackageResourceReference(StarPanel.class, "star_rating.css");
 	}
 	
 	/**

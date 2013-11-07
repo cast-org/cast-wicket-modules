@@ -23,15 +23,16 @@ import java.util.Date;
 import java.util.List;
 
 import net.databinder.hib.Databinder;
+import net.databinder.models.hib.BasicCriteriaBuilder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
@@ -100,15 +101,15 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#saveLoginEvent()
 	 */
-	public void saveLoginEvent() {
-		saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
+	public IModel<? extends Event> saveLoginEvent() {
+		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#savePageViewEvent(java.lang.String, java.lang.String)
 	 */
-	public void savePageViewEvent (String detail, String pageName) {
-		saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
+	public IModel<? extends Event> savePageViewEvent (String detail, String pageName) {
+		return saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
 	}
 	
 	/* (non-Javadoc)
@@ -116,7 +117,7 @@ public class EventService implements IEventService {
 	 */
 	public IModel<? extends Event> savePostEvent(boolean hasResponses, String pageName) {
 		Event e = newEvent();
-		e.setType(Boolean.valueOf(RequestCycle.get().getRequest().getParameter("autosave")) ? AUTOSAVE_POST_TYPE_NAME : POST_TYPE_NAME);
+		e.setType(RequestCycle.get().getRequest().getRequestParameters().getParameterValue("autosave").toBoolean() ? AUTOSAVE_POST_TYPE_NAME : POST_TYPE_NAME);
 		e.setHasResponses(hasResponses);
 		e.setPage(pageName);
 		return saveEvent(e);
@@ -141,7 +142,7 @@ public class EventService implements IEventService {
 		loginSession.setStartTime(new Date());
 		loginSession.setUser(cwmSession.getUser());
 		if (r instanceof ServletWebRequest) 
-			loginSession.setIpAddress(((ServletWebRequest)r).getHttpServletRequest().getRemoteAddr());
+			loginSession.setIpAddress(((ServletWebRequest)r).getContainerRequest().getRemoteAddr());
 		
 		loginSession.setCookiesEnabled(false);
 		if (cwmSession.getClientInfo() instanceof WebClientInfo) {
@@ -194,6 +195,14 @@ public class EventService implements IEventService {
 		}
 		// saveEvent will commit the transaction
 		saveEvent(LOGOUT_TYPE_NAME, sesLength, null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#getLoginSessionBySessionId(java.lang.String)
+	 */
+	public IModel<LoginSession> getLoginSessionBySessionId(String httpSessionId) {
+		return new HibernateObjectModel<LoginSession>(LoginSession.class,
+				new BasicCriteriaBuilder(Restrictions.eq("sessionId", httpSessionId)));
 	}
 
 	/* (non-Javadoc)

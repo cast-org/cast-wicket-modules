@@ -19,20 +19,22 @@
  */
 package org.cast.cwm.admin;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.devutils.inspector.InspectorPage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.cast.cwm.CwmSession;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.service.ICwmSessionService;
+
+import com.google.inject.Inject;
 
 /**
  * This is the home page for the ADMIN users.
@@ -40,6 +42,11 @@ import org.cast.cwm.data.Role;
  */
 @AuthorizeInstantiation("RESEARCHER")
 public class AdminHome extends AdminPage {
+	
+	@Inject
+	ICwmSessionService cwmSessionService;
+
+	private static final long serialVersionUID = 1L;
 
 	public AdminHome(PageParameters parameters) {
 		super(parameters);
@@ -56,41 +63,38 @@ public class AdminHome extends AdminPage {
 	 * Each repeater item has a "link" with a "label".
 	 */
 	protected void addLinks(RepeatingView repeater) {
-		for (Component c : homePageComponents()) {
+		for (Entry<String, Class<? extends Page>> e : getHomePageLinkMap().entrySet()) {
 			WebMarkupContainer container = new WebMarkupContainer(repeater.newChildId());
-			container.add(c);
+			BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("link", e.getValue());
+			link.add(new Label("label", e.getKey()));
+			container.add(link);
 			repeater.add(container);
 		}
 	}
 	
 	/**
-	 * Return a list of components to be added to the list on the home page.
+	 * Return a map of components to be added to the list on the home page.
 	 * This is usually a list of links.
 	 * @return 
 	 */
-	protected List<Component> homePageComponents() {
-		LinkedList<Component> list = new LinkedList<Component>(); 
+	protected Map<String,Class<? extends Page>> getHomePageLinkMap() {
+		Map<String,Class<? extends Page>> map = new LinkedHashMap<String,Class<? extends Page>>();
 			
 		// Links for users with full admin rights
-		if (CwmSession.get().getUser().hasRole(Role.ADMIN)) {
-			list.add(new BookmarkablePageLink<Page>("link", UserListPage.class).add(new Label("label", "Create/Edit Users")));
-			list.add(new BookmarkablePageLink<Page>("link", SiteListPage.class).add(new Label("label", "Create/Edit Sites")));
-			list.add(new BookmarkablePageLink<Page>("link", DatabaseStatisticsPage.class).add(new Label("label", "Database Statistics")));
-			list.add(new BookmarkablePageLink<Page>("link", SessionListPage.class).add(new Label("label", "Open login sessions")));
-			list.add(new BookmarkablePageLink<Page>("link", InspectorPage.class).add(new Label("label", "Wicket Inspector Page")));
-			// Can't just use a bookmarkable page link for data browser, since it's only bookmarkable in development mode
-//			list.add(new Link<Void>("link") {
-//				private static final long serialVersionUID = 1L;
-//				@Override
-//				public void onClick() {
-//					setResponsePage(new net.databinder.components.hib.DataBrowser<Void>(true));					
-//				}
-//			}.add(new Label("label", "Data browser")));
+		if (cwmSessionService.getUser().hasRole(Role.ADMIN)) {
+			map.put("Create/Edit Users", UserListPage.class);
+			map.put("Create/Edit Sites", SiteListPage.class);
+			map.put("Database Statistics", DatabaseStatisticsPage.class);
+			map.put("Cache Management", CacheManagementPage.class);
+			map.put("Open login sessions", SessionListPage.class);
+			map.put("Wicket Inspector Page", InspectorPage.class);
 		}
 		
-		list.add(new BookmarkablePageLink<Page>("link", EventLog.class).add(new Label("label", "Event Log")));
+		// Links for admins and researchers
+		map.put("Event Log", EventLog.class);
+		map.put("User Content Log", UserContentLogPage.class);
 		
-		return list;
+		return map;
 	}
 
 }

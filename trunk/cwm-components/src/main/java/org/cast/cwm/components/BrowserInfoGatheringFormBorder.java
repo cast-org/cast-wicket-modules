@@ -47,8 +47,7 @@ public class BrowserInfoGatheringFormBorder<T> extends Border {
 				BrowserInfoGatheringFormBorder.this.onSubmit();
 			}
 		};
-		add(form);
-		
+		addToBorder(form);
 		// The border's body is inside the form.
 		form.add(getBodyContainer());
 	}

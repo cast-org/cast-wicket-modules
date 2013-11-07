@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.JQueryHeaderContributor;
 
 /**
  * An instance of {@link IndicatingAjaxButton} that can disable components during
@@ -60,7 +61,8 @@ public abstract class DisablingIndicatingAjaxButton extends IndicatingAjaxButton
 	}
 	
 	public void renderHead(final IHeaderResponse response) {
-		response.renderJavascriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	
 	/**

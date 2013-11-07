@@ -24,13 +24,13 @@ import java.util.List;
 
 import net.databinder.models.hib.SortableHibernateProvider;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
 import org.slf4j.Logger;
@@ -46,6 +46,8 @@ public class SessionListPage extends AdminPage {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(SessionListPage.class);
+
+	private static final long serialVersionUID = 1L;
 
 	public SessionListPage(final PageParameters parameters) {
 		super(parameters);
@@ -65,8 +67,8 @@ public class SessionListPage extends AdminPage {
 	
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("User Name"), "user.username", "user.username"));
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Start time"), "startTime", "startTime"));
-		// FIXME the getSecondsSinceLastEvent() method doesn't currently exist.
-		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Time since last event"), "secondsSinceLastEvent")); // cannot sort since it's not a field Hibernate knows about
+		// TODO the getSecondsSinceLastEvent() method doesn't currently exist.
+		// columns.add(new PropertyColumn<LoginSession>(new Model<String>("Time since last event"), "secondsSinceLastEvent")); // cannot sort since it's not a field Hibernate knows about
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Browser"), "userAgent"));
 		columns.add(new PropertyColumn<LoginSession>(new Model<String>("IP Address"), "ipAddress"));
 	

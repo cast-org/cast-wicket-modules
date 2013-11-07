@@ -52,7 +52,7 @@ public class ClassAttributeModifier extends AttributeModifier {
   }
   
   public ClassAttributeModifier(IModel<?> value, boolean remove) {
-	  super("class", true, value);
+	  super("class", value);
 	  this.remove = remove;
   }
   

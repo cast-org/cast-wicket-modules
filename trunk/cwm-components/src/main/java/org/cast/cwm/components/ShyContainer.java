@@ -21,6 +21,8 @@ package org.cast.cwm.components;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 
 /**
  * A WebMarkupContainer that makes itself invisible whenever all immediate
@@ -42,22 +44,23 @@ public class ShyContainer extends WebMarkupContainer {
 	}
 
 	private boolean someChildVisible() {
-		Object found = this.visitChildren(new IVisitor<Component>(){
+		Boolean found = this.visitChildren(new IVisitor<Component,Boolean>(){
 
-			public Object component(Component component) {
+			public void component(Component component, final IVisit<Boolean> visit) {
 				if (determineVisibility(component)) {
-					return STOP_TRAVERSAL;
+					visit.stop(true);
+				} else {
+					visit.dontGoDeeper();
 				}
-				else
-					return CONTINUE_TRAVERSAL_BUT_DONT_GO_DEEPER;
 			}
 
 			private boolean determineVisibility(Component component) {
 				component.configure();
 				return component.determineVisibility();
 			}
+
 		});
-		return (found != null);
+		return (found != null && found);
 	}
 
 }

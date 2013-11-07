@@ -21,10 +21,11 @@ package org.cast.cwm.xml;
 
 import lombok.ToString;
 
-import org.apache.wicket.Resource;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.markup.html.PackageResource;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.PackageResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
+import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.cast.cwm.IRelativeLinkSource;
@@ -36,7 +37,7 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	private File file;
 	
 	public FileResource (File f) {
-		super(FileResource.class, f.getAbsolutePath(), null, null);
+		super(FileResource.class, f.getAbsolutePath(), null, null, null);
 		file = f;
 	}
 	
@@ -63,7 +64,7 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 		return new ResourceReference(FileResource.class, filePath) {
 			private static final long serialVersionUID = 1L;
 			@Override
-			protected Resource newResource() {
+			public IResource getResource() {
 				return getRelativeResource(relativePath);
 			}
 		};

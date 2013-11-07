@@ -24,21 +24,22 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.behavior.AbstractBehavior;
-import org.apache.wicket.behavior.IBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.border.Border;
-import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
+import org.cast.cwm.JQueryHeaderContributor;
 import org.cast.cwm.components.ShyLabel;
 import org.cast.cwm.service.IEventService;
 
@@ -62,8 +63,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final ResourceReference JS_REFERENCE = new JavascriptResourceReference(DialogBorder.class, "DialogBorder.js");
-	private static final ResourceReference BLOCKING_CSS_REFERENCE = new ResourceReference(DialogBorder.class, "modal_blocking.css");
+	private static final PackageResourceReference JS_REFERENCE = new JavaScriptResourceReference(DialogBorder.class, "DialogBorder.js");
+	private static final PackageResourceReference BLOCKING_CSS_REFERENCE = new PackageResourceReference(DialogBorder.class, "modal_blocking.css");
 	
 	@Getter @Setter
 	private boolean logEvents = true;
@@ -85,6 +86,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
 
 	@Getter @Setter
 	private boolean showMoveLink = false;
+
+	@Getter @Setter
+	private boolean autoSave = false; // autosave on close
 
 	/**
 	 * If true, DOM contents will be erased by the close javascript.
@@ -144,7 +148,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 		
 		addContentContainer();
 		contentContainer.setOutputMarkupId(true);
-		contentContainer.add(new SimpleAttributeModifier("tabindex", "-1"));
+		contentContainer.add(AttributeModifier.replace("tabindex", "-1"));
 		
 		addTitle(contentContainer);
 		addControls(contentContainer);
@@ -187,14 +191,14 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * Create and add the overall container for the dialog.
 	 */
 	protected void addContentContainer() {
-		add (contentContainer = new WebMarkupContainer("contentContainer") {
+		addToBorder (contentContainer = new WebMarkupContainer("contentContainer") {
 		    private static final long serialVersionUID = 1L;
 			@Override
 		    protected void onComponentTag(ComponentTag tag) {
 		    	super.onComponentTag(tag);
 		    	tag.put("style", "display:none;" + (zIndex == null ? "" : "z-index: " + zIndex.toString()));
 		    }
-		});		
+		});
 	}
 	
 	/**
@@ -263,7 +267,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 					add(DialogBorder.this.getClickToCloseBehavior());
 			}
 		};
-		add(overlay);
+		addToBorder(overlay);
 		overlay.setOutputMarkupId(true);
 	}
 	
@@ -272,7 +276,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
      * @param target
      */
     public void open(AjaxRequestTarget target) {
-        target.appendJavascript(getOpenString());
+        target.appendJavaScript(getOpenString());
     }
 
     /**
@@ -280,7 +284,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
      * @param target
      */
     public void close(AjaxRequestTarget target) {
-        target.appendJavascript(getCloseString());
+        target.appendJavaScript(getCloseString());
     }
 
     /**
@@ -288,8 +292,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
      * event handler that will open this Dialog.
      * @return
      */
-    public IBehavior getClickToOpenBehavior() {
-        return new AbstractBehavior() {
+    public Behavior getClickToOpenBehavior() {
+        return new Behavior() {
         	
 			private static final long serialVersionUID = 1L;
 
@@ -305,8 +309,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
      * event handler that will close this Dialog.
      * @return
      */
-    public IBehavior getClickToCloseBehavior() {
-        return new AbstractBehavior() {
+    public Behavior getClickToCloseBehavior() {
+        return new Behavior() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -375,6 +379,8 @@ public class DialogBorder extends Border implements IHeaderContributor {
      */
     public String getCloseString(boolean returnFocus) {
     	StringBuffer result = new StringBuffer();
+        if (autoSave)
+        	result.append("AutoSaver.autoSaveMaybeSave(null);");
         result.append(String.format("$('#%s').hide()%s;", 
         		contentContainer.getMarkupId(), 
         		emptyOnClose ? ".empty()" : ""));
@@ -388,27 +394,35 @@ public class DialogBorder extends Border implements IHeaderContributor {
     }
 
 	public void renderHead(final IHeaderResponse response) {
-        
-		response.renderJavascriptReference(JS_REFERENCE);
-        response.renderCSSReference(BLOCKING_CSS_REFERENCE);
+		renderJSinclusions(response);
+        renderCSSinclusions(response);
 
         // Move dialog components out of any containers on the page so that page CSS doesn't interfere with proper display
         // and so that they display on top of other content in older IE versions that don't respect z-index.
         if (moveContainer != null && moveContainer.contains(this, true)) {
         	moveContainer.setOutputMarkupId(true);
-        	response.renderOnDomReadyJavascript("$('#" + moveContainer.getMarkupId() + "').detach().appendTo('body');");
+        	response.renderOnDomReadyJavaScript("$('#" + moveContainer.getMarkupId() + "').detach().appendTo('body');");
         } else {
-        	response.renderOnDomReadyJavascript(
+        	response.renderOnDomReadyJavaScript(
 				"$('#" + contentContainer.getMarkupId() + "').detach().appendTo('body');"
 				+ (masking ? "$('#" + overlay.getMarkupId() + "').detach().appendTo('body');" : ""));
         }
+	}
+	
+	protected void renderJSinclusions(final IHeaderResponse response) {
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(JS_REFERENCE);
+	}
+
+	protected void renderCSSinclusions(final IHeaderResponse response) {
+		response.renderCSSReference(BLOCKING_CSS_REFERENCE);
 		if (styleReferences == null)
-			response.renderCSSReference(new ResourceReference(DialogBorder.class, "modal.css"));
+			response.renderCSSReference(new PackageResourceReference(DialogBorder.class, "modal.css"));
 		else
 			for (ResourceReference ref : styleReferences)
 				response.renderCSSReference(ref);
 	}
-
+	
 	/**
 	 * Set the list of CSS style resource references that this dialog should
 	 * render.  Use this to override the default styles.

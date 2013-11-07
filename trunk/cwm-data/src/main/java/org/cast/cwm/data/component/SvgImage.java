@@ -22,8 +22,9 @@ package org.cast.cwm.data.component;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.resource.SvgImageResource;
+import org.cast.cwm.data.resource.SvgImageResourceReference;
 import org.cast.cwm.drawtool.SvgEditor;
 
 /**
@@ -37,7 +38,7 @@ public class SvgImage extends WebMarkupContainer {
 
 	private static final long serialVersionUID = 1L;	
 	
-	private String imageUrl;
+	private CharSequence imageUrl;
 	private int width = SvgEditor.CANVAS_WIDTH;
 	private int height = SvgEditor.CANVAS_HEIGHT;
 	private Integer maxWidth;
@@ -64,8 +65,13 @@ public class SvgImage extends WebMarkupContainer {
 		}
 		
 		Response response = (Response)getDefaultModel().getObject();
-		if (response.getText() != null)
-			imageUrl = SvgImageResource.constructUrl(response.getResponseData(), width, height);
+		if (response.getText() != null) {
+			PageParameters pp = new PageParameters()
+				.set("id", response.getResponseData().getId())
+				.set("width", width)
+				.set("height", height);
+			imageUrl = getRequestCycle().urlFor(new SvgImageResourceReference(), pp);
+		}
 	}
 	
 	@Override

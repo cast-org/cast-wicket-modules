@@ -19,9 +19,9 @@
  */
 package org.cast.audioapplet.component;
 
-import org.apache.wicket.Resource;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.request.resource.IResource;
 
 /**
  * NOT WORKING YET.
@@ -35,18 +35,18 @@ public class TinyAudioPlayer extends AudioResourcePlayer {
 
 	private static final long serialVersionUID = 1L;
 
-	public TinyAudioPlayer(String id, Resource audioResource, boolean autoPlay) {
+	public TinyAudioPlayer(String id, IResource audioResource, boolean autoPlay) {
 		super(id, audioResource, autoPlay);
 	}
 
 	@Override
 	protected void addButtons() {
 		WebMarkupContainer play = new WebMarkupContainer("playButton");
-		play.add(new SimpleAttributeModifier("onclick", "audioPlay('" + dj.getMarkupId() + "')"));
+		play.add(AttributeModifier.replace("onclick", "audioPlay('" + dj.getMarkupId() + "')"));
 		add(play);
 		
 		WebMarkupContainer stop = new WebMarkupContainer("stopButton");
-		stop.add(new SimpleAttributeModifier("onclick", "audioStop('" + dj.getMarkupId() + "')"));
+		stop.add(AttributeModifier.replace("onclick", "audioStop('" + dj.getMarkupId() + "')"));
 		add(stop);
 	}
 

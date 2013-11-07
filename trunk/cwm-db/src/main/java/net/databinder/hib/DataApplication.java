@@ -20,15 +20,14 @@ package net.databinder.hib;
 
 import java.util.HashMap;
 
+import net.databinder.DBRequestCycleListener;
 import net.databinder.DataApplicationBase;
 
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.protocol.http.WebRequest;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 /**
  * Optional Databinder base Application class for configuration and session management. 
@@ -52,6 +51,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	@Override
 	protected void dataInit() {
 		buildHibernateSessionFactory(null);
+		getRequestCycleListeners().add(new DBRequestCycleListener());
 //		if (isDataBrowserAllowed())
 //			mountDataBrowser();
 	}
@@ -83,7 +83,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * @param key session factory key; the default key is null
 	 */
 	public void buildHibernateSessionFactory(Object key) {
-		buildHibernateSessionFactory(key, new AnnotationConfiguration());
+		buildHibernateSessionFactory(key, new Configuration());
 	}
 	
 	/**
@@ -94,10 +94,11 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * @see #configureHibernateEssentials(AnnotationConfiguration)
 	 * @see #configureHibernate(AnnotationConfiguration, Object) 
 	 */
-	final public void buildHibernateSessionFactory(Object key, AnnotationConfiguration config) {
+	final public void buildHibernateSessionFactory(Object key, Configuration config) {
 		configureHibernateEssentials(config);
 		configureHibernate(config, key);
-		setHibernateSessionFactory(key, config.buildSessionFactory());
+		ServiceRegistryBuilder regBuilder = new ServiceRegistryBuilder().applySettings(config.getProperties());
+		setHibernateSessionFactory(key, config.buildSessionFactory(regBuilder.buildServiceRegistry()));
 	}
 	
 	/**
@@ -108,7 +109,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * @param config configuration to update
 	 * @param key object, or null for the default factory
 	 */
-	protected	void configureHibernate(AnnotationConfiguration config, Object key) {
+	protected	void configureHibernate(Configuration config, Object key) {
 		configureHibernate(config);
 	}
 	
@@ -118,7 +119,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * the session lookup method used by DataRequestCycle.
 	 * @param config Hibernate configuration
 	 */
-	protected void configureHibernateEssentials(AnnotationConfiguration config) {
+	protected void configureHibernateEssentials(Configuration config) {
 		config.setProperty("hibernate.current_session_context_class","managed");
 	}
 		
@@ -130,7 +131,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * as required. For deployment it is configured for C3P0 connection pooling.
 	 * @param config used to build Hibernate session factory
 	 */
-	protected	void configureHibernate(AnnotationConfiguration config) {
+	protected	void configureHibernate(Configuration config) {
 			if (isDevelopment())
 				config.setProperty("hibernate.hbm2ddl.auto", "update");
 			else {
@@ -165,15 +166,6 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 		hibernateSessionFactories.put(key, sf);
 	}
 
-	
-	/**
-	 * @return a DataRequestCycle
-	 * @see DataRequestCycle
-	 */
-	@Override
-	public RequestCycle newRequestCycle(Request request, Response response) {
-		return new DataRequestCycle(this, (WebRequest) request, response);
-	}
 	
 	/**
 	 * Returns true if development mode is enabled. Override for other behavior.

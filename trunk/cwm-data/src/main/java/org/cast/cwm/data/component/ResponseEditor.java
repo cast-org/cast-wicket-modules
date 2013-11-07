@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.data.component;
 
-import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,15 +28,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.IRequestTarget;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
+import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
@@ -64,18 +63,21 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.protocol.http.RequestUtils;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.lang.Bytes;
+import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.components.AttributePrepender;
 import org.cast.cwm.components.UrlStreamedToString;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
-import org.cast.cwm.data.behavior.ChromeFrameUtils;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.drawtool.SvgEditor;
@@ -207,7 +209,7 @@ public abstract class ResponseEditor extends Panel {
 					// if you have already autosaved and then the user cancels - restore the original response
 					hasAutoSaved = false;
 				}
-				target.addComponent(feedbackPanel);
+				target.add(feedbackPanel);
 				ResponseEditor.this.onCancel(target);
 			}
 		};
@@ -232,7 +234,7 @@ public abstract class ResponseEditor extends Panel {
 			protected void deleteObject(AjaxRequestTarget target) {
 				responseService.deleteResponse(getModel());
 				setModelObject(null);
-				target.addComponent(feedbackPanel);
+				target.add(feedbackPanel);
 				onDelete(target);				
 			}			
 		};		
@@ -289,6 +291,7 @@ public abstract class ResponseEditor extends Panel {
 	protected class TextFragment extends Fragment {
 
 		private static final long serialVersionUID = 1L;
+		TextArea<String> textArea;
 		private DropDownChoice<String> choiceList;
 
 		public TextFragment(String id, IModel<Response> model) {
@@ -321,11 +324,11 @@ public abstract class ResponseEditor extends Panel {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public void renderHead(IHeaderResponse response) {
-						super.renderHead(response);
+					public void renderHead(Component c, IHeaderResponse response) {
+						super.renderHead(c, response);
 						// Ensure TinyMCE saves to form before we check to see if the form changed.
 						if (useWysiwyg)
-							response.renderJavascript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
+							response.renderJavaScript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
 					}
 
 					@Override
@@ -343,8 +346,7 @@ public abstract class ResponseEditor extends Panel {
 
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
-					onSave(target);
+					target.add(feedbackPanel);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
 					mOriginalResponse = getModel();
@@ -352,7 +354,7 @@ public abstract class ResponseEditor extends Panel {
 				
 				@Override
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
+					target.add(feedbackPanel);
 				}
 
 				@Override
@@ -363,7 +365,14 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public boolean isVisible() {
 					return saveVisible;
-				}				
+				}	
+
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+								
 			};
 			add(save);
 			
@@ -380,7 +389,7 @@ public abstract class ResponseEditor extends Panel {
 
 			// if you are editing an existing model use that one, otherwise use the new model
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
-			TextArea<String> textArea = new TextArea<String>("message", textModel);
+			textArea = new TextArea<String>("message", textModel);
 			textArea.setEscapeModelStrings(false);
 			if (useWysiwyg) {
 				textArea.add(new TinyMceBehavior(getTinyMCESettings()));
@@ -412,11 +421,29 @@ public abstract class ResponseEditor extends Panel {
 				public void onClick(AjaxRequestTarget target) {
 					onStarterAdded(target);
 				}
+
+				@Override
+				protected IAjaxCallDecorator getAjaxCallDecorator() {
+					return new AjaxCallDecorator() {
+						private static final long serialVersionUID = 1L;
+						public CharSequence decorateScript(Component c, CharSequence script) {
+							// The Javascript to actually add the sentence starter into the text area. 
+							String adder;
+							if (useWysiwyg)
+								adder = String.format("tinyMCE.get('%s').setContent(tinyMCE.get('%s').getContent() + $('#%s').val());",
+										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
+							else
+								adder = String.format("$('#%s').val($('#%s').val() + $('#%s').val());",
+										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
+
+							return adder + script; 
+						}						
+					};
+				}
 			};
 			add(addStarterLink);
 			
 			// add the sentence starter chosen to the text area response
-			addStarterLink.add(new AttributePrepender("onclick", "tinyMCE.get('" + textArea.getMarkupId() + "').setContent(tinyMCE.get('" + textArea.getMarkupId() + "').getContent() + $('#" + choiceList.getMarkupId(true) + "').val());", ";"));
 
 	         // label is linked to the sentence starter dropdown		
 			FormComponentLabel choiceListLabel = (new FormComponentLabel("sentenceStartersLabel", choiceList));
@@ -494,7 +521,7 @@ public abstract class ResponseEditor extends Panel {
 				if (templateURL != null) {
 					defaultTableUrl = getUrlFromString(templateURL);
 				} else { //new response with no authored default
-					String defaultTableUrlString = RequestCycle.get().urlFor(new ResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json")).toString();
+					String defaultTableUrlString = RequestCycle.get().urlFor(new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json"), null).toString();
 					defaultTableUrl = getUrlFromString(defaultTableUrlString);
 				}
 				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
@@ -522,13 +549,13 @@ public abstract class ResponseEditor extends Panel {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public void renderHead(IHeaderResponse response) {
-						super.renderHead(response);
+					public void renderHead(Component c, IHeaderResponse response) {
+						super.renderHead(c, response);
 						// Ensure grid saves to text area of form before we check to see if the form changed.
 						// Autosave will then submit the form to store the text area back to the db
 						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-						response.renderJavascript(script, "interactiveAutosave-" + textAreaMarkupId);					
+						response.renderJavaScript(script, "interactiveAutosave-" + textAreaMarkupId);					
 					}
 
 					@Override
@@ -550,17 +577,16 @@ public abstract class ResponseEditor extends Panel {
 
 						@Override
 						// this is what needs to be called right before the submit - send the table value to the hidden text field
-						public CharSequence decorateScript(CharSequence script) {
+						public CharSequence decorateScript(Component c, CharSequence script) {
 							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
-							return jsString + super.decorateScript(script);
+							return jsString + super.decorateScript(c, script);
 						}
 					};
 				}
 
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
-					onSave(target);
+					target.add(feedbackPanel);
 					// set new response flag and reset the new baseline response
 					newResponse = false;
 					mOriginalResponse = getModel();
@@ -568,7 +594,7 @@ public abstract class ResponseEditor extends Panel {
 				
 				@Override
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
+					target.add(feedbackPanel);
 				}
 
 				@Override
@@ -580,6 +606,13 @@ public abstract class ResponseEditor extends Panel {
 				public boolean isVisible() {
 					return saveVisible;
 				}				
+
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+
 			};
 			add(save);			
 
@@ -590,7 +623,7 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public void onClick(AjaxRequestTarget target) {
 					String jsString = new String("cwmAddRow(" + "\"" +  divMarkupId + "\");");
-					target.appendJavascript(jsString);					
+					target.appendJavaScript(jsString);					
 				}
 
 				@Override
@@ -606,7 +639,7 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public void onClick(AjaxRequestTarget target) {
 					String jsString = new String("cwmRemoveRow(" + "\"" +  divMarkupId + "\");");
-					target.appendJavascript(jsString);					
+					target.appendJavaScript(jsString);					
 				}
 
 				@Override
@@ -622,7 +655,7 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public void onClick(AjaxRequestTarget target) {
 					String jsString = new String("cwmAddColumn(" + "\"" +  divMarkupId + "\");");
-					target.appendJavascript(jsString);					
+					target.appendJavaScript(jsString);					
 				}
 
 				@Override
@@ -638,7 +671,7 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public void onClick(AjaxRequestTarget target) {
 					String jsString = new String("cwmRemoveColumn(" + "\"" +  divMarkupId + "\");");
-					target.appendJavascript(jsString);					
+					target.appendJavaScript(jsString);					
 				}
 
 				@Override
@@ -664,27 +697,34 @@ public abstract class ResponseEditor extends Panel {
 			}
 		}		
 		
-		// this enables the data stored in the database to be streamed via a url
+		// this enables the data stored in the database to be streamed via a URL
 		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
 			private static final long serialVersionUID = 1L;
 
 			public void onRequest() {
-				RequestCycle.get().setRequestTarget(new IRequestTarget() {
-
-					public void detach(RequestCycle requestCycle) { }
-					public void respond(RequestCycle requestCycle) {
-						try {
-							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
-							ps.print(getModel().getObject().getText());
-							ps.flush();
-							ps.close();
-						}
-						catch(Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
+				getRequestCycle().scheduleRequestHandlerAfterCurrent(
+						new ResourceStreamRequestHandler(
+								new AbstractStringResourceStream() {
+									private static final long serialVersionUID = 1L;
+									@Override
+									protected String getString() {
+										return getModelObject().getText();
+									}
+								}));
 			}
+// Used to be this, which is quite different, but I don't think functionality of PrintStream is being used at all
+//					public void respond(RequestCycle requestCycle) {
+//						try {
+//							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
+//							ps.print(getModel().getObject().getText());
+//							ps.flush();
+//							ps.close();
+//						}
+//						catch(Exception e) {
+//							e.printStackTrace();
+//						}
+//					}
+//				});
 		}
 
 		@Override
@@ -694,17 +734,17 @@ public abstract class ResponseEditor extends Panel {
 		}
 
 		public void renderHead(IHeaderResponse response) {		
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
-			response.renderJavascriptReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
 
-			response.renderCSSReference(new ResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
+			response.renderCSSReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available via the url make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', 'false');");
-			response.renderOnDomReadyJavascript(jsString);
+			response.renderOnDomReadyJavaScript(jsString);
 		}
 	}
 
@@ -770,7 +810,7 @@ public abstract class ResponseEditor extends Panel {
 			form.setMultiPart(true);
 			add(form);
 						
-			form.add(new FileUploadField("fileUploadField", new Model<FileUpload>(null)).setRequired(true));
+			form.add(new FileUploadField("fileUploadField").setRequired(true));
 			form.setMaxSize(Bytes.megabytes(2));
 			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
@@ -779,19 +819,25 @@ public abstract class ResponseEditor extends Panel {
 
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
-					onSave(target);			
+					target.add(feedbackPanel);
 				}
 				
 				@Override
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
+					target.add(feedbackPanel);
 				}
 
 				@Override
 				protected Collection<? extends Component> getComponents() {
 					return Arrays.asList(this, cancelButton, deleteButton);
 				}
+
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+
 			};
 			add(save);
 		}
@@ -821,12 +867,11 @@ public abstract class ResponseEditor extends Panel {
 			if (starters != null) {
 				ArrayList<String> starterUrls = new ArrayList<String>(starters.size());
 				for (String starter : starters) {
-					try {
-						// TODO: Better way to determine external image
-						starterUrls.add(starter.startsWith("http://") ? starter : new URI(RequestUtils.toAbsolutePath(starter)).getPath());
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
-					}
+					String absoluteUrl = starter;
+					// TODO: Better way to determine external image
+					if (!starter.startsWith("http://"))
+						absoluteUrl = RequestUtils.toAbsolutePath(starter, getRequestCycle().getRequest().getUrl().getPath());
+					starterUrls.add(absoluteUrl);
 				}
 				svgEditor.setDrawingStarters(starterUrls);
 			}
@@ -858,13 +903,13 @@ public abstract class ResponseEditor extends Panel {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public void renderHead(IHeaderResponse response) {
-						super.renderHead(response);
+					public void renderHead(Component c, IHeaderResponse response) {
+						super.renderHead(c, response);
 						String script = 
 							"AutoSaver.addOnBeforeSaveCallBack(function() { " +
 							"   $('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString()));" +
 							"});";
-						response.renderJavascript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
+						response.renderJavaScript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
 					}
 
 					@Override
@@ -883,16 +928,14 @@ public abstract class ResponseEditor extends Panel {
 
 				@Override
 				protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
-					onSave(target);		
+					target.add(feedbackPanel);
 				}
 				
 				@Override
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
-					target.addComponent(feedbackPanel);
+					target.add(feedbackPanel);
 				}
-				
-	
+					
 				@Override
 				protected IAjaxCallDecorator getAjaxCallDecorator() {
 					return new DisablingAjaxCallDecorator(getComponents()) {
@@ -900,8 +943,8 @@ public abstract class ResponseEditor extends Panel {
 						private static final long serialVersionUID = 1L;
 
 						@Override
-						public CharSequence decorateScript(CharSequence script) {
-							return "$('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString())); " + super.decorateScript(script);
+						public CharSequence decorateScript(Component c, CharSequence script) {
+							return "$('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString())); " + super.decorateScript(c, script);
 						}
 					};
 				}
@@ -914,17 +957,18 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				public boolean isVisible() {
 					return saveVisible;
-				}				
+				}	
+				
+				@Override
+				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
+					super.onAfterSubmit(target, form);
+					onSave(target);		
+				}
+				
 			};
 			add(save);
 		}
 		
-		@Override
-		protected void onBeforeRender() {
-			if (ChromeFrameUtils.isBareIE())
-				replaceWith(new SvgNotSupportedFragment(this.getId()));
-			super.onBeforeRender();
-		}
 	}
 	
 	protected class SvgNotSupportedFragment extends Fragment {
@@ -1092,11 +1136,12 @@ public abstract class ResponseEditor extends Panel {
 	 * @param stringUrl
 	 * @return
 	 */
-	public static URL getUrlFromString(String stringUrl) {
+
+	public URL getUrlFromString(String stringUrl) {
 		URL url = null;
 		if (stringUrl != null) {
 			try {
-				url = new URI(RequestUtils.toAbsolutePath(stringUrl)).toURL();
+				url = new URI(toAbsolutePath(stringUrl)).toURL();
 				return url;
 			} catch (MalformedURLException e) {
 				log.error("There is a problem with the Authored Data:  {}", stringUrl);
@@ -1109,6 +1154,13 @@ public abstract class ResponseEditor extends Panel {
 		return null;
 	}	
 
+	
+	public final static String toAbsolutePath(final String relativePagePath) {
+	       HttpServletRequest req = (HttpServletRequest)((WebRequest)RequestCycle.get().getRequest()).getContainerRequest();
+	       return RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
+	}
+
+	
 	public class DefaultSvgModel extends AbstractReadOnlyModel<String> implements IDetachable {
 		private static final long serialVersionUID = 1L;
 		private IModel<Response> model;
@@ -1129,7 +1181,7 @@ public abstract class ResponseEditor extends Panel {
 				if (templateURL != null) {
 					String url;
 					try {
-						url = new URI(RequestUtils.toAbsolutePath(templateURL)).getPath();
+						url = new URI(RequestUtils.toAbsolutePath(templateURL, getRequestCycle().getRequest().getUrl().getPath())).getPath();
 					} catch (URISyntaxException e) {
 						throw new IllegalArgumentException(e);
 					}

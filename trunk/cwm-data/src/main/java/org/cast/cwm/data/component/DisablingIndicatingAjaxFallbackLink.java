@@ -27,6 +27,7 @@ import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxFallbackLink;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.JQueryHeaderContributor;
 
 /**
  * An instance of {@link IndicatingAjaxFallbackLink} that can disable components during
@@ -54,7 +55,8 @@ public abstract class DisablingIndicatingAjaxFallbackLink<T> extends IndicatingA
 	}
 	
 	public void renderHead(final IHeaderResponse response) {
-		response.renderJavascriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	
 	/**

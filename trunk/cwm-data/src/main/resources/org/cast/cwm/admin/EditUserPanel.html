@@ -6,31 +6,37 @@
 		<form wicket:id="form">
 			<fieldset>
 				<div wicket:id="roleEnclosure">
-					<select wicket:id="role" id="role"></select>
+					<select wicket:id="role"></select>
 				</div>
 				<div wicket:id="usernameEnclosure">
-					<input wicket:id="username" id="username" type="text" size="40" />
+					<input wicket:id="username" type="text" size="40" />
 				</div>
 				<div wicket:id="firstNameEnclosure">
-					<input wicket:id="firstName" id="firstName" type="text" size="40" />
+					<input wicket:id="firstName" type="text" size="40" />
 				</div>
 				<div wicket:id="lastNameEnclosure">
-					<input wicket:id="lastName" id="lastName" type="text" size="40" />
+					<input wicket:id="lastName" type="text" size="40" />
 				</div>
 				<div wicket:id="subjectIdEnclosure">
-					<input wicket:id="subjectId" id="subjectId" type="text" size="40" />
+					<input wicket:id="subjectId" type="text" size="40" />
 				</div>
 				<div wicket:id="emailEnclosure">
-					<input wicket:id="email" id="email" type="text" size="40" />
+					<input wicket:id="email" type="text" size="40" />
 				</div>
 				<div wicket:id="passwordEnclosure">
-					<input wicket:id="password" id="password" type="password" size="40" />
+					<input wicket:id="password" type="password" size="40" />
 				</div>
 				<div wicket:id="verifyPasswordEnclosure">
-					<input wicket:id="verifyPassword" id="verifyPassword" type="password" size="40" />
+					<input wicket:id="verifyPassword" type="password" size="40" />
+				</div>
+				<div wicket:id="permissionEnclosure"> 
+					<input type="checkbox" wicket:id="permission" />
+				</div>
+				<div wicket:id="validEnclosure"> 
+					<input type="checkbox" wicket:id="valid" />
 				</div>
 				<div wicket:id="periodsEnclosure"> 
-		      		<div wicket:id="periods" id="periods" class="checkboxes"></div>
+		      		<div wicket:id="periods" class="checkboxes"></div>
 				</div>
 				<div class="formRow">
 					<a wicket:id="submit" class="button"><wicket:container wicket:id="operation">Save</wicket:container></a>

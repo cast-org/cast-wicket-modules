@@ -103,7 +103,6 @@ public class SignInFormPanel extends Panel {
 			eventService.saveLoginEvent();
 			if (!continueToOriginalDestination()) {
 				setResponsePage(CwmApplication.get().getHomePage(CwmSession.get().getUser().getRole()));
-				setRedirect(true);
 			}
 		}
 	}

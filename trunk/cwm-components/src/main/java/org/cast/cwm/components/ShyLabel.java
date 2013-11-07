@@ -42,15 +42,9 @@ public class ShyLabel extends Label {
 	}
 
 	@Override
-	protected void onBeforeRender() {
+	protected void onConfigure() {
+		super.onConfigure();
 		setVisible(!Strings.isEmpty(getDefaultModelObjectAsString()));
-		super.onBeforeRender();
-	}
-
-	// Without this it can't update from hidden to visible, since onBeforeRender isn't called.
-	@Override
-	protected boolean callOnBeforeRenderIfNotVisible() {
-		return true;
 	}
 
 }

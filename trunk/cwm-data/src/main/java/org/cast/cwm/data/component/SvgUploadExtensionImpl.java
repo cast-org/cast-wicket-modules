@@ -21,9 +21,10 @@ package org.cast.cwm.data.component;
 
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.resource.UploadedFileResource;
+import org.cast.cwm.data.resource.UploadedFileResourceReference;
 import org.cast.cwm.drawtool.extension.UploadExtension;
 import org.cast.cwm.service.IResponseService;
 
@@ -45,6 +46,7 @@ public class SvgUploadExtensionImpl extends UploadExtension {
 	@SuppressWarnings("unchecked")
 	protected String processFile(FileUpload file) {
 		IModel<BinaryFileData> mUploadedFile = responseService.attachBinaryResponse((IModel<Response>) getDefaultModel(), file);
-		return UploadedFileResource.constructUrl(mUploadedFile.getObject());
+		CharSequence url = getRequestCycle().urlFor(new UploadedFileResourceReference(), new PageParameters().add("id", mUploadedFile.getObject().getId()));
+		return url.toString();
 	}
 }

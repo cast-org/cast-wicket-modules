@@ -19,11 +19,10 @@
  */
 package org.cast.audioapplet.component;
 
-import org.apache.wicket.IRequestTarget;
 import org.apache.wicket.IResourceListener;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Resource;
-import org.apache.wicket.request.target.resource.ResourceStreamRequestTarget;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.handler.resource.ResourceRequestHandler;
+import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.util.string.Strings;
 
 /**
@@ -33,9 +32,9 @@ public class AudioResourcePlayer extends AudioPlayer implements IResourceListene
 
 	private static final long serialVersionUID = 1L;
 	
-	protected Resource audioResource = null;
+	protected IResource audioResource = null;
 	
-	public AudioResourcePlayer(String id, Resource audioResource, boolean autoPlay) {
+	public AudioResourcePlayer(String id, IResource audioResource, boolean autoPlay) {
 		super(id, null, autoPlay);
 		this.audioResource = audioResource;
 	}
@@ -50,7 +49,7 @@ public class AudioResourcePlayer extends AudioPlayer implements IResourceListene
 	@Override
 	protected CharSequence getDataUrl() {
 		if (audioResource != null) {
-			CharSequence url = urlFor(IResourceListener.INTERFACE);
+			CharSequence url = urlFor(IResourceListener.INTERFACE, null);
 			return RequestCycle.get().getOriginalResponse()
 				.encodeURL(Strings.replaceAll(url, "&", "&amp;"));
 		}
@@ -61,8 +60,8 @@ public class AudioResourcePlayer extends AudioPlayer implements IResourceListene
 	 * Called if we were initialized with a Resource and it's now being requested.
 	 */
 	public void onResourceRequested() {
-		IRequestTarget response = new ResourceStreamRequestTarget(audioResource.getResourceStream());
-		getRequestCycle().setRequestTarget(response);		
+		// TODO rewritten - does this work??
+		getRequestCycle().scheduleRequestHandlerAfterCurrent(new ResourceRequestHandler(audioResource, null));
 	}
 
 }

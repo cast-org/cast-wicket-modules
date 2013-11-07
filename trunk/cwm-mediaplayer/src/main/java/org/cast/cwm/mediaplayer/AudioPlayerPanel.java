@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.mediaplayer;
 
-import org.apache.wicket.ResourceReference;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 /** Media player panel, initialized with parameters appropriate for playing audio.
  * 
@@ -38,7 +38,7 @@ public class AudioPlayerPanel extends MediaPlayerPanel {
 		this.downloadText = "Download MP3";
 	}
 	
-	public AudioPlayerPanel(String id, ResourceReference resourceRef, int width, int height) {
+	public AudioPlayerPanel(String id, PackageResourceReference resourceRef, int width, int height) {
 	  super(id, resourceRef, width, height);
 	  this.fullScreen = false;
 	  this.showDownloadLink = true;

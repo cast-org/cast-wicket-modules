@@ -29,6 +29,7 @@ import org.apache.wicket.extensions.ajax.markup.html.AjaxIndicatorAppender;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
+import org.cast.cwm.JQueryHeaderContributor;
 
 /**
  * An instance of {@link AjaxSubmitLink} that can disable components during
@@ -70,7 +71,8 @@ implements IAjaxIndicatorAware, IHeaderContributor {
 	}
 	
 	public void renderHead(final IHeaderResponse response) {
-		response.renderJavascriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	
 	/**

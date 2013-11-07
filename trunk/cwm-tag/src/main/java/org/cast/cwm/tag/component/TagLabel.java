@@ -19,12 +19,11 @@
  */
 package org.cast.cwm.tag.component;
 
-import org.apache.wicket.RequestCycle;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.protocol.http.request.WebClientInfo;
+import org.apache.wicket.protocol.http.WebSession;
 import org.cast.cwm.tag.model.Tag;
 
 /**
@@ -44,15 +43,15 @@ public class TagLabel extends Label {
 	}
 	
 	@Override
-	protected void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag)
+	public void onComponentTagBody(final MarkupStream markupStream, final ComponentTag openTag)
 	{
 		Tag tag = (Tag)getDefaultModelObject();
 		String tagname = "";
 		if (tag != null) {
 			tagname = tag.getName();
-			String clientInfo = ((WebClientInfo) RequestCycle.get().getClientInfo()).getUserAgent();
-			if (clientInfo != null && clientInfo.toLowerCase().contains("win")) // Windows doesn't support Unicode out of the box
-				if (clientInfo.toLowerCase().contains("ie")) {
+			String userAgent = WebSession.get().getClientInfo().getUserAgent();
+			if (userAgent != null && userAgent.toLowerCase().contains("win")) // Windows doesn't support Unicode out of the box
+				if (userAgent.toLowerCase().contains("ie")) {
 					tagname = tagname.replace("*", "<span style='font-family:Wingdings'>&#171;</span>"); // If we're in IE, use Wingdings!
 
 				} else {

@@ -24,35 +24,35 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.datetime.PatternDateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.markup.repeater.RefreshingView;
-import org.apache.wicket.markup.repeater.util.ModelIteratorAdapter;
+import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.models.ResponseModel;
 import org.cast.cwm.service.IResponseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,9 +87,10 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	
 	private static TinyMCESettings editorSettings = null;
 	
-	private WebMarkupContainer responseListContainer;
-	private WebMarkupContainer controlPanel;
-	
+	protected WebMarkupContainer responseListContainer;
+	protected WebMarkupContainer controlPanel;
+	protected DataView<Response> dataView;
+
 	/**
 	 * Page name, for logging.
 	 */
@@ -116,13 +117,22 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	private boolean showAll;
 	
 	/**
+	 * List of names of response types that are supported by this ResponseArea.
+	 * There will be an "add new content" button for each of these.
+	 * Override {@link #getResponseTypeNames()} to change the types of content supported.
+	 */
+	private String[] defaultResponseTypeNames = new String[] { "HTML", "AUDIO", "SVG", "UPLOAD"};
+	
+	/**
 	 * If a ResponseType is listed in this array, a link to create a response
 	 * of that type will not be displayed.
 	 */
 	private Set<IResponseType> disabled = new HashSet<IResponseType>();
 	
+	@Getter @Setter
 	private List<String> sentenceStarters = new ArrayList<String>();
 	
+	@Getter @Setter
 	private List<String> stampURLs = new ArrayList<String>();
 	
 	/**
@@ -169,25 +179,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	}
 	
 	private void addContent() {
-		
 		// Container for New Response Links
-		controlPanel = new WebMarkupContainer("controls") {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isVisible() {
-				return !isEditing;
-			}
-		};
-		controlPanel.setOutputMarkupPlaceholderTag(true);
-		add(controlPanel);
-		
-		// Links for creating a new response
-		controlPanel.add(new NewResponseLink("xmlText", typeRegistry.getResponseType("HTML")));
-		controlPanel.add(new NewResponseLink("audio", typeRegistry.getResponseType("AUDIO")));
-		controlPanel.add(new NewResponseLink("upload", typeRegistry.getResponseType("UPLOAD")));
-		controlPanel.add(new NewResponseLink("draw", typeRegistry.getResponseType("SVG")));
+		add(controlPanel = getNewContentButtonsContainer("controls"));
 				
 		// Placeholder for a new response editor
 		add(new WebMarkupContainer(NEW_RESPONSE_ID).setOutputMarkupPlaceholderTag(true).setVisible(false));
@@ -197,29 +190,14 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		responseListContainer.setOutputMarkupId(true);
 		add(responseListContainer);
 		
-		// TODO: Seems like this would be better with a DataView repeater.
-		// TODO: Possible without hibernate references here?
-		responseListContainer.add(new RefreshingView<Response>("responseList") {
+		ISortableDataProvider<Response> provider = responseService.getResponseProviderForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel());
+		
+		dataView = new DataView<Response>("responseList", provider) {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected Iterator<IModel<Response>> getItemModels() {
-				
-				Iterator<Response> responses = responseService.getResponsesForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel()).getObject().iterator();
-
-				return new ModelIteratorAdapter<Response>(responses) {
-
-					@Override
-					protected IModel<Response> model(Response object) {
-						return new ResponseModel(object);
-					}
-				};
-			}
-
-			@Override
 			protected void populateItem(Item<Response> item) {
-
 				// Actual Response
 				ResponseViewer rv = new ResponseViewer(EXISTING_RESPONSE_ID, item.getModel(), RESPONSE_MAX_WIDTH, null);
 				item.add(rv);
@@ -227,7 +205,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 				//headerVisible;
 				//item.add(DateLabel.forDatePattern("timestamp", new PropertyModel<Date>(item.getModel(), "lastUpdated"), "M/d/yyyy - h:mma"));				
 				IModel<Date> mDate = new PropertyModel<Date>(item.getModel(), "lastUpdated");
-				item.add(new DateLabel("timestamp",mDate, new PatternDateConverter("yyyy-MM-dd HH:mm", false)){
+				item.add(new DateLabel("timestamp", mDate, new PatternDateConverter("yyyy-MM-dd HH:mm", false)){
 					private static final long serialVersionUID = 1L;
 					
 					@Override
@@ -244,15 +222,48 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 						setVisible(headerVisible);
 						super.onConfigure();
 					}
-				});					
-					
+				});
 
 				item.add(rv);
 
 				item.add(new EditResponseLink("edit", item.getModel()).setVisible(item.getModelObject().getUser().equals(CwmSession.get().getUser())));
 				item.setOutputMarkupId(true);
 			}
-		});
+			
+		};
+		responseListContainer.add(dataView);
+
+	}
+	
+	protected WebMarkupContainer getNewContentButtonsContainer (String id) {
+		return new NewContentButtonsContainer(id);
+	}
+	
+	protected String[] getResponseTypeNames () {
+		return defaultResponseTypeNames;
+	}
+	
+	
+	/**
+	 * Container component for the set of buttons.
+	 */
+	public class NewContentButtonsContainer extends WebMarkupContainer {
+
+		private static final long serialVersionUID = 1L;
+
+		public NewContentButtonsContainer(String id) {
+			super(id);
+			setOutputMarkupPlaceholderTag(true);
+			for (String rt : getResponseTypeNames()) {
+				// use the response type name as the wicket:id as well.
+				add(new NewResponseLink(rt, typeRegistry.getResponseType(rt)));
+			}
+		}
+		
+		@Override
+		public void onConfigure() {
+			setVisible(!isEditing);
+		}
 	}
 	
 	/**
@@ -304,10 +315,11 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			};
 			editor.setPageName(pageName);
 			
-			if (type.getName().equals("HTML")) {
+			String typeName = type.getName();
+			if (typeName.equals("TEXT") || typeName.equals("HTML")) {
 				if (!sentenceStarters.isEmpty())
 					editor.setStarters(sentenceStarters);
-			} else if (type.getName().equals("SVG")) {
+			} else if (typeName.equals("SVG")) {
 				if (!stampURLs.isEmpty())
 					editor.setStarters(stampURLs);
 			}
@@ -316,8 +328,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			
 			if (target != null) {
 				addEditLinksToTarget(target);
-				target.addComponent(controlPanel);
-				target.addComponent(BasicResponseArea.this.get(NEW_RESPONSE_ID));
+				target.add(controlPanel);
+				target.add(BasicResponseArea.this.get(NEW_RESPONSE_ID));
 			}	
 		}
 		
@@ -331,9 +343,9 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			
 			BasicResponseArea.this.replace(new WebMarkupContainer(NEW_RESPONSE_ID).setOutputMarkupPlaceholderTag(true).setVisible(false));
 			if (target != null) {
-				target.addComponent(responseListContainer);
-				target.addComponent(controlPanel);
-				target.addComponent(BasicResponseArea.this.get(NEW_RESPONSE_ID));
+				target.add(responseListContainer);
+				target.add(controlPanel);
+				target.add(BasicResponseArea.this.get(NEW_RESPONSE_ID));
 			}
 		}
 	}
@@ -377,11 +389,11 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			};
 			editor.setPageName(pageName);
 			
-			String type = getModelObject().getType().getName(); 
-			if (type.equals("HTML")) {
+			String typeName = getModelObject().getType().getName(); 
+			if (typeName.equals("TEXT") || typeName.equals("HTML")) {
 				if (!sentenceStarters.isEmpty())
 					editor.setStarters(sentenceStarters);
-			} else if (type.equals("SVG")) {
+			} else if (typeName.equals("SVG")) {
 				if (!stampURLs.isEmpty())
 					editor.setStarters(stampURLs);
 			}
@@ -390,8 +402,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			
 			if (target != null) {
 				addEditLinksToTarget(target);
-				target.addComponent(controlPanel);
-				target.addComponent(getParent().get(EXISTING_RESPONSE_ID));
+				target.add(controlPanel);
+				target.add(getParent().get(EXISTING_RESPONSE_ID));
 			}	
 		}
 
@@ -400,8 +412,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 			isEditing = false;
 			getParent().replace(new ResponseViewer(EXISTING_RESPONSE_ID, getModel(), RESPONSE_MAX_WIDTH, null));
 			if (target != null) {
-				target.addComponent(responseListContainer);
-				target.addComponent(controlPanel);
+				target.add(responseListContainer);
+				target.add(controlPanel);
 			}
 		}
 		
@@ -418,13 +430,10 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	 */
 	private void addEditLinksToTarget(final AjaxRequestTarget target) {
 		
-		responseListContainer.visitChildren(EditResponseLink.class, new IVisitor<EditResponseLink>() {
-
-			public Object component(EditResponseLink component) {
-				target.addComponent(component);
-				return IVisitor.CONTINUE_TRAVERSAL;
+		responseListContainer.visitChildren(EditResponseLink.class, new IVisitor<EditResponseLink,Void>() {
+			public void component(EditResponseLink component, IVisit<Void> visit) {
+				target.add(component);
 			}
-			
 		});
 	}
 	
@@ -441,7 +450,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		}
 		return this;
 	}
-	
+
 	public void addSentenceStarter(String s) {
 		sentenceStarters.add(s);
 	}
@@ -451,7 +460,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	}
 	
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new ResourceReference(BasicResponseArea.class, "buttons.css"));
+		response.renderCSSReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css"));
 	} 
 	
 	@Override
