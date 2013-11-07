@@ -5,7 +5,7 @@
     <groupId>org.cast.cwm</groupId>
     <artifactId>cwm-parent</artifactId>
     <name>CWM parent project</name>
-    <version>2.0</version>
+    <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     
     <url>http://code.google.com/p/cast-wicket-modules</url>
@@ -33,15 +33,15 @@
     </issueManagement>
     
     <scm>
-        <url>http://code.google.com/p/cast-wicket-modules/source/tags/cwm-parent-2.0</url>
-        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-2.0</connection>
-        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/tags/cwm-parent-2.0</developerConnection>
+        <url>http://code.google.com/p/cast-wicket-modules/source</url>
+        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/trunk</connection>
+        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/trunk</developerConnection>
     </scm>
     
     <distributionManagement>
         <repository>
             <id>CAST</id>
-            <url>scpexe://comp.cast.org/var/www/html/maven2</url>
+            <url>scpexe://xander.cast.org/shared/maven2-repository</url>
         </repository>
         <!-- todo: site -->
     </distributionManagement>
@@ -401,23 +401,21 @@
                     </execution>
                 </executions>
             </plugin>
-<!-- this will create Javadocs in an "apidocs" directory
-                         that is a sister to the "trunk" directory.
-                         This location works well on Google Code.
-                         Run "mvn javadoc:aggregate" to update. -->
-<!-- Commented out due to problems creating javadoc
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.8</version>
                 <configuration>
-                        <reportOutputDirectory>${basedir}/..</reportOutputDirectory>
+                    <!-- this will create Javadocs in an "apidocs" directory
+                         that is a sister to the "trunk" directory.
+                         This location works well on Google Code.
+                         Run "mvn javadoc:aggregate" to update. -->
+                    <reportOutputDirectory>${basedir}/..</reportOutputDirectory>
                     <outputDirectory>${basedir}/..</outputDirectory>
                     <author>false</author>
                     <quiet>true</quiet>
                 </configuration>
             </plugin>
--->
         </plugins>
 
         <extensions>
