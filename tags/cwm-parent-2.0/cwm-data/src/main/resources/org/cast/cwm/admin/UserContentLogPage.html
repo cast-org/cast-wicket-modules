@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<wicket:extend>
+	<h2>User Content Log</h2>
+
+    <form wicket:id="filter" class="filter">
+
+		<wicket:enclosure child="site">
+			<fieldset>
+    	    	<legend>Sites</legend>
+   	    		<div class="scrollable" wicket:id="site"></div>
+        	</fieldset>
+		</wicket:enclosure>
+
+		<fieldset>
+        	<legend>Date Range</legend>
+        	<label wicket:for="from" class="aligned">From: </label>
+        	<input wicket:id="from" type="text" name="from" />
+ 			<br />
+        	<label wicket:for="to" class="aligned">To: </label>
+        	<input wicket:id="to" type="text" name="to" />
+        </fieldset>
+		
+		
+		<br style="clear:both;" />
+        <input type="submit" value="filter list"/>
+        <br />
+		
+	</form>
+
+    <a wicket:id="downloadLink" href="#">Download data table</a>
+
+	<table wicket:id="table" class="dataTable"></table>
+
+</wicket:extend>
+</html>
