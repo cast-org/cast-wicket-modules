@@ -31,7 +31,7 @@ import net.databinder.models.hib.SortableHibernateProvider;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.IModel;
@@ -53,6 +53,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import com.google.inject.Inject;
+//import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
+//import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 
 /**
  * A Hibernate implementation of the service class used to save/load/modify
@@ -339,7 +341,7 @@ public class ResponseService implements IResponseService {
 		// DataProvider for Responses for this Prompt.
 		// It is assumed that the target Response is included in this list.
 		ISortableDataProvider<Response> dataProvider = getResponseProviderForPrompt(mPrompt);
-		dataProvider.getSortState().setPropertySortOrder("sortOrder", ISortState.ASCENDING);
+		dataProvider.getSortState().setPropertySortOrder("sortOrder", SortOrder.ASCENDING);
 		
 		if (index == null)
 			index = dataProvider.size() - 1;

@@ -28,10 +28,10 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.Resource;
-import org.apache.wicket.injection.web.InjectorHolder;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IInputStreamProvider;
+import org.cast.cwm.InputStreamNotFoundException;
 import org.cast.cwm.xml.parser.XmlParser;
 import org.cast.cwm.xml.service.IXmlService;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	@Getter protected XmlSection tocSection;
 	@Getter protected String documentNamespace;
 
-	@Getter protected Resource xmlFile;
+	@Getter protected IInputStreamProvider xmlFile;
 	protected XmlParser parser;
 	protected Time lastModified;
 	protected Time lastCheckedTime;
@@ -74,9 +74,9 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	@Inject
 	private IXmlService xmlService;
 	
-	public XmlDocument(String name, Resource xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
+	public XmlDocument(String name, IInputStreamProvider xmlFile, XmlParser parser, List<IDocumentObserver> observers) {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 		this.name = name;
 		this.xmlFile = xmlFile;
 		this.parser = parser;
@@ -93,8 +93,8 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 		parser.setIdMap(idMap);
 		parser.setDoc(this);
 		try {
-			this.tocSection = parser.parse(this.xmlFile.getResourceStream().getInputStream());
-		} catch (ResourceStreamNotFoundException e) {
+			this.tocSection = parser.parse(this.xmlFile.getInputStream());
+		} catch (InputStreamNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		// FIXME put LD processing back in?
@@ -146,7 +146,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	 */
 	synchronized protected void updateIfModified() {
 		lastCheckedTime = Time.now();
-		Time newLM = xmlFile.getResourceStream().lastModifiedTime();
+		Time newLM = xmlFile.lastModifiedTime();
 		if (lastModified==null || newLM.after(lastModified)) {
 			lastModified = newLM;
 			try {

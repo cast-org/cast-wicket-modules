@@ -33,6 +33,7 @@ import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -45,6 +46,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.EmailAddressValidator;
 import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
@@ -54,8 +56,10 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.UserService;
+
+import com.google.inject.Inject;
 
 /**
  * A panel for editing a user.  
@@ -70,6 +74,9 @@ import org.cast.cwm.service.UserService;
 public class EditUserPanel extends Panel {
 
 	private static final long serialVersionUID = 1L;
+	
+	@Inject
+	protected ISiteService siteService;
 	
 	private Form<User> userForm;
 	private Map<String, FormComponentContainer> components = new HashMap<String, FormComponentContainer>();
@@ -332,7 +339,6 @@ public class EditUserPanel extends Panel {
 
 			// E-mail Address
 			TextField<String> email = new TextField<String>("email");
-			email.setRequired(true);
 			email.add(EmailAddressValidator.getInstance());
 			email.add(new UniqueUserFieldValidator(getModel(), Field.EMAIL));
 
@@ -364,8 +370,20 @@ public class EditUserPanel extends Panel {
 			// Passwords have to match
 			add(new EqualPasswordConvertedInputValidator(password, verifyPassword));
 			
+			// Permission
+			CheckBox permission = new CheckBox("permission", new PropertyModel<Boolean>(this.getDefaultModel(), "permission"));
+			FormComponentContainer permissionContainer = new FormComponentContainer("permissionEnclosure", permission).setLabel("Permission:");
+			components.put("permission", permissionContainer);
+			add(permissionContainer);
+
+			// active
+			CheckBox active = new CheckBox("valid", new PropertyModel<Boolean>(this.getDefaultModel(), "valid"));
+			FormComponentContainer activeContainer = new FormComponentContainer("validEnclosure", active).setLabel("Valid:");
+			components.put("valid", activeContainer);
+			add(activeContainer);
+			
 			// Periods
-			CheckBoxMultipleChoice<Period> periods = new CheckBoxMultipleChoice<Period>("periods", SiteService.get().listPeriods());
+			CheckBoxMultipleChoice<Period> periods = new CheckBoxMultipleChoice<Period>("periods", siteService.listPeriods());
 			periods.setChoiceRenderer(new ChoiceRenderer<Period>() {
 
 				private static final long serialVersionUID = 1L;

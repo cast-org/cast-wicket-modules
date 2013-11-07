@@ -21,14 +21,16 @@ package org.cast.cwm.admin;
 
 import net.databinder.hib.Databinder;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.hibernate.stat.Statistics;
 
 @AuthorizeInstantiation("ADMIN")
 public class DatabaseStatisticsPage extends AdminPage {
+
+	private static final long serialVersionUID = 1L;
 
 	public DatabaseStatisticsPage (PageParameters params) {
 		super(params);
@@ -43,9 +45,12 @@ public class DatabaseStatisticsPage extends AdminPage {
 			add(new Label("qcmiss", String.valueOf(stats.getQueryCacheMissCount())));
 		} else {
 			stats.setStatisticsEnabled(true);
-			add (new Label("count", "--"));
-			add (new Label("worst", "--"));
-			add (new Label("worsttime", "--"));
+			add(new Label("count",     "--"));
+			add(new Label("cloads",    "--"));
+			add(new Label("worst",     "--"));
+			add(new Label("worsttime", "--"));
+			add(new Label("qchit",     "--"));
+			add(new Label("qcmiss",    "--"));
 		}
 		stats.clear();
 		

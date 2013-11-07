@@ -20,12 +20,11 @@
 package org.cast.cwm;
 
 import java.util.List;
-import java.util.Properties;
 
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.service.ICwmService;
 import org.slf4j.Logger;
@@ -37,14 +36,14 @@ class DatabaseInitializerRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(CwmApplication.class);
 
-	private Properties appProperties;
+	private IAppConfiguration appProperties;
 
 	@Inject
 	private ICwmService cwmService;
 
-	DatabaseInitializerRunner(Properties appProperties) {
-		this.appProperties = appProperties;
-		InjectorHolder.getInjector().inject(this);
+	DatabaseInitializerRunner(IAppConfiguration configuration) {
+		this.appProperties = configuration;
+		Injector.get().inject(this);
 	}
 	
 	void run(final List<IDatabaseInitializer> databaseInitializers) {

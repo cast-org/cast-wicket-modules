@@ -22,8 +22,8 @@ package org.cast.cwm.service;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.wicket.Request;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Request;
 import org.cast.cwm.IEventLogger;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
@@ -49,7 +49,7 @@ public interface IEventService extends IEventLogger {
 	 * Save a login event.
 	 * 
 	 */
-	public abstract void saveLoginEvent();
+	public abstract IModel<? extends Event> saveLoginEvent();
 
 	/**
 	 * Save a page view event.
@@ -57,7 +57,7 @@ public interface IEventService extends IEventLogger {
 	 * @param detail
 	 * @param pageName
 	 */
-	public abstract void savePageViewEvent(String detail, String pageName);
+	public abstract IModel<? extends Event> savePageViewEvent(String detail, String pageName);
 
 	/**
 	 * Save a post event.  If this event has an accompanying {@link ResponseData} object,
@@ -88,6 +88,14 @@ public interface IEventService extends IEventLogger {
 	 */
 	public abstract LoginSession createLoginSession(Request r);
 
+	/**
+	 * Lookup a LoginSession by the HTTP ID assigned to it by the web application container.
+	 * 
+	 * @param httpSessionId
+	 * @return model of the LoginSession (model object may be null if no such LoginSession exists)
+	 */
+	public IModel<LoginSession> getLoginSessionBySessionId(String httpSessionId);
+	
 	/**
 	 * Mark the LoginSession as having ended at the given time.
 	 * @param loginSession

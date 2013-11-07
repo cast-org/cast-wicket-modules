@@ -23,18 +23,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.apache.wicket.Resource;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.markup.html.WebResource;
-import org.apache.wicket.util.resource.IResourceStream;
+import org.apache.wicket.Application;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.io.IOUtils;
+import org.apache.wicket.util.lang.Bytes;
+import org.apache.wicket.util.resource.AbstractResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
+import org.cast.cwm.InputStreamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +51,10 @@ import com.xmlmind.davclient.PropertyList;
 /**
  * A Resource for a file on a DAV server.
  * 
- * TODO: this class needs to handle:
- *   - fixing up the last modified time basd on size comparison
- *   - caching so we don't constantly go out to the server.
- * 
  * @author bgoldowsky
  *
  */
-public class DavResource extends WebResource implements IRelativeLinkSource {
+public class DavResource extends AbstractResource implements IInputStreamProvider, IRelativeLinkSource {
 
 	protected final String clientName;
 	protected final String path;
@@ -82,16 +82,56 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 			throw new IllegalArgumentException("DAV Resource path name must be absolute; provided path was " + path);
 	}
 
+	/**
+	 * @see org.apache.wicket.request.resource.AbstractResource#newResourceResponse(org.apache.wicket.request.resource.IResource.Attributes)
+	 */
 	@Override
-	public IResourceStream getResourceStream() {
-		return new DavResourceStream();
+	protected ResourceResponse newResourceResponse(final Attributes attributes) {
+		final ResourceResponse response = new ResourceResponse();
+		
+		// Set last modified time so that response can determine if data needs to be written.
+		response.setLastModified(lastModifiedTime());
+		
+		if (response.dataNeedsToBeWritten(attributes)) {
+			DavResourceStream resourceStream = new DavResourceStream();
+			final byte[] bytes;
+			try {
+				bytes = IOUtils.toByteArray(resourceStream.getInputStream());
+				response.setContentLength(bytes.length);
+				response.setLastModified(lastModified);			
+				if (Application.exists())
+					response.setContentType(Application.get().getMimeType(path));
+				
+				response.setWriteCallback(new WriteCallback() {
+					@Override
+					public void writeData(Attributes attributes) {
+						attributes.getResponse().write(bytes);
+					}
+				});
+			} catch (IOException e) {
+				log.error("I/O Exception while trying to read DAV resource");
+				e.printStackTrace();
+				response.setError(404);
+			} catch (ResourceStreamNotFoundException e) {
+				log.error("DAV resource not found: " + path);
+				response.setError(404);
+			} finally {
+				try {
+					resourceStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}		
+		return response;
 	}
 
 	public DAVClient getClient() {
 		return DavClientManager.get().getClient(clientName);
 	}
 
-	public Time getLastModified() {
+	public Time lastModifiedTime() {
 		retrieveProperties();
 		return lastModified;
 	}
@@ -101,6 +141,14 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		return fileSize;
 	}
 	
+	public InputStream getInputStream() throws InputStreamNotFoundException {
+		try {
+			return new DavResourceStream().getInputStream();
+		} catch (ResourceStreamNotFoundException e) {
+			throw new InputStreamNotFoundException(e);
+		}
+	}
+
 	/** Return a ResourceReference to a relatively-addressed item
 	 * 
 	 * @param relativePath path relative to the path of this Resource
@@ -111,7 +159,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		return new ResourceReference (DavResource.class, childPath) {
 			private static final long serialVersionUID = 1L;
 			@Override
-			protected Resource newResource() {
+			public IResource getResource() {
 				return getRelativeResource(relativePath);
 			}
 		};
@@ -123,7 +171,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 	 * the same Resource will be returned again for a later query.  This allows for
 	 * the child Resources to do caching.
 	 */
-	public Resource getRelativeResource(String relativePath) {
+	public DavResource getRelativeResource(String relativePath) {
 		if (resourceMap.containsKey(relativePath)) {
 			return resourceMap.get(relativePath);
 		} else {
@@ -213,10 +261,9 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 		return null;
 	}
 
-	protected class DavResourceStream implements IResourceStream {
+	protected class DavResourceStream extends AbstractResourceStream {
 
 		protected InputStream stream = null;
-		protected Locale locale;
 
 		private static final long serialVersionUID = 1L;
 
@@ -225,11 +272,6 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 				stream.close();
 		}
 
-		public String getContentType() {
-			return "";   // FIXME!
-		}
-
-		// TODO  are we doing the right things with the various exceptions?
 		public InputStream getInputStream() throws ResourceStreamNotFoundException {
 			Content content = null;
 			try {
@@ -241,7 +283,7 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 				throw new ResourceStreamNotFoundException(e);
 			}
 			// Update file size and mod date based on the Content object
-			setMetadata (Time.milliseconds(content.getContentDate()), content.getContentLength());
+			setMetadata (Time.millis(content.getContentDate()), content.getContentLength());
 			contentType = content.getContentType();
 			try {
 				stream = content.openContent();
@@ -252,20 +294,8 @@ public class DavResource extends WebResource implements IRelativeLinkSource {
 			}
 		}
 
-		public Time lastModifiedTime() {
-			return getLastModified();
-		}
-
-		public Locale getLocale() {
-			return locale;
-		}
-
-		public void setLocale(Locale locale) {
-			this.locale = locale;
-		}
-
-		public long length() {
-			return getFileSize();
+		public Bytes length() {
+			return Bytes.bytes(getFileSize());
 		}
 
 	}

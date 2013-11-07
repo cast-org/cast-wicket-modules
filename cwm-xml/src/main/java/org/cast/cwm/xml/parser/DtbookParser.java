@@ -35,7 +35,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.xerces.util.XMLCatalogResolver;
 import org.cast.cwm.xml.XmlSection;
 import org.cast.cwm.xml.service.IXmlService;
@@ -67,7 +67,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 	
 	public DtbookParser () {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	/**

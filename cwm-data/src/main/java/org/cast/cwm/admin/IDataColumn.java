@@ -21,7 +21,6 @@ package org.cast.cwm.admin;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.model.IModel;
-import org.cast.cwm.data.Event;
 
 /** 
  * An IColumn that can also be used for static data table download.
@@ -33,10 +32,10 @@ import org.cast.cwm.data.Event;
  * @author bgoldowsky
  *
  */
-public interface IDataColumn extends IColumn<Event> {
+public interface IDataColumn<E> extends IColumn<E> {
 
 	public String getHeaderString();
 	
-	public String getItemString(IModel<Event> rowModel);
+	public String getItemString(IModel<E> rowModel);
 	
 }

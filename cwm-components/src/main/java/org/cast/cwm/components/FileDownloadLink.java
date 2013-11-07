@@ -19,12 +19,19 @@
  */
 package org.cast.cwm.components;
 
-import org.apache.wicket.markup.html.DynamicWebResource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.target.resource.ResourceStreamRequestTarget;
+import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.util.lang.Bytes;
+import org.apache.wicket.util.resource.AbstractResourceStream;
+import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 
 /**
  * A download link to a byte[] of binary data.  Use this to download files that have
@@ -70,27 +77,43 @@ public class FileDownloadLink extends Link<byte[]> implements IDetachable {
 
 	@Override
 	public void onClick() {
-		DynamicWebResource resource = new DynamicWebResource() {
+
+		AbstractResourceStream rs = new AbstractResourceStream() {
 
 			private static final long serialVersionUID = 1L;
+
+			private transient InputStream inputStream;
+
+			public InputStream getInputStream()
+					throws ResourceStreamNotFoundException {
+				inputStream = new ByteArrayInputStream(getModelObject());
+				return inputStream;
+			}
+
+			public void close() throws IOException {
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
+				}		
+			}
 			
 			@Override
-			protected ResourceState getResourceState() {
-				return new ResourceState() {
-					
-					@Override
-					public String getContentType() {
-						return mMimeType.getObject();
-					}
-					
-					@Override
-					public byte[] getData() {
-						return getModelObject();
-					}
-				};
+			public String getContentType() {
+				return mMimeType.getObject();
+			}
+
+			@Override
+			public Bytes length() {
+				return Bytes.bytes(getModelObject().length);
 			}
 		};
-		getRequestCycle().setRequestTarget(new ResourceStreamRequestTarget(resource.getResourceStream(), mFileName.getObject()));		
+		
+		ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(rs);
+		handler.setContentDisposition(ContentDisposition.ATTACHMENT)
+			.setFileName(mFileName.getObject());
+			
+		getRequestCycle().scheduleRequestHandlerAfterCurrent(handler);
+
 	}
 
 	@Override

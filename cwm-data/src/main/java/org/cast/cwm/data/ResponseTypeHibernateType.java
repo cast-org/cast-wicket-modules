@@ -24,9 +24,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.StringType;
 import org.hibernate.usertype.UserType;
 
@@ -41,7 +42,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	public ResponseTypeHibernateType() {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	public int[] sqlTypes() {
@@ -50,7 +51,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 		};
 	}
 
-	public Class returnedClass() {
+	public Class<?> returnedClass() {
 		return IResponseType.class;
 	}
 
@@ -62,20 +63,22 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 		return x.hashCode();
 	}
 
-	public Object nullSafeGet(ResultSet rs, String[] names, Object owner)
+	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		assert names.length == 1;
 		String typeName = rs.getString(names[0]);
+		if (typeName == null)
+			return null;
 		return typeRegistry.getResponseType(typeName);
 	}
 
-	public void nullSafeSet(PreparedStatement st, Object value, int index)
+	public void nullSafeSet(PreparedStatement st, Object value, int index,  SessionImplementor session)
 			throws HibernateException, SQLException {
 		if (value == null) {
-			StringType.INSTANCE.set(st, null, index);
+			StringType.INSTANCE.set(st, null, index, session);
 		} else {
 			IResponseType rt = (IResponseType) value;
-			StringType.INSTANCE.set(st, rt.getName(), index);
+			StringType.INSTANCE.set(st, rt.getName(), index, session);
 		}
 	}
 

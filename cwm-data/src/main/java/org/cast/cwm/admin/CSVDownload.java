@@ -20,25 +20,19 @@
 package org.cast.cwm.admin;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
-import java.util.Locale;
-
-import net.databinder.models.hib.HibernateObjectModel;
+import java.util.List;
 
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.markup.html.WebResource;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.protocol.http.WebResponse;
-import org.apache.wicket.util.resource.IResourceStream;
-import org.apache.wicket.util.resource.IResourceStreamWriter;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.request.Response;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.string.StringValueConversionException;
-import org.apache.wicket.util.time.Time;
-import org.cast.cwm.data.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,114 +42,84 @@ import com.generationjava.io.CsvWriter;
  * A CSV-formatted downloadable dump of data.
  *
  */
-class CSVDownload extends WebResource {
+class CSVDownload<E extends Serializable> extends AbstractResource {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(CSVDownload.class);
 
-	protected IDataColumn[] columns;
-	protected IDataProvider<Event> dataProvider;
+	protected List<IDataColumn<E>> columns;
+	protected IDataProvider<E> dataProvider;
 
 	/**
 	 * Configure a download with a given data provider and set of columns
-	 * @param columns
+	 * @param columns2
 	 * @param dataProvider
 	 */
-	CSVDownload (IDataColumn[] columns, IDataProvider<Event> dataProvider) {
+	CSVDownload (List<IDataColumn<E>> columns2, IDataProvider<E> dataProvider) {
 		super();
-		this.columns = columns;
+		this.columns = columns2;
 		this.dataProvider = dataProvider;
 	}
 
 	/**
-	 * @see org.apache.wicket.markup.html.WebResource#setHeaders(org.apache.wicket.protocol.http.WebResponse)
+	 * creates a new resource response based on the request attributes
+	 * 
+	 * @param attributes
+	 *            current request attributes from client
+	 * @return resource response for answering request
 	 */
 	@Override
-	protected void setHeaders(WebResponse response)
-	{
-		super.setHeaders(response);
-		response.setAttachmentHeader("log.csv");
-	}
-
-	@Override
-	public IResourceStream getResourceStream() {
-		return new CSVResourceStreamWriter();
-	}
-
-	private final class CSVResourceStreamWriter implements IResourceStreamWriter {
-		private static final long serialVersionUID = 1L;
+	protected ResourceResponse newResourceResponse(Attributes attributes) {
+		ResourceResponse rr = new ResourceResponse();
+		rr.disableCaching();
+		rr.setFileName("log.csv");
+		rr.setContentDisposition(ContentDisposition.ATTACHMENT);
+		rr.setContentType("text/csv");
 		
-		CsvWriter writer = null;		
+		if (rr.dataNeedsToBeWritten(attributes)) {
+			rr.setWriteCallback(new WriteCallback() {
+				@Override
+				public void writeData(Attributes attributes) {
+					Response response = attributes.getResponse();
 
-		public void write(OutputStream output) {
-			try {
-				writer = new CsvWriter(new OutputStreamWriter(output, "UTF-8"));
-				
-				// Write header row
-				for (IDataColumn col : columns) {
-					writer.writeField(col.getHeaderString());
-				}
-				writer.endBlock();
-				
-				// Write Data
-				// DataProvider doesn't have a concept of "unlimited".  Hopefully 
-				// a million event records is enough
-				Iterator<? extends Event> it = dataProvider.iterator(0, 1000000); 
-				while (it.hasNext()) {
-					Event e = it.next();
-					for (IDataColumn col : columns) {
-						String columnValue = col.getItemString(new HibernateObjectModel<Event>(e));
-						if (columnValue==null) {
-							log.warn("Got a null value for {} of event {}", col.getHeaderString(), e.getId());
-							columnValue="null";
+					try {
+						CsvWriter writer = new CsvWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
+						
+						// Write header row
+						for (IDataColumn<E> col : columns) {
+							writer.writeField(col.getHeaderString());
 						}
-						// Clean up text -- CSV file cannot have newlines in it
-						writer.writeField(columnValue.replaceAll("[\r\n]", " "));
+						writer.endBlock();
+						
+						// Write Data
+						// DataProvider doesn't have a concept of "unlimited".  Hopefully 
+						// a million event records is enough
+						Iterator<? extends E> it = dataProvider.iterator(0, 1000000); 
+						while (it.hasNext()) {
+							E e = it.next();
+							for (IDataColumn<E> col : columns) {
+								String columnValue = col.getItemString(new Model<E>(e)); // does this need to be a HibernateObjectModel?  That makes it hard to test.
+								if (columnValue==null) {
+									log.warn("Got a null value for {} of item {}", col.getHeaderString(), e);
+									columnValue="null";
+								}
+								// Clean up text -- CSV file cannot have newlines in it
+								writer.writeField(columnValue.replaceAll("[\r\n]", " "));
+							}
+							writer.endBlock();
+						}
+						writer.close();
+						
+					} catch (UnsupportedEncodingException e) {
+						throw new StringValueConversionException("UTF-8 translation not supported?!", e);
+					} catch (IOException e) {
+						throw new WicketRuntimeException("Couldn't write to resource", e);
 					}
-					writer.endBlock();
 				}
-				writer.close();
-				
-			} catch (UnsupportedEncodingException e) {
-				throw new StringValueConversionException("UTF-8 translation not supported?!", e);
-			} catch (IOException e) {
-				throw new WicketRuntimeException("Couldn't write to resource", e);
-			}
+			});
 		}
-
-		public void close() throws IOException {
-			if (writer != null) {
-				writer.close();
-			}
-		}
-
-		public String getContentType() {
-			return "text/csv";
-		}
-
-		public InputStream getInputStream()
-		throws ResourceStreamNotFoundException {
-			// OK to return null since we're an IResourceStreamWriter
-			return null;
-		}
-
-		public Time lastModifiedTime() {
-			return Time.now();
-		}
-
-		public long length() {
-			return -1;  // -1 means unknown length
-		}
-
-		public Locale getLocale() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		public void setLocale(Locale locale) {
-			// TODO Auto-generated method stub
-
-		}
+		
+		return rr;
 	}
-
+	
 }

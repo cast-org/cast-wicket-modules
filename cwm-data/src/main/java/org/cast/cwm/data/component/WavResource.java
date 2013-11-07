@@ -24,18 +24,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.util.resource.IResourceStream;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.ResponseData;
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author bgoldowsky
  *
  */
-public class WavResource extends Resource {
+public class WavResource extends AbstractResource {
 	
 	IModel<ResponseData> mResponseData;
 	
@@ -64,74 +63,45 @@ public class WavResource extends Resource {
 	}
 
 	@Override
-	public IResourceStream getResourceStream() {
-		return new WavResourceStream();
+	protected ResourceResponse newResourceResponse(Attributes attributes) {
+		final ResourceResponse response = new ResourceResponse();
+		response.setContentType("audio/wave");
+		response.setLastModified(Time.valueOf(mResponseData.getObject().getCreateDate()));
+		
+		if (response.dataNeedsToBeWritten(attributes)) {
+			response.setContentDisposition(ContentDisposition.INLINE);
+			final byte[] audioData = getConverted();
+			if (audioData == null) {
+				response.setError(HttpServletResponse.SC_NOT_FOUND);
+			} else {
+				response.setWriteCallback(new WriteCallback() {
+					@Override
+					public void writeData(final Attributes attributes) {
+						attributes.getResponse().write(audioData);
+					}
+				});
+			}
+		}
+		return response;
 	}
 
-	
-	private class WavResourceStream implements IResourceStream {
-		
-		private transient byte[] waveBytes;
-		ByteArrayInputStream inputStream;
-		
-		private static final long serialVersionUID = 1L;
-
-		public void close() throws IOException {
-			if (inputStream != null)
-				inputStream.close();
-			inputStream = null;
+	private byte[] getConverted() {
+		try {
+			InputStream is = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(mResponseData.getObject().getBytes())));
+			// For mp3 we'd need additional Java Sound plugins, eg tritonus
+			AudioInputStream ais = AudioSystem.getAudioInputStream(is);
+			log.debug("Input format: " + ais.getFormat());
+			// Set up stream as a buffer
+			ByteArrayOutputStream waveStream = new ByteArrayOutputStream();
+			// Fill it, with proper WAVE header
+			AudioSystem.write(ais, AudioFileFormat.Type.WAVE, waveStream);
+			return waveStream.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (UnsupportedAudioFileException e) {
+			e.printStackTrace();
 		}
-
-		public String getContentType() {
-			return "audio/wave";
-		}
-
-		public InputStream getInputStream() throws ResourceStreamNotFoundException {
-			convert();
-			// TODO: make this a PipedOutputStream, where a separate thread fills it, rather than doing all conversion ahead of time.
-			if (inputStream == null)
-				inputStream = new ByteArrayInputStream(waveBytes);
-			return inputStream;
-		}
-		
-		private void convert() {
-			if (waveBytes != null)
-				return;  // already converted
-			try {
-				InputStream is = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(mResponseData.getObject().getBytes())));
-				// For mp3 we'd need additional Java Sound plugins, eg tritonus
-				AudioInputStream ais = AudioSystem.getAudioInputStream(is);
-				log.debug("Input format: " + ais.getFormat());
-				// Set up stream as a buffer
-				ByteArrayOutputStream waveStream = new ByteArrayOutputStream();
-				// Fill it, with proper WAVE header
-				AudioSystem.write(ais, AudioFileFormat.Type.WAVE, waveStream);
-				waveBytes = waveStream.toByteArray();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (UnsupportedAudioFileException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-		}
-
-		public Locale getLocale() {
-			return null;
-		}
-
-		public long length() {
-			convert();
-			return waveBytes.length;
-		}
-
-		public void setLocale(Locale locale) {
-		}
-
-		public Time lastModifiedTime() {
-			return Time.valueOf(mResponseData.getObject().getCreateDate());
-		}
-		
+		return null;
 	}
-	
+
 }

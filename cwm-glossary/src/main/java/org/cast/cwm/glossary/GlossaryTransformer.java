@@ -44,13 +44,14 @@ import org.w3c.dom.Text;
 /**
  * Takes an XML node and replaces in-text glossary words with 'glossary' nodes.  Each glossary word
  * is replaced by a &lt;gl&gt; element in the document's namespace.  The element will have
- * an "entry" attribute that contains the name of the actual glossary word.  The content inside the 
+ * an "entryId" attribute that contains the ID of the glossary word.  The content inside the 
  * glossary element will remain the same.
  * <br /><br />
- * For example, if "gas" is a glossary word that is associated with "gaseous", the following would take place:
+ * For example, if "gas" is a glossary word that is associated with "gaseous", as has the ID "g1",
+ * the following would take place:
  * <pre>
  * Original Node: The gaseous cloud.
- * New Node: The &lt;gl entry="gas"&gt;gaseous&lt;/gl&gt; cloud.
+ * New Node: The &lt;gl entryId="g1"&gt;gaseous&lt;/gl&gt; cloud.
  * </pre> 
  * 
  * These can then be replaced during XSLT transform with appropriate links to the glossary page.

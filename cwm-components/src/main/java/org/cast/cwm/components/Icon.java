@@ -19,13 +19,13 @@
  */
 package org.cast.cwm.components;
 
-import org.apache.wicket.RequestCycle;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.util.string.UrlUtils;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.UrlUtils;
 
 /**
  * A simple image component that generates URLs targeted at {@link ImageUrlCodingStrategy} directories.
@@ -98,7 +98,7 @@ public class Icon extends WebComponent {
 			title = mAltText.getObject();
 		if (title != null)
 			tag.put("title", title);
-		tag.put("src", UrlUtils.rewriteToContextRelative(mImagePath.getObject(), RequestCycle.get().getRequest()));
+		tag.put("src", UrlUtils.rewriteToContextRelative(mImagePath.getObject(), RequestCycle.get()));
 		super.onComponentTag(tag);
 	}
 

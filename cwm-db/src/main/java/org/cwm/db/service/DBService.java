@@ -19,6 +19,8 @@
  */
 package org.cwm.db.service;
 
+import java.io.Serializable;
+
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
@@ -45,6 +47,10 @@ public class DBService implements IDBService {
 
 	public Object ensureHibernateSession(SessionUnit unit) {
 		return Databinder.ensureSession(unit);
+	}
+
+	public Serializable save(Object persistableObject) {
+		return getHibernateSession().save(persistableObject);
 	}
 
 }

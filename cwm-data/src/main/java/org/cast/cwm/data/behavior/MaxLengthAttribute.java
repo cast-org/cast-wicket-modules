@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.behavior;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 
 /**
  * A very simple extension of SimpleAttributeModifier that takes an integer
@@ -29,7 +29,7 @@ import org.apache.wicket.behavior.SimpleAttributeModifier;
  * @author jbrookover
  *
  */
-public class MaxLengthAttribute extends SimpleAttributeModifier {
+public class MaxLengthAttribute extends AttributeModifier {
 
 	private static final long serialVersionUID = 1L;
 	

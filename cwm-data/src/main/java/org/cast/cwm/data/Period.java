@@ -39,6 +39,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
+import org.hibernate.envers.Audited;
 
 /**
  * <p>
@@ -53,6 +54,7 @@ import org.hibernate.annotations.SortType;
  *
  */
 @Entity
+@Audited
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Getter

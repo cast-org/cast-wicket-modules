@@ -47,8 +47,8 @@ public class ShyMultiLineLabel extends MultiLineLabel {
 	
 	@Override
 	protected void onConfigure() {
-		setVisible(!Strings.isEmpty(getDefaultModelObjectAsString()));
 		super.onConfigure();
+		setVisible(!Strings.isEmpty(getDefaultModelObjectAsString()));
 	}
 
 }

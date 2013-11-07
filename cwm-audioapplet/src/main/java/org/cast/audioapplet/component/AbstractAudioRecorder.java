@@ -22,19 +22,18 @@ package org.cast.audioapplet.component;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.wicket.IRequestTarget;
-import org.apache.wicket.RequestCycle;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IDetachable;
+import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.cycle.RequestCycle;
 
 /**
  * A component that holds the Java audio-recording applet, and record/play/pause/stop buttons
@@ -100,7 +99,7 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 		super.addButtons();
 		WebMarkupContainer record = new WebMarkupContainer("recordButton");
 		if(!readOnly) {
-			record.add(new SimpleAttributeModifier("onclick", "audioRecord('" + dj.getMarkupId() + "'); return false;"));
+			record.add(AttributeModifier.replace("onclick", "audioRecord('" + dj.getMarkupId() + "'); return false;"));
 		}
 		add(record);
 	}
@@ -152,7 +151,7 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
-		response.renderJavascript("function save_" + getMarkupId() + "() {" +
+		response.renderJavaScript("function save_" + getMarkupId() + "() {" +
 				"wicketAjaxGet('" + notifyBehavior.getCallbackUrl() + "'); }", 
 				"save_" + getMarkupId());
 	}
@@ -162,30 +161,28 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 		private static final long serialVersionUID = 1L;
 
 		public void onRequest() {
-			RequestCycle.get().setRequestTarget(new IRequestTarget() {
-
-				public void detach(RequestCycle requestCycle) { }
-
-				public void respond(RequestCycle requestCycle) {
-					HttpServletRequest r = getWebRequest().getHttpServletRequest();
-					try {
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						InputStream is = r.getInputStream();
-						byte[] transfer = new byte[1024];
-						int amount = 0;
-						while((amount = is.read(transfer)) > 0) {
-							baos.write(transfer, 0, amount);
-						}
-
-						setModelObject(baos.toByteArray());
-						onReceiveAudio();
-
+			// TODO - rewritten.. does this work??
+			
+			Request request = RequestCycle.get().getRequest();
+			if (request instanceof ServletWebRequest) {
+				ServletWebRequest r = (ServletWebRequest)request;
+				try {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					InputStream is = r.getContainerRequest().getInputStream();
+					byte[] transfer = new byte[1024];
+					int amount = 0;
+					while((amount = is.read(transfer)) > 0) {
+						baos.write(transfer, 0, amount);
 					}
-					catch(Exception e) {
-						e.printStackTrace();
-					}
+
+					setModelObject(baos.toByteArray());
+					onReceiveAudio();
+
 				}
-			});
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

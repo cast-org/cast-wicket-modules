@@ -21,11 +21,10 @@ package org.cast.cwm.data.resource;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.wicket.Application;
-import org.apache.wicket.injection.web.InjectorHolder;
-import org.apache.wicket.markup.html.DynamicWebResource;
-import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.servlet.AbortWithWebErrorCodeException;
+import org.apache.wicket.injection.Injector;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
@@ -37,67 +36,63 @@ import com.google.inject.Inject;
  * the file with the matching ID in the database.  If the file is
  * not found, this will throw a 404 Not Found Error.
  * 
- * TODO: Compare for quality with https://cwiki.apache.org/WICKET/uploaddownload.html as it was suggested by Igor
+ * TODO: reconcile this with the almost-identical BinaryFileDataResource
  * 
  * @author jbrookover
  *
  */
-public class UploadedFileResource extends DynamicWebResource {
+public class UploadedFileResource extends AbstractResource {
 
 	private static final long serialVersionUID = 1L;
-	public static final String UPLOAD_FILE_PATH = "file";
-	private static boolean mounted = false;
 
 	@Inject
 	private ICwmService cwmService;
-
-	/**
-	 * Constructor.  Turns caching on by default,
-	 * overriding superclass behavior.  
-	 */
+	
 	public UploadedFileResource() {
 		super();
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
+
+		// TODO is this still true in Wicket 1.5?
 		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
 		// date, before the session context has been set up, and this database session can remain unclosed.
 		// setCacheable(true);
 	}
-	
+
 	@Override
-	protected ResourceState getResourceState() {
-		
-		// Check ID parameter; throw 404 if invalid
-		Long id = getParameters().getAsLong("id");		
-		if (id == null)
-			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Invalid File Id");	
-		
-		// Get Data; throw 404 if not found
-		final BinaryFileData bfd = cwmService.getById(BinaryFileData.class, id).getObject();
-		if (bfd == null)
-			throw new AbortWithWebErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "File not found [id=" + id + "]");
-		
-		return new ResourceState() {
+	protected ResourceResponse newResourceResponse(final Attributes attributes) {
+		final ResourceResponse response = new ResourceResponse();
 
-			@Override
-			public String getContentType() { return bfd.getMimeType();}
-
-			@Override
-			public byte[] getData() { return bfd.getData();}
-			
-			@Override
-			public Time lastModifiedTime() { return Time.valueOf(bfd.getLastModified());}
-		};
+		long id = attributes.getParameters().get("id").toLong();
+		IModel<BinaryFileData> mBfd = cwmService.getById(BinaryFileData.class, id);
+		if (mBfd == null || mBfd.getObject() == null) {
+			response.setError(HttpServletResponse.SC_NOT_FOUND);
+			return response;
+		}
+		BinaryFileData bfd = mBfd.getObject();
+		response.setLastModified(Time.valueOf(bfd.getLastModified()));
+		
+		if (response.dataNeedsToBeWritten(attributes)) {
+			response.setContentType(bfd.getMimeType());
+			response.setContentDisposition(ContentDisposition.INLINE);
+			final byte[] imageData = bfd.getData();			
+			if (imageData == null) {
+				response.setError(HttpServletResponse.SC_NOT_FOUND);
+			} else {
+				response.setWriteCallback(new WriteCallback() {
+					@Override
+					public void writeData(final Attributes attributes) {
+						attributes.getResponse().write(imageData);
+					}
+				});
+			}
+		}
+		return response;
 	}
 
-	public static void mount(WebApplication app) {
-		app.getSharedResources().add(UPLOAD_FILE_PATH, new UploadedFileResource());
-		app.mountSharedResource("/" + UPLOAD_FILE_PATH, Application.class.getName() + "/" + UPLOAD_FILE_PATH);
-		mounted = true;
+	// FIXME this can't be right
+	@Override
+	public boolean equals(Object that) {
+		return that instanceof SvgImageResource;
 	}
-		
-	public static String constructUrl(BinaryFileData fileData) {
-		if (!mounted)
-			throw new IllegalStateException("UploadedFileResource has not been mounted in the Application.");
-		return UPLOAD_FILE_PATH + "/id/" + fileData.getId();
-	}
+
 }

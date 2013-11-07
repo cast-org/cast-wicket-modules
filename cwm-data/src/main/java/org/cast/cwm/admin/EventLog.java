@@ -30,9 +30,7 @@ import lombok.Setter;
 import net.databinder.models.hib.OrderingCriteriaBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.Resource;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -40,6 +38,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
@@ -56,17 +55,19 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,13 +85,19 @@ public class EventLog extends AdminPage {
 	protected IModel<List<String>> showEventTypesM;
 	protected IModel<List<Site>> showSitesM;
 	protected IModel<Date> fromDateM, toDateM;
-	protected IModel<Boolean> showNoSite;
-	
-	private static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
+	protected IModel<Boolean> inAPeriod;
+	protected IModel<Boolean> showPermissionUsers;
+
+	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 	private static final Logger log = LoggerFactory.getLogger(EventLog.class);
 	
+	private static final long serialVersionUID = 1L;
+
 	@Inject
-	private IEventService eventService;
+	protected IEventService eventService;
+	
+	@Inject
+	protected ISiteService siteService;
 
 	public EventLog(final PageParameters params) {
 		super(params);
@@ -100,29 +107,32 @@ public class EventLog extends AdminPage {
 		
 		OrderingCriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
-		IDataColumn[] columns = makeColumns().toArray(new IDataColumn[0]);
-		DataTable<Event> table = new DataTable<Event>("eventtable", columns, eventsprovider, 30);
+		List<IDataColumn<Event>> columns = makeColumns();
+		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
+		ArrayList<IColumn<Event>> colList = new ArrayList<IColumn<Event>>(columns);
+		DataTable<Event> table = new DataTable<Event>("eventtable", colList, eventsprovider, 30);
 		table.addTopToolbar(new HeadersToolbar(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
 		add(table);
 
-		Resource download = new CSVDownload(columns, eventsprovider);
+		CSVDownload<Event> download = new CSVDownload<Event>(columns, eventsprovider);
 		add(new ResourceLink<Object>("downloadLink", download));
 
 	}
 
 	protected OrderingCriteriaBuilder makeCriteriaBuilder() {
-		return new EventCriteriaBuilder();
+		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
+		SingleSortState defaultSort = new SingleSortState();
+		defaultSort.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
+		eventCriteriaBuilder.setSortState(defaultSort);
+		return eventCriteriaBuilder;
 	}
 
 	protected SortableHibernateProvider<Event> makeHibernateProvider(OrderingCriteriaBuilder builder) {
 		SortableHibernateProvider<Event> provider = new SortableHibernateProvider<Event>(Event.class, builder);
 		provider.setWrapWithPropertyModel(false);
-		SingleSortState ss = new SingleSortState();
-		ss.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
-		provider.setSortState(ss);
 		return provider;
 	}
 
@@ -155,7 +165,7 @@ public class EventLog extends AdminPage {
 	}
 	
 	protected void addSiteFilter(Form<Object> form) {
-		IModel<List<Site>> allSites = SiteService.get().listSites();
+		IModel<List<Site>> allSites = siteService.listSites();
 		List<Site> sites = new ArrayList<Site>();
 		sites.addAll(allSites.getObject());
 		showSitesM = new ListModel<Site>(sites);
@@ -166,16 +176,21 @@ public class EventLog extends AdminPage {
 	}
 	
 	protected void addOtherFilters(Form<Object> form) {
-		showNoSite = new Model<Boolean>(false);
-		form.add(new CheckBox("showNoSite", showNoSite));
+		inAPeriod = new Model<Boolean>(true);
+		form.add(new CheckBox("showNoSite", inAPeriod));		
+
+		showPermissionUsers = new Model<Boolean>(true);
+		form.add(new CheckBox("showPermissionUsers", showPermissionUsers));
+		
+		
 	}
 
-	protected List<IDataColumn> makeColumns() {
-		List<IDataColumn> columns = new ArrayList<IDataColumn>();
+	protected List<IDataColumn<Event>> makeColumns() {
+		List<IDataColumn<Event>> columns = new ArrayList<IDataColumn<Event>>();
 		
-		columns.add(new PropertyDataColumn("EventID", "id", "id"));
+		columns.add(new PropertyDataColumn<Event>("EventID", "id", "id"));
 
-		columns.add(new AbstractDataColumn("Date/Time", "insertTime") {
+		columns.add(new AbstractDataColumn<Event>("Date/Time", "insertTime") {
 
 			private static final long serialVersionUID = 1L;
 
@@ -189,11 +204,11 @@ public class EventLog extends AdminPage {
 			}
 		});
 		
-		columns.add(new PropertyDataColumn("User", "user.subjectId", "user.subjectId"));
-		columns.add(new PropertyDataColumn("Event Type", "type", "type"));
-		columns.add(new PropertyDataColumn("Details", "detail"));
-		columns.add(new PropertyDataColumn("Page", "page"));
-		columns.add(new AbstractDataColumn("Response") {
+		columns.add(new PropertyDataColumn<Event>("User", "user.subjectId", "user.subjectId"));
+		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type"));
+		columns.add(new PropertyDataColumn<Event>("Details", "detail"));
+		columns.add(new PropertyDataColumn<Event>("Page", "page"));
+		columns.add(new AbstractDataColumn<Event>("Response") {
 			
 			private static final long serialVersionUID = 1L;
 
@@ -237,7 +252,8 @@ public class EventLog extends AdminPage {
 	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator {
 
 		private static final long serialVersionUID = 1L;
-		@Getter @Setter private ISortState sortState = new SingleSortState();
+		@Getter @Setter private ISortState sortState;
+;
 		
 		public void buildUnordered(Criteria criteria) {
 			
@@ -246,13 +262,13 @@ public class EventLog extends AdminPage {
 
 			// Site Check
 			List<Site> siteList = showSitesM.getObject();
-			criteria.createAlias("user", "user").createAlias("user.periods", "period", Criteria.LEFT_JOIN);
+			criteria.createAlias("user", "user").createAlias("user.periods", "period", JoinType.LEFT_OUTER_JOIN);
 			Disjunction siteRestriction = Restrictions.disjunction();
-			if (showNoSite.getObject())
+			if (!inAPeriod.getObject())
 				siteRestriction.add(Restrictions.isEmpty("user.periods")); // Show users with no periods
 			if (!siteList.isEmpty())
 				siteRestriction.add(Restrictions.in("period.site",siteList)); // Show users with matching periods
-			if (!showNoSite.getObject() && siteList.isEmpty()) {
+			if (inAPeriod.getObject() && siteList.isEmpty()) {
 				siteRestriction.add(Restrictions.idEq(-1L)); // Halt query early; don't show anyone.
 				criteria.setMaxResults(0);
 			}
@@ -265,6 +281,11 @@ public class EventLog extends AdminPage {
 				toDate.add(Calendar.DAY_OF_MONTH, 1);
 				log.debug("Considering events between {} and {}", fromDateM.getObject(), toDate.getTime());
 				criteria.add(Restrictions.between("insertTime", fromDateM.getObject(), toDate.getTime()));
+			}
+
+			//set permission check
+			if (showPermissionUsers.getObject()) {
+				criteria.add(Restrictions.eq("user.permission", true));
 			}
 			
 			// Also load ResponseData elements in the same query, to avoid thousands of subsequent queries.

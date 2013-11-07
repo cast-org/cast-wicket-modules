@@ -22,12 +22,13 @@ package org.cast.cwm.data.behavior;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.RequestCycle;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.service.IEventService;
@@ -100,28 +101,27 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	public EventLoggingBehavior(String jsEvent, String eventCode) {
 		super(jsEvent);
 		this.eventCode = eventCode;
-		InjectorHolder.getInjector().inject(this);
+		Injector.get().inject(this);
 	}
 	
 	@Override
-	protected CharSequence getCallbackScript(boolean onlyTargetActivePage) {
+	protected CharSequence getCallbackScript() {
 		if (queryStringExpression == null)
-			return super.getCallbackScript(onlyTargetActivePage);
+			return super.getCallbackScript();
 		else
-			return generateCallbackScript("wicketAjaxGet('" + getCallbackUrl(onlyTargetActivePage) +
-			"&" + queryVar + "=' + " + queryVar);
+			return generateCallbackScript("wicketAjaxGet('" + 
+					getCallbackUrl() + "&" + queryVar + "=' + " + queryVar);
 	}
 
 	@Override
 	protected void onEvent(AjaxRequestTarget target) {
-		
 		// Construct Detail
 		StringBuffer finalDetail = new StringBuffer();
 		if (!Strings.isEmpty(detail))
 			finalDetail.append(detail);
 		
 		// Additional detail from client side
-		String clientSideInfo = RequestCycle.get().getRequest().getParameter(queryVar);
+		String clientSideInfo = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(queryVar).toString();
 		if (!Strings.isEmpty(clientSideInfo)) {
 			if (finalDetail.length() > 0)
 				finalDetail.append(":");
@@ -157,7 +157,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 				private static final long serialVersionUID = 1L;
 				
 				@Override
-				public CharSequence decorateScript(CharSequence script) {
+				public CharSequence decorateScript(Component c, CharSequence script) {
 					return preScript.toString() + script;
 				}
 			};

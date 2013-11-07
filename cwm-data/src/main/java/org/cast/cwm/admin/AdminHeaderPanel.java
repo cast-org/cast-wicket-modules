@@ -19,14 +19,17 @@
  */
 package org.cast.cwm.admin;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.cast.cwm.CwmApplication;
-import org.cast.cwm.CwmSession;
-import org.cast.cwm.data.Role;
+import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.component.LogoutLink;
+import org.cast.cwm.service.ICwmSessionService;
+
+import com.google.inject.Inject;
 
 /**
  * Header Panel for Admin Pages.
@@ -35,15 +38,27 @@ import org.cast.cwm.data.component.LogoutLink;
  *
  */
 public class AdminHeaderPanel extends Panel {
+	
+	@Inject
+	IAppConfiguration configuration;
+	
+	@Inject
+	ICwmSessionService cwmSessionService;
 
 	private static final long serialVersionUID = 1L;
 
 	public AdminHeaderPanel(String id) {
 		super(id);
 	
-		add(new Label("appName", CwmApplication.get().getAppAndInstanceId()));
-		add (new BookmarkablePageLink<WebPage>("homeLink", CwmApplication.get().getHomePage(Role.ADMIN)));
-		add(new Label("name", CwmSession.get().getUser().getFullName()));
+		String appNameHeader = "";
+		if (Application.get() instanceof CwmApplication) {
+			appNameHeader = CwmApplication.get().getAppId() + "/"; 
+		}
+		appNameHeader += configuration.getString("instanceId", "?");
+		
+		add(new Label("appName", appNameHeader));
+		add(new BookmarkablePageLink<WebPage>("homeLink", Application.get().getHomePage()));
+		add(new Label("name", cwmSessionService.getUser().getFullName()));
 		add(new LogoutLink("logoutLink"));
 	}
 }

@@ -22,7 +22,6 @@ package org.cast.cwm.admin;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.data.Event;
 
 /**
  * Extension of PropertyColumn that can also function as an IDataColumn for static download.
@@ -32,7 +31,7 @@ import org.cast.cwm.data.Event;
  * @author bgoldowsky
  *
  */
-public class PropertyDataColumn extends PropertyColumn<Event> implements IDataColumn {
+public class PropertyDataColumn<E> extends PropertyColumn<E> implements IDataColumn<E> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -49,7 +48,7 @@ public class PropertyDataColumn extends PropertyColumn<Event> implements IDataCo
 		return getDisplayModel().getObject().toString();
 	}
 
-	public String getItemString(IModel<Event> rowModel) {
+	public String getItemString(IModel<E> rowModel) {
 		Object rowObj = createLabelModel(rowModel).getObject();
 		return rowObj==null ? "" : rowObj.toString();
 	}

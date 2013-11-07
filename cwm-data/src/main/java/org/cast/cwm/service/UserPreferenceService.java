@@ -25,8 +25,13 @@ import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserPreference;
 import org.cast.cwm.data.UserPreferenceBoolean;
+import org.cast.cwm.data.UserPreferenceString;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -40,19 +45,18 @@ import com.google.inject.Inject;
  */
 public class UserPreferenceService implements IUserPreferenceService {
 
+	private static final Logger log = LoggerFactory.getLogger(UserPreferenceService.class);
+
 	@Inject
 	private ICwmService cwmService;
-
+	
 	protected UserPreferenceService() { /* Protected Constructor - use injection */
 	}
 		
-	/* (non-Javadoc)
-	 * @see org.cast.isi.service.IUserService#setUserPreference(org.apache.wicket.model.IModel, java.lang.String, org.cast.isi.data.PreferenceType)
-	 */
 	public void setUserPreferenceBoolean(IModel<User> mUser, String name, Boolean booleanValue) {
-		
+					
 		// if a user preference doesn't exist, create it, otherwise update
-		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreference(UserPreferenceBoolean.class, mUser, name).uniqueResult();
+		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreferenceCriteria(UserPreferenceBoolean.class, mUser, name).uniqueResult();
 		if (userPreference == null) {
 			userPreference = new UserPreferenceBoolean();
 			userPreference.setUser(mUser.getObject());
@@ -62,35 +66,63 @@ public class UserPreferenceService implements IUserPreferenceService {
 		} else {			
 			userPreference.setBooleanValue(booleanValue);
 		}
+		
 		cwmService.flushChanges();
+		
 	}
 	
-
-	/* (non-Javadoc)
-	 * @see org.cast.isi.service.IUserService#setUserPreference(org.apache.wicket.model.IModel, java.lang.String)
-	 */
 	public Boolean getUserPreferenceBoolean(IModel<User> mUser, String name) {
-		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreference(UserPreferenceBoolean.class, mUser, name).uniqueResult();
+		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreferenceCriteria(UserPreferenceBoolean.class, mUser, name).uniqueResult();
 		if (userPreference == null) {
 			return null;
 		}
 		return userPreference.getBooleanValue();
 	}
-	
+		
+	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
+		// if a user preference doesn't exist, create it, otherwise update
+		log.info("get user preference for mUser="+mUser.getObject().getId() + " & prefernce="+name);
+		UserPreferenceString userPreference = (UserPreferenceString) getUserPreferenceCriteria(UserPreferenceString.class, mUser, name).uniqueResult();
+		Session session = Databinder.getHibernateSession();
+		if (userPreference == null) {
+			log.info("creating preference");
+
+			userPreference = new UserPreferenceString();
+			userPreference.setUser(mUser.getObject());
+			userPreference.setName(name);
+			userPreference.setStringValue(stringValue);
+			session.save(userPreference);
+		} else {			
+			log.info("UPDATING preference");
+			userPreference.setStringValue(stringValue);
+			session.update(userPreference);
+		}
+
+		cwmService.flushChanges();
+
+		log.info("preference=" + userPreference.getId());
+
+	}
+
+	public String getUserPreferenceString(IModel<User> mUser, String name) {
+		Criteria criteria = getUserPreferenceCriteria(UserPreferenceString.class, mUser, name);
+		UserPreferenceString preference = (UserPreferenceString) criteria.uniqueResult();
+		return (preference==null) ? null : preference.getStringValue();
+	}
 	
 	/**
 	 * Retrieve the user preference from DB
 	 * @param userPreferenceClass
 	 * @param mUser
 	 * @param name
-	 * @return a generic criteria that needs to be cast to a specific user preference type
+	 * @return a criteria query to look up the indicated preference
 	 */
-	protected Criteria getUserPreference (Class<? extends UserPreference> userPreferenceClass, IModel<User> mUser, String name) {
+	protected Criteria getUserPreferenceCriteria (Class<? extends UserPreference> userPreferenceClass, IModel<User> mUser, String name) {
 		Criteria c = Databinder.getHibernateSession().createCriteria(userPreferenceClass)
 				.add(Restrictions.eq("user", mUser.getObject()))
 				.add(Restrictions.eq("name", name))
-				.setCacheable(true);		
+				.setCacheable(false);		
 		return c;		
 	}
-	
+
 }

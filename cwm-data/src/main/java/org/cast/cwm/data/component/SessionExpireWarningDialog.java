@@ -22,8 +22,6 @@ package org.cast.cwm.data.component;
 import lombok.Getter;
 import net.databinder.auth.AuthDataSessionBase;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
@@ -31,6 +29,8 @@ import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.service.ICwmService;
@@ -53,7 +53,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(SessionExpireWarningDialog.class);
 	
-	public static final ResourceReference JAVASCRIPT_REFERENCE = new ResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
+	public static final PackageResourceReference JAVASCRIPT_REFERENCE = new PackageResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
 	
 	@Inject
 	private ICwmService cwmService;
@@ -154,12 +154,10 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();
 			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters("expired=true"));
-			setRedirect(true);
 		
 		// We're not signed in; redirect to home because page is no longer functional
 		} else {
 			setResponsePage(CwmApplication.get().getHomePage());
-			setRedirect(true);
 		}			
 	}
 
@@ -172,7 +170,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			throw new IllegalStateException("Warning time must be less than session time.");
 		}
 
-		response.renderJavascriptReference(JAVASCRIPT_REFERENCE);
+		response.renderJavaScriptReference(JAVASCRIPT_REFERENCE);
 		StringBuffer script = new StringBuffer();
 		script.append("SessionExpireWarning.init(");
 		script.append(CwmApplication.get().getSessionTimeout() + ", ");
@@ -185,7 +183,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		script.append("}");
 		script.append(");"); 
 		
-		response.renderOnDomReadyJavascript(script.toString());
+		response.renderOnDomReadyJavaScript(script.toString());
 	}
 	
 	protected String getBeforeInactiveTimeoutJavaScript() {

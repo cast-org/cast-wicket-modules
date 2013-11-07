@@ -19,8 +19,7 @@
  */
 package org.cast.cwm;
 
-import org.apache.wicket.Resource;
-import org.apache.wicket.ResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 
 /**
  * An object (typically a Resource) that can be used to locate resources via relative links.
@@ -31,8 +30,6 @@ import org.apache.wicket.ResourceReference;
  *
  */
 public interface IRelativeLinkSource {
-
-	public Resource getRelativeResource (String relativePath);
 
 	public ResourceReference getRelativeReference (String relativePath);
 

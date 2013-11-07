@@ -21,12 +21,12 @@ package org.cast.cwm.mediaplayer;
 
 import java.util.Formatter;
 
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 
 /** Component to render a Flash applet.
  * 
@@ -85,7 +85,7 @@ public class FlashAppletPanel extends Panel implements IHeaderContributor {
 	}
 	
 	public void renderHead(IHeaderResponse r) {
-		r.renderJavascriptReference(new JavascriptResourceReference(FlashAppletPanel.class, "JavaScriptFlashGateway.js"));
+		r.renderJavaScriptReference(new JavaScriptResourceReference(FlashAppletPanel.class, "JavaScriptFlashGateway.js"));
 		
 		Formatter f = new Formatter();
 		f.format("var tag = new FlashTag('%s', %d, %d);\n", getAppletHref(), getWidth(), getHeight());
@@ -95,7 +95,8 @@ public class FlashAppletPanel extends Panel implements IHeaderContributor {
 		f.format("tag.setFlashvars('%s');\n", getFlashVars());
 		f.format("tag.setId('%s');\n", containerId + "-flash");
 		f.format("document.getElementById('%s').innerHTML = tag.toString();", containerId);
-		r.renderOnLoadJavascript(f.toString());
+		r.renderOnLoadJavaScript(f.toString());
+		f.close();
 	}
 
 	public int getWidth() {
@@ -139,7 +140,7 @@ public class FlashAppletPanel extends Panel implements IHeaderContributor {
 	}
 
 	public void setAppletResourceReference (ResourceReference rr) {
-		this.appletHref = urlFor(rr).toString();
+		this.appletHref = urlFor(rr, null).toString();
 	}
 
 	public CharSequence getAppletHref() {

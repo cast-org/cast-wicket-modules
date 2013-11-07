@@ -27,10 +27,8 @@ import java.util.List;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.ResourceReference;
 import org.apache.wicket.RestartResponseAtInterceptPageException;
-import org.apache.wicket.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -50,6 +48,8 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.file.Files;
 import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.lang.Bytes;
@@ -62,11 +62,13 @@ import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.UserSpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 /**
  * Page for editing an individual site.  Link to periods and allows uploading files of users
@@ -75,17 +77,22 @@ import org.slf4j.LoggerFactory;
  */
 @AuthorizeInstantiation("ADMIN")
 public class SiteInfoPage extends AdminPage {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(SiteInfoPage.class);
 
 	private IModel<Site> mSite = null;
+	
+	@Inject
+	protected ISiteService siteService;
+
+	private static final long serialVersionUID = 1L;
 
 	public SiteInfoPage(PageParameters param) {
 		super(param);
 
 		// Current Site
-		Long siteId = param.getAsLong("siteId");
-		mSite = SiteService.get().getSiteById(siteId); // May create a Transient Instance
+		Long siteId = param.get("siteId").toOptionalLong();
+		mSite = siteService.getSiteById(siteId); // May create a Transient Instance
 		if (siteId != null && mSite.getObject() == null)
 			throw new RestartResponseAtInterceptPageException(SiteListPage.class);
 
@@ -114,9 +121,10 @@ public class SiteInfoPage extends AdminPage {
 
 			@Override
 			protected void populateItem(ListItem<Period> item) {
-				item.add(new BookmarkablePageLink<Void>("periodLink", PeriodInfoPage.class)
-						.setParameter("periodId", item.getModelObject().getId())
-						.add(new Label("name", item.getModelObject().getName())));
+				BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("periodLink", PeriodInfoPage.class);
+				link.getPageParameters().add("periodId", item.getModelObject().getId());
+				item.add(link);
+				link.add(new Label("name", item.getModelObject().getName()));
 
 				DeletePersistedObjectDialog<Period> dialog = new DeletePersistedObjectDialog<Period>("deletePeriodModal", item.getModel()) {
 
@@ -124,7 +132,7 @@ public class SiteInfoPage extends AdminPage {
 
 					@Override
 					protected void deleteObject() {
-						SiteService.get().deletePeriod(getModel());
+						siteService.deletePeriod(getModel());
 					}
 				};
 				item.add(dialog);
@@ -136,12 +144,12 @@ public class SiteInfoPage extends AdminPage {
 		// Link to create a new Period
 		BookmarkablePageLink<Void> createNewPeriod = new BookmarkablePageLink<Void>("createNewPeriod", PeriodInfoPage.class);
 		if (siteId != null)
-			createNewPeriod.setParameter("siteId", siteId);
+			createNewPeriod.getPageParameters().add("siteId", siteId);
 		createNewPeriod.setVisible(!mSite.getObject().isTransient()); // For Enclosure Visibility
 		add(createNewPeriod);
 
 		// Sample CSV File
-		add(new ResourceLink<Void>("sampleLink", new ResourceReference(SiteInfoPage.class, "sample_class_list.csv")));
+		add(new ResourceLink<Void>("sampleLink", new PackageResourceReference(SiteInfoPage.class, "sample_class_list.csv")));
 		
 		// Upload CSV File to populate Site
 		Folder uploadFolder = new Folder(System.getProperty("java.io.tmpdir"), "wicket-uploads");
@@ -384,7 +392,7 @@ public class SiteInfoPage extends AdminPage {
 			List<String> headers = new ArrayList<String>();
 			headers.add("Line");  headers.add("SubjectID"); headers.add("Type"); 
 			headers.add("Period"); headers.add("Username"); headers.add("Password"); 
-			headers.add("Full Name"); headers.add("Email");
+			headers.add("Full Name"); headers.add("Email"); headers.add("Permission");
 
 			resultsContainer.add(new ListView<String>("headers", headers) {
 
@@ -413,6 +421,7 @@ public class SiteInfoPage extends AdminPage {
 					values.add(p.getUsername()); values.add("********");
 					values.add(p.getFullName());
 					values.add(p.getEmail());
+					values.add(String.valueOf(p.isPermission()));
 					item.add(new ListView<String>("data-columns", values) {
 
 						private static final long serialVersionUID = 1L;
@@ -425,7 +434,7 @@ public class SiteInfoPage extends AdminPage {
 
 					});
 					if (!pe.getError().matches("")) {
-						item.add(new AttributeAppender("style", true, new Model<String>("color:red"), ";"));
+						item.add(new AttributeAppender("style", new Model<String>("color:red"), ";"));
 					}
 				}
 			});

@@ -32,6 +32,7 @@ import org.cast.cwm.data.builders.ResponseCriteriaBuilder;
  * @author jbrookover
  *
  */
+
 public class ResponseModel extends HibernateObjectModel<Response> {
 
 	private static final long serialVersionUID = 1L;
@@ -61,7 +62,6 @@ public class ResponseModel extends HibernateObjectModel<Response> {
 	protected void onDetach() {
 		if (criteria != null)
 			criteria.detach();
-		checkBinding();
 		super.onDetach();
 	}
 

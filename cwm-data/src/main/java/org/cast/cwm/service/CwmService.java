@@ -94,7 +94,7 @@ public class CwmService implements ICwmService {
 			if (catchErrors) {
 				// Note: Hibernate Logging will often print the stack trace anyways
 				session.getTransaction().rollback();
-				log.debug("Ignored exception during commit: {}", ex.getMessage());
+				log.info("Ignored exception during commit: {}", ex.getMessage());
 			} else {
 				throw ex;
 			}

@@ -19,11 +19,10 @@
  */
 package org.cast.cwm.components;
 
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 /**
  * A TextArea that will dynamically resize itself to a height that fits its current content.
@@ -52,7 +51,7 @@ import org.apache.wicket.model.IModel;
  *
  * @param <T>  the model type of the TextArea
  */
-public class AutoGrowTextArea<T> extends TextArea<T> implements IHeaderContributor {
+public class AutoGrowTextArea<T> extends TextArea<T> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -68,9 +67,9 @@ public class AutoGrowTextArea<T> extends TextArea<T> implements IHeaderContribut
 
 	public void renderHead(IHeaderResponse response) {
 		// This script works well but requires the text area to have cols and rows attributes - CSS sizing doesn't work
-		 response.renderJavascriptReference(new ResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js"));
+		 response.renderJavaScriptReference(new PackageResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js"));
 		 // Must be onLoad, not onDomReady, or else it happens too early in AJAX insertion
-		 response.renderOnLoadJavascript(String.format("$('#%s').autoGrow();", getMarkupId()));
+		 response.renderOnLoadJavaScript(String.format("$('#%s').autoGrow();", getMarkupId()));
 	}
 
 

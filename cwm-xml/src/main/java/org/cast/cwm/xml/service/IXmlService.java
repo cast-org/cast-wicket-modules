@@ -23,9 +23,9 @@ import java.util.List;
 
 import javax.xml.namespace.NamespaceContext;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.util.file.File;
-import org.cast.cwm.xml.FileResource;
+import org.cast.cwm.IInputStreamProvider;
+import org.cast.cwm.xml.FileXmlDocumentSource;
 import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IDocumentObserver;
 import org.cast.cwm.xml.IXmlPointer;
@@ -111,7 +111,7 @@ public interface IXmlService {
 	 * @param xslFileName
 	 * @return a FileResource, or null if not found.
 	 */
-	FileResource findXslResource(String xslFileName);
+	FileXmlDocumentSource findXslResource(String xslFileName);
 
 	/**
 	 * Load an XML document from a File and register it by name with this object.  
@@ -126,16 +126,16 @@ public interface IXmlService {
 			List<IDocumentObserver> observers);
 
 	/** 
-	 * Read an XML document from the given Resource.
+	 * Read an XML document from the given source.
 	 * It will be remembered by this service class and can thereafter be referred to by the given name.
 	 *  
 	 * @param name name for this XML document (must be globally unique)
-	 * @param xmlResource Resource from which to read the XML content
+	 * @param xmlSource location from which to read the XML content
 	 * @param parser the XML parser to be used
 	 * @param observers (optional) list of initial document observers
 	 * @return the XmlDocument
 	 */
-	XmlDocument loadXmlDocument(String name, Resource xmlResource,
+	XmlDocument loadXmlDocument(String name, IInputStreamProvider xmlSource,
 			XmlParser parser, List<IDocumentObserver> observers);
 
 	/** 
@@ -186,12 +186,13 @@ public interface IXmlService {
 	 * If second argument is true, then a secondary transformation will be chained on, which makes
 	 * sure that all wicket:ids created by the XSL are made unique. 
 	 * @param name
-	 * @param xslResource
-	 * @param forceUniqueWicketIds
+	 * @param xslSource the location from which to read the XSL
+	 * @param forceUniqueWicketIds if true, change wicket:ids to be unique
+	 * @param dependentDocuments list of other included XSL documents to be checked for updates
 	 * @return the transformer
 	 */
-	IDOMTransformer loadXSLTransformer(String name, Resource xslResource,
-			boolean forceUniqueWicketIds, Resource... dependentResources);
+	IDOMTransformer loadXSLTransformer(String name, IInputStreamProvider xslSource,
+			boolean forceUniqueWicketIds, IInputStreamProvider... dependentDocuments);
 
 	/**
 	 * Register the provided DOM Transformer under the name provided.

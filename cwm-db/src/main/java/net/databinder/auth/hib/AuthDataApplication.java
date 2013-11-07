@@ -30,20 +30,21 @@ import net.databinder.hib.DataApplication;
 import net.databinder.hib.Databinder;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
 import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.Session;
 import org.apache.wicket.authorization.IUnauthorizedComponentInstantiationListener;
 import org.apache.wicket.authorization.UnauthorizedInstantiationException;
-import org.apache.wicket.authorization.strategies.role.IRoleCheckingStrategy;
-import org.apache.wicket.authorization.strategies.role.RoleAuthorizationStrategy;
-import org.apache.wicket.authorization.strategies.role.Roles;
+import org.apache.wicket.authroles.authorization.strategies.role.IRoleCheckingStrategy;
+import org.apache.wicket.authroles.authorization.strategies.role.RoleAuthorizationStrategy;
+import org.apache.wicket.authroles.authorization.strategies.role.Roles;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.util.crypt.Base64UrlSafe;
-import org.hibernate.cfg.AnnotationConfiguration;
+import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.util.crypt.Base64;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -61,8 +62,8 @@ import org.hibernate.criterion.Restrictions;
  * @see DataUser
  * @author Nathan Hamblen
  */
-public abstract class AuthDataApplication extends DataApplication 
-implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, AuthApplication {
+public abstract class AuthDataApplication<T extends DataUser> extends DataApplication 
+implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, AuthApplication<T> {
 
 	/**
 	 * Internal initialization. Client applications should not normally override
@@ -76,7 +77,7 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	
 	/**
 	 * Sets Wicket's security strategy for role authorization and appoints this 
-	 * object as the unauthorized instatiation listener. Called automatically on start-up.
+	 * object as the unauthorized instantiation listener. Called automatically on start-up.
 	 */
 	protected void authInit() {
 		getSecuritySettings().setAuthorizationStrategy(new RoleAuthorizationStrategy(this));
@@ -95,7 +96,7 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * Adds to the configuration whatever DataUser class is defined.
 	 */
 	@Override
-	protected void configureHibernate(AnnotationConfiguration config) {
+	protected void configureHibernate(Configuration config) {
 		super.configureHibernate(config);
 		config.addAnnotatedClass(getUserClass());
 	}
@@ -129,8 +130,9 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * if you have a differently named property.
 	 * @return DataUser for the given username. 
 	 */
-	public DataUser getUser(String username) {
-		return (DataUser) Databinder.getHibernateSession().createCriteria(getUserClass())
+	@SuppressWarnings("unchecked")
+	public T getUser(String username) {
+		return (T) Databinder.getHibernateSession().createCriteria(getUserClass())
 			.add(Restrictions.eq("username", username)).uniqueResult();
 	}
 
@@ -162,7 +164,7 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * @return restricted token
 	 */
 	public String getToken(DataUser user) {
-		HttpServletRequest req = ((WebRequest) RequestCycle.get().getRequest()).getHttpServletRequest();
+		HttpServletRequest req = ((ServletWebRequest) RequestCycle.get().getRequest()).getContainerRequest();
 		String fwd = req.getHeader("X-Forwarded-For");
 		if (fwd == null)
 			fwd = "nil";
@@ -170,6 +172,6 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 		user.getPassword().update(digest);
 		digest.update((fwd + "-" + req.getRemoteAddr()).getBytes());
 		byte[] hash = digest.digest(user.getUsername().getBytes());
-		return new String(Base64UrlSafe.encodeBase64(hash));
+		return new String(Base64.encodeBase64(hash));
 	}
 }

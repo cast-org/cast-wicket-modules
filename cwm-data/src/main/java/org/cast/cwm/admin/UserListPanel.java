@@ -90,6 +90,7 @@ public class UserListPanel extends Panel {
 		columns.add(new PropertyColumn<User>(new Model<String>("First Name"), "firstName", "firstName"));
 		columns.add(new PropertyColumn<User>(new Model<String>("Last Name"), "lastName", "lastName"));
 		columns.add(new PropertyColumn<User>(new Model<String>("Role"), "role", "role"));
+		columns.add(new PropertyColumn<User>(new Model<String>("Permission"), "permission", "permission"));
 		
 		columns.add(new AbstractColumn<User>(new Model<String>("Edit")) {
 

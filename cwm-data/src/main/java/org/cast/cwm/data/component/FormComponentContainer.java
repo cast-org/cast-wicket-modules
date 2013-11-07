@@ -65,9 +65,9 @@ public class FormComponentContainer extends Border {
 		
 		// TODO: Create custom feedback border that shows a filter based on FormComponentContainer
 		// TODO: OR see if you can add the component directly to the feedbackBorder
-		add(new FormComponentLabel("label", formComponent).add(new Label("labelText", new PropertyModel<String>(FormComponentContainer.this, "label"))));
+		addToBorder(new FormComponentLabel("label", formComponent).add(new Label("labelText", new PropertyModel<String>(FormComponentContainer.this, "label"))));
 		
-		add(new WebMarkupContainer("errorIndicator") {
+		addToBorder(new WebMarkupContainer("errorIndicator") {
 
 			private static final long serialVersionUID = 1L;
 

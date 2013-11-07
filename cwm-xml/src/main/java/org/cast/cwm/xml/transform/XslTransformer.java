@@ -35,11 +35,10 @@ import javax.xml.transform.stream.StreamSource;
 
 import lombok.Getter;
 
-import org.apache.wicket.Resource;
-import org.apache.wicket.util.resource.FileResourceStream;
-import org.apache.wicket.util.resource.IResourceStream;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
+import org.cast.cwm.IInputStreamProvider;
+import org.cast.cwm.InputStreamNotFoundException;
+import org.cast.cwm.xml.FileXmlDocumentSource;
 import org.cast.cwm.xml.service.XmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import org.w3c.dom.Element;
 
 public class XslTransformer implements IDOMTransformer {
 	
-	@Getter protected Resource xslFile;
+	@Getter protected IInputStreamProvider xslFile;
 	private transient Templates xslTemplates;
 	
 	protected Time lastCheckedTime;
@@ -58,11 +57,11 @@ public class XslTransformer implements IDOMTransformer {
 	 * Files, other than the main XSL file, to check for modifications.
 	 * These would typically be subsidiary XSL files that are imported by the main XSL.
 	 */
-	protected Set<Resource> dependentResources = new HashSet<Resource>();
+	protected Set<IInputStreamProvider> dependentResources = new HashSet<IInputStreamProvider>();
 
 	private static final Logger log = LoggerFactory.getLogger(XslTransformer.class);
 
-	public XslTransformer (Resource xslFile) {
+	public XslTransformer (IInputStreamProvider xslFile) {
 		this.xslFile = xslFile;
 	}
 	
@@ -75,8 +74,8 @@ public class XslTransformer implements IDOMTransformer {
 	 * @param resource
 	 * @return this, for chaining
 	 */
-	public XslTransformer addDependentResources (Resource... resources) {
-		for (Resource r : resources) {
+	public XslTransformer addDependentResources (IInputStreamProvider... resources) {
+		for (IInputStreamProvider r : resources) {
 			dependentResources.add(r);
 		}
 		return this;
@@ -122,9 +121,9 @@ public class XslTransformer implements IDOMTransformer {
 	 */
 	synchronized protected void updateLastModified() {
 		lastCheckedTime = Time.now();
-		Time lastMod = xslFile.getResourceStream().lastModifiedTime();
-		for (Resource r : dependentResources) {
-			Time rtime = r.getResourceStream().lastModifiedTime();
+		Time lastMod = xslFile.lastModifiedTime();
+		for (IInputStreamProvider r : dependentResources) {
+			Time rtime = r.lastModifiedTime();
 			if (rtime.after(lastMod))
 				lastMod = rtime;
 		}
@@ -135,13 +134,13 @@ public class XslTransformer implements IDOMTransformer {
 	}
 	
 	public synchronized Templates getXslTemplates() 
-	  throws TransformerConfigurationException, ResourceStreamNotFoundException, TransformerFactoryConfigurationError {
+	  throws TransformerConfigurationException, InputStreamNotFoundException, TransformerFactoryConfigurationError {
 		if (xslTemplates == null)
 			readXSL();
 		return xslTemplates;
 	}
 	
-	private Transformer getTransformer() throws TransformerConfigurationException, ResourceStreamNotFoundException, 
+	private Transformer getTransformer() throws TransformerConfigurationException, InputStreamNotFoundException, 
 			TransformerFactoryConfigurationError {
 		Templates templates = getXslTemplates();
 		Transformer transformer = templates.newTransformer();
@@ -154,27 +153,25 @@ public class XslTransformer implements IDOMTransformer {
 	 * any time that the XSLT file is changed, and whenever the
 	 * DtbookDocument object is re-instantiated after serialization
 	 * since Templates is not serializable and is marked transient.
-	 * @throws ResourceStreamNotFoundException 
+	 * @throws InputStreamNotFoundException 
 	 * @throws TransformerFactoryConfigurationError 
 	 * @throws TransformerConfigurationException 
 	 */
 	synchronized private void readXSL() 
-	  throws ResourceStreamNotFoundException, TransformerConfigurationException, TransformerFactoryConfigurationError {
+	  throws InputStreamNotFoundException, TransformerConfigurationException, TransformerFactoryConfigurationError {
 		log.debug ("Reading XSL stylesheet {}", xslFile);
 		// Setup a transformer
-		IResourceStream resourceStream = xslFile.getResourceStream();
-		Source xslSource = new StreamSource(resourceStream.getInputStream());
+		Source xslSource = new StreamSource(xslFile.getInputStream());
 
 		// We want to tell the parser the real file name of the XSL resource, so that it can 
 		// follow relative filenames to any other XSL that may be included or imported.
 		// The URIResolver will look for the resources in the directories setup in xmlService transformerDirectories 
-		if (resourceStream instanceof FileResourceStream)
-			xslSource.setSystemId(((FileResourceStream)resourceStream).getFile().getAbsolutePath());
+		if (xslFile instanceof FileXmlDocumentSource)
+			xslSource.setSystemId(((FileXmlDocumentSource)xslFile).getFile().getAbsolutePath());
 
 		TransformerFactory tf = TransformerFactory.newInstance();
 		tf.setURIResolver(new TransformContextURIResolver());
 		xslTemplates = tf.newTemplates(xslSource);
-
 	}
 	
 }

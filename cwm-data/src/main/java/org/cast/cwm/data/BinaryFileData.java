@@ -34,14 +34,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import org.apache.wicket.Application;
-import org.apache.wicket.ResourceReference;
-import org.apache.wicket.markup.html.DynamicWebResource;
-import org.apache.wicket.util.time.Time;
-import org.cast.cwm.data.resource.UploadedFileResource;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.envers.Audited;
 
 /**
  * An object that holds a binary file, such as an image
@@ -51,6 +47,7 @@ import org.hibernate.annotations.GenericGenerator;
  *
  */
 @Entity
+@Audited
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
@@ -109,39 +106,39 @@ public class BinaryFileData extends PersistedObject {
 		return getPrimaryType().equals("image");
 	}
 	
-	/**
-	 * Deprecated Method.  Instead, use {@link UploadedFileResource}.
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public ResourceReference getResourceReference() {
-		String filename = id + "_" + name;
-
-		if (Application.get().getSharedResources().get(filename) == null) {
-			DynamicWebResource res = new DynamicWebResource(filename) {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected ResourceState getResourceState() {
-					return new ResourceState() {
-
-						@Override
-						public String getContentType() { return mimeType;}
-
-						@Override
-						public byte[] getData() { return BinaryFileData.this.getData();}
-						
-						@Override
-						public Time lastModifiedTime() { return Time.valueOf(lastModified);}
-					};
-				}
-			};
-			res.setCacheable(true); // Not often changed
-			Application.get().getSharedResources().add(filename, res);
-		}
-		
-		return new ResourceReference(filename);
-	}
+//	/**  Trying to remove this since it's deprecated anyway.
+//	 * Deprecated Method.  Instead, use {@link UploadedFileResource}.
+//	 * 
+//	 * @return
+//	 */
+//	@Deprecated
+//	public ResourceReference getResourceReference() {
+//		String filename = id + "_" + name;
+//
+//		if (Application.get().getSharedResources().get(filename) == null) {
+//			DynamicWebResource res = new DynamicWebResource(filename) {
+//
+//				private static final long serialVersionUID = 1L;
+//
+//				@Override
+//				protected ResourceState getResourceState() {
+//					return new ResourceState() {
+//
+//						@Override
+//						public String getContentType() { return mimeType;}
+//
+//						@Override
+//						public byte[] getData() { return BinaryFileData.this.getData();}
+//						
+//						@Override
+//						public Time lastModifiedTime() { return Time.valueOf(lastModified);}
+//					};
+//				}
+//			};
+//			res.setCacheable(true); // Not often changed
+//			Application.get().getSharedResources().add(filename, res);
+//		}
+//		
+//		return new ResourceReference(filename);
+//	}
 }

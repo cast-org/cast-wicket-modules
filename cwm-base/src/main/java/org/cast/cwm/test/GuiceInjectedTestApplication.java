@@ -22,13 +22,13 @@ package org.cast.cwm.test;
 import java.util.Map;
 
 import org.apache.wicket.guice.GuiceComponentInjector;
-import org.apache.wicket.util.tester.WicketTester.DummyWebApplication;
+import org.apache.wicket.mock.MockApplication;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-public class GuiceInjectedTestApplication<T> extends DummyWebApplication {
+public class GuiceInjectedTestApplication<T> extends MockApplication {
 
 	Map<Class<T>, T> injectionMap;
 
@@ -39,7 +39,7 @@ public class GuiceInjectedTestApplication<T> extends DummyWebApplication {
 	@Override
 	public void init() {
 		super.init();
-		addComponentInstantiationListener(new GuiceComponentInjector(this, getGuiceInjector()));
+		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getGuiceInjector()));
 	}
 
 	protected Injector getGuiceInjector()

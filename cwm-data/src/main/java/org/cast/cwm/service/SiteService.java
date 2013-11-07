@@ -21,14 +21,11 @@ package org.cast.cwm.service;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.HibernateProvider;
 
-import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -46,58 +43,61 @@ import com.google.inject.Inject;
 /**
  * General Service Class for both Sites and Periods  
  */
-public class SiteService {
-
-	protected static SiteService instance = new SiteService();
+public class SiteService implements ISiteService {
 
 	@Inject
 	private ICwmService cwmService;
 
-	@Getter @Setter
-	private Class<? extends Period> periodClass = Period.class;
-	
-	@Getter @Setter
-	private Class<? extends Site> siteClass = Site.class;
-
-	public SiteService() {
-		InjectorHolder.getInjector().inject(this);
-	}
-	
-	public static SiteService get() {
-		return instance;
-	}
-
-	public static void setInstance(SiteService instance) {
-		SiteService.instance = instance;
-	}
-	
-	
 	// Site specific methods
 	
-	/**
-	 * Create a new instance of the specified Site class.
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getSiteClass()
 	 */
+	@Override
+	public Class<? extends Site> getSiteClass() {
+		return Site.class;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#newSite()
+	 */
+	@Override
 	public final Site newSite() {
 		try {
-			return siteClass.newInstance();
+			return getSiteClass().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException (e);
 		}	
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#listSites()
+	 */
+	@Override
 	public IModel<List<Site>> listSites() {
 		return new HibernateListModel<Site>(Site.class, new CachingCriteriaBuilder());
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#listSitesPageable()
+	 */
+	@Override
 	public IDataProvider<Site> listSitesPageable() {
 		return new HibernateProvider<Site>(Site.class, new CachingCriteriaBuilder());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getSiteById(java.lang.Long)
+	 */
+	@Override
 	public IModel<Site> getSiteById(Long id) {
 		return new HibernateObjectModel<Site>(Site.class, id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getSiteByName(java.lang.String)
+	 */
+	@Override
 	public IModel<Site> getSiteByName (String name) {
 		Criteria criteria = Databinder.getHibernateSession().createCriteria(Site.class);
 		criteria.add(Restrictions.eq("name", name));
@@ -108,46 +108,68 @@ public class SiteService {
 
 	// Period specific methods
 	
-	/**
-	 * Create a new instance of the specified Period class.
-	 * @return
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodClass()
 	 */
+	@Override
+	public Class<? extends Period> getPeriodClass() {
+		return Period.class;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#newPeriod()
+	 */
+	@Override
 	public final Period newPeriod() {
 		try {
-			return periodClass.newInstance();
+			return getPeriodClass().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException (e);
 		}	
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#listPeriods()
+	 */
+	@Override
 	public IModel<List<Period>> listPeriods() {
 		return new HibernateListModel<Period>(Period.class);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodById(long)
+	 */
+	@Override
 	public IModel<Period> getPeriodById(long id) {
 		return new HibernateObjectModel<Period>(Period.class, id);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodEditForm(java.lang.String, org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
+	 */
+	@Override
 	public Form<Period> getPeriodEditForm(String id, IModel<Site> site, IModel<Period> period) {
 		// New Period
 		if (period == null || period.getObject() == null)
-			return new HibernateEditPeriodForm(id, site, periodClass);
+			return new HibernateEditPeriodForm<Period>(id, site, Period.class);
 		// Existing Period
 		if (!(period instanceof HibernateObjectModel))
 			throw new IllegalArgumentException("This Service class expects a UserModel (which extends Hibernate)");
-		return new HibernateEditPeriodForm(id, (HibernateObjectModel<Period>) period);
+		return new HibernateEditPeriodForm<Period>(id, (HibernateObjectModel<Period>) period);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodEditForm(java.lang.String, org.apache.wicket.model.IModel)
+	 */
+	@Override
 	public Form<Period> getPeriodEditForm(String id, IModel<Site> site) {
 		return getPeriodEditForm(id, site, null);
 	}
 	
-	/**
-	 * Deletes a period from the datastore, removing all associations
-	 * with related objects (e.g. {@link User}s and {@link Site}).
-	 * 
-	 * @param period
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#deletePeriod(org.apache.wicket.model.IModel)
 	 */
+	@Override
 	public void deletePeriod(IModel<Period> period) {
 		
 		cwmService.confirmDatastoreModel(period);
@@ -161,14 +183,15 @@ public class SiteService {
 		cwmService.flushChanges();
 	}
 
-	/**
-	 * Get the period by name - this assumes the name is unique
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodByName(java.lang.String)
 	 */
+	@Override
 	public IModel<Period> getPeriodByName(String name) {
 		PeriodCriteriaBuilder pcb = new PeriodCriteriaBuilder();
 		pcb.setName(name);
 		pcb.setMaxResults(1);
-		return new HibernateObjectModel<Period>(periodClass, pcb);
+		return new HibernateObjectModel<Period>(Period.class, pcb);
 	}
 
 }

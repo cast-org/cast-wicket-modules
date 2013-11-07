@@ -27,7 +27,7 @@
 
 .visuraloverlaycontent,.visuraloverlaycontent_high {
 	display:none;
-	z-index:5500;
+	z-index:5500 !important;
 	text-align:left;
 }
 
