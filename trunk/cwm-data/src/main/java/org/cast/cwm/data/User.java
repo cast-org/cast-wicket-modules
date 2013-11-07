@@ -144,6 +144,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		return role.subsumes(r);
 	}
 
+	@Override
 	public boolean hasRole(String roleString) {
 		return hasRole(Role.forRoleString(roleString));
 	}
@@ -194,6 +195,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		return getFullName();
 	}
 	
+	@Override
 	public int compareTo(User o) {
 		if (o == null)
 			return 1;		

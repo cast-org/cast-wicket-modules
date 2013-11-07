@@ -63,6 +63,7 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 		((SingleSortState) getSortState()).setSort(new SortParam("lastUpdated", true));
 	}
 	
+	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
 		SortParam sort = ((SingleSortState) getSortState()).getSort();
@@ -74,6 +75,7 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 		}
 	}
 
+	@Override
 	public void buildUnordered(Criteria criteria) {
 		if (promptModel != null && promptModel.getObject() != null)
 			criteria.add(Restrictions.eq("prompt", promptModel.getObject()));
@@ -94,10 +96,12 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	}
 
 	
+	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}	
 	
+	@Override
 	public void detach() {
 		if (promptModel != null)
 			promptModel.detach();

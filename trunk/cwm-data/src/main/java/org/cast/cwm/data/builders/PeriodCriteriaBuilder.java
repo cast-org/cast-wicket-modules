@@ -46,6 +46,7 @@ public class PeriodCriteriaBuilder implements CriteriaBuilder {
 		
 	}
 	
+	@Override
 	public void build(Criteria criteria) {
 		if (name != null)
 			criteria.add(Restrictions.eq("name", name));

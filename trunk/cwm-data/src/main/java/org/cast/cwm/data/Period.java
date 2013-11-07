@@ -107,6 +107,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 * This function is careful to avoid NPEs and avoids returning 0 for two 
 	 * Periods that have different IDs.
 	 */
+	@Override
 	public int compareTo(Period other) {
 		if (other == null)
 			return 1;

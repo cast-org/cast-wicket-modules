@@ -65,6 +65,7 @@ public class AutoGrowTextArea<T> extends TextArea<T> {
 		this.setOutputMarkupId(true);
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		// This script works well but requires the text area to have cols and rows attributes - CSS sizing doesn't work
 		 response.renderJavaScriptReference(new PackageResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js"));

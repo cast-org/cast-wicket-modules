@@ -120,6 +120,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#setXmlSectionClass(java.lang.Class)
 	 */
+	@Override
 	public void setXmlSectionClass(Class<? extends XmlSection> clazz) {
 		xmlSectionClass = clazz;
 	}
@@ -127,6 +128,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#setUpdateCheckInterval(int)
 	 */
+	@Override
 	public void setUpdateCheckInterval(int interval) {
 		updateCheckInterval = interval;
 	}
@@ -134,6 +136,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getUpdateCheckInterval()
 	 */
+	@Override
 	public int getUpdateCheckInterval() {
 		return updateCheckInterval;
 	}
@@ -141,6 +144,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getNamespaceContext()
 	 */
+	@Override
 	public NamespaceContext getNamespaceContext() {
 		return namespaceContext;
 	}
@@ -148,6 +152,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#addTransformerDirectory(java.lang.String)
 	 */
+	@Override
 	public void addTransformerDirectory(String dir) {
 		transformerDirectories.add(dir);
 	}
@@ -155,6 +160,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getDocument(java.lang.String)
 	 */
+	@Override
 	public XmlDocument getDocument (String name) {
 		return documents.get(name);
 	}
@@ -162,6 +168,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getTransformer(java.lang.String)
 	 */
+	@Override
 	public IDOMTransformer getTransformer (String name) {
 		return transformers.get(name);
 	}
@@ -169,6 +176,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#newXmlSection()
 	 */
+	@Override
 	public XmlSection newXmlSection() {
 		try {
 			return xmlSectionClass.newInstance();
@@ -180,6 +188,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#findXslFile(java.lang.String)
 	 */
+	@Override
 	public File findXslFile (String xslFileName) {
 		File xslFile = new File(xslFileName);
 		
@@ -205,6 +214,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#findXslResource(java.lang.String)
 	 */
+	@Override
 	public FileXmlDocumentSource findXslResource (String xslFileName) {
 		File file = findXslFile(xslFileName);
 		if (file == null)
@@ -215,6 +225,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXmlDocument(java.lang.String, org.apache.wicket.util.file.File, org.cast.cwm.xml.parser.XmlParser, java.util.List)
 	 */
+	@Override
 	public XmlDocument loadXmlDocument (String name, File file, XmlParser parser, List<IDocumentObserver> observers) {
 		return loadXmlDocument (name, new FileXmlDocumentSource(file), parser, observers);
 	}
@@ -222,6 +233,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXmlDocument(java.lang.String, org.apache.wicket.Resource, org.cast.cwm.xml.parser.XmlParser, java.util.List)
 	 */
+	@Override
 	public XmlDocument loadXmlDocument (String name, IInputStreamProvider xmlResource, XmlParser parser, List<IDocumentObserver> observers) {
 		XmlDocument doc = new XmlDocument(name, xmlResource, parser, observers);
 		doc.setSortOrder(documents.size());
@@ -232,6 +244,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#registerXmlDocument(java.lang.String, org.cast.cwm.xml.XmlDocument)
 	 */
+	@Override
 	public void registerXmlDocument (String name, XmlDocument document) {
 		if (documents.containsKey(name))
 			throw new IllegalArgumentException("XML Document with duplicate name: " + name);
@@ -241,6 +254,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, org.apache.wicket.util.file.File, boolean, org.apache.wicket.util.file.File)
 	 */
+	@Override
 	public IDOMTransformer loadXSLTransformer (String name, File xslFile, boolean forceUniqueWicketIds, File... dependentFiles) {
 		IInputStreamProvider[] resources = new IInputStreamProvider[dependentFiles.length];
 		for (int i=0; i<dependentFiles.length; i++)
@@ -252,6 +266,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, java.lang.String, boolean, java.lang.String)
 	 */
+	@Override
 	public IDOMTransformer loadXSLTransformer (String name, String xslFile, boolean forceUniqueWicketIds, String... dependentFiles) {
 		IInputStreamProvider[] resources = new IInputStreamProvider[dependentFiles.length];
 		for (int i=0; i<dependentFiles.length; i++)
@@ -262,6 +277,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, java.lang.String, boolean)
 	 */
+	@Override
 	public IDOMTransformer loadXSLTransformer (String name, String xslFileName, boolean forceUniqueWicketIds) {
 		File xslFile = findXslFile(xslFileName);
 		return loadXSLTransformer(name, new FileXmlDocumentSource(xslFile), forceUniqueWicketIds);
@@ -271,6 +287,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#loadXSLTransformer(java.lang.String, org.apache.wicket.Resource, boolean, org.apache.wicket.Resource)
 	 */
+	@Override
 	public IDOMTransformer loadXSLTransformer (String name, IInputStreamProvider xslResource, boolean forceUniqueWicketIds, IInputStreamProvider... dependentResources) {
 		XslTransformer xsl = new XslTransformer(xslResource);
 		for (IInputStreamProvider r : dependentResources)
@@ -287,6 +304,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#registerTransformer(java.lang.String, org.cast.cwm.xml.transform.IDOMTransformer)
 	 */
+	@Override
 	public void registerTransformer (String name, IDOMTransformer transformer) {
 		if (transformers.containsKey(name))
 			throw new IllegalArgumentException("XML Document with duplicate name: " + name);
@@ -296,6 +314,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getTransformed(org.cast.cwm.xml.ICacheableModel, java.lang.String)
 	 */
+	@Override
 	public TransformResult getTransformed (ICacheableModel<? extends IXmlPointer> mXmlPtr, String transformName) {
 		return getTransformed(mXmlPtr, transformName, null);
 	}
@@ -303,6 +322,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getTransformed(org.cast.cwm.xml.ICacheableModel, java.lang.String, org.cast.cwm.xml.transform.TransformParameters)
 	 */
+	@Override
 	public TransformResult getTransformed (ICacheableModel<? extends IXmlPointer> mXmlPtr, String transformName, TransformParameters params) {
 		IDOMTransformer transformer = getTransformer(transformName);
 		// First, check the cache.
@@ -339,6 +359,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#serialize(org.w3c.dom.Element)
 	 */
+	@Override
 	public String serialize (Element res) {
 		DOMImplementationRegistry registry;
 		try {
@@ -368,6 +389,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#addNamespaceContext(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public void addNamespaceContext(String prefix, String uri) {
 		((CwmNamespaceContext) getNamespaceContext()).putNamespacePair(prefix, uri);
 	}
@@ -375,6 +397,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#getWicketNodes(org.w3c.dom.Element, boolean)
 	 */
+	@Override
 	public NodeList getWicketNodes(Element elt, boolean all) {
 		XPathFactory factory=XPathFactory.newInstance();
 		XPath xPath = factory.newXPath();
@@ -398,6 +421,7 @@ public class XmlService implements IXmlService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.xml.service.IXMLService#findTransformFile(java.lang.String)
 	 */
+	@Override
 	public File findTransformFile(String href) {
 		for (String directory : transformerDirectories) {
 			File file = new File(directory, href);
@@ -425,6 +449,7 @@ public class XmlService implements IXmlService {
 			uri2prefix.put(uri, prefix);
 		}
 		
+		@Override
 		public String getNamespaceURI(String prefix) {
 			if (prefix == null)
 				throw new IllegalArgumentException("Prefix cannot be null");			
@@ -432,12 +457,14 @@ public class XmlService implements IXmlService {
 		}
 
 
+		@Override
 		public String getPrefix(String uri) {
 			if (uri == null)
 				throw new IllegalArgumentException("URI cannot be null");
 			return uri2prefix.get(uri);
 		}
 
+		@Override
 		public Iterator<Void> getPrefixes(String arg0) {
 			log.error("Called unimplemented function getPrefixes");
 			return null;

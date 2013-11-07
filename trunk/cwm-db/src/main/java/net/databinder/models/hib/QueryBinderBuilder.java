@@ -33,6 +33,7 @@ public class QueryBinderBuilder implements QueryBuilder {
 		this.query = query;
 		this.binders = binders;
 	}
+	@Override
 	public Query build(Session sess) {
 		Query q = sess.createQuery(query);
 		for (QueryBinder b: binders)

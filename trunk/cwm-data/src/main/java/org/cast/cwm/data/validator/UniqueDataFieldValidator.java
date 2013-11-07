@@ -89,6 +89,7 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void build(Criteria criteria) {
 				criteria.add(Restrictions.eq(field, validatable.getValue()));
 				for (String field : scope.keySet()) {

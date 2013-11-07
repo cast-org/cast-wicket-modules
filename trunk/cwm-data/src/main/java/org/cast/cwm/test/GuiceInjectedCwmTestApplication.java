@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.util.tester.DummyHomePage;
-import org.cast.cwm.test.GuiceInjectedTestApplication;
 
 public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplication<T> {
 

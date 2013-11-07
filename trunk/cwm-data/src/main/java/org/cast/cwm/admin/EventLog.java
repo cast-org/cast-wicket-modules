@@ -64,6 +64,7 @@ import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -199,6 +200,7 @@ public class EventLog extends AdminPage {
 				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "insertTime"), eventDateFormat));				
 			}
 
+			@Override
 			public String getItemString(IModel<Event> rowModel) {
 				return rowModel.getObject().getInsertTime().toString(); // TODO: string format?
 			}
@@ -220,6 +222,7 @@ public class EventLog extends AdminPage {
 			// TODO: this should do something more useful for audio, drawing, upload, and table responses.
 			// The raw data display is not very usable inside a spreadsheet; and for audio and upload we don't display anything at all.
 			// Perhaps we could include a link to display the item?  Or some metadata about it?
+			@Override
 			public String getItemString(IModel<Event> rowModel) {
 				if (!rowModel.getObject().hasResponses()) {
 					return "";
@@ -255,6 +258,7 @@ public class EventLog extends AdminPage {
 		@Getter @Setter private ISortState sortState;
 ;
 		
+		@Override
 		public void buildUnordered(Criteria criteria) {
 			
 			// Type check
@@ -273,7 +277,7 @@ public class EventLog extends AdminPage {
 				criteria.setMaxResults(0);
 			}
 			criteria.add(siteRestriction);
-			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
+			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
 			
 			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
 				Calendar toDate = Calendar.getInstance(); // Set "to" time to end of the day (expressed as <00:00 of the following day)
@@ -293,6 +297,7 @@ public class EventLog extends AdminPage {
 
 		}
 
+		@Override
 		public void buildOrdered(Criteria criteria) {
 			buildUnordered(criteria);
 			SortParam sort = ((SingleSortState) getSortState()).getSort();

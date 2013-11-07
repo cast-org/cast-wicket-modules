@@ -46,12 +46,14 @@ public class BasicPassword implements DataPassword, Serializable {
 		change(password);
 	}
 	
+	@Override
 	public void change(String password) {
 		MessageDigest md = ((AuthApplication)Application.get()).getDigest();
 		byte[] hash = md.digest(password.getBytes());
 		passwordHash = new String(Base64.encodeBase64(hash));
 	}
 	
+	@Override
 	public void update(MessageDigest md) {
 		md.update(passwordHash.getBytes());
 	}
@@ -66,6 +68,7 @@ public class BasicPassword implements DataPassword, Serializable {
 		this.passwordHash = passwordHash;
 	}
 	
+	@Override
 	public boolean matches(String password) {
 		return passwordHash != null &&
 			passwordHash.equals(new BasicPassword(password).getPasswordHash());

@@ -84,6 +84,7 @@ public class XslTransformer implements IDOMTransformer {
 	/**
 	 * Runs the transformation, returns the result.
 	 */
+	@Override
 	public Element applyTransform(Element element, TransformParameters params) {
 		DOMResult res = new DOMResult();
 		log.debug("Running XSLT {} on {}", xslFile, element.getAttributeNS(null, "id"));
@@ -109,6 +110,7 @@ public class XslTransformer implements IDOMTransformer {
 	 * To avoid constantly reading the disk or DAV connection, this will only check as often as
 	 * specified by XmlService's updateCheckInterval; otherwise returning a remembered value.
 	 */
+	@Override
 	public Time getLastModified(TransformParameters params) {
 		if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > XmlService.get().getUpdateCheckInterval())
 			updateLastModified();

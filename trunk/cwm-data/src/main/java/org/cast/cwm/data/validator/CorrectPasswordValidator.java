@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.validator;
 
-import net.databinder.auth.hib.AuthDataSession;
+import net.databinder.auth.AuthDataSessionBase;
 
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
@@ -37,7 +37,7 @@ public class CorrectPasswordValidator extends AbstractValidator<String> {
 
 	@Override
 	protected void onValidate(IValidatable<String> validatable) {		
-		if (!AuthDataSession.get().getUser().getPassword().matches(validatable.getValue())) {
+		if (!AuthDataSessionBase.get().getUser().getPassword().matches(validatable.getValue())) {
 			error(validatable);
 		}
 	}

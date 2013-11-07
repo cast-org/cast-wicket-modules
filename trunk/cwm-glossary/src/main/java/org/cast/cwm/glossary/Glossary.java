@@ -208,6 +208,7 @@ public class Glossary {
 		 * @throws NullPointerException if either <code>e1</code> or
 		 *             <code>e2</code> is null
 		 */
+		@Override
 		public int compare (IGlossaryEntry e1, IGlossaryEntry e2) {
 			return normalizeTerm(e1.getSortForm()).compareTo(normalizeTerm(e2.getSortForm()));
 		}
@@ -226,6 +227,7 @@ public class Glossary {
 		 * @throws NullPointerException if either <code>e1</code> or
 		 *             <code>e2</code> is null
 		 */
+		@Override
 		public int compare (String id1, String id2) {
 			 return getEntryById(id1).getObject().getSortForm().compareTo(getEntryById(id2).getObject().getSortForm());
 		}
@@ -239,6 +241,7 @@ public class Glossary {
  	 * that may be found within them.
 	 */
 	protected static class LengthComparator implements Comparator<String> {
+		@Override
 		public int compare(String a, String b) {
 			if (a.length() < b.length())
 				return (1);

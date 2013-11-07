@@ -176,6 +176,7 @@ public class ResponseViewer extends Panel {
 			super.onBeforeRender();
 		}
 
+		@Override
 		public void renderHead(IHeaderResponse response) {
 			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
 			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
@@ -196,6 +197,7 @@ public class ResponseViewer extends Panel {
 	class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void onRequest() {
 			getRequestCycle().scheduleRequestHandlerAfterCurrent(
 					new ResourceStreamRequestHandler(

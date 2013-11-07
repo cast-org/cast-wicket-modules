@@ -323,6 +323,7 @@ public class XmlSection implements IXmlPointer, Serializable, Comparable<XmlSect
 				&& this.getXmlDocument().equals(osection.getXmlDocument()));
 	}
 
+	@Override
 	public int compareTo(XmlSection other) {
 		if (this.getXmlDocument().equals(other.getXmlDocument())) {
 			return this.getSortOrder() - other.getSortOrder();

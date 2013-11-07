@@ -80,6 +80,7 @@ public class CSVDownloadTest {
 			super(headerString);
 		}
 
+		@Override
 		public String getItemString(IModel<Event> rowModel) {
 			return "data";
 		}

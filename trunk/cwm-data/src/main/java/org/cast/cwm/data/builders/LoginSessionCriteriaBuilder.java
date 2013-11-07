@@ -48,10 +48,12 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 		sortState = sort;
 	}
 
+	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}
 
+	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
 		SortParam sort = ((SingleSortState) getSortState()).getSort();
@@ -63,6 +65,7 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 		}
 	}
 
+	@Override
 	public void buildUnordered(Criteria criteria) {
 		criteria.add(Restrictions.isNull("endTime"));
 		criteria.createAlias("user", "user"); // Must be joined for sort on username to work.

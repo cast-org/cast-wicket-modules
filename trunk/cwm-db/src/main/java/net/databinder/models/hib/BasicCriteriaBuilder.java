@@ -60,17 +60,20 @@ public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBu
 		this.requestedCriteria = criteria;
 	}
 
+	@Override
 	public void buildUnordered(Criteria criteria) {
 		for (int i=0; i<requestedCriteria.length; i++)
 			criteria.add(requestedCriteria[i]);
 	}
 
+	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
 		if (requestedOrder != null)
 			criteria.addOrder(requestedOrder);
 	}
 
+	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}

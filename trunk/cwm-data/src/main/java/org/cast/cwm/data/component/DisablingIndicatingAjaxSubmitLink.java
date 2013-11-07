@@ -60,6 +60,7 @@ implements IAjaxIndicatorAware, IHeaderContributor {
 	/**
 	 * @see org.apache.wicket.ajax.IAjaxIndicatorAware#getAjaxIndicatorMarkupId()
 	 */
+	@Override
 	public String getAjaxIndicatorMarkupId()
 	{
 		return indicatorAppender.getMarkupId();
@@ -70,6 +71,7 @@ implements IAjaxIndicatorAware, IHeaderContributor {
 		return new DisablingAjaxCallDecorator(getComponents());
 	}
 	
+	@Override
 	public void renderHead(final IHeaderResponse response) {
 		new JQueryHeaderContributor().renderHead(response);
 		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());

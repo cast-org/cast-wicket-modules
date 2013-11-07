@@ -147,6 +147,7 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * @param key object, or null for the default factory
 	 * @return the retained session factory
 	 */
+	@Override
 	public SessionFactory getHibernateSessionFactory(Object key) {
 		SessionFactory sf = hibernateSessionFactories.get(key);
 		if (sf == null)

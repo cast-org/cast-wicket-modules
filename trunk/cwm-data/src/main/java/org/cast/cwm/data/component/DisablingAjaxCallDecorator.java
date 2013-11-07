@@ -57,14 +57,17 @@ public class DisablingAjaxCallDecorator implements IAjaxCallDecorator {
 		}
 	}
 	
+	@Override
 	public CharSequence decorateScript(Component component, CharSequence script) {
 		return "$('" + generateSelector() + "').ajaxDisable(); " + script;
 	}
 
+	@Override
 	public CharSequence decorateOnFailureScript(Component component,CharSequence script) {
 		return "$('" + generateSelector() + "').ajaxEnable(); " + script;
 	}
 
+	@Override
 	public CharSequence decorateOnSuccessScript(Component component,CharSequence script) {
 		return "$('" + generateSelector() + "').ajaxEnable(); " + script;
 	}

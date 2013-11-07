@@ -44,10 +44,12 @@ public class PropertyDataColumn<E> extends PropertyColumn<E> implements IDataCol
 		super(new Model<String>(headerString), sortProperty, propertyExpression);
 	}
 
+	@Override
 	public String getHeaderString() {
 		return getDisplayModel().getObject().toString();
 	}
 
+	@Override
 	public String getItemString(IModel<E> rowModel) {
 		Object rowObj = createLabelModel(rowModel).getObject();
 		return rowObj==null ? "" : rowObj.toString();

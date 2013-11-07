@@ -96,6 +96,7 @@ public class UserListPanel extends Panel {
 
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void populateItem(Item<ICellPopulator<User>> cellItem, String componentId, IModel<User> rowModel) {
 				cellItem.add(new EditLinkFragment(componentId, rowModel));
 			}

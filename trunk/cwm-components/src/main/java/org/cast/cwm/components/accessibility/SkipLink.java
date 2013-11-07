@@ -43,6 +43,7 @@ public class SkipLink extends Panel {
 		add(new Label("skipLinkText", new StringResourceModel("skipLinkText", this, null)));
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		response.renderCSSReference(new PackageResourceReference(SkipLink.class, "skiplink.css"));
 		response.renderJavaScriptReference(new JavaScriptResourceReference(SkipLink.class, "skiplink.js"));

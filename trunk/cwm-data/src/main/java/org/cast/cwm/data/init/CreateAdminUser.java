@@ -46,15 +46,18 @@ public class CreateAdminUser implements IDatabaseInitializer {
 	private static final String DEFAULT_ADMIN_USERNAME = "admin";
 	private static final String DEFAULT_ADMIN_PASSWORD = "admin";
 
+	@Override
 	public String getName() {
 		return "create admin user";
 	}
 	
+	@Override
 	public boolean isOneTimeOnly() {
 		// False because this also can be used to reset the admin user's password in case of forgetfulness.
 		return false;
 	}
 
+	@Override
 	public boolean run(IAppConfiguration props) {
 		String username = props.getProperty("cwm.adminUsername");
 		if (Strings.isEmpty(username))

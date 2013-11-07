@@ -54,6 +54,7 @@ public abstract class DisablingIndicatingAjaxFallbackLink<T> extends IndicatingA
 		return new DisablingAjaxCallDecorator(getComponents());
 	}
 	
+	@Override
 	public void renderHead(final IHeaderResponse response) {
 		new JQueryHeaderContributor().renderHead(response);
 		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());

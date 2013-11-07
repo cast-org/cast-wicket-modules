@@ -393,6 +393,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
         return result.toString();
     }
 
+	@Override
 	public void renderHead(final IHeaderResponse response) {
 		renderJSinclusions(response);
         renderCSSinclusions(response);

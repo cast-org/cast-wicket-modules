@@ -58,6 +58,7 @@ public class HibernateListModel<T> extends LoadableDetachableModel<List<T>> {
 		this(queryString, new QueryBinder() {
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void bind(Query query) {
 				query.setCacheable(cacheable);
 			}

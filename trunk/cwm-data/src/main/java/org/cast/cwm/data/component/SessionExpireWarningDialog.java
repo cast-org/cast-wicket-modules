@@ -161,6 +161,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		}			
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		if (warningTime <= responseTime) {
 			throw new IllegalStateException("Warning time must be greater than response time.");

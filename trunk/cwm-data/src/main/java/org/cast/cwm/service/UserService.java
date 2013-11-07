@@ -87,6 +87,7 @@ public class UserService implements IUserService {
 	 * 
 	 * @return
 	 */
+	@Override
 	public User newUser() {
 		try {
 			return userClass.newInstance();
@@ -98,6 +99,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#confirmUser(org.cast.cwm.data.User)
 	 */
+	@Override
 	public void confirmUser(User user) {
 		user.setValid(true);
 		user.setSecurityToken(null);
@@ -107,6 +109,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#generateSecurityToken(org.apache.wicket.model.IModel)
 	 */
+	@Override
 	public void generateSecurityToken(IModel<User> mUser) {
 		mUser.getObject().generateSecurityToken();
 		cwmService.flushChanges();
@@ -116,6 +119,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getAllUsers()
 	 */
+	@Override
 	public IModel<List<User>> getAllUsers() {
 		return new UserListModel();
 	}
@@ -123,6 +127,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getById(long)
 	 */
+	@Override
 	public IModel<User> getById(long userId) {
 		return new UserModel(userId);
 	}
@@ -130,6 +135,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getByUsername(java.lang.String)
 	 */
+	@Override
 	public IModel<User> getByUsername (String username) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setUsername(username);
@@ -139,6 +145,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getBySubjectId(java.lang.String)
 	 */
+	@Override
 	public IModel<User> getBySubjectId (String subjectId) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setSubjectId(subjectId);
@@ -148,6 +155,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getByEmail(java.lang.String)
 	 */
+	@Override
 	public IModel<User> getByEmail (String email) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setEmail(email);
@@ -158,6 +166,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getAllByEmail(java.lang.String)
 	 */
+	@Override
 	public IModel<User> getAllByEmail (String email) {
 
 		// Sort valid users to the top
@@ -179,6 +188,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getByFullnameFromPeriod(java.lang.String, java.lang.String, org.apache.wicket.model.IModel)
 	 */
+	@Override
 	public IModel<User> getByFullnameFromPeriod(String firstName, String lastName, IModel<Period> period) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setFirstName(firstName);
@@ -191,6 +201,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getByRole(org.cast.cwm.data.Role)
 	 */
+	@Override
 	public UserListModel getByRole(Role role) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setRole(role);
@@ -200,6 +211,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getUserListProvider()
 	 */
+	@Override
 	public ISortableDataProvider<User> getUserListProvider() {
 		return getUserListProvider(null);
 	}
@@ -207,6 +219,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getUserListProvider(org.apache.wicket.model.IModel)
 	 */
+	@Override
 	public ISortableDataProvider<User> getUserListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
@@ -216,6 +229,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getUncachedUserListProvider(org.apache.wicket.model.IModel)
 	 */
+	@Override
 	public ISortableDataProvider<User> getUncachedUserListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
@@ -226,6 +240,7 @@ public class UserService implements IUserService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getLoginSessions(org.apache.wicket.model.IModel)
 	 */
+	@Override
 	public LoginData getLoginSessions(IModel<User> user) {
 		return new LoginData(user);
 	}
@@ -242,6 +257,7 @@ public class UserService implements IUserService {
 
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				public Query build(Session hibernateSession) {
 					Query q = hibernateSession.createQuery("select count(S), max(S.startTime) from LoginSession S where S.user = :user");
 					q.setParameter("user", userModel.getObject());

@@ -431,6 +431,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	private void addEditLinksToTarget(final AjaxRequestTarget target) {
 		
 		responseListContainer.visitChildren(EditResponseLink.class, new IVisitor<EditResponseLink,Void>() {
+			@Override
 			public void component(EditResponseLink component, IVisit<Void> visit) {
 				target.add(component);
 			}
@@ -459,6 +460,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		stampURLs.add(s);
 	}
 	
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		response.renderCSSReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css"));
 	} 

@@ -426,6 +426,7 @@ public abstract class ResponseEditor extends Panel {
 				protected IAjaxCallDecorator getAjaxCallDecorator() {
 					return new AjaxCallDecorator() {
 						private static final long serialVersionUID = 1L;
+						@Override
 						public CharSequence decorateScript(Component c, CharSequence script) {
 							// The Javascript to actually add the sentence starter into the text area. 
 							String adder;
@@ -466,6 +467,7 @@ public abstract class ResponseEditor extends Panel {
 		private class SentenceStarterRenderer implements IChoiceRenderer<String> {
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public String getDisplayValue(String object) {
 				if ("default".equals(object))
 					return new StringResourceModel("sentenceStarters.null", null, "Choose a Sentence Starter").getString();
@@ -473,6 +475,7 @@ public abstract class ResponseEditor extends Panel {
 					return object;
 			}
 
+			@Override
 			public String getIdValue(String object, int index) {
 				if ("default".equals(object))
 					return " ";
@@ -701,6 +704,7 @@ public abstract class ResponseEditor extends Panel {
 		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void onRequest() {
 				getRequestCycle().scheduleRequestHandlerAfterCurrent(
 						new ResourceStreamRequestHandler(
@@ -733,6 +737,7 @@ public abstract class ResponseEditor extends Panel {
 			super.onBeforeRender();
 		}
 
+		@Override
 		public void renderHead(IHeaderResponse response) {		
 			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
 			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));

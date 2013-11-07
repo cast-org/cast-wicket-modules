@@ -84,6 +84,7 @@ public class FlashAppletPanel extends Panel implements IHeaderContributor {
 		tag.put("style", tag.getAttribute("style") == null ? style : style + tag.getAttribute("style"));
 	}
 	
+	@Override
 	public void renderHead(IHeaderResponse r) {
 		r.renderJavaScriptReference(new JavaScriptResourceReference(FlashAppletPanel.class, "JavaScriptFlashGateway.js"));
 		

@@ -63,6 +63,7 @@ public class BaseEntry implements IWritableGlossaryEntry {
 	@Setter
 	protected ICacheableModel<? extends IXmlPointer> xmlPointer;
 
+	@Override
 	public void addAlternateForm(String form) {
 		alternateForms.add(form);
 	}

@@ -54,6 +54,7 @@ public abstract class DisablingIndicatingAjaxLink<T> extends IndicatingAjaxLink<
 		return new DisablingAjaxCallDecorator(getComponents());
 	}
 	
+	@Override
 	public void renderHead(final IHeaderResponse response) {
 		new JQueryHeaderContributor().renderHead(response);
 		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());

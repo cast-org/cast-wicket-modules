@@ -45,6 +45,7 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 
 	private static final long serialVersionUID = 1L;
 	
+	@Override
 	public void validate(Form<?> form) {
 		
 		// Ensure that no other users exist in this period with the same full name
@@ -57,6 +58,7 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 		}
 	}
 
+	@Override
 	public FormComponent<?>[] getDependentFormComponents() {
 		return new FormComponent<?>[] { getFirstNameComponent(), getLastNameComponent() };
 	}
@@ -76,6 +78,7 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 		final List<TextField<String>> list = new ArrayList<TextField<String>>();
 		form.visitChildren(TextField.class, new IVisitor<TextField<String>,Void>() {
 
+			@Override
 			public void component(TextField<String> component, IVisit<Void> visit) {
 				if (component.getId().equals(wicketId)) {
 					list.add(component);

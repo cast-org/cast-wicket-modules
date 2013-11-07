@@ -47,11 +47,13 @@ public abstract class AbstractDataColumn<E> extends AbstractColumn<E> implements
 		super(new Model<String>(headerString), sortProperty);
 	}
 
+	@Override
 	public String getHeaderString() {
 		return getDisplayModel().getObject().toString();
 	}
 	
 	// Default implementation
+	@Override
 	public void populateItem(Item<ICellPopulator<E>> cellItem, String componentId, IModel<E> rowModel) {
 		cellItem.add(new Label(componentId, getItemString(rowModel)));
 	}

@@ -58,6 +58,7 @@ public class GlossaryXmlDocumentObserver  implements IDocumentObserver {
 	 * This method is part of the IDocumentObserver interface and will be automatically
 	 * called when the Glossary object is created or the XML is modified.
 	 */
+	@Override
 	public void xmlUpdated(XmlDocument doc) {
 		glossary.setLanguage(doc.getDocument().getDocumentElement().getAttributeNS(null, "xml:lang"));
 		createEntriesFromXmlSections(doc.getTocSection().getChildren());

@@ -45,6 +45,7 @@ public class PromptCriteriaBuilder implements CriteriaBuilder, IDetachable {
 		this.identifier = identifier;
 	}
 
+	@Override
 	public void build(Criteria criteria) {
 		if (identifier != null) {
 			criteria.add(Restrictions.eq("identifier", identifier));
@@ -53,6 +54,7 @@ public class PromptCriteriaBuilder implements CriteriaBuilder, IDetachable {
 		criteria.setCacheable(true);
 	}
 
+	@Override
 	public void detach() {
 		// Nothing to detach, yet, but following other Criteria Builder Conventions.
 	}

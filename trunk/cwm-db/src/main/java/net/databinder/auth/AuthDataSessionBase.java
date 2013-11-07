@@ -64,6 +64,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	/**
 	 * @return DataUser object for current user, or null if none signed in.
 	 */
+	@Override
 	public T getUser() {
 		if  (isSignedIn()) {
 			return getUserModel().getObject();
@@ -71,6 +72,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 		return null;
 	}
 	
+	@Override
 	public IModel<T> getUserModel() {
 		return userModel;
 	}
@@ -91,6 +93,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	 * Determine if user is signed in, or can be via cookie.
 	 * @return true if signed in or cookie sign in is possible and successful
 	 */
+	@Override
 	public boolean isSignedIn() {
 //		if (userModel == null)
 //			cookieSignIn();
@@ -100,6 +103,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	/**
 	 * @return true if signed in, false if credentials incorrect
 	 */
+	@Override
 	public boolean signIn(String username, String password) {
 		return signIn(username, password, false);
 	}
@@ -108,6 +112,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	 * @param setCookie if true, sets cookie to remember user
 	 * @return true if signed in, false if credentials incorrect
 	 */
+	@Override
 	public boolean signIn(final String username, final String password, boolean setCookie) {
 		clearUser();
 		T potential = getUser(username);
@@ -123,6 +128,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
 	 * @param user validated and persisted user, must be in current Hibernate session
 	 * @param setCookie if true, sets cookie to remember user
 	 */
+	@Override
 	public void signIn(T user, boolean setCookie) {
 		userModel = createUserModel(user);
 		if (setCookie)
@@ -228,6 +234,7 @@ public abstract class AuthDataSessionBase<T extends DataUser> extends WebSession
   }	  
 
   /** Signs out and invalidates session. */	
+	@Override
 	public void signOut() {
 	  clearUser();
 		getSessionStore().invalidate(RequestCycle.get().getRequest());

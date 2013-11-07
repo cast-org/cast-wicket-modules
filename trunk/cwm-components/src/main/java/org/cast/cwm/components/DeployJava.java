@@ -211,6 +211,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	// Look for a file beginning with the given prefix in the given folder.
 	private File findMatchingFile (Folder folder, final String prefix) {
 		File[] options = folder.listFiles(new FilenameFilter() {
+			@Override
 			public boolean accept(File dir, String file) {
 				return (file.startsWith(prefix));
 			}
@@ -392,6 +393,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	 *
 	 * @param response Header response.
 	 */
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		if (AjaxRequestTarget.get() == null)
 			response.renderJavaScriptReference(JAVASCRIPT_URL);
