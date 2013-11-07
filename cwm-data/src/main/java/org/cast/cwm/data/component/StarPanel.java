@@ -38,7 +38,6 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.IResponseTypeRegistry;
 import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.Response;
@@ -166,6 +165,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 		super.onBeforeRender();
 	}
 	
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		
 		response.renderJavaScriptReference(new PackageResourceReference(StarPanel.class, "star_rating.js"), "StarRating");

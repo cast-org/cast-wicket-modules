@@ -64,6 +64,7 @@ public abstract class AdminPage extends WebPage implements IHeaderContributor {
 		add(new AdminHeaderPanel("header"));
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatest(Library.JQUERY)).renderHead(response);
 		response.renderCSSReference(admincss);

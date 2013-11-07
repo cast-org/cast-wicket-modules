@@ -103,6 +103,7 @@ public class ImageService {
 	 * 
 	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 */
+	@Deprecated
 	public BufferedImage resizeToBufferedImage(BufferedImage original, Integer maxW, Integer maxH, boolean exact) {
 
 		if (original == null)
@@ -219,6 +220,7 @@ public class ImageService {
 	 * @return
 	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 */
+	@Deprecated
 	public ScaledImage getScaledImage(ScaledImageKey key) {
 		ScaledImage thumb = scaledImageCache.get(key);
 		
@@ -309,6 +311,7 @@ public class ImageService {
 	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 *
 	 */
+	@Deprecated
 	public static class ScaledImageResource extends DynamicImageResource {
 
 		private static final long serialVersionUID = 1L;
@@ -336,6 +339,7 @@ public class ImageService {
 	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 * 
 	 */
+	@Deprecated
 	public static class ScaledImageResourceReference extends ResourceReference {
 
 		private static final long serialVersionUID = 1L;
@@ -357,6 +361,7 @@ public class ImageService {
 	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 *
 	 */
+	@Deprecated
 	public static class ScaledImageComponent extends Image {
 		
 		private static final long serialVersionUID = 1L;
@@ -384,6 +389,7 @@ public class ImageService {
 	 * @deprecated image scaling in this class not working with wicket 1.5; use ThumbnailUPloadedImageResourceReference instead
 	 *
 	 */
+	@Deprecated
 	@Getter
 	@Setter
 	public static class ScaledImage {

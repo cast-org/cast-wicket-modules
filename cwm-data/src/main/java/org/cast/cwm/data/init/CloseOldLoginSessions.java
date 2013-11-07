@@ -20,7 +20,6 @@
 package org.cast.cwm.data.init;
 
 import java.util.Date;
-import java.util.Properties;
 
 import net.databinder.models.hib.HibernateListModel;
 
@@ -56,14 +55,17 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 		Injector.get().inject(this);
 	}
 
+	@Override
 	public String getName() {
 		return "close old loginsessions";
 	}
 
+	@Override
 	public boolean isOneTimeOnly() {
 		return false;
 	}
 
+	@Override
 	public boolean run(IAppConfiguration appProperties) {
 		boolean changesMade = false;
 		Date now = new Date();

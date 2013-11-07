@@ -34,6 +34,7 @@ public class ModelOfAny<T> extends BaseMatcher<IModel<T>> {
         object = modelArg;
     }
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean matches(Object item) {
 		if (!(item instanceof IModel))
@@ -42,6 +43,7 @@ public class ModelOfAny<T> extends BaseMatcher<IModel<T>> {
 		return instanceOfMatcher.matches(((IModel<T>) item).getObject());
 	}
 
+	@Override
 	public void describeTo(Description description) {
 		description.appendText("model containing an instance of ");
 		description.appendValue(object.getName());

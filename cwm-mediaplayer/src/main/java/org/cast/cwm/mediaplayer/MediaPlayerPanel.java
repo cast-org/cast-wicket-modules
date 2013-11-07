@@ -164,6 +164,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		add(playResponse);
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse r) {
 
 		r.renderJavaScriptReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js"));

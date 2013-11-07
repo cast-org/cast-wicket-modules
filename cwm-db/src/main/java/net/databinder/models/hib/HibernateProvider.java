@@ -63,10 +63,12 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 		this(objectClass);
 		this.criteriaBuilder = new OrderingCriteriaBuilder() {
 			private static final long serialVersionUID = 1L;
+			@Override
 			public void buildOrdered(Criteria criteria) {
 				criteriaBuilder.build(criteria);
 				criteriaOrderer.build(criteria);
 			}
+			@Override
 			public void buildUnordered(Criteria criteria) {
 				criteriaBuilder.build(criteria);
 			}
@@ -87,9 +89,11 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	public HibernateProvider(Class objectClass, final CriteriaBuilder criteriaBuilder) {
 		this(objectClass, new OrderingCriteriaBuilder() {
 			private static final long serialVersionUID = 1L;
+			@Override
 			public void buildOrdered(Criteria criteria) {
 				criteriaBuilder.build(criteria);
 			}
+			@Override
 			public void buildUnordered(Criteria criteria) {
 				criteriaBuilder.build(criteria);
 			}
@@ -166,6 +170,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	/**
 	 * It should not normally be necessary to override (or call) this default implementation.
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Iterator<T> iterator(int first, int count) {
 		Session sess =  Databinder.getHibernateSession(factoryKey);
@@ -190,6 +195,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	 * Only override this method if a single count query or 
 	 * criteria projection is not possible.
 	 */
+	@Override
 	public int size() {
 		Session sess =  Databinder.getHibernateSession(factoryKey);
 

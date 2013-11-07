@@ -232,10 +232,12 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 		tag.setType(TagType.OPEN); // Ensure open/close tags.  Turns <span /> into <span></span>
 	}
 	
+	@Override
 	public IResourceStream getMarkupResourceStream(MarkupContainer container, Class<?> containerClass) {
 		return new StringResourceStream(getTransformedMarkup());
 	}
 
+	@Override
 	public String getCacheKey(MarkupContainer container, Class<?> containerClass) {
 		return null;
 	}

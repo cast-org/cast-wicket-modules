@@ -164,6 +164,7 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 				getAppletMarkupId(), message);
 	}
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		response.renderCSSReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.css"));
 		// TODO - centralize JQuery versioning
@@ -175,6 +176,7 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void onRequest() {
 			try {
 				OutputStream os = RequestCycle.get().getOriginalResponse().getOutputStream();

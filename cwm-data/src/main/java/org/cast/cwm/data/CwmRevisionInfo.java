@@ -51,7 +51,8 @@ public class CwmRevisionInfo extends DefaultRevisionEntity {
 	
 	public static class CwmRevisionListener implements RevisionListener {
 		
-	    public void newRevision(Object revisionEntity) {
+	    @Override
+		public void newRevision(Object revisionEntity) {
 	    	// Unlike Session.get(), this will never create a Session if one doesn't already exist.
 	    	Session session = ThreadContext.getSession();
 	    	if (session instanceof CwmSession) {

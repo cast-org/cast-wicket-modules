@@ -46,6 +46,7 @@ public class ShyContainer extends WebMarkupContainer {
 	private boolean someChildVisible() {
 		Boolean found = this.visitChildren(new IVisitor<Component,Boolean>(){
 
+			@Override
 			public void component(Component component, final IVisit<Boolean> visit) {
 				if (determineVisibility(component)) {
 					visit.stop(true);

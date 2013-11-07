@@ -102,6 +102,7 @@ public class XmlDocumentList implements Iterable<XmlDocument> {
 		return count;
 	}
 	
+	@Override
 	public Iterator<XmlDocument> iterator() {
 		return documentList.iterator();
 	}

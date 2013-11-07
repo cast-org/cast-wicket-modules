@@ -72,10 +72,12 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	public UserCriteriaBuilder() {
 	}
 	
+	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}
 	
+	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
 		SortParam sort = ((SingleSortState) getSortState()).getSort();
@@ -91,6 +93,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 		}
 	}
 	
+	@Override
 	public void buildUnordered(Criteria criteria) {
 		if (role != null)
 			criteria.add(Restrictions.eq("role", role));
@@ -123,6 +126,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 			criteria.setCacheable(true);	
 	}
 	
+	@Override
 	public void detach() {
 		if (period != null)
 			period.detach();

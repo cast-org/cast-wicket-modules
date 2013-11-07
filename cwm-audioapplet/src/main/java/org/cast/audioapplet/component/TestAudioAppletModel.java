@@ -71,18 +71,22 @@ public class TestAudioAppletModel implements IAudioAppletModel {
 		this.maxLength = maxLength;
 	}
 
+	@Override
 	public boolean isReadOnly() {
 		return readOnly;
 	}
 
+	@Override
 	public byte[] getObject() {
 		return audio;
 	}
 
+	@Override
 	public int getMaxLength() {
 		return maxLength;
 	}
 
+	@Override
 	public void setObject(byte[] audio) {
 		if(readOnly) {
 			throw new RuntimeException("Audio is read-only");
@@ -90,6 +94,7 @@ public class TestAudioAppletModel implements IAudioAppletModel {
 		else this.audio = audio;
 	}
 
+	@Override
 	public void detach() {
 
 	}

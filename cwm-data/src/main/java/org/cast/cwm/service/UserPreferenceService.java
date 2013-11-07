@@ -27,7 +27,6 @@ import org.cast.cwm.data.UserPreference;
 import org.cast.cwm.data.UserPreferenceBoolean;
 import org.cast.cwm.data.UserPreferenceString;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -53,6 +52,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 	protected UserPreferenceService() { /* Protected Constructor - use injection */
 	}
 		
+	@Override
 	public void setUserPreferenceBoolean(IModel<User> mUser, String name, Boolean booleanValue) {
 					
 		// if a user preference doesn't exist, create it, otherwise update
@@ -71,6 +71,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 		
 	}
 	
+	@Override
 	public Boolean getUserPreferenceBoolean(IModel<User> mUser, String name) {
 		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreferenceCriteria(UserPreferenceBoolean.class, mUser, name).uniqueResult();
 		if (userPreference == null) {
@@ -79,6 +80,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 		return userPreference.getBooleanValue();
 	}
 		
+	@Override
 	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
 		// if a user preference doesn't exist, create it, otherwise update
 		log.info("get user preference for mUser="+mUser.getObject().getId() + " & prefernce="+name);
@@ -104,6 +106,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 
 	}
 
+	@Override
 	public String getUserPreferenceString(IModel<User> mUser, String name) {
 		Criteria criteria = getUserPreferenceCriteria(UserPreferenceString.class, mUser, name);
 		UserPreferenceString preference = (UserPreferenceString) criteria.uniqueResult();

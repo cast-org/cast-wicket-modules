@@ -235,6 +235,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 		return this;
 	}
 
+	@Override
 	public int compareTo(XmlDocument other) {
 		return this.getSortOrder() - other.getSortOrder();
 	}

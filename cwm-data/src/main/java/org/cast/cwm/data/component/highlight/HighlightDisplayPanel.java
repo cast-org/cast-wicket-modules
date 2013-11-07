@@ -143,6 +143,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 			
 			HighlightDisplayForm.this.visitChildren(HiddenHighlightField.class, new IVisitor<HiddenHighlightField,Void>() {
 
+				@Override
 				public void component(HiddenHighlightField component, IVisit<Void> visit) {
 					String s = component.getModelObject();
 					if (s != null &&! s.isEmpty()) {
@@ -166,6 +167,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		}
 	}
 	
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		// FIXME: used to refer to, but not supply, a CSS file.  That's not really helpful.
 		// Caller should supply any necessary CSS.

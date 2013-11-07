@@ -42,6 +42,7 @@ public interface IEventService extends IEventLogger {
 	 * @see {@link AbstractEventService#saveEvent(String, String, String)}
 	 * @return model wrapping the event that was saved
 	 */
+	@Override
 	public abstract IModel<? extends Event> saveEvent(String type,
 			String detail, String pageName);
 

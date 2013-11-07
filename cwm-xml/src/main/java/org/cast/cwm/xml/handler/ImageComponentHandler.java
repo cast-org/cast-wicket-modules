@@ -33,6 +33,7 @@ public class ImageComponentHandler extends BaseDynamicComponentHandler implement
 		super(prefix);
 	}
 
+	@Override
 	public Component getComponent(String wicketId, Element element,
 			IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod) {
 		String src = element.getAttributeNS(null, "src");

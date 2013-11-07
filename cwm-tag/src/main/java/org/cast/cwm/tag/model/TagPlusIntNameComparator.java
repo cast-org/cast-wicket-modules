@@ -51,7 +51,8 @@ public class TagPlusIntNameComparator implements Comparator<TagPlusInt> {
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare (TagPlusInt o1, TagPlusInt o2) {
+    @Override
+	public int compare (TagPlusInt o1, TagPlusInt o2) {
         return direction * o1.getTag().getName().compareToIgnoreCase(o2.getTag().getName());
     }
 }

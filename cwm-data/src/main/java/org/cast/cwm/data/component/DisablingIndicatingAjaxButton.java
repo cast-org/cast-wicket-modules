@@ -60,6 +60,7 @@ public abstract class DisablingIndicatingAjaxButton extends IndicatingAjaxButton
 		return new DisablingAjaxCallDecorator(getComponents());
 	}
 	
+	@Override
 	public void renderHead(final IHeaderResponse response) {
 		new JQueryHeaderContributor().renderHead(response);
 		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());

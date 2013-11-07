@@ -27,6 +27,11 @@ import org.apache.wicket.markup.html.WebPage;
  */
 public class PageExpiredCookieless extends WebPage {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public PageExpiredCookieless() {
 //		add(new DataStyleLink("css"));  // FIXME
 		add(homePageLink("homePageLink"));

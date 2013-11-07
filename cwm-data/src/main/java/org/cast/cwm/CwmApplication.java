@@ -215,6 +215,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	protected List<Module> getInjectionModules() {
 		ArrayList<Module> modules = new ArrayList<Module>();
 		modules.add(new Module() {
+			@Override
 			public void configure(Binder binder) {
 				log.debug("Binding CWM Services");
 				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
@@ -277,6 +278,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		return (CwmApplication) Application.get();
 	}
 
+	@Override
 	public Class<User> getUserClass() {
 		return org.cast.cwm.data.User.class;
 	}
@@ -414,6 +416,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		return responseTypeRegistry.getLegalResponseTypes();
 	}
 	
+	@Override
 	public byte[] getSalt() {
 		return "mmmm salt, makes the encryption tasty".getBytes();
 	}
@@ -463,6 +466,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 				try {
 					final String loginSessionId = closeQueue.take();
 					Databinder.ensureSession(new SessionUnit() {
+						@Override
 						public Object run(org.hibernate.Session dbSession) {
 							LoginSession loginSession = eventService.getLoginSessionBySessionId(loginSessionId).getObject();
 							if (loginSession != null) {

@@ -49,6 +49,7 @@ class DatabaseInitializerRunner {
 	void run(final List<IDatabaseInitializer> databaseInitializers) {
 		Databinder.ensureSession(new SessionUnit() {
 
+			@Override
 			public Object run(org.hibernate.Session session) {
 				List<String> initsDone = cwmService.getInitializationNames();
 				for (IDatabaseInitializer init : databaseInitializers) {

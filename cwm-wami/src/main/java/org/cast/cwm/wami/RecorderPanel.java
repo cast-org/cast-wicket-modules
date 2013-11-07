@@ -120,6 +120,7 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 	protected class AudioDataListenerBehavior extends AbstractAjaxBehavior {
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void onRequest() {
 			Request request = getRequest();
 		    RequestCycle requestCycle = RequestCycle.get();

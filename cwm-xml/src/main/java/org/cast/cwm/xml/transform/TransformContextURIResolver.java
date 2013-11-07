@@ -47,6 +47,7 @@ public class TransformContextURIResolver implements URIResolver {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformContextURIResolver.class);
 	
+	@Override
 	public Source resolve(String href, String base) throws TransformerException {
 		File file = findTransformFile(href, base);
 		

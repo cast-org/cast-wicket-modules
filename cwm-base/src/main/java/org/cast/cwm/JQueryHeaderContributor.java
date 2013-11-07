@@ -36,6 +36,7 @@ public class JQueryHeaderContributor implements IHeaderContributor {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public void renderHead(IHeaderResponse response) {
 		JSLib.getHeaderContribution(VersionDescriptor.exactVersion(Library.JQUERY, 1, 7, 1)).renderHead(response);
 	}

@@ -64,7 +64,6 @@ import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.SiteService;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
 
@@ -199,6 +198,7 @@ public class UserContentLogPage extends AdminPage {
 				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "info.revisionDate"), eventDateFormat));				
 			}
 
+			@Override
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
 				return rowModel.getObject().getInfo().getRevisionDate().toString();
 			}
@@ -228,6 +228,7 @@ public class UserContentLogPage extends AdminPage {
 					item.add(new EmptyPanel(componentId));										
 				}
 			}
+			@Override
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
 				if (uc.getDataType().getName().equals("TEXT")) {

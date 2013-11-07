@@ -33,6 +33,7 @@ public class CachingCriteriaBuilder implements CriteriaBuilder {
 
 	private static final long serialVersionUID = 1L;
 
+	@Override
 	public void build(Criteria criteria) {
 		criteria.setCacheable(true);		
 	}

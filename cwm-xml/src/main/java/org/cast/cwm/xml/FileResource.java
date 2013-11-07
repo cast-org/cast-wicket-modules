@@ -25,7 +25,6 @@ import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.PackageResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
-import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.cast.cwm.IRelativeLinkSource;
@@ -59,6 +58,7 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 * @param relativePath path relative to the path of this Resource
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
+	@Override
 	public ResourceReference getRelativeReference (final String relativePath) {
 		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
 		return new ResourceReference(FileResource.class, filePath) {

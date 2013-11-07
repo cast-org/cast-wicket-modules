@@ -38,6 +38,7 @@ public abstract class BaseDynamicComponentHandler  implements IDynamicComponentH
 		this.prefix = prefix;
 	}
 
+	@Override
 	public boolean canHandle(String wicketId) {
 		return wicketId.startsWith(prefix);
 	}

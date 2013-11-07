@@ -67,6 +67,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 		this.builder = builder;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public Iterator<? extends T> iterator(int first, int count) {
 		FullTextQuery query = getQuery();
@@ -88,6 +89,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	protected void onBeforeSearchExecution(FullTextQuery query) {
 	}
 	
+	@Override
 	public int size() {
 		FullTextQuery query = getQuery();
 		return query == null ? 0 : query.getResultSize();

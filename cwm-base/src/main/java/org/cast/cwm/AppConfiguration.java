@@ -102,6 +102,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getProperty(java.lang.String)
 	 */
+	@Override
 	public String getProperty (String key) {
 		String value = properties.getProperty(key);
 		return value==null ? null : value.trim();
@@ -110,6 +111,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getString(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public String getString (String key, String defaultValue) {
 		String value = getProperty(key);
 		if (value == null)
@@ -120,6 +122,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getString(java.lang.String)
 	 */
+	@Override
 	public String getString (String key) {
 		String value = getProperty(key);
 		if (value == null)
@@ -130,6 +133,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getInteger(java.lang.String, java.lang.Integer)
 	 */
+	@Override
 	public Integer getInteger (String key, Integer defaultValue) {
 		String value = properties.getProperty(key);
 		if (value==null)
@@ -146,6 +150,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getInteger(java.lang.String)
 	 */
+	@Override
 	public int getInteger (String key) {
 		Integer value = getInteger(key, null);
 		if (value==null)
@@ -157,6 +162,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getOptionalFile(java.lang.String)
 	 */	
+	@Override
 	public File getOptionalFile (String key) {
 		String fileName = getProperty(key);
 		if (fileName == null)
@@ -176,6 +182,7 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getFile(java.lang.String)
 	 */
+	@Override
 	public File getFile (String key) {
 		File file = getOptionalFile(key);
 		if (file == null)

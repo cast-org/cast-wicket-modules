@@ -147,6 +147,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	 * are removed if present.
 	 * @param object must be an entity contained in the current Hibernate session, or Serializable, or null
 	 */
+	@Override
 	public void setObject(T object) {
 		unbind();	// clear everything but class, name
 		objectClass = null;
@@ -276,6 +277,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	 * @see HibernateObjectModel#HibernateObjectModel(Class objectClass)
 	 * @see #isBound()
 	 */
+	@Override
 	public void unbind() {
 		objectId = null;
 		queryBuilder = null;
@@ -291,6 +293,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	 * behavior is dictated by the value of retanUnsaved.
 	 * @return true if information needed to load from Hibernate (identifier, query, or criteria) is present
 	 */
+	@Override
 	public boolean isBound() {
 		return objectId != null || criteriaBuilder != null || queryBuilder != null;
 	}

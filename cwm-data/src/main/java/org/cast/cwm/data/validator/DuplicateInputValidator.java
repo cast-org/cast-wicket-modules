@@ -74,10 +74,12 @@ public class DuplicateInputValidator extends AbstractFormValidator {
 	}
 	
 	
+	@Override
 	public FormComponent<?>[] getDependentFormComponents() {
 		return components;
 	}
 
+	@Override
 	public void validate(Form<?> form) {
 		int in = 0;
 		List<FormComponent<?>> inputs = new ArrayList<FormComponent<?>>();

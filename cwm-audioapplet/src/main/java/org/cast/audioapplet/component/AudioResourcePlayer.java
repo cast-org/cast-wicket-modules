@@ -59,6 +59,7 @@ public class AudioResourcePlayer extends AudioPlayer implements IResourceListene
 	/**
 	 * Called if we were initialized with a Resource and it's now being requested.
 	 */
+	@Override
 	public void onResourceRequested() {
 		// TODO rewritten - does this work??
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(new ResourceRequestHandler(audioResource, null));

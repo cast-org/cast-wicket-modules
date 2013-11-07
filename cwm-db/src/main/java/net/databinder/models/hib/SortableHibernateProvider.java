@@ -51,7 +51,8 @@ public class SortableHibernateProvider<T> extends HibernateProvider<T> implement
             sortStateLocator = (ISortStateLocator) criteriaBuilder;
     }
 
-    public ISortState getSortState() {
+    @Override
+	public ISortState getSortState() {
         return (sortStateLocator != null) ? sortStateLocator.getSortState() : sortState;
     }
 

@@ -45,12 +45,14 @@ public class BinaryFileDataMapper extends AbstractMapper {
 		this.urlPrefix = urlPrefix;
 	}
 
+	@Override
 	public int getCompatibilityScore(Request request) {
 		if(request.getUrl().toString().startsWith(urlPrefix))
 			return COMPATIBILITY_SCORE;
 		return 0;
 	}
 
+	@Override
 	public IRequestHandler mapRequest(Request request) {
 		List<String> segments = request.getUrl().getSegments();
 		if (segments.size() != 2)
@@ -61,6 +63,7 @@ public class BinaryFileDataMapper extends AbstractMapper {
 		return new ResourceRequestHandler(new BinaryFileDataResource(id), null);
 	}
 
+	@Override
 	public Url mapHandler(IRequestHandler requestHandler) {
 		if (requestHandler instanceof ResourceRequestHandler) {
 			ResourceRequestHandler rrh = (ResourceRequestHandler)requestHandler;

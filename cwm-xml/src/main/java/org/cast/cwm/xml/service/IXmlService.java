@@ -21,6 +21,7 @@ package org.cast.cwm.xml.service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.NamespaceContext;
 
 import org.apache.wicket.util.file.File;

@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.component;
 
-import net.databinder.auth.hib.AuthDataSession;
+import net.databinder.auth.AuthDataSessionBase;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.link.StatelessLink;
@@ -46,7 +46,7 @@ public class LogoutLink extends StatelessLink<Void> {
 
 	@Override
 	public void onClick() {
-		AuthDataSession.get().signOut();
+		AuthDataSessionBase.get().signOut();
 		setResponsePage(Application.get().getHomePage());
 	}
 }
