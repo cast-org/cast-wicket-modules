@@ -44,11 +44,11 @@ import org.hibernate.criterion.Restrictions;
 @Setter
 
 // TODO: ResponseType should be a set
-public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator, IDetachable {
+public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String>, IDetachable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private ISortState sortState = new SingleSortState();
+	private ISortState<String> sortState = new SingleSortState<String>();
 	
 	private IModel<? extends Prompt> promptModel;
 	private IModel<User> userModel;
@@ -60,13 +60,13 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	private Date toDate;
 	
 	public ResponseCriteriaBuilder() {
-		((SingleSortState) getSortState()).setSort(new SortParam("lastUpdated", true));
+		((SingleSortState<String>) getSortState()).setSort(new SortParam<String>("lastUpdated", true));
 	}
 	
 	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
-		SortParam sort = ((SingleSortState) getSortState()).getSort();
+		SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
 		if (sort != null) {
 			if (sort.isAscending())
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());

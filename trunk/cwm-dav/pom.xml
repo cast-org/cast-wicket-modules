@@ -12,11 +12,6 @@
 	<description>Access to content on a DAV server</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.wicket</groupId>
-			<artifactId>wicket</artifactId>
-			<type>pom</type>
-		</dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

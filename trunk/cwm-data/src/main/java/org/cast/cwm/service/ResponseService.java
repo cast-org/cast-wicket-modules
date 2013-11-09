@@ -170,7 +170,7 @@ public class ResponseService implements IResponseService {
 	 * @see org.cast.cwm.service.IResponseService#getResponseProviderForPrompt(org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p) {
+	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p) {
 		return getResponseProviderForPrompt(p, null);
 	}
 	
@@ -178,7 +178,7 @@ public class ResponseService implements IResponseService {
 	 * @see org.cast.cwm.service.IResponseService#getResponseProviderForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
+	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setUserModel(u);
@@ -186,7 +186,7 @@ public class ResponseService implements IResponseService {
 	}
 	
 	@Override
-	public ISortableDataProvider<Response> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod) {
+	public ISortableDataProvider<Response,String> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setPeriodModel(mPeriod);
@@ -361,7 +361,7 @@ public class ResponseService implements IResponseService {
 		
 		// DataProvider for Responses for this Prompt.
 		// It is assumed that the target Response is included in this list.
-		ISortableDataProvider<Response> dataProvider = getResponseProviderForPrompt(mPrompt);
+		ISortableDataProvider<Response,String> dataProvider = getResponseProviderForPrompt(mPrompt);
 		dataProvider.getSortState().setPropertySortOrder("sortOrder", SortOrder.ASCENDING);
 		
 		if (index == null)

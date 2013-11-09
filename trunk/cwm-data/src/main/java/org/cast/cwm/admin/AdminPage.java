@@ -22,8 +22,9 @@ package org.cast.cwm.admin;
 import lombok.Getter;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
@@ -32,9 +33,6 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.IAppConfiguration;
-import org.wicketstuff.jslibraries.JSLib;
-import org.wicketstuff.jslibraries.Library;
-import org.wicketstuff.jslibraries.VersionDescriptor;
 
 import com.google.inject.Inject;
 
@@ -66,8 +64,7 @@ public abstract class AdminPage extends WebPage implements IHeaderContributor {
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatest(Library.JQUERY)).renderHead(response);
-		response.renderCSSReference(admincss);
+		response.render(CssHeaderItem.forReference(admincss));
 	}
 	
 	protected String getDefaultPageTitle() {

@@ -60,8 +60,9 @@ public class UserListPage extends AdminPage {
 
 			@Override
 			protected void populateItem(ListItem<Role> item) {
-				item.add(new BookmarkablePageLink<Page>("addLink", UserFormPage.class)
-						.setParameter("role", item.getModelObject().getRoleString())
+				PageParameters pp = new PageParameters();
+				pp.set("role", item.getModelObject().getRoleString());
+				item.add(new BookmarkablePageLink<Page>("addLink", UserFormPage.class, pp)
 						.add(new Label("role", item.getModelObject().toString())));
 				if (item.getIndex() != 0)
 					item.add(AttributeModifier.replace("class", "addSeparator"));

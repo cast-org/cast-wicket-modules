@@ -19,7 +19,9 @@
  */
 package org.cast.cwm.components.accessibility;
 
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.StringResourceModel;
@@ -34,6 +36,7 @@ import org.apache.wicket.request.resource.PackageResourceReference;
  * @author jbrookover
  *
  */
+@Deprecated
 public class SkipLink extends Panel {
 
 	private static final long serialVersionUID = 1L;
@@ -45,8 +48,8 @@ public class SkipLink extends Panel {
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new PackageResourceReference(SkipLink.class, "skiplink.css"));
-		response.renderJavaScriptReference(new JavaScriptResourceReference(SkipLink.class, "skiplink.js"));
+		response.render(CssHeaderItem.forReference(new PackageResourceReference(SkipLink.class, "skiplink.css")));
+		response.render(JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(SkipLink.class, "skiplink.js")));
 		
 	}
 }

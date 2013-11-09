@@ -69,14 +69,14 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Iterator<? extends T> iterator(int first, int count) {
+	public Iterator<? extends T> iterator(long first, long count) {
 		FullTextQuery query = getQuery();
 		if (query == null) {
 			List<T> empty = Collections.emptyList();
 			return empty.iterator();
 		}
-		query.setFirstResult(first);
-		query.setMaxResults(count);
+		query.setFirstResult((int)first);
+		query.setMaxResults((int)count);
 		onBeforeSearchExecution(query);
 		long startTime = System.currentTimeMillis();
 		Iterator<? extends T> iterator = query.iterate();
@@ -90,7 +90,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	}
 	
 	@Override
-	public int size() {
+	public long size() {
 		FullTextQuery query = getQuery();
 		return query == null ? 0 : query.getResultSize();
 	}

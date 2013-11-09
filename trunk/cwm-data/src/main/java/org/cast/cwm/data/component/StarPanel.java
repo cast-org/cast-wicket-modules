@@ -22,12 +22,12 @@ package org.cast.cwm.data.component;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -128,7 +128,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 			
 			Label label = new Label("label", i == 1 ? i + " Star" : i + " Stars");
 			label.setRenderBodyOnly(true);
-			item.add(new SimpleAttributeModifier("for", radio.getMarkupId()));
+			item.add(AttributeModifier.set("for", radio.getMarkupId()));
 			item.add(radio);
 			item.add(label);
 		}

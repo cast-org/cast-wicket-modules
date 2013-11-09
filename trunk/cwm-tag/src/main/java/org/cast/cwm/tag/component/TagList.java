@@ -91,7 +91,7 @@ public class TagList extends WebMarkupContainer {
 					@Override
 					public void onClick(AjaxRequestTarget ajaxtarget) {
 						TagService.get().findTaggingCreate(user, target, t.getName());
-						ajaxtarget.addComponent(TagList.this);
+						ajaxtarget.add(TagList.this);
 						ajaxtarget.addChildren(findParent(TagPanel.class), TaggingsListPanel.class);
 					}
 				};

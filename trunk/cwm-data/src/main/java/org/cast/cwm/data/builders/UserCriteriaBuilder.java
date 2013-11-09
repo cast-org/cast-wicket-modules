@@ -54,7 +54,7 @@ import org.hibernate.criterion.Restrictions;
  */
 @Getter
 @Setter
-public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator, IDetachable {
+public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String>, IDetachable {
 
 	private static final long serialVersionUID = 1L;
 	private Role role = null;
@@ -66,7 +66,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private String subjectId;
 	private IModel<Period> period;
 	private IModel<? extends Collection<Site>> sites;
-	private ISortState sortState = new SingleSortState();
+	private ISortState<String> sortState = new SingleSortState<String>();
 	private boolean cacheResults = true;
 	
 	public UserCriteriaBuilder() {
@@ -80,7 +80,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
-		SortParam sort = ((SingleSortState) getSortState()).getSort();
+		SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
 		if (sort != null) {
 			if (sort.isAscending())
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());

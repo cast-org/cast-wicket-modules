@@ -22,8 +22,10 @@ package org.cast.cwm.mediaplayer;
 import java.util.Formatter;
 
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnLoadHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
@@ -86,7 +88,7 @@ public class FlashAppletPanel extends Panel implements IHeaderContributor {
 	
 	@Override
 	public void renderHead(IHeaderResponse r) {
-		r.renderJavaScriptReference(new JavaScriptResourceReference(FlashAppletPanel.class, "JavaScriptFlashGateway.js"));
+		r.render(JavaScriptHeaderItem.forReference(new JavaScriptResourceReference(FlashAppletPanel.class, "JavaScriptFlashGateway.js")));
 		
 		Formatter f = new Formatter();
 		f.format("var tag = new FlashTag('%s', %d, %d);\n", getAppletHref(), getWidth(), getHeight());
@@ -96,7 +98,7 @@ public class FlashAppletPanel extends Panel implements IHeaderContributor {
 		f.format("tag.setFlashvars('%s');\n", getFlashVars());
 		f.format("tag.setId('%s');\n", containerId + "-flash");
 		f.format("document.getElementById('%s').innerHTML = tag.toString();", containerId);
-		r.renderOnLoadJavaScript(f.toString());
+		r.render(OnLoadHeaderItem.forScript(f.toString()));
 		f.close();
 	}
 

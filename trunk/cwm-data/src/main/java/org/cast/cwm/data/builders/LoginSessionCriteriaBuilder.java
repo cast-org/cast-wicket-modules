@@ -35,16 +35,16 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator {
+public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String> {
 
 	@Getter @Setter
-	private ISortState sortState;
+	private ISortState<String> sortState;
 	
 	private static final long serialVersionUID = 1L;
 
 	public LoginSessionCriteriaBuilder() {
-		SingleSortState sort = new SingleSortState();
-		sort.setSort(new SortParam("startTime", true));
+		SingleSortState<String> sort = new SingleSortState<String>();
+		sort.setSort(new SortParam<String>("startTime", true));
 		sortState = sort;
 	}
 
@@ -56,7 +56,7 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
-		SortParam sort = ((SingleSortState) getSortState()).getSort();
+		SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
 		if (sort != null) {
 			if (sort.isAscending())
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());

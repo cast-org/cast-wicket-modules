@@ -29,8 +29,10 @@ import lombok.Setter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -172,10 +174,10 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		// FIXME: used to refer to, but not supply, a CSS file.  That's not really helpful.
 		// Caller should supply any necessary CSS.
 		// response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
-		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js"));
-		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "new-highlight.js"));
+		response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js")));
+		response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(HighlightDisplayPanel.class, "new-highlight.js")));
 		
-		response.renderOnDomReadyJavaScript(getHighlighterInitScript()); 
+		response.render(OnDomReadyHeaderItem.forScript(getHighlighterInitScript()));
 	}
 
 	private String getHighlighterInitScript() {

@@ -27,8 +27,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
@@ -205,7 +207,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 	public void renderHead(IHeaderResponse response)
 	{
 		// initialize the (custom) javascript library
-		response.renderJavaScriptReference(JS);
+		response.render(JavaScriptHeaderItem.forReference(JS));
 		
 		StringBuffer js = new StringBuffer();
 		
@@ -227,7 +229,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 		js.append(jsVarName + ".addElement(document.getElementById('" + upload.getMarkupId() + "'));");
 
 		// Render
-		response.renderOnDomReadyJavaScript(js.toString());
+		response.render(OnDomReadyHeaderItem.forScript(js.toString()));
 	}
 
 	/**

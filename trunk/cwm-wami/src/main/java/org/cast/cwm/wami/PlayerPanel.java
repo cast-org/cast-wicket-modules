@@ -22,8 +22,10 @@ package org.cast.cwm.wami;
 import java.util.Iterator;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnLoadHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
@@ -96,9 +98,9 @@ public class PlayerPanel<T extends UserContent> extends GenericPanel<T> implemen
 //        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "normalize.css"));
 //        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "edit.css"));
 
-        response.renderJavaScriptReference(new PackageResourceReference(PlayerPanel.class, "audio_applet.js"));
-        response.renderJavaScriptReference(new PackageResourceReference(PlayerPanel.class, "wami-recorder.js"));
-        response.renderJavaScriptReference(new PackageResourceReference(PlayerPanel.class, "castrecorder.js"));
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "audio_applet.js")));
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "wami-recorder.js")));
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "castrecorder.js")));
 
         configureRecorder(response);
 	}
@@ -108,8 +110,8 @@ public class PlayerPanel<T extends UserContent> extends GenericPanel<T> implemen
         RecorderOptions recorderOptions = getRecorderOptions();
 
         Gson gson = new Gson();
-        response.renderOnLoadJavaScript(String.format("createCastRecorder('%s', %s);", 
-        		this.getMarkupId(), gson.toJson(recorderOptions)));
+        response.render(OnLoadHeaderItem.forScript(String.format("createCastRecorder('%s', %s);", 
+        		this.getMarkupId(), gson.toJson(recorderOptions))));
 	}
 
 	protected RecorderOptions getRecorderOptions() {

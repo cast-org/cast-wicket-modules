@@ -35,14 +35,13 @@ import lombok.Setter;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
-import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -328,7 +327,7 @@ public abstract class ResponseEditor extends Panel {
 						super.renderHead(c, response);
 						// Ensure TinyMCE saves to form before we check to see if the form changed.
 						if (useWysiwyg)
-							response.renderJavaScript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
+							response.render(JavaScriptHeaderItem.forScript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave"));
 					}
 
 					@Override

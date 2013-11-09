@@ -172,13 +172,13 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Iterator<T> iterator(int first, int count) {
+	public Iterator<T> iterator(long first, long count) {
 		Session sess =  Databinder.getHibernateSession(factoryKey);
 		
 		if(queryBuilder != null) {
 			org.hibernate.Query q = queryBuilder.build(sess);
-			q.setFirstResult(first);
-			q.setMaxResults(count);
+			q.setFirstResult((int)first);
+			q.setMaxResults((int)count);
 			return q.iterate();
 		}			
 		
@@ -186,8 +186,8 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 		if (criteriaBuilder != null)
 			criteriaBuilder.buildOrdered(crit);
 		
-		crit.setFirstResult(first);
-		crit.setMaxResults(count);
+		crit.setFirstResult((int)first);
+		crit.setMaxResults((int)count);
 		return crit.list().iterator();
 	}
 	
@@ -196,13 +196,13 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	 * criteria projection is not possible.
 	 */
 	@Override
-	public int size() {
+	public long size() {
 		Session sess =  Databinder.getHibernateSession(factoryKey);
 
 		if(countQueryBuilder != null) {
 			org.hibernate.Query q = countQueryBuilder.build(sess);
 			Object obj = q.uniqueResult();
-			return ((Number) obj).intValue();
+			return ((Number) obj).longValue();
 		}
 		
 		Criteria crit = sess.createCriteria(objectClass);
@@ -211,7 +211,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 			criteriaBuilder.buildUnordered(crit);
 		crit.setProjection(Projections.rowCount());
 		Number size = (Number) crit.uniqueResult();
-		return size == null ? 0 : size.intValue();
+		return size == null ? 0 : size.longValue();
 	}
 
 

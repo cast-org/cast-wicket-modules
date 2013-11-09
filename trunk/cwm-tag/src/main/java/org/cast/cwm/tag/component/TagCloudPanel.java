@@ -136,7 +136,7 @@ public class TagCloudPanel extends Panel {
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				listView = false;
-				target.addComponent(TagCloudPanel.this);
+				target.add(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
@@ -148,7 +148,7 @@ public class TagCloudPanel extends Panel {
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				listView = true;
-				target.addComponent(TagCloudPanel.this);
+				target.add(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
@@ -162,7 +162,7 @@ public class TagCloudPanel extends Panel {
 			public void onClick(AjaxRequestTarget target) {
 				sortFreq = false;
 				sortTagList();
-				target.addComponent(TagCloudPanel.this);
+				target.add(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
@@ -175,7 +175,7 @@ public class TagCloudPanel extends Panel {
 			public void onClick(AjaxRequestTarget target) {
 				sortFreq = true;
 				sortTagList();
-				target.addComponent(TagCloudPanel.this);
+				target.add(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {

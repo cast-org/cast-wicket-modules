@@ -23,7 +23,8 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.injection.Injector;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.cast.cwm.service.IEventService;
 
@@ -74,7 +75,7 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 	@Override
 	public void renderHead(Component component, IHeaderResponse response) {
 		// setup a global js variable with the callback URL
-		response.renderJavaScript("var logJsEventCallbackUrl = '" + this.getCallbackUrl() + "';", "logJsEventCallbackUrl");
+		response.render(JavaScriptHeaderItem.forScript("var logJsEventCallbackUrl = '" + this.getCallbackUrl() + "';", "logJsEventCallbackUrl"));
 		super.renderHead(component, response);
 	}		
 }

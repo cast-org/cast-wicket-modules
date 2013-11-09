@@ -30,8 +30,11 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.border.Border;
 import org.apache.wicket.model.IModel;
@@ -39,7 +42,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.cast.cwm.JQueryHeaderContributor;
 import org.cast.cwm.components.ShyLabel;
 import org.cast.cwm.service.IEventService;
 
@@ -402,26 +404,25 @@ public class DialogBorder extends Border implements IHeaderContributor {
         // and so that they display on top of other content in older IE versions that don't respect z-index.
         if (moveContainer != null && moveContainer.contains(this, true)) {
         	moveContainer.setOutputMarkupId(true);
-        	response.renderOnDomReadyJavaScript("$('#" + moveContainer.getMarkupId() + "').detach().appendTo('body');");
+        	response.render(OnDomReadyHeaderItem.forScript("$('#" + moveContainer.getMarkupId() + "').detach().appendTo('body');"));
         } else {
-        	response.renderOnDomReadyJavaScript(
+        	response.render(OnDomReadyHeaderItem.forScript(
 				"$('#" + contentContainer.getMarkupId() + "').detach().appendTo('body');"
-				+ (masking ? "$('#" + overlay.getMarkupId() + "').detach().appendTo('body');" : ""));
+				+ (masking ? "$('#" + overlay.getMarkupId() + "').detach().appendTo('body');" : "")));
         }
 	}
 	
 	protected void renderJSinclusions(final IHeaderResponse response) {
-		new JQueryHeaderContributor().renderHead(response);
-		response.renderJavaScriptReference(JS_REFERENCE);
+		response.render(JavaScriptHeaderItem.forReference(JS_REFERENCE));
 	}
 
 	protected void renderCSSinclusions(final IHeaderResponse response) {
-		response.renderCSSReference(BLOCKING_CSS_REFERENCE);
+		response.render(CssHeaderItem.forReference(BLOCKING_CSS_REFERENCE));
 		if (styleReferences == null)
-			response.renderCSSReference(new PackageResourceReference(DialogBorder.class, "modal.css"));
+			response.render(CssHeaderItem.forReference(new PackageResourceReference(DialogBorder.class, "modal.css")));
 		else
 			for (ResourceReference ref : styleReferences)
-				response.renderCSSReference(ref);
+				response.render(CssHeaderItem.forReference(ref));
 	}
 	
 	/**

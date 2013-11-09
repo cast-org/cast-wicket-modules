@@ -27,8 +27,9 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
@@ -151,9 +152,9 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
-		response.renderJavaScript("function save_" + getMarkupId() + "() {" +
+		response.render(JavaScriptHeaderItem.forScript("function save_" + getMarkupId() + "() {" +
 				"wicketAjaxGet('" + notifyBehavior.getCallbackUrl() + "'); }", 
-				"save_" + getMarkupId());
+				"save_" + getMarkupId()));
 	}
 
 	class AudioFileSaveAjaxBehavior extends AbstractAjaxBehavior {

@@ -25,8 +25,10 @@ import net.databinder.auth.AuthDataSessionBase;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -153,7 +155,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			cwmService.flushChanges();
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();
-			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters("expired=true"));
+			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters().set("expired", "true"));
 		
 		// We're not signed in; redirect to home because page is no longer functional
 		} else {
@@ -171,7 +173,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			throw new IllegalStateException("Warning time must be less than session time.");
 		}
 
-		response.renderJavaScriptReference(JAVASCRIPT_REFERENCE);
+		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
 		StringBuffer script = new StringBuffer();
 		script.append("SessionExpireWarning.init(");
 		script.append(CwmApplication.get().getSessionTimeout() + ", ");
@@ -184,7 +186,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		script.append("}");
 		script.append(");"); 
 		
-		response.renderOnDomReadyJavaScript(script.toString());
+		response.render(OnDomReadyHeaderItem.forScript(script.toString()));
 	}
 	
 	protected String getBeforeInactiveTimeoutJavaScript() {

@@ -36,8 +36,9 @@ import org.apache.wicket.authroles.authorization.strategies.role.annotations.Aut
 import org.apache.wicket.datetime.PatternDateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -190,7 +191,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		responseListContainer.setOutputMarkupId(true);
 		add(responseListContainer);
 		
-		ISortableDataProvider<Response> provider = responseService.getResponseProviderForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel());
+		ISortableDataProvider<Response,String> provider = responseService.getResponseProviderForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel());
 		
 		dataView = new DataView<Response>("responseList", provider) {
 
@@ -462,7 +463,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css"));
+		response.render(CssHeaderItem.forReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css")));
 	} 
 	
 	@Override

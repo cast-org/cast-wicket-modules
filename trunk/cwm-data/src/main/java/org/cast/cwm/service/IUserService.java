@@ -64,12 +64,12 @@ public interface IUserService {
 
 	UserListModel getByRole(Role role);
 
-	ISortableDataProvider<User> getUserListProvider();
+	ISortableDataProvider<User,String> getUserListProvider();
 
-	ISortableDataProvider<User> getUserListProvider(
+	ISortableDataProvider<User,String> getUserListProvider(
 			IModel<Period> mPeriod);
 
-	ISortableDataProvider<User> getUncachedUserListProvider(
+	ISortableDataProvider<User,String> getUncachedUserListProvider(
 			IModel<Period> mPeriod);
 
 	/**

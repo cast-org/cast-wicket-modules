@@ -23,11 +23,12 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.cast.cwm.JQueryHeaderContributor;
 import org.cast.cwm.components.ClassAttributeModifier;
 
 /**
@@ -99,17 +100,16 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	
 	@Override
 	public void renderHead(Component component, final IHeaderResponse response) {
-		new JQueryHeaderContributor().renderHead(response);
 		super.renderHead(component, response);
 		
 		// Run once to initialize
-		response.renderJavaScriptReference(AUTOSAVING_JAVASCRIPT);
-		response.renderJavaScript("AutoSaver.setup(" + updateInterval + ");", "AjaxAutoSavingBehaviorSetup");
+		response.render(JavaScriptHeaderItem.forReference(AUTOSAVING_JAVASCRIPT));
+		response.render(JavaScriptHeaderItem.forScript("AutoSaver.setup(" + updateInterval + ");", "AjaxAutoSavingBehaviorSetup"));
 		
-		response.renderOnDomReadyJavaScript("AutoSaver.makeLinksSafe();");
+		response.render(OnDomReadyHeaderItem.forScript("AutoSaver.makeLinksSafe();"));
 
 		// Run each time to register this Form's default values and call-back URL with the AutoSaver
-		response.renderOnDomReadyJavaScript("AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');");		
+		response.render(OnDomReadyHeaderItem.forScript("AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');"));
 	}
 
 	/**

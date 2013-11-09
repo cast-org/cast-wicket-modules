@@ -77,7 +77,7 @@ public class DomCache {
 			if (updated == 0)
 				updated = cacheElt.getCreationTime();
 		}
-		return (updated == 0 ? null : Time.valueOf(updated));
+		return (updated == 0 ? null : Time.millis(updated));
 	}
 
 	

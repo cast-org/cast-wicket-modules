@@ -112,11 +112,11 @@ public interface IResponseService {
 	IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p,
 			IModel<Period> period);
 
-	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p);
+	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p);
 
-	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u);
+	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u);
 
-	public ISortableDataProvider<Response> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod);
+	public ISortableDataProvider<Response,String> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod);
 	
 	/**
 	 * Get the total number of valid responses for the given prompt.
