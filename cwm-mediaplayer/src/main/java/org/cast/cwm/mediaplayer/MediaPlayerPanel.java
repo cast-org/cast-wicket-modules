@@ -21,8 +21,10 @@ package org.cast.cwm.mediaplayer;
 
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -167,7 +169,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	@Override
 	public void renderHead(IHeaderResponse r) {
 
-		r.renderJavaScriptReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js"));
+		r.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js")));
 
 		StringBuffer jsString = new StringBuffer();
 		jsString.append("jwplayer(" + "\"" + getMarkupId() + "\").setup({" +
@@ -201,10 +203,10 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		jsString.append("}"); // end plugins
 
 		jsString.append("});"); // end setup
-		r.renderOnDomReadyJavaScript(jsString.toString());
+		r.render(OnDomReadyHeaderItem.forScript(jsString.toString()));
 		
 		if (useOnPlay) {
-			r.renderOnDomReadyJavaScript(getEventScript());
+			r.render(OnDomReadyHeaderItem.forScript(getEventScript()));
 		}
 	}
 	

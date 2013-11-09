@@ -109,17 +109,19 @@ public class UserFormPage extends AdminPage {
 			repeater.add(site);
 			repeater.add(period);
 			
-			site.add(new BookmarkablePageLink<Void>("link", SiteInfoPage.class)
-					.setParameter("siteId", periodModel.getObject().getSite().getId())
+			PageParameters pp = new PageParameters();
+			pp.set("siteId", periodModel.getObject().getSite().getId());
+			site.add(new BookmarkablePageLink<Void>("link", SiteInfoPage.class, pp)
 					.add(new Label("label", periodModel.getObject().getSite().getName())));
 
-			period.add(new BookmarkablePageLink<Void>("link", PeriodInfoPage.class)
-					.setParameter("periodId", periodModel.getObject().getId())
+			PageParameters pp2 = new PageParameters();
+			pp2.set("periodId", periodModel.getObject().getId());
+			period.add(new BookmarkablePageLink<Void>("link", PeriodInfoPage.class, pp2)
 					.add(new Label("label", periodModel.getObject().getName())));
 			period.add(AttributeModifier.replace("class", "addSeparator"));
 
-		// Breadcrumb link back to List of Users
 		}  else {
+			// Breadcrumb link back to List of Users
 			WebMarkupContainer item = new WebMarkupContainer(repeater.newChildId());
 			repeater.add(item);
 			

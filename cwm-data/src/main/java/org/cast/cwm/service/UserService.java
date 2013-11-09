@@ -170,8 +170,8 @@ public class UserService implements IUserService {
 	public IModel<User> getAllByEmail (String email) {
 
 		// Sort valid users to the top
-		SingleSortState sort = new SingleSortState();
-		SortParam sortParam = new SortParam("valid", false);
+		SingleSortState<String> sort = new SingleSortState<String>();
+		SortParam<String> sortParam = new SortParam<String>("valid", false);
 		sort.setSort(sortParam);
 
 		// it is possible to return both valid and invalid
@@ -212,7 +212,7 @@ public class UserService implements IUserService {
 	 * @see org.cast.cwm.service.IUserService#getUserListProvider()
 	 */
 	@Override
-	public ISortableDataProvider<User> getUserListProvider() {
+	public ISortableDataProvider<User,String> getUserListProvider() {
 		return getUserListProvider(null);
 	}
 	
@@ -220,7 +220,7 @@ public class UserService implements IUserService {
 	 * @see org.cast.cwm.service.IUserService#getUserListProvider(org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public ISortableDataProvider<User> getUserListProvider(IModel<Period> mPeriod) {
+	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
 		return new SortableHibernateProvider<User>(User.class, c);
@@ -230,7 +230,7 @@ public class UserService implements IUserService {
 	 * @see org.cast.cwm.service.IUserService#getUncachedUserListProvider(org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public ISortableDataProvider<User> getUncachedUserListProvider(IModel<Period> mPeriod) {
+	public ISortableDataProvider<User,String> getUncachedUserListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
 		c.setCacheResults(false);

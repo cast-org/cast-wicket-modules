@@ -128,7 +128,7 @@ public class TestUserContentLogPage {
 		@Override
 		public AuditDataProvider<UserContent, DefaultRevisionEntity> getDataProvider() {
 			AuditDataProvider<UserContent,DefaultRevisionEntity> mockProvider = mock(AuditDataProvider.class);
-			when(mockProvider.size()).thenReturn(1);
+			when(mockProvider.size()).thenReturn(1L);
 			when(mockProvider.model(any(AuditTriple.class))).thenCallRealMethod(); // wraps argument in a model.
 			doReturn(getMockDataIterator()).when(mockProvider).iterator(anyInt(), anyInt());
 			return mockProvider;

@@ -42,12 +42,6 @@ import com.google.inject.Inject;
 /**
  * A simple Sign-In form for authenticating users.
  * 
- * Form must be statefull because RSAPasswordTextField has a 'challenge' field that must be consistent
- * between requests.
- * 
- * TODO: Databinder RSAPasswordTextField fails HTML validation.
- * 
- * 
  * @author jbrookover
  *
  */
@@ -101,9 +95,9 @@ public class SignInFormPanel extends Panel {
 			
 			eventService.createLoginSession(getRequest());
 			eventService.saveLoginEvent();
-			if (!continueToOriginalDestination()) {
-				setResponsePage(CwmApplication.get().getHomePage(CwmSession.get().getUser().getRole()));
-			}
+			continueToOriginalDestination();
+			// if we reach this line, there was no stored destination; load home page.
+			setResponsePage(CwmApplication.get().getHomePage(CwmSession.get().getUser().getRole()));
 		}
 	}
 }

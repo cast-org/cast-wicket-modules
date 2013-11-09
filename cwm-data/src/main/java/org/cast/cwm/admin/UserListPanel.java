@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -55,8 +56,8 @@ public class UserListPanel extends Panel {
 
 	public UserListPanel(String id) {
 		super(id);
-		ISortableDataProvider<User> provider = getDataProvider(getCriteriaBuilder());
-		DefaultDataTable<User> table = new DefaultDataTable<User>("userList", makeColumns(), provider, 25);
+		ISortableDataProvider<User,String> provider = getDataProvider(getCriteriaBuilder());
+		DefaultDataTable<User,String> table = new DefaultDataTable<User,String>("userList", makeColumns(), provider, 25);
 		table.addBottomToolbar(new NavigationToolbar(table));
 		add(table);
 	}
@@ -67,7 +68,7 @@ public class UserListPanel extends Panel {
 		return builder;
 	}
 	
-	protected ISortableDataProvider<User> getDataProvider(UserCriteriaBuilder builder) {
+	protected ISortableDataProvider<User,String> getDataProvider(UserCriteriaBuilder builder) {
 		SortableHibernateProvider<User> provider = new SortableHibernateProvider<User>(User.class, builder);
 		provider.setWrapWithPropertyModel(false);
 		return provider;
@@ -83,16 +84,16 @@ public class UserListPanel extends Panel {
 		return this;
 	}
 	
-	protected List<IColumn<User>> makeColumns() {
-		List<IColumn<User>> columns = new ArrayList<IColumn<User>>();
+	protected List<IColumn<User,String>> makeColumns() {
+		List<IColumn<User,String>> columns = new ArrayList<IColumn<User,String>>();
 				
-		columns.add(new PropertyColumn<User>(new Model<String>("User Name"), "username", "username"));
-		columns.add(new PropertyColumn<User>(new Model<String>("First Name"), "firstName", "firstName"));
-		columns.add(new PropertyColumn<User>(new Model<String>("Last Name"), "lastName", "lastName"));
-		columns.add(new PropertyColumn<User>(new Model<String>("Role"), "role", "role"));
-		columns.add(new PropertyColumn<User>(new Model<String>("Permission"), "permission", "permission"));
+		columns.add(new PropertyColumn<User,String>(new Model<String>("User Name"), "username", "username"));
+		columns.add(new PropertyColumn<User,String>(new Model<String>("First Name"), "firstName", "firstName"));
+		columns.add(new PropertyColumn<User,String>(new Model<String>("Last Name"), "lastName", "lastName"));
+		columns.add(new PropertyColumn<User,String>(new Model<String>("Role"), "role", "role"));
+		columns.add(new PropertyColumn<User,String>(new Model<String>("Permission"), "permission", "permission"));
 		
-		columns.add(new AbstractColumn<User>(new Model<String>("Edit")) {
+		columns.add(new AbstractColumn<User,String>(new Model<String>("Edit")) {
 
 			private static final long serialVersionUID = 1L;
 
@@ -118,8 +119,9 @@ public class UserListPanel extends Panel {
 
 		public EditLinkFragment(String id, IModel<User> model) {
 			super(id, "editLinkFragment", UserListPanel.this, model);
-			add(new BookmarkablePageLink<Void>("link", UserFormPage.class)
-					.setParameter("userId", model.getObject().getId()));
+			PageParameters pp = new PageParameters();
+			pp.set("userId", model.getObject().getId());
+			add(new BookmarkablePageLink<Void>("link", UserFormPage.class, pp));
 		}
 	}
 	

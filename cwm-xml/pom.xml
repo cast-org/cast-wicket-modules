@@ -14,6 +14,10 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.cast.cwm</groupId>
+			<artifactId>cwm-base</artifactId>
+		</dependency>
+	    <dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 		</dependency>
@@ -37,15 +41,6 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.wicket</groupId>
-			<artifactId>wicket</artifactId>
-			<type>pom</type>
-		</dependency>
-		<dependency>
-			<groupId>org.cast.cwm</groupId>
-			<artifactId>cwm-base</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

@@ -92,7 +92,7 @@ public class ApproximateDateLabel extends DateLabel {
 			} else {
 				pattern = DEFAULT_PATTERN;
 			}
-			return DateTimeFormat.forPattern(pattern).withLocale(getLocale()).withPivotYear(2000);
+			return DateTimeFormat.forPattern(pattern);
 		}
 
 		@Override

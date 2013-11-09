@@ -25,8 +25,6 @@ import lombok.Setter;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
-import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.Strings;
@@ -105,7 +103,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	}
 	
 	@Override
-	protected CharSequence getCallbackScript() {
+	public CharSequence getCallbackScript() {
 		if (queryStringExpression == null)
 			return super.getCallbackScript();
 		else

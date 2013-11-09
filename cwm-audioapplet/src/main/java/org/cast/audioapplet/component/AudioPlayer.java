@@ -23,16 +23,15 @@ import java.io.OutputStream;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.components.DeployJava;
-import org.wicketstuff.jslibraries.JSLib;
-import org.wicketstuff.jslibraries.Library;
-import org.wicketstuff.jslibraries.VersionDescriptor;
 
 /**
  * A component that holds the Java audio applet, and HTML to communicate with it for playing audio.
@@ -166,10 +165,8 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		response.renderCSSReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.css"));
-		// TODO - centralize JQuery versioning
-		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.JQUERY, 1, 8));
-		response.renderJavaScriptReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.js"));
+		response.render(CssHeaderItem.forReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.css")));
+		response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.js")));
 	}
 
 	class AudioFileLoadAjaxBehavior extends AbstractAjaxBehavior {

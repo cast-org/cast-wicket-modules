@@ -30,8 +30,9 @@ import org.apache.wicket.SharedResources;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.ContextRelativeResource;
@@ -327,7 +328,8 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 		final IValueMap tagAttributes = tag.getAttributes();
 		appletAttributes.putAll(tagAttributes);
 		tagAttributes.clear();
-		if (AjaxRequestTarget.get() == null) {
+		AjaxRequestTarget target = getRequestCycle().find(AjaxRequestTarget.class);
+		if (target == null) {
 			tag.setName("script");
 			tagAttributes.put("type", "text/javascript");
 		} else {
@@ -347,7 +349,8 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	public void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag) {
 
 		// If this is being directly rendered, use Sun's Deployment Toolkit.
-		if (AjaxRequestTarget.get() == null) {
+		AjaxRequestTarget target = getRequestCycle().find(AjaxRequestTarget.class);
+		if (target == null) {
 			final StringBuilder deployScript = new StringBuilder();
 			if (appletAttributes.size() > 0) {
 				deployScript.append("var attributes = {");
@@ -395,7 +398,8 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	 */
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		if (AjaxRequestTarget.get() == null)
-			response.renderJavaScriptReference(JAVASCRIPT_URL);
+		AjaxRequestTarget target = getRequestCycle().find(AjaxRequestTarget.class);
+		if (target == null)
+			response.render(JavaScriptHeaderItem.forUrl(JAVASCRIPT_URL));
 	}
 }

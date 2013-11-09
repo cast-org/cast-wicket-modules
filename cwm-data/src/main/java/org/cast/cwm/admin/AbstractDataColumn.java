@@ -35,7 +35,7 @@ import org.apache.wicket.model.Model;
  * @author bgoldowsky
  *
  */
-public abstract class AbstractDataColumn<E> extends AbstractColumn<E> implements IDataColumn<E> {
+public abstract class AbstractDataColumn<E> extends AbstractColumn<E,String> implements IDataColumn<E> {
 
 	private static final long serialVersionUID = 1L;
 	

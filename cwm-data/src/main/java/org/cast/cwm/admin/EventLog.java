@@ -110,9 +110,9 @@ public class EventLog extends AdminPage {
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
 		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
-		ArrayList<IColumn<Event>> colList = new ArrayList<IColumn<Event>>(columns);
-		DataTable<Event> table = new DataTable<Event>("eventtable", colList, eventsprovider, 30);
-		table.addTopToolbar(new HeadersToolbar(table, eventsprovider));
+		ArrayList<IColumn<Event,String>> colList = new ArrayList<IColumn<Event,String>>(columns);
+		DataTable<Event,String> table = new DataTable<Event,String>("eventtable", colList, eventsprovider, 30);
+		table.addTopToolbar(new HeadersToolbar<String>(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
@@ -125,8 +125,8 @@ public class EventLog extends AdminPage {
 
 	protected OrderingCriteriaBuilder makeCriteriaBuilder() {
 		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
-		SingleSortState defaultSort = new SingleSortState();
-		defaultSort.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
+		SingleSortState<String> defaultSort = new SingleSortState<String>();
+		defaultSort.setSort(new SortParam<String>("insertTime", false)); // Sort by Insert Time by default
 		eventCriteriaBuilder.setSortState(defaultSort);
 		return eventCriteriaBuilder;
 	}
@@ -300,7 +300,7 @@ public class EventLog extends AdminPage {
 		@Override
 		public void buildOrdered(Criteria criteria) {
 			buildUnordered(criteria);
-			SortParam sort = ((SingleSortState) getSortState()).getSort();
+			SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
 			if (sort != null) {
 				if (sort.isAscending())
 					criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());

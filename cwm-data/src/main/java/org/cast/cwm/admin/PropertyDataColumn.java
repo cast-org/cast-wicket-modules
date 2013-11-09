@@ -31,7 +31,7 @@ import org.apache.wicket.model.Model;
  * @author bgoldowsky
  *
  */
-public class PropertyDataColumn<E> extends PropertyColumn<E> implements IDataColumn<E> {
+public class PropertyDataColumn<E> extends PropertyColumn<E,String> implements IDataColumn<E> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,7 +51,7 @@ public class PropertyDataColumn<E> extends PropertyColumn<E> implements IDataCol
 
 	@Override
 	public String getItemString(IModel<E> rowModel) {
-		Object rowObj = createLabelModel(rowModel).getObject();
+		Object rowObj = getDataModel(rowModel).getObject();
 		return rowObj==null ? "" : rowObj.toString();
 	}
 

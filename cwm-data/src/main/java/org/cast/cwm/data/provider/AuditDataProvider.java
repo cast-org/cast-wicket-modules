@@ -42,9 +42,11 @@ import org.hibernate.envers.query.property.RevisionNumberPropertyName;
  *
  * @param <E> type of the @Audited @Entity being queried.
  * @param <R> type of the @RevisionEntity in your app.
+ * 
+ * TODO: allow parameterization of sort field type
  */
 public  class AuditDataProvider<E extends Serializable, R extends Serializable> 
-		implements ISortableDataProvider<AuditTriple<E,R>> {
+		implements ISortableDataProvider<AuditTriple<E,R>,String> {
 
 	private static final long serialVersionUID = 1L;
 	private ISortableAuditQueryBuilder builder;
@@ -60,19 +62,19 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<? extends AuditTriple<E, R>> iterator(int first, int count) {
+	public Iterator<? extends AuditTriple<E, R>> iterator(long first, long count) {
 		AuditQuery query = builder.buildSorted(Databinder.getHibernateSession());
-		query.setFirstResult(first);
-		query.setMaxResults(count);
+		query.setFirstResult((int)first);
+		query.setMaxResults((int)count);
 		return new AuditIteratorAdapter<E,R>(query.getResultList().iterator());
 	}
 
 	@Override
-	public int size() {
+	public long size() {
 		AuditQuery query = builder.build(Databinder.getHibernateSession());
 		query.addProjection(new AuditProperty<Long>(new RevisionNumberPropertyName()).count());
 		Number size = (Number) query.getSingleResult();
-		return size == null ? 0 : size.intValue();
+		return size == null ? 0 : size.longValue();
 	}
 
 	@Override
@@ -81,7 +83,7 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 	}
 
 	@Override
-	public ISortState getSortState() {
+	public ISortState<String> getSortState() {
 		// TODO Auto-generated method stub
 		return null;
 	}

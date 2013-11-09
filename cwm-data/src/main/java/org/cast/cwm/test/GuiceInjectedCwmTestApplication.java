@@ -22,6 +22,7 @@ package org.cast.cwm.test;
 import java.util.Map;
 
 import org.apache.wicket.Page;
+import org.apache.wicket.util.file.Path;
 import org.apache.wicket.util.tester.DummyHomePage;
 
 public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplication<T> {
@@ -34,7 +35,7 @@ public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplica
     public void init() {
             super.init();
             // Check separate "theme" folder for markup and XSL styles.
-            getResourceSettings().addResourceFolder(getThemeDir());
+            getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));
     }
 
     private String getThemeDir() {

@@ -105,7 +105,7 @@ public class TaggingsListPanel extends Panel {
 					@Override
 					public void onClick(AjaxRequestTarget target) {
 						TagService.get().removeTagging(ting);
-						target.addComponent(TaggingsListPanel.this);
+						target.add(TaggingsListPanel.this);
 						target.addChildren(findParent(TagPanel.class), TagList.class);
 					}
 				});

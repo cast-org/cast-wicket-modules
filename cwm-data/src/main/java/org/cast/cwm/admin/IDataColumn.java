@@ -30,9 +30,11 @@ import org.apache.wicket.model.IModel;
  * @see org.apache.wicket.Component.IColumn 
  * 
  * @author bgoldowsky
+ * 
+ * TODO: allow parameterization of sort field type
  *
  */
-public interface IDataColumn<E> extends IColumn<E> {
+public interface IDataColumn<E> extends IColumn<E,String> {
 
 	public String getHeaderString();
 	
