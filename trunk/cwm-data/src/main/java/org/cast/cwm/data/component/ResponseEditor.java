@@ -35,12 +35,16 @@ import lombok.Setter;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxCallListener;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
+import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -422,30 +426,27 @@ public abstract class ResponseEditor extends Panel {
 				}
 
 				@Override
-				protected IAjaxCallDecorator getAjaxCallDecorator() {
-					return new AjaxCallDecorator() {
-						private static final long serialVersionUID = 1L;
+				protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+					super.updateAjaxAttributes(attributes);
+					// Call the Javascript to actually add the sentence starter into the text area. 
+				    AjaxCallListener adder = new AjaxCallListener() {
+				        private static final long serialVersionUID = 1L;
 						@Override
-						public CharSequence decorateScript(Component c, CharSequence script) {
-							// The Javascript to actually add the sentence starter into the text area. 
-							String adder;
+				        public CharSequence getBeforeSendHandler(Component component) {
 							if (useWysiwyg)
-								adder = String.format("tinyMCE.get('%s').setContent(tinyMCE.get('%s').getContent() + $('#%s').val());",
+								return String.format("tinyMCE.get('%s').setContent(tinyMCE.get('%s').getContent() + $('#%s').val());",
 										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
 							else
-								adder = String.format("$('#%s').val($('#%s').val() + $('#%s').val());",
+								return String.format("$('#%s').val($('#%s').val() + $('#%s').val());",
 										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
-
-							return adder + script; 
-						}						
-					};
+				        }
+				    };
+				    attributes.getAjaxCallListeners().add(adder);
 				}
 			};
 			add(addStarterLink);
 			
-			// add the sentence starter chosen to the text area response
-
-	         // label is linked to the sentence starter dropdown		
+			// label is linked to the sentence starter dropdown		
 			FormComponentLabel choiceListLabel = (new FormComponentLabel("sentenceStartersLabel", choiceList));
 			add(choiceListLabel);
 		}
@@ -557,7 +558,7 @@ public abstract class ResponseEditor extends Panel {
 						// Autosave will then submit the form to store the text area back to the db
 						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-						response.renderJavaScript(script, "interactiveAutosave-" + textAreaMarkupId);					
+						response.render(JavaScriptHeaderItem.forScript(script, "interactiveAutosave-" + textAreaMarkupId));
 					}
 
 					@Override
@@ -573,17 +574,17 @@ public abstract class ResponseEditor extends Panel {
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				protected IAjaxCallDecorator getAjaxCallDecorator() {
-					return new DisablingAjaxCallDecorator(getComponents()) {
-						private static final long serialVersionUID = 1L;
-
+				protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+					super.updateAjaxAttributes(attributes);
+				    AjaxCallListener exporter = new AjaxCallListener() {
+				        private static final long serialVersionUID = 1L;
 						@Override
-						// this is what needs to be called right before the submit - send the table value to the hidden text field
-						public CharSequence decorateScript(Component c, CharSequence script) {
-							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
-							return jsString + super.decorateScript(c, script);
+				        public CharSequence getBeforeSendHandler(Component component) {
+							// this is what needs to be called right before the submit - send the table value to the hidden text field
+							return "cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");";
 						}
 					};
+					attributes.getAjaxCallListeners().add(exporter);
 				}
 
 				@Override
@@ -738,17 +739,17 @@ public abstract class ResponseEditor extends Panel {
 
 		@Override
 		public void renderHead(IHeaderResponse response) {		
-			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
-			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
-			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
-			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
-			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
+			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js")));
+			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js")));
+			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js"))); // tabbing
+			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js")));
+			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js")));
 
-			response.renderCSSReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
+			response.render(CssHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css")));
 
 			// once the text for the grid is available via the url make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', 'false');");
-			response.renderOnDomReadyJavaScript(jsString);
+			response.render(OnDomReadyHeaderItem.forScript(jsString));
 		}
 	}
 
@@ -913,7 +914,7 @@ public abstract class ResponseEditor extends Panel {
 							"AutoSaver.addOnBeforeSaveCallBack(function() { " +
 							"   $('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString()));" +
 							"});";
-						response.renderJavaScript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
+						response.render(JavaScriptHeaderItem.forScript(script, "SvgEditorAutosave-" + svg.getMarkupId()));
 					}
 
 					@Override
@@ -939,18 +940,18 @@ public abstract class ResponseEditor extends Panel {
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
 				}
-					
-				@Override
-				protected IAjaxCallDecorator getAjaxCallDecorator() {
-					return new DisablingAjaxCallDecorator(getComponents()) {
-						
-						private static final long serialVersionUID = 1L;
 
+				@Override
+				protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+					super.updateAjaxAttributes(attributes);
+				    AjaxCallListener svgExporter = new AjaxCallListener() {
+				        private static final long serialVersionUID = 1L;
 						@Override
-						public CharSequence decorateScript(Component c, CharSequence script) {
-							return "$('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString())); " + super.decorateScript(c, script);
+				        public CharSequence getBeforeSendHandler(Component component) {
+							return "$('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString())); ";
 						}
 					};
+					attributes.getAjaxCallListeners().add(svgExporter);
 				}
 
 				@Override

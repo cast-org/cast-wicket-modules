@@ -365,7 +365,7 @@ public class ResponseService implements IResponseService {
 		dataProvider.getSortState().setPropertySortOrder("sortOrder", SortOrder.ASCENDING);
 		
 		if (index == null)
-			index = dataProvider.size() - 1;
+			index = (int)dataProvider.size() - 1;
 		
 		if (index < 0)
 			throw new IllegalArgumentException("Index cannot be negative.");
