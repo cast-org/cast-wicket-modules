@@ -49,6 +49,7 @@ var AutoSaver = {
 							AutoSaver.logger("AutoSave: form " + form.attr('id') + " has no callback URL set");
 						} else {
 							AutoSaver.logger("AutoSave: saving form " + form.attr('id') + " to " + callback);
+							// TODO fix this
 							wicketSubmitFormById(
 									form.attr('id'), // Form Id
 									callback + '&autosave=true', // Wicket Ajax Behavior URL 

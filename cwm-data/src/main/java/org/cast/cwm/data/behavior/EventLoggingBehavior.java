@@ -22,13 +22,13 @@ package org.cast.cwm.data.behavior;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.Strings;
-import org.cast.cwm.CwmSession;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +48,12 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(EventLoggingBehavior.class);
-	private static final String queryVar = "EventLoggingBehaviorDetailParameter";
+	private static final String queryVar = "EventDetail";
 	
 	/**
 	 * The event code.
 	 */
-	private String eventCode;
+	private String eventType;
 	
 	/**
 	 * The detail of the event.
@@ -67,12 +67,15 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	@Getter @Setter
 	private String pageName;
 	
-	/**
-	 * Javascript to be executed on the client side before
-	 * the AJAX logging request.
-	 */
-	@Getter @Setter
-	private String javascript;
+//	/**
+//	 * Javascript to be executed on the client side before
+//	 * the AJAX logging request.
+//	 * 
+//	 * TODO, bring this back, with a more descriptive name, if it's actually used.
+//	 * Will require an AjaxCallListener, see https://cwiki.apache.org/confluence/display/WICKET/Wicket+Ajax
+//	 */
+//	@Getter @Setter
+//	private String javascript;
 	
 	/**
 	 * Expression that will be evaluated on the client and
@@ -89,6 +92,9 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	
 	@Inject
 	private IEventService eventService;
+	
+	@Inject
+	private ICwmSessionService cwmSessionService;
 
 	/**
 	 * Constructor
@@ -96,28 +102,30 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	 * @param jsEvent the client-side event (e.g. onclick)
 	 * @param eventCode the logging event code
 	 */
-	public EventLoggingBehavior(String jsEvent, String eventCode) {
+	public EventLoggingBehavior(String jsEvent, String eventType) {
 		super(jsEvent);
-		this.eventCode = eventCode;
+		this.eventType = eventType;
 		Injector.get().inject(this);
 	}
 	
 	@Override
-	public CharSequence getCallbackScript() {
-		if (queryStringExpression == null)
-			return super.getCallbackScript();
-		else
-			return generateCallbackScript("wicketAjaxGet('" + 
-					getCallbackUrl() + "&" + queryVar + "=' + " + queryVar);
-	}
+	protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+	    super.updateAjaxAttributes(attributes);
 
+	    if (queryStringExpression != null) {
+		    // Add detail string dynamically
+		    attributes.getDynamicExtraParameters().add(String.format("{ %s : %s }",
+		    		queryVar, queryStringExpression));
+	    }
+	}
+	
 	@Override
 	protected void onEvent(AjaxRequestTarget target) {
 		// Construct Detail
 		StringBuffer finalDetail = new StringBuffer();
 		if (!Strings.isEmpty(detail))
 			finalDetail.append(detail);
-		
+
 		// Additional detail from client side
 		String clientSideInfo = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(queryVar).toString();
 		if (!Strings.isEmpty(clientSideInfo)) {
@@ -127,40 +135,10 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 		}
 		
 		// Log Event
-		if (CwmSession.get().isSignedIn())
-			eventService.saveEvent(eventCode, finalDetail.toString(), pageName);
+		if (cwmSessionService.isSignedIn())
+			eventService.saveEvent(eventType, finalDetail.toString(), pageName);
 		else
-			log.info("Event triggered for non-logged in user: {}, {}, {}", new Object[] {eventCode, finalDetail, pageName});
+			log.info("Event triggered for non-logged in user: {}, {}, {}", new Object[] {eventType, finalDetail, pageName});
 	}
 	
-	/**
-	 * This method is final because of the option to add a pre-pending script and
-	 * client-side detail.  While this limits future flexibility, it makes the 
-	 * common case MUCH easier.
-	 */
-	@Override
-	final protected IAjaxCallDecorator getAjaxCallDecorator() {
-		
-		final StringBuffer preScript = new StringBuffer();
-		
-		if (javascript != null) {
-			preScript.append(javascript).append("; ");
-		}
-		if (queryStringExpression != null)
-			preScript.append("var " + queryVar + " = " + queryStringExpression + "; ");
-		
-		if (preScript.length() > 0) {
-			return new AjaxCallDecorator() {
-				
-				private static final long serialVersionUID = 1L;
-				
-				@Override
-				public CharSequence decorateScript(Component c, CharSequence script) {
-					return preScript.toString() + script;
-				}
-			};
-		} else {
-			return super.getAjaxCallDecorator();
-		}
-	}
 }

@@ -26,7 +26,10 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -128,7 +131,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 			
 			Label label = new Label("label", i == 1 ? i + " Star" : i + " Stars");
 			label.setRenderBodyOnly(true);
-			item.add(AttributeModifier.set("for", radio.getMarkupId()));
+			item.add(AttributeModifier.replace("for", radio.getMarkupId()));
 			item.add(radio);
 			item.add(label);
 		}
@@ -140,7 +143,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 				onSave(target);
-				target.addComponent(StarPanel.this);
+				target.add(StarPanel.this);
 			}
 			
 			@Override
@@ -168,10 +171,9 @@ public class StarPanel extends Panel implements IHeaderContributor {
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		
-		response.renderJavaScriptReference(new PackageResourceReference(StarPanel.class, "star_rating.js"), "StarRating");
-		response.renderCSSReference(getStarCSSReference());
-		
-		response.renderOnDomReadyJavaScript("starRating.create('#" + getMarkupId() + " .stars')");
+		response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(StarPanel.class, "star_rating.js"), "StarRating"));
+		response.render(CssHeaderItem.forReference(getStarCSSReference()));
+		response.render(OnDomReadyHeaderItem.forScript("starRating.create('#" + getMarkupId() + " .stars')"));
 	}
 	
 	/**
