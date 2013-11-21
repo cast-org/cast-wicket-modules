@@ -67,6 +67,7 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.apache.wicket.util.time.Time;
@@ -112,8 +113,12 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected IModel<? extends Prompt> prompt;
 	@Getter @Setter protected String pageName;
 	@Getter @Setter protected IResponseType type;
+
 	@Getter @Setter protected List<String> starters = new ArrayList<String>();
+	@Getter @Setter protected List<ResourceReference> starterResourceReferences = new ArrayList<ResourceReference>();
 	@Getter @Setter protected String templateURL;
+	@Getter @Setter protected ResourceReference templateResourceReference;
+	
 	@Getter @Setter protected FeedbackPanel feedbackPanel;
 	@Getter @Setter protected boolean cancelVisible = true;
 	@Getter @Setter protected boolean saveVisible = true;
@@ -862,15 +867,13 @@ public abstract class ResponseEditor extends Panel {
 			svgEditor.addExtension(new SvgUploadExtensionImpl(getModel()));
 			
 			svgEditor.setMSvg(new DefaultSvgModel(model));
+
 			// Transform drawing starters into absolute URLs so that they work both in editor and viewer,
 			// which have different base hrefs.
-			if (starters != null) {
-				ArrayList<String> starterUrls = new ArrayList<String>(starters.size());
-				for (String starter : starters) {
-					String absoluteUrl = starter;
-					// TODO: Better way to determine external image
-					if (!starter.startsWith("http://"))
-						absoluteUrl = RequestUtils.toAbsolutePath(starter, getRequestCycle().getRequest().getUrl().getPath());
+			if (starterResourceReferences != null) {
+				ArrayList<String> starterUrls = new ArrayList<String>(starterResourceReferences.size());
+				for (ResourceReference starterResourceReference : starterResourceReferences) {
+					String absoluteUrl = getAbsoluteUrlAsString(starterResourceReference);
 					starterUrls.add(absoluteUrl);
 				}
 				svgEditor.setDrawingStarters(starterUrls);
@@ -1131,6 +1134,19 @@ public abstract class ResponseEditor extends Panel {
 		super.onDetach();
 	}
 	
+
+	/**
+	 * Return an absolute URL given a specific resource reference
+	 * 
+	 * @param starterResourceReference
+	 * @return
+	 */
+	public String getAbsoluteUrlAsString(ResourceReference starterResourceReference) {
+		String referenceUrl = getRequestCycle().mapUrlFor(starterResourceReference, null).toString();
+		String absoluteUrl = getRequest().getContextPath() + "/" + referenceUrl;
+		return absoluteUrl;
+	}
+
 	/**
 	 * Return an actual URL from a string that represents a URL
 	 * @param stringUrl
@@ -1178,14 +1194,11 @@ public abstract class ResponseEditor extends Panel {
 			if (baseSvg == null) {
 				
 				baseSvg = "<svg width=\"" + SvgEditor.CANVAS_WIDTH + "\" height=\"" + SvgEditor.CANVAS_HEIGHT + "\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">";
-				if (templateURL != null) {
-					String url;
-					try {
-						url = new URI(RequestUtils.toAbsolutePath(templateURL, getRequestCycle().getRequest().getUrl().getPath())).getPath();
-					} catch (URISyntaxException e) {
-						throw new IllegalArgumentException(e);
-					}
 
+				// add the background image if it has been authored
+				if (templateResourceReference != null) {
+					String url = getAbsoluteUrlAsString(templateResourceReference);
+					
 					baseSvg = baseSvg.concat("<g display=\"inline\"><title>Template</title>");
 					baseSvg = baseSvg.concat("<image x=\"0\" y=\"0\" width=\"" + SvgEditor.CANVAS_WIDTH + "\" height=\"" + SvgEditor.CANVAS_HEIGHT + "\" id=\"svg_1\" xlink:href=\"" + url + "\" />");
 					baseSvg = baseSvg.concat("</g>");
