@@ -153,7 +153,9 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			cwmService.flushChanges();
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();
-			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters("expired=true"));
+			PageParameters pageParameters = new PageParameters();
+			pageParameters.add("expired", "true");
+			setResponsePage(CwmApplication.get().getSignInPageClass(), pageParameters);
 		
 		// We're not signed in; redirect to home because page is no longer functional
 		} else {
