@@ -231,6 +231,16 @@ hintHide    - when a hitn is turned off and no longer visible
 
             return false;
         },
+        
+        /**
+         * Use this method to call modify without saving the state - used to initialize the
+         * highlighter on page load
+         */
+        modifyWithoutSave : function (clicked, id) {
+        	settings.saveState = false;
+        	methods.modify(clicked, id);
+        	settings.saveState = true;
+        },
 
         /**
          * Return current selection of false if nothing selected.
