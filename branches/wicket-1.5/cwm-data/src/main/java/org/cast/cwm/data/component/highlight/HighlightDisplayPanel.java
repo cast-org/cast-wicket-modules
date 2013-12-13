@@ -77,6 +77,9 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	@Getter @Setter
 	private boolean readOnly = false; // Whether the highlighting should be 'readOnly'
 	
+	@Getter @Setter
+	private boolean saveState = false; // Whether the highlighting should save the state
+	
 	private IModel<User> mUser; // Target user to display
 
 	@Inject
@@ -182,6 +185,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		sb.append(getColors());
 		sb.append("], readonly: ");
 		sb.append(readOnly);
+		sb.append(", saveState: " + saveState);
 		sb.append("});");
 		return sb.toString();
 	}

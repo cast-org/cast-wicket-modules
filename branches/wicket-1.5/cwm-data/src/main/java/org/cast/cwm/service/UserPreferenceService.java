@@ -27,11 +27,8 @@ import org.cast.cwm.data.UserPreference;
 import org.cast.cwm.data.UserPreferenceBoolean;
 import org.cast.cwm.data.UserPreferenceString;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -44,8 +41,6 @@ import com.google.inject.Inject;
  *
  */
 public class UserPreferenceService implements IUserPreferenceService {
-
-	private static final Logger log = LoggerFactory.getLogger(UserPreferenceService.class);
 
 	@Inject
 	private ICwmService cwmService;
@@ -81,27 +76,20 @@ public class UserPreferenceService implements IUserPreferenceService {
 		
 	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
 		// if a user preference doesn't exist, create it, otherwise update
-		log.info("get user preference for mUser="+mUser.getObject().getId() + " & prefernce="+name);
 		UserPreferenceString userPreference = (UserPreferenceString) getUserPreferenceCriteria(UserPreferenceString.class, mUser, name).uniqueResult();
 		Session session = Databinder.getHibernateSession();
 		if (userPreference == null) {
-			log.info("creating preference");
-
 			userPreference = new UserPreferenceString();
 			userPreference.setUser(mUser.getObject());
 			userPreference.setName(name);
 			userPreference.setStringValue(stringValue);
 			session.save(userPreference);
 		} else {			
-			log.info("UPDATING preference");
 			userPreference.setStringValue(stringValue);
 			session.update(userPreference);
 		}
 
 		cwmService.flushChanges();
-
-		log.info("preference=" + userPreference.getId());
-
 	}
 
 	public String getUserPreferenceString(IModel<User> mUser, String name) {
@@ -121,7 +109,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 		Criteria c = Databinder.getHibernateSession().createCriteria(userPreferenceClass)
 				.add(Restrictions.eq("user", mUser.getObject()))
 				.add(Restrictions.eq("name", name))
-				.setCacheable(false);		
+				.setCacheable(true);		
 		return c;		
 	}
 
