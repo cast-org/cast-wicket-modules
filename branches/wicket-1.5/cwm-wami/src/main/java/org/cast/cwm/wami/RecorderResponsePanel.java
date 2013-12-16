@@ -24,7 +24,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
-import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.html.IHeaderContributor;
@@ -34,15 +33,15 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.TextRequestHandler;
 import org.apache.wicket.util.io.IOUtils;
-import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.data.UserContent;
+import org.cast.cwm.data.Response;
 import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.service.IResponseService;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 
 /**
- * An audio recorder and player.
+ * An audio recorder and player, based on @Response rather than UserContent.
  * 
  * Important notes:
  *    1. this requires that a {@link org.cast.cwm.BinaryFileDataMapper} be set up with prefix {@link #BINARY_FILE_DATA_MAPPER_PREFIX}.
@@ -50,29 +49,35 @@ import com.google.inject.Inject;
  *       and provide better markup.
  *    3. JQuery is assumed to be already loaded on the page.
  *    
- * @author cdietz
  * @author bgoldowsky
  *
  */
 @Slf4j
-public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> implements IHeaderContributor {
+public class RecorderResponsePanel extends PlayerResponsePanel<Response> implements IHeaderContributor {
 
 	@Inject
 	private ICwmService cwmService;
 	
+	@Inject
+	protected IResponseService responseService;
+
 	private AbstractAjaxBehavior listener;
+	
+	private String pageName;
 	
 	private static final long serialVersionUID = 1L;
 
-	public RecorderPanel(String id, IModel<T> mUserContent, AudioSkin skin, WamiAppletHolder appletHolder) {
-		super(id, mUserContent, skin, appletHolder);
+	public RecorderResponsePanel(String id, IModel<Response> mResponse, AudioSkin audioSkin, WamiAppletHolder appletHolder, String pageName) {
+		super(id, mResponse, audioSkin, appletHolder);
 		listener = new AudioDataListenerBehavior();
+		this.pageName = pageName;
 		add(listener);
 	}
 
-	public RecorderPanel(String id, IModel<T> mUserContent, AudioSkin skin) {
-		super(id, mUserContent, skin);
+	public RecorderResponsePanel(String id, IModel<Response> mUserContent, AudioSkin audioSkin, String pageName) {
+		super(id, mUserContent, audioSkin);
 		listener = new AudioDataListenerBehavior();
+		this.pageName = pageName;
 		add(listener);
 	}
 
@@ -88,32 +93,27 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 	 * @param req the HttpServletRequest callback from the WAMI recorder.
 	 */
     protected void saveAudioData(HttpServletRequest req) {
-		BinaryFileData audioData = audioData(req);
-		cwmService.save(audioData);
-		getModelObject().setPrimaryFile(audioData);
-		if (getModelObject().isTransient()) {
-			// The UserContent object might not be saved yet.  If not, save it and adjust model accordingly.
-			cwmService.save(getModelObject());
-			if (getModel() instanceof HibernateObjectModel)
-				((HibernateObjectModel<T>)getModel()).checkBinding();
-		}
-		cwmService.flushChanges();
-		log.debug("Audio callback received, length {}; saved BFD {} for UserContent {}",
-				req.getContentLength(),
-				audioData.getId(), getModelObject().getId());
-	}
+    	if (req.getContentLength() > 50) {
+    		responseService.saveBinaryResponse(getModel(), audioData(req), "audio/wav", "audio", pageName);
+    		log.debug("Audio callback received, length {}; saved BFD for Response {}",
+    				req.getContentLength(),
+    				getModelObject().getId());
+    	} else {
+    		log.warn("Audio callback received, length {} for Response {}: ignoring apparently empty audio!",
+    				req.getContentLength(),
+    				getModelObject().getId());
+    	}
+    }
 
 	/**
 	 * Format incoming audio data into the database object.
 	 */
-	protected BinaryFileData audioData (HttpServletRequest req) {
-		byte[] bytes;
+	protected byte[] audioData (HttpServletRequest req) {
 		try {
-			bytes = IOUtils.toByteArray(req.getInputStream());
+			return IOUtils.toByteArray(req.getInputStream());
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to save audio data");
 		}
-		return new BinaryFileData("audio", "audio/wav", bytes);
 	}
 
 	
@@ -131,8 +131,8 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 		}
 
 		// send the JSON response to the audio applet...
-	    private void sendResponse(final RequestCycle requestCycle, UserContent userContent) {
-	        RecordingResponse recordingResponse = new RecordingResponse(userContent.getId(),userContent.getPrimaryFile().getId());
+	    private void sendResponse(final RequestCycle requestCycle, Response response) {
+	        RecordingResponse recordingResponse = new RecordingResponse(response.getResponseData().getBinaryFileData().getId());
 	        Gson gson = new Gson();
 	        requestCycle.scheduleRequestHandlerAfterCurrent(new TextRequestHandler("application/json", "UTF-8", gson.toJson(recordingResponse)));
 	    }
@@ -145,11 +145,11 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 	 *
 	 */
     static class RecordingResponse {
-        Long userContentId;
+    	Long userContentId;
         Long binaryFileId;
 
-        RecordingResponse(Long userContentId, Long binaryFileId) {
-            this.userContentId = userContentId;
+        RecordingResponse(Long binaryFileId) {
+            this.userContentId = null;
             this.binaryFileId = binaryFileId;
         }
     }
