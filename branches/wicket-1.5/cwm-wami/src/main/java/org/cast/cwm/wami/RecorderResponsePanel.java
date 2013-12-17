@@ -67,13 +67,6 @@ public class RecorderResponsePanel extends PlayerResponsePanel<Response> impleme
 	
 	private static final long serialVersionUID = 1L;
 
-	public RecorderResponsePanel(String id, IModel<Response> mResponse, AudioSkin audioSkin, WamiAppletHolder appletHolder, String pageName) {
-		super(id, mResponse, audioSkin, appletHolder);
-		listener = new AudioDataListenerBehavior();
-		this.pageName = pageName;
-		add(listener);
-	}
-
 	public RecorderResponsePanel(String id, IModel<Response> mUserContent, AudioSkin audioSkin, String pageName) {
 		super(id, mUserContent, audioSkin);
 		listener = new AudioDataListenerBehavior();
