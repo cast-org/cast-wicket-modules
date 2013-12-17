@@ -523,11 +523,12 @@ public abstract class ResponseEditor extends Panel {
 			IModel<String> newTextModel = new Model<String>("");
 
 			if (newResponse) {
-				if (templateURL != null) {
-					defaultTableUrl = getUrlFromString(templateURL);
+				if (templateResourceReference != null) {
+					defaultTableUrl = getUrlFromResourceReference(templateResourceReference);
+					
 				} else { //new response with no authored default
-					String defaultTableUrlString = RequestCycle.get().urlFor(new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json"), null).toString();
-					defaultTableUrl = getUrlFromString(defaultTableUrlString);
+					ResourceReference defaultResourceReference = new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json");
+					defaultTableUrl = getUrlFromResourceReference(defaultResourceReference);
 				}
 				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
 			} 
@@ -1170,7 +1171,27 @@ public abstract class ResponseEditor extends Panel {
 		return null;
 	}	
 
-	
+	/**
+	 * Return an actual URL from a ResourceReference
+	 * @param resourceReference
+	 * @return
+	 */
+	public URL getUrlFromResourceReference(ResourceReference resourceReference) {
+		URL url = null;
+		if (resourceReference != null) {
+			String resourceReferenceString = getAbsoluteUrlAsString(resourceReference);
+			String urlString = RequestCycle.get().getUrlRenderer().renderContextRelativeUrl(resourceReferenceString);
+				try {
+					url = new URL(toAbsolutePath(urlString));
+				} catch (MalformedURLException e) {
+					log.error("There is a problem with the Authored Data:  {}", urlString);
+					e.printStackTrace();
+				}
+		}
+		return url;
+	}	
+
+
 	public final static String toAbsolutePath(final String relativePagePath) {
 	       HttpServletRequest req = (HttpServletRequest)((WebRequest)RequestCycle.get().getRequest()).getContainerRequest();
 	       return RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
