@@ -45,7 +45,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 	@Inject
 	private ICwmService cwmService;
 	
-	protected UserPreferenceService() { /* Protected Constructor - use injection */
+	public UserPreferenceService() {
 	}
 		
 	public void setUserPreferenceBoolean(IModel<User> mUser, String name, Boolean booleanValue) {
@@ -61,7 +61,6 @@ public class UserPreferenceService implements IUserPreferenceService {
 		} else {			
 			userPreference.setBooleanValue(booleanValue);
 		}
-		
 		cwmService.flushChanges();
 		
 	}

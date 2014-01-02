@@ -148,6 +148,10 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		return hasRole(Role.forRoleString(roleString));
 	}
 	
+	public boolean isGuest() {
+		return role == Role.GUEST;
+	}
+	
 	/**
 	 * Should we expect this user to have connections to specific Periods?
 	 * By default students, teachers, and researchers do, but apps may override this.

@@ -51,8 +51,6 @@ import org.cast.cwm.tag.model.TagPlusIntNameComparator;
  * A standard panel that displays a sorted, clickable interface to a user's tags for 
  * this application, either in cloud or list view.  
  * 
- * TODO: More customization on how this is displayed.
- * 
  * @author jbrookover
  *
  */

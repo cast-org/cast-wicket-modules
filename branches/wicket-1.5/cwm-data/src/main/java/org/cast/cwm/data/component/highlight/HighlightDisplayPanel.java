@@ -114,7 +114,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		@Inject
 		protected IResponseTypeRegistry typeRegistry;
 
-	@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked")
 		public HighlightDisplayForm(String id, IModel<Response> model) {
 			super(id, model);
 			
