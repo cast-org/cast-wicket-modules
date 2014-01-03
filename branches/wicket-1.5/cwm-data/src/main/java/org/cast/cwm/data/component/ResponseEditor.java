@@ -39,7 +39,6 @@ import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -64,16 +63,15 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Bytes;
-import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.UserResponseDataMapper;
 import org.cast.cwm.components.UrlStreamedToString;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
@@ -695,42 +693,11 @@ public abstract class ResponseEditor extends Panel {
 			if (newResponse) {
 				return defaultTableUrl.toString();  // either authored or default
 			} else {
-				TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
-				ResponseEditor.TableFragment.this.add(loadBehavior);
-				return (loadBehavior.getCallbackUrl());				
+				String prefix = UserResponseDataMapper.USER_RESPONSE_DATA_MAPPER_PREFIX;
+				return prefix + "/" + ((Response)getDefaultModelObject()).getId();
 			}
 		}		
 		
-		// this enables the data stored in the database to be streamed via a URL
-		class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
-			private static final long serialVersionUID = 1L;
-
-			public void onRequest() {
-				getRequestCycle().scheduleRequestHandlerAfterCurrent(
-						new ResourceStreamRequestHandler(
-								new AbstractStringResourceStream() {
-									private static final long serialVersionUID = 1L;
-									@Override
-									protected String getString() {
-										return getModelObject().getText();
-									}
-								}));
-			}
-// Used to be this, which is quite different, but I don't think functionality of PrintStream is being used at all
-//					public void respond(RequestCycle requestCycle) {
-//						try {
-//							PrintStream ps = new PrintStream(requestCycle.getOriginalResponse().getOutputStream());
-//							ps.print(getModel().getObject().getText());
-//							ps.flush();
-//							ps.close();
-//						}
-//						catch(Exception e) {
-//							e.printStackTrace();
-//						}
-//					}
-//				});
-		}
-
 		@Override
 		public void onBeforeRender() {
 			tableUrl = getDataUrl();
