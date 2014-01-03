@@ -19,8 +19,8 @@
  */
 package org.cast.cwm.xml.component;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -65,7 +65,7 @@ public abstract class NavListView extends ChildListView {
 		item.add( makeLink(sec).add(makeLabel(sec)));
 		String classAttribute = makeAttributeString(item);
 		if (classAttribute != null)
-			item.add(new SimpleAttributeModifier("class", classAttribute));
+			item.add(AttributeModifier.replace("class", classAttribute));
 	}
 	
 	/** Return a string to use for the class attribute of the list item.

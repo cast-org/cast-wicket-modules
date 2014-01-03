@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.xml.component;
 
+import java.util.List;
+
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -35,7 +37,7 @@ public abstract class ChildListView extends ListView<XmlSection> {
 	 * @param model
 	 */
 	public ChildListView(String id, IModel<XmlSection> model) {
-		super(id, new PropertyModel(model, "children"));
+		super(id, new PropertyModel<List<XmlSection>>(model, "children"));
 	}
 
 }
