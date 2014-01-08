@@ -38,7 +38,7 @@ public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplica
             getResourceSettings().addResourceFolder(getThemeDir());
     }
 
-    private String getThemeDir() {
+    protected String getThemeDir() {
             return "theme";
     }
 
