@@ -115,7 +115,8 @@ public abstract class ResponseEditor extends Panel {
 	@Getter @Setter protected List<String> starters = new ArrayList<String>();
 	@Getter @Setter protected List<ResourceReference> starterResourceReferences = new ArrayList<ResourceReference>();
 	@Getter @Setter protected String templateURL;
-	@Getter @Setter protected ResourceReference templateResourceReference;
+	// TODO: stop using references and use template - ldm
+	@Getter @Setter protected ResourceReference templateResourceReference; 
 	
 	@Getter @Setter protected FeedbackPanel feedbackPanel;
 	@Getter @Setter protected boolean cancelVisible = true;
@@ -494,6 +495,7 @@ public abstract class ResponseEditor extends Panel {
 		
 		protected String divMarkupId, textAreaMarkupId; // used by the js
 		protected URL defaultTableUrl = null;
+		protected String stringDefaultTableUrl;
 		protected CharSequence tableUrl;
 
 		public TableFragment(String id, IModel<Response> model) {
@@ -521,15 +523,17 @@ public abstract class ResponseEditor extends Panel {
 			IModel<String> newTextModel = new Model<String>("");
 
 			if (newResponse) {
-				if (templateResourceReference == null) { //new response with no authored default
-					templateResourceReference = new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json");
+				if (templateURL == null) { //new response with no authored default
+					PackageResourceReference defaultResourceReference = new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json");
+					templateURL = getRequestCycle().mapUrlFor(defaultResourceReference, null).toString();
 				}
-				String referenceUrl = getRequestCycle().mapUrlFor(templateResourceReference, null).toString();
-				defaultTableUrl = getUrlFromString(referenceUrl);
+				defaultTableUrl = getUrlFromString(templateURL);
+				
+				// get the content from either table template and put it into the new response
 				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
 			} 
 			
-			// if you are editing an existing model use that one, otherwise use the new model
+			// if you are editing an existing model use that one, otherwise use a new model based on the default
 			// this model setting is used for autosave purposes and not for sending data down to the grid
 			IModel<String> textModel = (((model != null) && (model.getObject() != null) && (model.getObject().getText() != null)) ? (new Model<String>(((Response) getDefaultModelObject()).getText())) : newTextModel);
 
@@ -691,7 +695,7 @@ public abstract class ResponseEditor extends Panel {
 		 */
 		protected CharSequence getDataUrl() {
 			if (newResponse) {
-				return defaultTableUrl.toString();  // either authored or default
+				return templateURL;
 			} else {
 				String prefix = UserResponseDataMapper.USER_RESPONSE_DATA_MAPPER_PREFIX;
 				return prefix + "/" + ((Response)getDefaultModelObject()).getId();
