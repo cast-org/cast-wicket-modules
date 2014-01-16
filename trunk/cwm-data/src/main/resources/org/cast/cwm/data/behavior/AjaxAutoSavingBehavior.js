@@ -49,24 +49,30 @@ var AutoSaver = {
 							AutoSaver.logger("AutoSave: form " + form.attr('id') + " has no callback URL set");
 						} else {
 							AutoSaver.logger("AutoSave: saving form " + form.attr('id') + " to " + callback);
+
+							//Wicket.Ajax.get({"u":"the/url/to/the/link", "e": "click", "c":"linkId"});
 							// TODO fix this
-							wicketSubmitFormById(
-									form.attr('id'), // Form Id
-									callback + '&autosave=true', // Wicket Ajax Behavior URL 
-									null, // Submit Button
-									function() { // Success Handler
-										form.data('autosaveOrigValues', newValues);
-										AutoSaver.removeFormFromProcessing(form.attr('id'));
-										AutoSaver.runIfNoneProcessing(onSuccessCallBack);
-									},
-									function() { // Failure Handler
-										alert ("Autosave Failed for form: " + form.attr('id'));
-										AutoSaver.logger("Autosave Failed");
-									}, 
-									function() { // Precondition
-										return Wicket.$$(this) && Wicket.$$($(this).attr('id'));
-									}.bind(this)
-							);
+							//wicketSubmitFormById(
+							//form.attr('id'), // Form Id
+							Wicket.Ajax.submitForm({
+									"f":form.attr('id') 
+							});
+////									form,
+////									callback + '&autosave=true', // Wicket Ajax Behavior URL 
+////									null, // Submit Button
+////									function() { // Success Handler
+////										form.data('autosaveOrigValues', newValues);
+////										AutoSaver.removeFormFromProcessing(form.attr('id'));
+////										AutoSaver.runIfNoneProcessing(onSuccessCallBack);
+////									},
+////									function() { // Failure Handler
+////										alert ("Autosave Failed for form: " + form.attr('id'));
+////										AutoSaver.logger("Autosave Failed");
+////									}, 
+////									function() { // Precondition
+////										return Wicket.$$(this) && Wicket.$$($(this).attr('id'));
+////									}.bind(this)
+
 						}
 	                }
 	        });
