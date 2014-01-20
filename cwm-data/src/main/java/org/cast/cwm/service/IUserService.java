@@ -69,6 +69,8 @@ public interface IUserService {
 	ISortableDataProvider<User,String> getUserListProvider(
 			IModel<Period> mPeriod);
 
+	ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role);
+
 	ISortableDataProvider<User,String> getUncachedUserListProvider(
 			IModel<Period> mPeriod);
 
