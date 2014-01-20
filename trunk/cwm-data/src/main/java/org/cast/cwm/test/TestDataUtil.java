@@ -15,20 +15,21 @@ public class TestDataUtil {
 	public static void setId(User user, long id) {
 		setId(user, id, User.class);
 	}
-	
+
 	public static void setId(Object item, long id, Class<?> clazz) {
+		Field field;
 		try {
-			Field field = clazz.getDeclaredField("id");
+			field = clazz.getDeclaredField("id");
 			field.setAccessible(true);
 			field.set(item, id);
 		} catch (Exception e) {
-			// TODO make a nice error message ...
-			e.printStackTrace();
+			throw new RuntimeException("Failed to set ID", e);
 		}
 	}
 
-	public static User makeUser(String first, String last, Role role) {
+	public static User makeUser(Long id, String first, String last, Role role) {
 		User user = new User();
+		setId(user, id);
 		user.setFirstName(first);
 		user.setLastName(last);
 		user.setRole(role);

@@ -221,8 +221,14 @@ public class UserService implements IUserService {
 	 */
 	@Override
 	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod) {
+		return getUserListProvider(mPeriod, null);
+	}
+
+	@Override
+	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
+		c.setRole(role);
 		return new SortableHibernateProvider<User>(User.class, c);
 	}
 
