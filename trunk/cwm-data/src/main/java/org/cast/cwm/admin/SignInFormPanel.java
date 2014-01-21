@@ -33,7 +33,7 @@ import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FeedbackBorder;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.UserService;
+import org.cast.cwm.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +54,11 @@ public class SignInFormPanel extends Panel {
 	private PasswordTextField password;
 	
 	@Inject
-	private IEventService eventService;
+	protected IEventService eventService;
 
+	@Inject 
+	protected IUserService userService;
+	
 	public SignInFormPanel(String id) {
 		super(id);
 		add(new SignInForm("form"));
@@ -80,7 +83,7 @@ public class SignInFormPanel extends Panel {
 		@Override
 		protected void onSubmit()	{
 			
-			IModel<User> user = UserService.get().getByUsername(username.getModelObject());
+			IModel<User> user = userService.getByUsername(username.getModelObject());
 			
 			if (user!=null && user.getObject()!=null && !user.getObject().isValid()) {
 				error(getLocalizer().getString("accountInvalid", this, "Account not confirmed.  You must confirm your account by clicking on the link in the email we sent you before you can log in."));

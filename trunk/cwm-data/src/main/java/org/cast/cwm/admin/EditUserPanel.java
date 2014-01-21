@@ -57,7 +57,7 @@ import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.UserService;
+import org.cast.cwm.service.IUserService;
 
 import com.google.inject.Inject;
 
@@ -77,6 +77,9 @@ public class EditUserPanel extends Panel {
 	
 	@Inject
 	protected ISiteService siteService;
+	
+	@Inject 
+	IUserService userService;
 	
 	private Form<User> userForm;
 	private Map<String, FormComponentContainer> components = new HashMap<String, FormComponentContainer>();
@@ -239,7 +242,7 @@ public class EditUserPanel extends Panel {
 	 */
 	protected void onUserCreated(IModel<User> mUser) {
 		if (autoConfirmNewUser)
-			UserService.get().confirmUser(mUser.getObject());
+			userService.confirmUser(mUser.getObject());
 	}
 	
 	/**
@@ -274,7 +277,8 @@ public class EditUserPanel extends Panel {
 		 */
 		@SuppressWarnings("unchecked")
 		public UserForm(String id) {
-			super(id, (Class<User>) UserService.get().getUserClass());
+			// FIXME I don't think this will work if userService returns something other than User.class.
+			super(id, (Class<User>) userService.getUserClass());
 			addFields();
 		}
 		

@@ -21,12 +21,15 @@ package org.cast.cwm.data.init;
 
 import net.databinder.hib.Databinder;
 
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.UserService;
+import org.cast.cwm.service.IUserService;
 import org.hibernate.Session;
+
+import com.google.inject.Inject;
 
 /**
  * This initializer makes sure that an administrative user is defined.
@@ -46,6 +49,13 @@ public class CreateAdminUser implements IDatabaseInitializer {
 	private static final String DEFAULT_ADMIN_USERNAME = "admin";
 	private static final String DEFAULT_ADMIN_PASSWORD = "admin";
 
+	@Inject 
+	IUserService userService;
+	
+	public CreateAdminUser() {
+		Injector.get().inject(this);
+	}
+	
 	@Override
 	public String getName() {
 		return "create admin user";
@@ -90,9 +100,9 @@ public class CreateAdminUser implements IDatabaseInitializer {
      */
 	public boolean createAdminUser (final String username, final String password, String email, final boolean resetPassword) {
 		Session session = Databinder.getHibernateSession();
-		User admin = UserService.get().getByUsername(username).getObject();
+		User admin = userService.getByUsername(username).getObject();
 		if (admin == null) {
-			admin = UserService.get().newUser();
+			admin = userService.newUser();
 			admin.setRole(Role.ADMIN);
 			admin.setFirstName("Administrator");
 			admin.setLastName("Account");

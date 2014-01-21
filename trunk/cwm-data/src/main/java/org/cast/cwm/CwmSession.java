@@ -22,6 +22,7 @@ package org.cast.cwm;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.auth.AuthDataSessionBase;
+import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.injection.Injector;
@@ -31,7 +32,6 @@ import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
-import org.cast.cwm.data.models.UserModel;
 import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +109,7 @@ public class CwmSession extends AuthDataSessionBase<User> {
 
 	@Override
 	public IModel<User> createUserModel(User user) {
-		return new UserModel(user);
+		return new HibernateObjectModel<User>(user);
 	}
 	
 	@Override
