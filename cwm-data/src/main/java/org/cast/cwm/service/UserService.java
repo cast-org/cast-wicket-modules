@@ -25,6 +25,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.QueryBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
@@ -32,14 +33,14 @@ import net.databinder.models.hib.SortableHibernateProvider;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
-import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
+import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.models.UserListModel;
-import org.cast.cwm.data.models.UserModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -68,20 +69,6 @@ public class UserService implements IUserService {
 	@Getter @Setter
 	private Class<? extends User> userClass = User.class;
 
-	public UserService() {
-		Injector.get().inject(this);
-	}
-	
-	protected static UserService instance = new UserService();
-	
-	public static UserService get() {
-		return instance;
-	}
-
-	public static void setInstance(UserService instance) {
-		UserService.instance = instance;
-	}
-	
 	/** 
 	 * Instantiate an instance of the application's User class.
 	 * 
@@ -129,7 +116,7 @@ public class UserService implements IUserService {
 	 */
 	@Override
 	public IModel<User> getById(long userId) {
-		return new UserModel(userId);
+		return new HibernateObjectModel<User>(User.class, userId);
 	}
 
 	/* (non-Javadoc)
@@ -139,7 +126,7 @@ public class UserService implements IUserService {
 	public IModel<User> getByUsername (String username) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setUsername(username);
-		return new UserModel(c);
+		return new HibernateObjectModel<User>(User.class, c);
 	}
 	
 	/* (non-Javadoc)
@@ -149,7 +136,7 @@ public class UserService implements IUserService {
 	public IModel<User> getBySubjectId (String subjectId) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setSubjectId(subjectId);
-		return new UserModel(c);
+		return new HibernateObjectModel<User>(User.class, c);
 	}
 	
 	/* (non-Javadoc)
@@ -159,7 +146,7 @@ public class UserService implements IUserService {
 	public IModel<User> getByEmail (String email) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setEmail(email);
-		return new UserModel(c);
+		return new HibernateObjectModel<User>(User.class, c);
 	}
 	
 	// gets both valid and invalid users
@@ -180,7 +167,7 @@ public class UserService implements IUserService {
 		c.setGetAllUsers(true);
 		c.setSortState(sort);
 		UserListModel userListModel = new UserListModel(c);
-		UserModel mUser = new UserModel(userListModel.getObject().get(0));
+		HibernateObjectModel<User> mUser = new HibernateObjectModel<User>(userListModel.getObject().get(0));
 		
 		return mUser;
 	}
@@ -194,7 +181,7 @@ public class UserService implements IUserService {
 		c.setFirstName(firstName);
 		c.setLastName(lastName);
 		c.setPeriod(period);
-		return new UserModel(c);
+		return new HibernateObjectModel<User>(User.class, c);
 	}
 
 
@@ -243,6 +230,28 @@ public class UserService implements IUserService {
 		return new SortableHibernateProvider<User>(User.class, c);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getOpenLoginSessions(org.apache.wicket.model.IModel)
+	 */
+	@Override
+	public IModel<List<LoginSession>> getOpenLoginSessions(IModel<User> mUser) {
+		LoginSessionCriteriaBuilder cb = new LoginSessionCriteriaBuilder();
+		cb.setOpenOnly(true);
+		cb.setUserId(mUser.getObject().getId());
+		return new HibernateListModel<LoginSession>(LoginSession.class, cb);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getAllLoginSessions(org.apache.wicket.model.IModel)
+	 */
+	@Override
+	public IModel<List<LoginSession>> getAllLoginSessions(IModel<User> mUser) {
+		LoginSessionCriteriaBuilder cb = new LoginSessionCriteriaBuilder();
+		cb.setOpenOnly(false);
+		cb.setUserId(mUser.getObject().getId());
+		return new HibernateListModel<LoginSession>(LoginSession.class, cb);
+	}
+		
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getLoginSessions(org.apache.wicket.model.IModel)
 	 */

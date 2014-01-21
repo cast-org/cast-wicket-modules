@@ -34,7 +34,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.UserService;
+import org.cast.cwm.service.IUserService;
 import org.cast.cwm.service.UserService.LoginData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +51,9 @@ public class UserFormPage extends AdminPage {
 	@Inject
 	ISiteService siteService;
 	
+	@Inject 
+	IUserService userService;
+	
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(UserFormPage.class);
 	private HibernateObjectModel<User> userModel;
@@ -64,7 +67,7 @@ public class UserFormPage extends AdminPage {
 		
 		// The user we're editing, if any
 		if (!parameters.get("userId").isEmpty())
-			userModel = (HibernateObjectModel<User>) UserService.get().getById(parameters.get("userId").toLongObject());
+			userModel = (HibernateObjectModel<User>) userService.getById(parameters.get("userId").toLongObject());
 		// The role of the user to create, if any
 		if (!parameters.get("role").isEmpty())
 			role = Role.forRoleString(parameters.get("role").toString());
@@ -136,7 +139,7 @@ public class UserFormPage extends AdminPage {
 	protected void addLoginHistory() {
 		LoginData data = null;
 		if  (userModel != null && userModel.getObject() != null && !userModel.getObject().isTransient()) {
-			data = UserService.get().getLoginSessions(userModel); 
+			data = userService.getLoginSessions(userModel); 
 		}
 		if (data != null) {
 			add(new Label("logincount", data.getLoginCount().toString()));

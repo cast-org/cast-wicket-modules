@@ -40,6 +40,12 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 	@Getter @Setter
 	private ISortState<String> sortState;
 	
+	@Getter @Setter
+	private boolean openOnly = true;
+	
+	@Getter @Setter
+	private Long userId = null;
+	
 	private static final long serialVersionUID = 1L;
 
 	public LoginSessionCriteriaBuilder() {
@@ -67,8 +73,13 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 
 	@Override
 	public void buildUnordered(Criteria criteria) {
-		criteria.add(Restrictions.isNull("endTime"));
+		if (openOnly)
+			criteria.add(Restrictions.isNull("endTime"));
+
 		criteria.createAlias("user", "user"); // Must be joined for sort on username to work.
+		if (userId != null)
+			criteria.add(Restrictions.eq("user.id", userId));
+		
 		criteria.setCacheable(true);			
 	}
 	
