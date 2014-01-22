@@ -325,7 +325,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	public void loadAppProperties() {
 		configuration = AppConfiguration.loadFor(this);
 		appInstanceId = configuration.getString("cwm.instanceId", "unknown");
-		// TODO: sessionTimeout is not used anywhere yet
 		sessionTimeout = configuration.getInteger("cwm.sessionTimeout", DEFAULT_SESSION_TIMEOUT);
 	}
 	
