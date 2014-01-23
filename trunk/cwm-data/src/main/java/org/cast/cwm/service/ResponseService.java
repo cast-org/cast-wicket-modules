@@ -344,13 +344,19 @@ public class ResponseService implements IResponseService {
 	public void saveResponseWithoutData (IModel<Response> mResponse) {
 		cwmService.confirmDatastoreModel(mResponse);
 		Response response = mResponse.getObject();
+		boolean checkBinding = false;
 		// If the Response is new, save it.
 		if (response.isTransient()) {
 			if (response.getCreateDate() == null)
 				response.setCreateDate(new Date());
 			Databinder.getHibernateSession().save(response);
+			checkBinding = true;
 		}
 		cwmService.flushChanges();
+		if (checkBinding) {
+			((HibernateObjectModel<Response>)mResponse).checkBinding();
+		}
+
 	}
 	
 	/* (non-Javadoc)
