@@ -20,7 +20,6 @@
 package org.cast.cwm.admin;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -64,9 +63,9 @@ import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.SiteService;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
+import org.joda.time.DateTime;
 
 import com.google.inject.Inject;
 
@@ -139,11 +138,9 @@ public class UserContentLogPage extends AdminPage {
 	}
 	
 	protected void addDateFilter(Form<Object> form) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());   // Default: from 1 month ago, to end of today.
-		toDateM = new Model<Date>(cal.getTime());
-		cal.add(Calendar.MONTH, -1);
-		fromDateM = new Model<Date>(cal.getTime());
+		DateTime currentDateTime = new DateTime(new Date());
+		toDateM = new Model<Date>(currentDateTime.toDate());
+		fromDateM = new Model<Date>(currentDateTime.minusMonths(1).toDate());
 
 		form.add(new DateTextField("from", fromDateM));
 		form.add(new DateTextField("to", toDateM));		
@@ -157,10 +154,7 @@ public class UserContentLogPage extends AdminPage {
 		UserContentAuditQueryBuilder qb = new UserContentAuditQueryBuilder();
 		
 		if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
-			Calendar toDate = Calendar.getInstance(); // Set "to" time to end of the day (expressed as <00:00 of the following day)
-			toDate.setTime(toDateM.getObject());
-			toDate.add(Calendar.DAY_OF_MONTH, 1);
-			log.debug("Considering events between {} and {}", fromDateM.getObject(), toDate.getTime());
+			log.debug("Considering events between {} and {}", fromDateM.getObject(), toDateM.getObject());
 			qb.setMFromDate(fromDateM);
 			qb.setMToDate(toDateM);
 			
