@@ -128,19 +128,17 @@ public abstract class BaseGlossaryPanel extends Panel {
 		public TopNavContainer (String id, Character letter, IGlossaryEntry current) {
 			super(id);
 			List<IModel<? extends IGlossaryEntry>> list = getGlossaryEntriesForLetter(letter);
-			WebMarkupContainer topli = new WebMarkupContainer("topli");
-			add(topli);
 			if (list == null || list.isEmpty()) {
 				// Non-alphabetic container is special: it disappears completely when empty.
 				if (letter == '#')
-					topli.setVisible(false);
+					setVisible(false);
 				else
-					topli.add(AttributeModifier.replace("class", "empty"));
+					add(AttributeModifier.replace("class", "empty"));
 			} else if (list.contains(current)) {
-				topli.add(AttributeModifier.replace("class", "current"));
+				add(AttributeModifier.replace("class", "current"));
 			}
 			
-			topli.add(new Label("toplink", letter.toString().toUpperCase())
+			add(new Label("toplink", letter.toString().toUpperCase())
 				.add(AttributeModifier.replace("href", "#"+letter))
 			);
 		}
@@ -186,8 +184,10 @@ public abstract class BaseGlossaryPanel extends Panel {
 				this.setVisible(false);
 				return;
 			}
-			add (new WebMarkupContainer("anchor").add(AttributeModifier.replace("name", letter.toString())));
-			add (new Label("letter", letter.toString().toUpperCase()));
+			WebMarkupContainer anchor = new WebMarkupContainer("anchor");
+			add(anchor);
+			anchor.add(AttributeModifier.replace("id", letter.toString()));
+			anchor.add (new Label("letter", letter.toString().toUpperCase()));
 			add (new LetterListView ("list", letter, current));
 		}
 	}
