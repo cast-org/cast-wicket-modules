@@ -17,27 +17,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.xml.component;
+package org.cast.cwm.service;
 
-import java.util.List;
-
-import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
-import org.cast.cwm.xml.XmlSection;
+import org.cast.cwm.data.User;
 
-public abstract class ChildListView extends ListView<XmlSection> {
+/**
+ * Version of @UserPreferenceService for GUEST type Users, which doesn't refer to database.
+ * All preference values will be reported as null, and setters a no-ops.
+ * 
+ * @author bgoldowsky
+ *
+ */
+public class GuestUserPreferenceService implements IUserPreferenceService {
 
-	private static final long serialVersionUID = 1L;
+	public GuestUserPreferenceService() {
+	}
+		
+	public void setUserPreferenceBoolean(IModel<User> mUser, String name, Boolean booleanValue) {
+	}
+	
+	public Boolean getUserPreferenceBoolean(IModel<User> mUser, String name) {
+		return null;
+	}
+		
+	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
+	}
 
-	/**
-	 * Creates a ChildListView showing each child of the given section.
-	 * The model parameter should be an XmlSectionModel of the parent.
-	 * @param id
-	 * @param model
-	 */
-	public ChildListView(String id, IModel<XmlSection> model) {
-		super(id, new PropertyModel<List<XmlSection>>(model, "children"));
+	public String getUserPreferenceString(IModel<User> mUser, String name) {
+		return null;
 	}
 
 }
