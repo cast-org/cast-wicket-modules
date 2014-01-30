@@ -526,13 +526,11 @@ public abstract class ResponseEditor extends Panel {
 			IModel<String> newTextModel = new Model<String>("");
 
 			if (newResponse) {
-				if (templateResourceReference != null) {
-					defaultTableUrl = getUrlFromResourceReference(templateResourceReference);
-					
-				} else { //new response with no authored default
-					ResourceReference defaultResourceReference = new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json");
-					defaultTableUrl = getUrlFromResourceReference(defaultResourceReference);
+				if (templateResourceReference == null) { //new response with no authored default
+					templateResourceReference = new PackageResourceReference(ResponseEditor.class, "editablegrid/defaultgrid.json");
 				}
+				String referenceUrl = getRequestCycle().mapUrlFor(templateResourceReference, null).toString();
+				defaultTableUrl = getUrlFromString(referenceUrl);
 				newTextModel = new Model<String>(new UrlStreamedToString(defaultTableUrl).getPostString());
 			} 
 			
@@ -1163,7 +1161,8 @@ public abstract class ResponseEditor extends Panel {
 		URL url = null;
 		if (stringUrl != null) {
 			try {
-				url = new URI(toAbsolutePath(stringUrl)).toURL();
+				String absoluteUrlPath = toAbsolutePath(stringUrl);
+				url = new URI(absoluteUrlPath).toURL();
 				return url;
 			} catch (MalformedURLException e) {
 				log.error("There is a problem with the Authored Data:  {}", stringUrl);
