@@ -62,7 +62,6 @@ public class UserPreferenceService implements IUserPreferenceService {
 		} else {			
 			userPreference.setBooleanValue(booleanValue);
 		}
-		
 		cwmService.flushChanges();
 		
 	}
