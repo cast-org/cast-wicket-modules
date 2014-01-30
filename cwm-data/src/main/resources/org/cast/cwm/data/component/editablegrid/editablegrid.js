@@ -407,8 +407,8 @@ EditableGrid.prototype.loadJSON = function(url)
 {
 	// we use a trick to avoid getting an old version from the browser's cache
 	var orig_url = url;
-	var sep = url.indexOf('?') >= 0 ? '&' : '?';
-	url += sep + Math.floor(Math.random() * 100000);
+//	var sep = url.indexOf('?') >= 0 ? '&' : '?';
+//	url += sep + Math.floor(Math.random() * 100000);
 
 	// should never happen
 	if (!window.XMLHttpRequest) {
