@@ -46,6 +46,7 @@ hintHide    - when a hitn is turned off and no longer visible
         'currentScope'      : null,         // Highlighting scope id
         'currentHint'       : null,         // Hint class name
         'currentCompare'    : null,         // Color that hint is comparing against
+        'saveState'		    : false,        // save state back to db for persistence
 
         // Callback hooks
         'create'            : null,
@@ -123,6 +124,8 @@ hintHide    - when a hitn is turned off and no longer visible
 
             var $currColor = settings.currentColor;
             var $currScope = settings.currentScope;
+            var $saveState = settings.saveState;
+            
             // Check for and update with new range if needed
             var $currRange = (settings.currentRange == null) ? methods.rangeGet() : settings.currentRange;
 
@@ -132,6 +135,11 @@ hintHide    - when a hitn is turned off and no longer visible
 
             // Turn off highlight (No Selection + Same Color)
             if (clicked == null || ($currRange == false && $currColor == clicked && $currScope == id) || (settings.readonly == true && $currColor == clicked && $currScope == id)) {
+
+            	// store the state change to off
+            	if ($saveState) {
+                	highlightStateChangeEvent($currColor, "false");
+            	}
 
                 // Store/unset existing highlighting
                 if ($currColor != null) {
@@ -169,6 +177,11 @@ hintHide    - when a hitn is turned off and no longer visible
 
                     // Display highlights for new color
                     methods.wordShowHighlights(clicked, id);
+
+                    // store the state change of new color to on
+                    if (clicked != null && $saveState) {
+                    	highlightStateChangeEvent(clicked, "true");
+                    }
                 }
 
                 // Set new mode
@@ -217,6 +230,16 @@ hintHide    - when a hitn is turned off and no longer visible
             }
 
             return false;
+        },
+        
+        /**
+         * Use this method to call modify without saving the state - used to initialize the
+         * highlighter on page load
+         */
+        modifyWithoutSave : function (clicked, id) {
+        	settings.saveState = false;
+        	methods.modify(clicked, id);
+        	settings.saveState = true;
         },
 
         /**
@@ -831,4 +854,11 @@ function changeMode(arg1, arg2) {
 function toggleModelHighlightDisplay(arg1, arg2, arg3, arg4) {
     $().CAST_Highlighter('hintDisplay', arg1, arg2, arg3, arg4);
     return false;
+}
+
+// log the state change - to be stored in the db for persistence
+function highlightStateChangeEvent(highlightColor, highlightOn) {
+	// wicketAjaxGet(highlightStateChangeCallbackUrl + '&highlightColor=' +  highlightColor + '&highlightOn=' + highlightOn , function() {}, function() {});
+	// TODO: fix this; include highlightColor and highlightOn params
+	Wicket.Ajax.get({"u":highlightStateChangeCallbackUrl});
 }

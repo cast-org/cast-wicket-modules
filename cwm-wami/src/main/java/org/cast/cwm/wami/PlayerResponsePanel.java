@@ -22,13 +22,14 @@ package org.cast.cwm.wami;
 import java.util.Iterator;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnLoadHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.cast.cwm.data.UserContent;
+import org.cast.cwm.data.Response;
 import org.cast.cwm.service.ICwmService;
 import org.wicketstuff.jslibraries.JSLib;
 import org.wicketstuff.jslibraries.Library;
@@ -38,7 +39,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 
 /**
- * An audio recorder and player.
+ * A panel for the WAMI audio player, based on @Response rather than UserContent.
  * 
  * Important notes:
  *    1. this requires that a {@link org.cast.cwm.BinaryFileDataMapper} be set up with prefix {@link #BINARY_FILE_DATA_MAPPER_PREFIX}.
@@ -46,19 +47,18 @@ import com.google.inject.Inject;
  *       and provide better markup.
  *    3. JQuery is assumed to be already loaded on the page.
  *    
- * @author cdietz
  * @author bgoldowsky
  *
  */
-public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implements IHeaderContributor {
+public class PlayerResponsePanel<T extends Response> extends BaseAudioPanel<T> implements IHeaderContributor {
 
 	@Inject
 	private ICwmService cwmService;
 
+	private AudioSkin audioSkin;
+
 	public static final String BINARY_FILE_DATA_MAPPER_PREFIX = "userdata";
 		
-	private AudioSkin audioSkin;
-	
 	/**
 	 * The place where the SWF may be inserted.
 	 */
@@ -66,14 +66,14 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 
 	private static final long serialVersionUID = 1L;
 
-	public PlayerPanel(String id, IModel<T> mUserContent, AudioSkin skin, WamiAppletHolder appletHolder) {
-		this(id, mUserContent, skin);
+	public PlayerResponsePanel(String id, IModel<T> mResponse, AudioSkin audioSkin, WamiAppletHolder appletHolder) {
+		this(id, mResponse, audioSkin);
 		this.appletHolder = appletHolder;
 	}
 
-	public PlayerPanel(String id, IModel<T> mUserContent, AudioSkin skin) {
-		super(id, mUserContent);
-		this.audioSkin = skin;
+	public PlayerResponsePanel(String id, IModel<T> mResponse, AudioSkin audioSkin) {
+		super(id, mResponse);
+		this.audioSkin = audioSkin;
 		setOutputMarkupId(true);
 	}
 
@@ -95,19 +95,19 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 	public String getVariation() {
 		return audioSkin.getVariationName();
 	}
-	
+
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
 		
 		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.SWFOBJECT, 2)).renderHead(response);
 
-//        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "normalize.css"));
-//        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "edit.css"));
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "audio_applet.js", null, null, getVariation())));
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "wami-recorder.js", null, null, getVariation())));
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "castrecorder.js", null, null, getVariation())));
 
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "audio_applet.js", null, null, getVariation()), "wami-applet"));
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "wami-recorder.js", null, null, getVariation()), "wami-recorder"));
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "castrecorder.js", null, null, getVariation()), "wami-cast"));
+        if (audioSkin.isHasCss())
+        	response.render(CssHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "audio_applet.css", null, null, getVariation())));
 
         configureRecorder(response);
 	}
@@ -122,9 +122,10 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 	}
 
 	protected RecorderOptions getRecorderOptions() {
-		boolean hasExistingContent = getModelObject().getPrimaryFile() != null;
+		boolean hasExistingContent = getModelObject().getResponseData() != null 
+				&& getModelObject().getResponseData().getBinaryFileData() != null;
 
-		PackageResourceReference wamiRR = new PackageResourceReference(PlayerPanel.class, "Wami2.swf");
+		PackageResourceReference wamiRR = new PackageResourceReference(PlayerResponsePanel.class, "Wami2.swf");
 		String wamiURL = urlFor(wamiRR, null).toString();
 
 		return new RecorderOptions(
@@ -132,8 +133,8 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
                 wamiURL,
                 null,
                 BINARY_FILE_DATA_MAPPER_PREFIX + "/",
-                getModelObject().getId(),
-                (hasExistingContent ? getModelObject().getPrimaryFile().getId() : 0) );
+                null, // FIXME?  would be UserContent ID
+                (hasExistingContent ? getModelObject().getResponseData().getBinaryFileData().getId() : 0) );
 	}
 
     /**
