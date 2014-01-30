@@ -52,13 +52,13 @@
         <module>cwm-components</module>
         <module>cwm-data</module>
         <module>cwm-dav</module>
+	    <module>cwm-db</module>
         <module>cwm-glossary</module>
         <module>cwm-mediaplayer</module>
         <module>cwm-search</module>
         <module>cwm-tag</module>
+    	<module>cwm-wami</module>
         <module>cwm-xml</module>
-    <module>cwm-db</module>
-    <module>cwm-wami</module>
     </modules>
 
     <repositories>
@@ -109,13 +109,13 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.cast.cwm</groupId>
-                <artifactId>cwm-glossary</artifactId>
-                <version>${project.version}</version>
+            	<groupId>org.cast.cwm</groupId>
+            	<artifactId>cwm-db</artifactId>
+            	<version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.cast.cwm</groupId>
-                <artifactId>cwm-indira</artifactId>
+                <artifactId>cwm-glossary</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -126,6 +126,11 @@
             <dependency>
                 <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-tag</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cast.cwm</groupId>
+                <artifactId>cwm-wami</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
