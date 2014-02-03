@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
@@ -38,11 +37,10 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.util.resource.AbstractStringResourceStream;
 import org.cast.audioapplet.component.AudioPlayer;
+import org.cast.cwm.UserResponseDataMapper;
 import org.cast.cwm.components.FileDownloadLink;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
@@ -80,7 +78,6 @@ public class ResponseViewer extends Panel {
 	@Getter
 	private IModel<? extends Response> mResponse;
 
-	
 	@Override 
 	public void onDetach() {
 		super.onDetach();
@@ -168,9 +165,8 @@ public class ResponseViewer extends Panel {
 
 		// The URL from which the table data can be loaded.
 		protected CharSequence getDataUrl() {
-			TableDataLoadAjaxBehavior loadBehavior = new TableDataLoadAjaxBehavior();
-			ResponseViewer.TableFragment.this.add(loadBehavior);
-			return (loadBehavior.getCallbackUrl());				
+			String prefix = UserResponseDataMapper.USER_RESPONSE_DATA_MAPPER_PREFIX;
+			return prefix + "/" + ((Response)getDefaultModelObject()).getId();
 		}
 
 		@Override
@@ -192,25 +188,6 @@ public class ResponseViewer extends Panel {
 			// once the text for the grid is available in the hidden text field make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
 			response.render(OnDomReadyHeaderItem.forScript(jsString));			
-		}
-	}
-
-	
-	// this behavior enables the data stored in the database to be streamed via a url
-	class TableDataLoadAjaxBehavior extends AbstractAjaxBehavior {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public void onRequest() {
-			getRequestCycle().scheduleRequestHandlerAfterCurrent(
-					new ResourceStreamRequestHandler(
-							new AbstractStringResourceStream() {
-								private static final long serialVersionUID = 1L;
-								@Override
-								protected String getString() {
-									return getModel().getObject().getText();
-								}
-							}));
 		}
 	}
 
