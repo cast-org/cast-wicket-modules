@@ -36,9 +36,13 @@ function cwmImportGrid(divId, url, readonly) {
 	//pull json string from the URL
 	var data = $.ajax({type: "GET", url: url, async: false}).responseText;
 	
-	//parse string into object
-	castEditableGridObjects[divId] = JSON.parse(data);
-	
+	//parse string into object	
+	try {
+		castEditableGridObjects[divId] = JSON.parse(data);
+	} catch (e) {
+	    console.error("Error Parsing JSON for Table Response:", e); 
+	    jQuery('#'+divId).parent().prepend("<p>Authoring Error when parsing table template!</p>").addClass('error');    
+	}	
 	setRemoveButtonState(divId);
 
 }
