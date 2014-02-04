@@ -33,6 +33,7 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
+import org.joda.time.DateTime;
 
 /**
  * Builds queries over the audit data for UserContent.
@@ -73,9 +74,9 @@ public class UserContentAuditQueryBuilder implements ISortableAuditQueryBuilder 
 		}
 		
 		if (mFromDate != null && mFromDate.getObject() != null)
-			query.add(AuditEntity.revisionProperty("timestamp").ge(mFromDate.getObject().getTime()));
+			query.add(AuditEntity.revisionProperty("timestamp").ge(midnightStart(mFromDate.getObject()).getTime()));
 		if (mToDate != null && mToDate.getObject() != null)
-			query.add(AuditEntity.revisionProperty("timestamp").le(mToDate.getObject().getTime()));
+			query.add(AuditEntity.revisionProperty("timestamp").le(midnightEnd(mToDate.getObject()).getTime()));
 		return query;
 	}
 	
@@ -86,4 +87,21 @@ public class UserContentAuditQueryBuilder implements ISortableAuditQueryBuilder 
 		return query;
 	}
 	
+	protected Date midnightEnd(Date olddate) {
+		DateTime dateTime = new DateTime(olddate);
+		DateTime adjustedDateTime
+			= dateTime
+				.plusDays(1)
+				.withTimeAtStartOfDay();
+		return adjustedDateTime.toDate();
+	}
+
+	protected Date midnightStart(Date olddate) {
+		DateTime dateTime = new DateTime(olddate);
+		DateTime adjustedDateTime
+			= dateTime
+				.withTimeAtStartOfDay();
+		return adjustedDateTime.toDate();
+	}
+
 }

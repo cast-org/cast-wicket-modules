@@ -20,7 +20,6 @@
 package org.cast.cwm.admin;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +68,7 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,11 +155,9 @@ public class EventLog extends AdminPage {
 	}
 
 	protected void addDateFilter(Form<Object> form) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());   // Default: from 1 month ago, to end of today.
-		toDateM = new Model<Date>(cal.getTime());
-		cal.add(Calendar.MONTH, -1);
-		fromDateM = new Model<Date>(cal.getTime());
+		DateTime currentDateTime = new DateTime(new Date());
+		toDateM = new Model<Date>(currentDateTime.toDate());
+		fromDateM = new Model<Date>(currentDateTime.minusMonths(1).toDate());
 
 		form.add(new DateTextField("from", fromDateM));
 		form.add(new DateTextField("to", toDateM));		
@@ -252,6 +250,23 @@ public class EventLog extends AdminPage {
 		return columns;
 	}
 	
+	protected Date midnightEnd(Date olddate) {
+		DateTime dateTime = new DateTime(olddate);
+		DateTime adjustedDateTime
+			= dateTime
+				.plusDays(1)
+				.withTimeAtStartOfDay();
+		return adjustedDateTime.toDate();
+	}
+
+	protected Date midnightStart(Date olddate) {
+		DateTime dateTime = new DateTime(olddate);
+		DateTime adjustedDateTime
+			= dateTime
+				.withTimeAtStartOfDay();
+		return adjustedDateTime.toDate();
+	}
+
 	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator {
 
 		private static final long serialVersionUID = 1L;
@@ -280,11 +295,10 @@ public class EventLog extends AdminPage {
 			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
 			
 			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
-				Calendar toDate = Calendar.getInstance(); // Set "to" time to end of the day (expressed as <00:00 of the following day)
-				toDate.setTime(toDateM.getObject());
-				toDate.add(Calendar.DAY_OF_MONTH, 1);
-				log.debug("Considering events between {} and {}", fromDateM.getObject(), toDate.getTime());
-				criteria.add(Restrictions.between("insertTime", fromDateM.getObject(), toDate.getTime()));
+				Date startDate = midnightStart(fromDateM.getObject());
+				Date endDate = midnightEnd(toDateM.getObject());
+				log.debug("Considering events between {} and {}", startDate, endDate);
+				criteria.add(Restrictions.between("insertTime", startDate, endDate));
 			}
 
 			//set permission check
