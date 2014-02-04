@@ -22,6 +22,7 @@ package org.cast.cwm.data.resource;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
@@ -42,6 +43,9 @@ import com.google.inject.Inject;
  * 
  * If the response and/or text value is not found, this will throw a 404 Not Found Error.
  * 
+ * TODO: used for json files only - need to make generic for other types
+ * of UserResponseData - ldm
+ * 
  */
 public class UserResponseDataResource extends AbstractResource {
 
@@ -49,6 +53,12 @@ public class UserResponseDataResource extends AbstractResource {
 
 	@Getter
 	protected Long id;
+	
+	@Setter
+	protected String contentType = "application/json";
+	
+	@Setter
+	protected String textEncoding = "UTF-8";
 	
 	@Inject
 	private ICwmService cwmService;
@@ -73,7 +83,6 @@ public class UserResponseDataResource extends AbstractResource {
 		}
 		
 		response.setLastModified(Time.valueOf(cwmResponse.getLastUpdated()));
-		response.setContentLength(cwmResponse.getText().length());
 		
 		if (response.dataNeedsToBeWritten(attributes)) {
 			response.setContentDisposition(ContentDisposition.INLINE);
@@ -86,6 +95,8 @@ public class UserResponseDataResource extends AbstractResource {
 						attributes.getResponse().write(cwmResponse.getText());
 					}
 				});
+				response.setContentType(contentType);					
+				response.setTextEncoding(textEncoding);
 			}
 		}
 		return response;
