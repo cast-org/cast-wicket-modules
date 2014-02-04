@@ -76,4 +76,6 @@ public interface ISiteService {
 	 */
 	public IModel<Period> getPeriodByName(String name);
 
+	public IModel<Period> newPeriod(String defaultName);
+
 }
