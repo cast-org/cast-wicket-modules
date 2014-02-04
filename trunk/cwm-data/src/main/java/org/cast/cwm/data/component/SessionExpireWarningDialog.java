@@ -20,6 +20,7 @@
 package org.cast.cwm.data.component;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.databinder.auth.AuthDataSessionBase;
 
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
@@ -37,8 +38,6 @@ import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.IEventService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -50,10 +49,10 @@ import com.google.inject.Inject;
  * @author jbrookover
  *
  */
+@Slf4j
 public class SessionExpireWarningDialog extends Panel implements IHeaderContributor {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(SessionExpireWarningDialog.class);
 	
 	public static final PackageResourceReference JAVASCRIPT_REFERENCE = new PackageResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
 	
@@ -63,6 +62,8 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	@Inject
 	private IEventService eventService;
 
+	// Note that the session timeout is set in CwmApplication - sessionTimeout
+	
 	@Getter
 	private int warningTime = 60 * 5; // Number of seconds before session expires that the user receives a warning.
 	
@@ -119,13 +120,12 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 	}
 	
 	/**
-	 * Called when the user indicates that they are still working.  By default,
-	 * does nothing.
+	 * Called when the user indicates that they are still working.
 	 * 
 	 * @param target
 	 */
 	protected void keepAliveCall(AjaxRequestTarget target) {
-		/* Nothing by default */
+		target.appendJavaScript(getResetJavascript());
 	}
 	
 	/**
@@ -174,6 +174,14 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		}
 
 		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
+
+		// initialize the warning js by calling SessionExpireWarning.init with the following params
+		//	sessionLength - length, in seconds, of the HttpSession
+		//	warningTime - time, in seconds, before HttpSession ends to trigger a warning
+		//	warningCallbackFunction - function that is triggered to warn the user of impending session expiration
+		//	responseTime - time, in seconds, the user has to respond to the warning
+		//	inactiveCallbackFunction - function that is triggered if the user does not respond to warning
+		
 		StringBuffer script = new StringBuffer();
 		script.append("SessionExpireWarning.init(");
 		script.append(CwmApplication.get().getSessionTimeout() + ", ");
@@ -227,8 +235,4 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		this.responseTime = time;
 		return this; // for chaining
 	}
-	
-	
-
-
 }
