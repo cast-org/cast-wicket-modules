@@ -33,6 +33,7 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.string.StringValueConversionException;
+import org.cast.cwm.data.provider.IteratorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,17 +49,35 @@ class CSVDownload<E extends Serializable> extends AbstractResource {
 	private static final Logger log = LoggerFactory.getLogger(CSVDownload.class);
 
 	protected List<IDataColumn<E>> columns;
-	protected IDataProvider<E> dataProvider;
+	private IteratorProvider<? extends E> iteratorProvider;
+
+	/**
+	 * Configure a download with a given iterator provider and set of columns
+	 * @param columns
+	 * @param interatorProvider
+	 */
+	CSVDownload (final List<IDataColumn<E>> columns, final IteratorProvider<E> iteratorProvider) {
+		super();
+		this.columns = columns;
+		this.iteratorProvider = iteratorProvider;
+	}
 
 	/**
 	 * Configure a download with a given data provider and set of columns
-	 * @param columns2
+	 * @param columns
 	 * @param dataProvider
 	 */
-	CSVDownload (List<IDataColumn<E>> columns2, IDataProvider<E> dataProvider) {
-		super();
-		this.columns = columns2;
-		this.dataProvider = dataProvider;
+	CSVDownload (final List<IDataColumn<E>> columns, final IDataProvider<E> dataProvider) {
+		this(columns, new IteratorProvider<E>(){
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Iterator<? extends E> getIterator() {
+				// DataProvider doesn't have a concept of "unlimited".  Hopefully 
+				// a million event records is enough
+				return dataProvider.iterator(0, 1000000);
+			}});
 	}
 
 	/**
@@ -94,7 +113,7 @@ class CSVDownload<E extends Serializable> extends AbstractResource {
 						// Write Data
 						// DataProvider doesn't have a concept of "unlimited".  Hopefully 
 						// a million event records is enough
-						Iterator<? extends E> it = dataProvider.iterator(0, 1000000); 
+						Iterator<? extends E> it = iteratorProvider.getIterator(); 
 						while (it.hasNext()) {
 							E e = it.next();
 							for (IDataColumn<E> col : columns) {
