@@ -88,15 +88,12 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 
 	@Override
 	protected final void onSubmit(AjaxRequestTarget target) {
-		
 		if (RequestCycle.get().getRequest().getRequestParameters().getParameterValue("autosave").toBoolean()) {	
 			onAutoSave(target);
 		} else {
 			throw new IllegalStateException("Autosaving request expected parameter autosave='true'");
 		}
-		
 	}
-	
 	
 	@Override
 	public void renderHead(Component component, final IHeaderResponse response) {
