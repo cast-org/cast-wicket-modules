@@ -25,6 +25,7 @@ var AutoSaver = {
 				try {
 					value.call();
 				} catch (err) {
+					AutoSaver.logger("Removing failing callback: ", value, "cause:", err);
 					AutoSaver.onBeforeSaveCallBacks.splice(key, 1) /* Probably a stale callback; remove it. */
 				}
 	        });
@@ -60,7 +61,7 @@ var AutoSaver = {
 								}],
 								fh: [function() { // Failure Handler
 									alert ("Autosave Failed for form: " + id);
-									AutoSaver.logger("Autosave Failed");
+									AutoSaver.logger("Autosave Failed for form ", id);
 									statusObject.hasErrors = true;
 								}],
 								coh: [function() { // Complete handler
