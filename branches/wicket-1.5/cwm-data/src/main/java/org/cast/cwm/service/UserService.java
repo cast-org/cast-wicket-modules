@@ -214,12 +214,14 @@ public class UserService implements IUserService {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IUserService#getUncachedUserListProvider(org.apache.wicket.model.IModel)
+	 * @see org.cast.cwm.service.IUserService#getUncachedStudentListProvider(org.apache.wicket.model.IModel)
+	 *
 	 */
-	public ISortableDataProvider<User> getUncachedUserListProvider(IModel<Period> mPeriod) {
+	public ISortableDataProvider<User> getUncachedStudentListProvider(IModel<Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
 		c.setCacheResults(false);
+		c.setRole(Role.STUDENT);
 		return new SortableHibernateProvider<User>(User.class, c);
 	}
 

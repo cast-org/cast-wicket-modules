@@ -69,7 +69,7 @@ public interface IUserService {
 	ISortableDataProvider<User> getUserListProvider(
 			IModel<Period> mPeriod);
 
-	ISortableDataProvider<User> getUncachedUserListProvider(
+	ISortableDataProvider<User> getUncachedStudentListProvider(
 			IModel<Period> mPeriod);
 
 	/**
