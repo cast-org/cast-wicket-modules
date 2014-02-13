@@ -19,9 +19,6 @@
  */
 package org.cast.cwm.wami;
 
-import java.util.Iterator;
-
-import org.apache.wicket.Component;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnLoadHeaderItem;
@@ -59,17 +56,7 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 		
 	private AudioSkin audioSkin;
 	
-	/**
-	 * The place where the SWF may be inserted.
-	 */
-	private WamiAppletHolder appletHolder;
-
 	private static final long serialVersionUID = 1L;
-
-	public PlayerPanel(String id, IModel<T> mUserContent, AudioSkin skin, WamiAppletHolder appletHolder) {
-		this(id, mUserContent, skin);
-		this.appletHolder = appletHolder;
-	}
 
 	public PlayerPanel(String id, IModel<T> mUserContent, AudioSkin skin) {
 		super(id, mUserContent);
@@ -79,16 +66,7 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 
 	@Override
 	protected void onInitialize() {
-		super.onInitialize();
-		
-		// If no appletHolder was specified in the constructor, search for one on the page.
-		if (appletHolder == null) {
-			Iterator<Component> iterator = getPage().visitChildren(WamiAppletHolder.class).iterator();
-			if (iterator.hasNext())
-				appletHolder = (WamiAppletHolder) iterator.next();
-			else
-				throw new RuntimeException("This component must be used on a page with a WamiAppletHolder");
-		}
+		super.onInitialize();		
 	}
 	
 	@Override
@@ -128,7 +106,6 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 		String wamiURL = urlFor(wamiRR, null).toString();
 
 		return new RecorderOptions(
-        		appletHolder.getMarkupId(),
                 wamiURL,
                 null,
                 BINARY_FILE_DATA_MAPPER_PREFIX + "/",
@@ -142,15 +119,13 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
      *
      */
 	static class RecorderOptions {
-		String swfId;
         String swfUrl;
         String recordUrl;
         String playPrefix;
         Long userContentId;
         Long binaryFileId;
 
-        RecorderOptions(String swfId, String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
-        	this.swfId = swfId;
+        RecorderOptions(String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
             this.swfUrl = swfUrl;
             this.recordUrl = recordUrl;
             this.playPrefix = playPrefix;
