@@ -64,12 +64,6 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 	
 	private static final long serialVersionUID = 1L;
 
-	public RecorderPanel(String id, IModel<T> mUserContent, AudioSkin skin, WamiAppletHolder appletHolder) {
-		super(id, mUserContent, skin, appletHolder);
-		listener = new AudioDataListenerBehavior();
-		add(listener);
-	}
-
 	public RecorderPanel(String id, IModel<T> mUserContent, AudioSkin skin) {
 		super(id, mUserContent, skin);
 		listener = new AudioDataListenerBehavior();
