@@ -813,18 +813,8 @@ public abstract class ResponseEditor extends Panel {
 
 				@Override
 				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
-					// replace the fileuploadfield - model is no longer valid after save
-//					FileUploadField updatedFileUploadField = new FileUploadField("fileUploadField");
-//					updatedFileUploadField.setOutputMarkupId(true);
-//					FileUploadField fileUploadField = (FileUploadField) get("form:fileUploadField");
-//					fileUploadField.replaceWith(updatedFileUploadField);
-//					fileUploadField = updatedFileUploadField;
-//					target.add(fileUploadField);
-//					target.add(form);
-
 					super.onAfterSubmit(target, form);
 					onSave(target);	
-					
 				}
 
 			};
