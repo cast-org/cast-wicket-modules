@@ -190,7 +190,7 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		script.append(responseTime + ", ");
 		script.append("function() { ");
 		script.append(getBeforeInactiveTimeoutJavaScript());
-		script.append("wicketAjaxGet('" + inactiveBehavior.getCallbackUrl() + "'); ");
+		script.append("Wicket.Ajax.get({u:'" + inactiveBehavior.getCallbackUrl() + "'}); ");
 		script.append("}");
 		script.append(");"); 
 		

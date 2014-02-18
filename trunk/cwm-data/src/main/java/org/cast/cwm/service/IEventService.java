@@ -38,13 +38,19 @@ public interface IEventService extends IEventLogger {
 	
 	/**
 	 * Save an event to the datastore.
-	 * 
-	 * @see {@link AbstractEventService#saveEvent(String, String, String)}
+	 * @see IEventLogger#saveEvent(String, String, String, String)
 	 * @return model wrapping the event that was saved
 	 */
 	@Override
-	public abstract IModel<? extends Event> saveEvent(String type,
-			String detail, String pageName);
+	public abstract IModel<? extends Event> saveEvent(String type, String detail, String pageName, String componentPath);
+
+	/**
+	 * Save an event to the datastore.
+	 * @see IEventLogger#saveEvent(String, String, String)
+	 * @return model wrapping the event that was saved
+	 */
+	@Override
+	public abstract IModel<? extends Event> saveEvent(String type, String detail, String pageName);
 
 	/**
 	 * Save a login event.

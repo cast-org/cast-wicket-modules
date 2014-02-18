@@ -89,15 +89,24 @@ public class EventService implements IEventService {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String)
+	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public IModel<? extends Event> saveEvent(String type, String detail, String pageName) {
+	public IModel<? extends Event> saveEvent(String type, String detail, String pageName, String componentPath) {
 		Event e = newEvent();
 		e.setType(type);
 		e.setDetail(detail);
 		e.setPage(pageName);
+		e.setComponentPath(componentPath);
 		return saveEvent(e);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public IModel<? extends Event> saveEvent(String type, String detail, String pageName) {
+		return saveEvent(type, detail, pageName, null);
 	}
 
 	/* (non-Javadoc)
@@ -105,7 +114,7 @@ public class EventService implements IEventService {
 	 */
 	@Override
 	public IModel<? extends Event> saveLoginEvent() {
-		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
+		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null, null);
 	}
 	
 	/* (non-Javadoc)

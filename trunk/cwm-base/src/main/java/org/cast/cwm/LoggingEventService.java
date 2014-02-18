@@ -41,4 +41,10 @@ public class LoggingEventService implements IEventLogger {
 		return null;
 	}
 
+	@Override
+	public Object saveEvent(String type, String detail, String location, String componentPath) {
+		log.debug("Event: {}, {}, {}, {}", Arrays.asList(type, detail, location, componentPath));
+		return null;
+	}
+
 }
