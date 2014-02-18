@@ -219,19 +219,19 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 				"			status = 'resume'; } " +
 				"	   else {" +
 				"      		status = 'play';\n };" +
-				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
+				"      Wicket.Ajax.get({u:url, ep:{ status: status}});\n" +
 				" 	});\n" +
 
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onPause(function() {" +
 				"      status = 'paused';\n "  +
-				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
+				"      Wicket.Ajax.get({u:url, ep:{status: status}});\n" +
 				" 	});\n" +
 
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onComplete(function() {" +
 				"      status = 'completed';\n "  +
-				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
+				"      Wicket.Ajax.get({u:url, ep:{status: status}});\n" +
 				" 	});\n";
-		return jsString;		
+		return jsString;
 	}
 
 	

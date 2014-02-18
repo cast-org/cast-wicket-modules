@@ -19,6 +19,7 @@
  */
 package org.cast.cwm;
 
+
 /**
  * Interface for an object that can be used to log events.
  * Exists so that CWM modules can record some user activity without depending on
@@ -35,6 +36,18 @@ public interface IEventLogger {
 	 * @param location An indication of the page or area of the application where the event occurred
 	 * @return if an object was created to represent the event, return it.
 	 */
-    public Object saveEvent (String type, String detail, String location);
+    public abstract Object saveEvent (String type, String detail, String location);
+    
+	/**
+	 * Log a component-related event with the appropriate details.
+	 *
+	 * @param type The type of event; should be a manageable finite set of types for each application
+	 * @param detail Any additional details about the event
+	 * @param location An indication of the page or area of the application where the event occurred
+	 * @param componentPath the wicket ID path to the component related to this event.
+	 * @return if an object was created to represent the event, return it.
+	 */
+	public abstract Object saveEvent(String type, String detail, String pageName, String componentPath);
+
 
 }

@@ -346,7 +346,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
         result.append("if (typeof(modalInit)==='function') modalInit(); ");
         result.append("DialogBorder.focusDialog('" + contentContainer.getMarkupId() + "', " + (storeCallingButton? "true" : "false") + ");");
         if (logEvents)
-        	result.append("wicketAjaxGet('" + openEventBehavior.getCallbackUrl() + "');");
+        	result.append("Wicket.Ajax.get({u:'" + openEventBehavior.getCallbackUrl() + "'});");
         return result.toString();	
     }
     

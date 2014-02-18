@@ -93,6 +93,11 @@ public class Event extends PersistedObject {
 	
 	protected String page;
 	
+	/**
+	 * The wicket ID path of the component that was clicked to generate this event. 
+	 */
+	protected String componentPath;
+	
 	/** Called just before saving Event to database to set various fields
 	 * whose values are predictable.  Override as necessary for you application.
 	 */

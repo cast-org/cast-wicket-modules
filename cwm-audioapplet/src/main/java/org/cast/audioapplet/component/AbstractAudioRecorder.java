@@ -153,7 +153,7 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
 		response.render(JavaScriptHeaderItem.forScript("function save_" + getMarkupId() + "() {" +
-				"wicketAjaxGet('" + notifyBehavior.getCallbackUrl() + "'); }", 
+				"Wicket.Ajax.get({u:'" + notifyBehavior.getCallbackUrl() + "'}); }", 
 				"save_" + getMarkupId()));
 	}
 
