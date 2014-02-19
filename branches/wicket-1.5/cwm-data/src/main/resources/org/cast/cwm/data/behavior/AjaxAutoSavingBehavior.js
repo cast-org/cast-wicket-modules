@@ -9,7 +9,7 @@
  */
 var AutoSaver = {
 		
-	    DEBUG: true, // If true, will print logging messages in Firebug
+	    DEBUG: false, // If true, will print logging messages in Firebug
 	    autoSaveInterval: 30000,  // time between autosaves, in ms
 	    onBeforeSaveCallBacks: new Array(), // Collection of callbacks to run before checking if the form needs to be saved.
 	    formsInProgress: new Array(), // Collection of forms that are being saved
