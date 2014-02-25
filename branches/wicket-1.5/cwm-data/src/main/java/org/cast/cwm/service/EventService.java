@@ -62,7 +62,7 @@ public class EventService implements IEventService {
 	private final static Logger log = LoggerFactory.getLogger(EventService.class);
 	
 	@Inject
-	private ICwmService cwmService;
+	protected ICwmService cwmService;
 
 	/** 
 	 * Create a new Event instance.
@@ -73,8 +73,7 @@ public class EventService implements IEventService {
 	}
 	
 	/**
-	 * Save an actual event object.  Private and final because I feel
-	 * everyone should call {@link #saveEvent(String, String, String)}.
+	 * Save an actual event object.  
 	 * 
 	 * @param e
 	 * @return model wrapping the event that was saved
