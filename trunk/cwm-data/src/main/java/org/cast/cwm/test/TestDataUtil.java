@@ -54,6 +54,4 @@ public class TestDataUtil {
 		user.setRole(role);
 		return user;
 	}
-
-
 }
