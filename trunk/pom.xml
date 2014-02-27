@@ -466,12 +466,12 @@
     </build>
   
     <properties>
-        <wicket.version>6.12.0</wicket.version>
-        <wicketstuff.version>6.11.1</wicketstuff.version>
+        <wicket.version>6.14.0</wicket.version>
+        <wicketstuff.version>6.14.0</wicketstuff.version>
         <hibernate.version>4.2.0.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
-        <copyright.year>2013</copyright.year>
+        <copyright.year>2014</copyright.year>
     </properties>
   
 </project>
