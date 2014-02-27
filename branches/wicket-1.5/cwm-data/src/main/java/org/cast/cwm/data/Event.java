@@ -101,7 +101,7 @@ public class Event extends PersistedObject {
 			insertTime = new Date();
 		if (loginSession == null)
 			loginSession = CwmSession.get().getLoginSession();
-		if (user == null)
+		if ((user == null) && (loginSession != null))
 			user = loginSession.getUser();
 	}
 	
