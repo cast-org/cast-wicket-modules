@@ -79,6 +79,8 @@ public class Event extends PersistedObject {
 	
 	protected boolean hasResponses = false;
 	
+	protected boolean hasUserContent = false;
+	
 	@OneToMany(mappedBy="event", fetch=FetchType.LAZY)
 	protected Set<ResponseData> responseData = new HashSet<ResponseData>();
 	
