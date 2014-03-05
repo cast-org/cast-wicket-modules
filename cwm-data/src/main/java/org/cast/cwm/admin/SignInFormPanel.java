@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -33,7 +33,7 @@ import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FeedbackBorder;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.IUserService;
+import org.cast.cwm.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,12 @@ import com.google.inject.Inject;
 
 /**
  * A simple Sign-In form for authenticating users.
+ * 
+ * Form must be statefull because RSAPasswordTextField has a 'challenge' field that must be consistent
+ * between requests.
+ * 
+ * TODO: Databinder RSAPasswordTextField fails HTML validation.
+ * 
  * 
  * @author jbrookover
  *
@@ -54,11 +60,8 @@ public class SignInFormPanel extends Panel {
 	private PasswordTextField password;
 	
 	@Inject
-	protected IEventService eventService;
+	private IEventService eventService;
 
-	@Inject 
-	protected IUserService userService;
-	
 	public SignInFormPanel(String id) {
 		super(id);
 		add(new SignInForm("form"));
@@ -83,7 +86,7 @@ public class SignInFormPanel extends Panel {
 		@Override
 		protected void onSubmit()	{
 			
-			IModel<User> user = userService.getByUsername(username.getModelObject());
+			IModel<User> user = UserService.get().getByUsername(username.getModelObject());
 			
 			if (user!=null && user.getObject()!=null && !user.getObject().isValid()) {
 				error(getLocalizer().getString("accountInvalid", this, "Account not confirmed.  You must confirm your account by clicking on the link in the email we sent you before you can log in."));
@@ -98,9 +101,9 @@ public class SignInFormPanel extends Panel {
 			
 			eventService.createLoginSession(getRequest());
 			eventService.saveLoginEvent();
-			continueToOriginalDestination();
-			// if we reach this line, there was no stored destination; load home page.
-			setResponsePage(CwmApplication.get().getHomePage(CwmSession.get().getUser().getRole()));
+			if (!continueToOriginalDestination()) {
+				setResponsePage(CwmApplication.get().getHomePage(CwmSession.get().getUser().getRole()));
+			}
 		}
 	}
 }

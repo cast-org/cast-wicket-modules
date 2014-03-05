@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -54,7 +54,7 @@ import org.hibernate.criterion.Restrictions;
  */
 @Getter
 @Setter
-public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String>, IDetachable {
+public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator, IDetachable {
 
 	private static final long serialVersionUID = 1L;
 	private Role role = null;
@@ -66,21 +66,19 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private String subjectId;
 	private IModel<Period> period;
 	private IModel<? extends Collection<Site>> sites;
-	private ISortState<String> sortState = new SingleSortState<String>();
+	private ISortState sortState = new SingleSortState();
 	private boolean cacheResults = true;
 	
 	public UserCriteriaBuilder() {
 	}
 	
-	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}
 	
-	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
-		SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
+		SortParam sort = ((SingleSortState) getSortState()).getSort();
 		if (sort != null) {
 			if (sort.isAscending())
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());
@@ -93,7 +91,6 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 		}
 	}
 	
-	@Override
 	public void buildUnordered(Criteria criteria) {
 		if (role != null)
 			criteria.add(Restrictions.eq("role", role));
@@ -126,7 +123,6 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 			criteria.setCacheable(true);	
 	}
 	
-	@Override
 	public void detach() {
 		if (period != null)
 			period.detach();

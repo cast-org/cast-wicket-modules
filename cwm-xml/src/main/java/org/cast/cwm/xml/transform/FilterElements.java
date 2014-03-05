@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -57,7 +57,6 @@ public class FilterElements implements IDOMTransformer, Serializable {
 	
 	private static final Logger log = LoggerFactory.getLogger(FilterElements.class);
 
-	@Override
 	public Element applyTransform(Element n, TransformParameters params) {
 		
 		// Check to see if we need to apply the transform
@@ -110,7 +109,6 @@ public class FilterElements implements IDOMTransformer, Serializable {
 		return null;
 	}
 
-	@Override
 	public Time getLastModified(TransformParameters params) {
 		return null;  // this transformation will not change over time.
 	}

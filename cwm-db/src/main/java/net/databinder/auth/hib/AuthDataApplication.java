@@ -42,6 +42,7 @@ import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.util.crypt.Base64;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
@@ -103,7 +104,6 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	/**
 	 * Sends to sign in page if not signed in, otherwise throws UnauthorizedInstantiationException.
 	 */
-	@Override
 	public void onUnauthorizedInstantiation(Component component) {
 		if (((AuthSession)Session.get()).isSignedIn()) {
 			throw new UnauthorizedInstantiationException(component.getClass());
@@ -116,7 +116,6 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	/**
 	 * Passes query on to the DataUser object if signed in.
 	 */
-	@Override
 	public final boolean hasAnyRole(Roles roles) {
 		DataUser user = ((AuthSession)Session.get()).getUser();
 		if (user != null)
@@ -131,7 +130,6 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * if you have a differently named property.
 	 * @return DataUser for the given username. 
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public T getUser(String username) {
 		return (T) Databinder.getHibernateSession().createCriteria(getUserClass())
@@ -142,13 +140,11 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * Override if you need to customize the sign-in page.
 	 * @return page to sign in users
 	 */
-	@Override
 	public abstract Class< ? extends WebPage> getSignInPageClass();
 	
 	/**
 	 * @return app-salted MessageDigest.  
 	 */
-	@Override
 	public MessageDigest getDigest() {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA");
@@ -167,7 +163,6 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 	 * @param user source of token
 	 * @return restricted token
 	 */
-	@Override
 	public String getToken(DataUser user) {
 		HttpServletRequest req = ((ServletWebRequest) RequestCycle.get().getRequest()).getContainerRequest();
 		String fwd = req.getHeader("X-Forwarded-For");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -59,7 +59,6 @@ public class AudioResourcePlayer extends AudioPlayer implements IResourceListene
 	/**
 	 * Called if we were initialized with a Resource and it's now being requested.
 	 */
-	@Override
 	public void onResourceRequested() {
 		// TODO rewritten - does this work??
 		getRequestCycle().scheduleRequestHandlerAfterCurrent(new ResourceRequestHandler(audioResource, null));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.event;
+package org.cast.cwm.data.provider;
 
-import lombok.Getter;
+import java.io.Serializable;
+import java.util.Iterator;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
+public interface IteratorProvider<T> extends Serializable {
 
-/**
- * Superclass for all Messages that are tied to Ajax events,
- * and thus have an AjaxRequestTarget.  A Message in CWM
- * is the payload of an {@link org.apache.wicket.event.IEvent}
- *
- */
-public class AjaxMessage {
-
-	@Getter
-	private AjaxRequestTarget target;
-
-	public AjaxMessage(AjaxRequestTarget target) {
-		this.target = target;
-	}
-
+	Iterator<? extends T> getIterator();
 }

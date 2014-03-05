@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -89,7 +89,6 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 
 			private static final long serialVersionUID = 1L;
 
-			@Override
 			public void build(Criteria criteria) {
 				criteria.add(Restrictions.eq(field, validatable.getValue()));
 				for (String field : scope.keySet()) {

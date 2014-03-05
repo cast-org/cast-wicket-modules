@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -74,9 +74,9 @@ public class TagPanel extends Panel {
 		else
 			add(new WebMarkupContainer("form").setVisible(false));
 		if (student == null)
-			add(new Label("tagsSubHeader", "Add page tags:"));
+			add(new Label("tagsSubHeader", "Add Tags:"));
 		else
-			add(new Label("tagsSubHeader", "Available tags:"));
+			add(new Label("tagsSubHeader", "Available Tags:"));
 		
 	}
 

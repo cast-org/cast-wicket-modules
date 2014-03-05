@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -31,7 +31,6 @@ import org.cast.cwm.xml.service.IXmlService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.google.inject.Inject;
 /*
  * Copyright 2011-2013 CAST, Inc.
  *
@@ -51,6 +50,7 @@ import com.google.inject.Inject;
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.google.inject.Inject;
 
 /**
  * A Component Handler to be used as a last ditch if no others applied.
@@ -70,7 +70,6 @@ public class DefaultDynamicComponentHandler implements IDynamicComponentHandler 
 		Injector.get().inject(this);
 	}
 
-	@Override
 	public Component getComponent(String wicketId, Element element,
 			IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod ) {
 		boolean isContainer = false;
@@ -89,7 +88,6 @@ public class DefaultDynamicComponentHandler implements IDynamicComponentHandler 
 		}
 	}
 
-	@Override
 	public boolean canHandle(String wicketId) {
 		return true;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -92,7 +92,7 @@ public class ApproximateDateLabel extends DateLabel {
 			} else {
 				pattern = DEFAULT_PATTERN;
 			}
-			return DateTimeFormat.forPattern(pattern);
+			return DateTimeFormat.forPattern(pattern).withLocale(getLocale()).withPivotYear(2000);
 		}
 
 		@Override

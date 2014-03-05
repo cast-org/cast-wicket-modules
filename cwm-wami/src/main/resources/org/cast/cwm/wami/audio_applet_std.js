@@ -1,25 +1,39 @@
 /* audioStatus()
     id - player HTML id
     state - status message state - recording, playback, or default
-    msg1 - message text to display (used in playback mode to show current time position during playback, pairs with audioSlider() to indicate position
-    msg2 - used in playback mode to indicate track length
+    msg - message text to display
 */
-function audioStatus(id, state, msg0, msg1) {
+function audioStatus(id, state, msg) {
     // Reset status state
-    $("#" + id + " .status").removeClass("status_recording status_playback");
-    $("#" + id + " .status .msg0").html("");
-    $("#" + id + " .status .msg1").html("");
+    $("#" + id + " .status").removeClass("status_recording status_playback status_progress");
+    $("#" + id + " .status").html("");
     // Set new state
     switch(state) {
         case 'playback':  { $("#" + id + " .status").addClass("status_playback"); break; }
         case 'recording': { $("#" + id + " .status").addClass("status_recording"); break; }
+        case 'progress': { $("#" + id + " .status").addClass("status_progress"); break; }
         default: { }
     }
     // Update msg
-    if (msg0==null || msg0=='') msg0="&nbsp;";
-    if (msg1==null || msg1=='') msg1="&nbsp;";
-    $("#" + id + " .status .msg0").html(msg0);
-    $("#" + id + " .status .msg1").html(msg1);
+    if (msg==null || msg=='') msg="&nbsp;";
+    $("#" + id + " .status").html(msg);
+
+    return false;
+}
+
+/* audioTimestamp()
+    id - player HTML id
+    ts0 - current timestamp
+    ts1 - end timestamp
+*/
+function audioTimestamp(id, ts0, ts1) {
+    // Reset status state
+    $("#" + id + " .indicator .ts0").html("");
+    $("#" + id + " .indicator .ts1").html("");
+    if (ts0==null) ts0="";
+    if (ts1==null) ts1="";
+    $("#" + id + " .indicator .ts0").html(ts0);
+    $("#" + id + " .indicator .ts1").html(ts1);
 
     return false;
 }
@@ -31,7 +45,7 @@ function audioStatus(id, state, msg0, msg1) {
 function audioIndicator(id, state) {
     // Reset indicator state
     $("#" + id + " .indicator").removeClass("indicator_busy indicator_volume indicator_slider indicator_progress");
-    $("#" + id + " .indicator").attr("style", "");
+    //$("#" + id + " .indicator").attr("style", "");
     $("#" + id + " .indicator .mask").attr("style", "");
     // Set new state
     switch(state) {
@@ -50,76 +64,42 @@ function audioIndicator(id, state) {
     state - player state - loading, recording, recording_nt (no exising track), playback
     action - selected action
 */
-/* Button css states:
-    hide - button hidden/not visible
-    off - visible and in 'gray/disabled' state
-    on  - visible and in 'available' state
-    active - visible and in 'active' state
-    recording nt - used as a pair for recording with the no existing track option
-
-*/
 function audioAction(id, state, action) {
     // Reset actions
     $("#" + id + " .actions").addClass("on");
-    $("#" + id + " .actions a").removeClass("on off active hide nt recording");
+    $("#" + id + " .actions a").removeClass("on off active");
     // Set action buttons
     switch(action) {
         case 'record': {
-            $("#" + id + " .actions .record").addClass("hide");
-            $("#" + id + " .actions .play").addClass("hide");
-            $("#" + id + " .actions .pause").addClass("hide");
-            $("#" + id + " .actions .stop").addClass("recording nt");
-            /*
-            $("#" + id + " .actions .record").addClass("active");
+            $("#" + id + " .actions .record").addClass("on");
             $("#" + id + " .actions .play").addClass("off");
-            $("#" + id + " .actions .pause").addClass("hide");
-            $("#" + id + " .actions .stop").addClass("on");
-            */
+            $("#" + id + " .actions .pause").addClass("off");
             break;
         }
         case 'play': {
             $("#" + id + " .actions .record").addClass("off");
-            $("#" + id + " .actions .play").addClass("hide");
-            $("#" + id + " .actions .pause").addClass("on");
-            $("#" + id + " .actions .stop").addClass("on");
-
+            $("#" + id + " .actions .play").addClass("on");
             break;
         }
         case 'pause': {
             if (state == 'recording') {
-                $("#" + id + " .actions .record").addClass("off");
-                $("#" + id + " .actions .play").addClass("hide");
+                $("#" + id + " .actions .play").addClass("off");
                 $("#" + id + " .actions .pause").addClass("on");
-                $("#" + id + " .actions .stop").addClass("on");
             } else {
                 $("#" + id + " .actions .record").addClass("off");
-                $("#" + id + " .actions .play").addClass("on");
-                $("#" + id + " .actions .pause").addClass("hide");
-                $("#" + id + " .actions .stop").addClass("on");
+                $("#" + id + " .actions .pause").addClass("on");
             }
             break;
         }
         case 'stop': { }
         default: {
             if (state == 'loading') {
-                $("#" + id + " .actions .record").addClass("hide");
-                $("#" + id + " .actions .play").addClass("hide");
-                $("#" + id + " .actions .pause").addClass("hide");
-                $("#" + id + " .actions .stop").addClass("hide");
-            } else if (state == 'recording_nt') {
-               $("#" + id + " .actions .record").addClass("nt");
-                $("#" + id + " .actions .play").addClass("hide");
-                $("#" + id + " .actions .pause").addClass("hide");
-                $("#" + id + " .actions .stop").addClass("hide");
-            } else if (state == 'recording') {
-                $("#" + id + " .actions .record").addClass("nt");
-                $("#" + id + " .actions .play").addClass("hide");
-                $("#" + id + " .actions .pause").addClass("hide");
-                $("#" + id + " .actions .stop").addClass("hide");
+                $("#" + id + " .actions .record").addClass("off");
+                $("#" + id + " .actions .play").addClass("off");
+                $("#" + id + " .actions .pause").addClass("off");
+                $("#" + id + " .actions .stop").addClass("off");
             } else {
-                $("#" + id + " .actions .record").addClass("on");
-                $("#" + id + " .actions .play").addClass("on");
-                $("#" + id + " .actions .pause").addClass("hide");
+                $("#" + id + " .actions .pause").addClass("off");
                 $("#" + id + " .actions .stop").addClass("off");
             }
         }
@@ -144,32 +124,7 @@ function audioVolume(id, level) {
     return false;
 }
 
-function audioVolumeResponsive(id, level) {
-    if ( $("#" + id + " .indicator").hasClass("indicator_volume") ) {
-        var maxWidth = parseInt($("#" + id + " .indicator_volume .mask").css('max-width'));
-        var minWidth = parseInt($("#" + id + " .indicator_volume .mask").css('min-width'));
-        var percent = 0;
-        if ( level < 2 ) {
-            percent = 0;
-        } else if ( level < 5 ) {
-            percent = .25;
-        } else if ( level < 10 ) {
-            percent = .50;
-        } else if ( level < 20 ) {
-            percent = .75;
-        } else {
-            percent = 1;
-        }
-        var levelWidth = ((maxWidth - minWidth) * (percent) );
-        var newWidth = minWidth + levelWidth;
-        var newMargin = (newWidth/2) * -1;
-        $("#" + id + " .indicator_volume .mask").css('width', newWidth + "px");
-        $("#" + id + " .indicator_volume .mask").css('margin-left', newMargin + "px");
-    }
-    return false;
-}
-
-/* audioSlider(id, time)
+/* audioSlider(id, level)
     id - player HTML id
     time - playback %
 */
@@ -196,10 +151,6 @@ function audioProgress(id, complete) {
     return false;
 }
 
-/* audioSlider(id, show)
-    id - player HTML id
-    show - boolean value (true=show, false=hide)
-*/
 function audioModal(id, show) {
     if (show) {
         $("#" + id + " .audio_modal").show();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -86,7 +86,6 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 		return sess;
 	}
 
-	@Override
 	public void onBeginRequest(RequestCycle cycle) {
 		log.debug("onBeginRequest: {}", cycle.getRequest().getUrl());
 	}
@@ -96,7 +95,6 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 	 * not been committed, it will be rolled back before closing the session.
 	 * @see net.databinder.components.hib.DataForm#onSubmit()
 	 */
-	@Override
 	public void onEndRequest(RequestCycle cycle) {
 		for (Object key : keys) {
 			SessionFactory sf = Databinder.getHibernateSessionFactory(key);
@@ -108,17 +106,14 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 		log.debug("onEndRequest complete {}", cycle.getRequest().getUrl());
 	}
 
-	@Override
 	public void onDetach(RequestCycle cycle) {
 		// no action needed
 	}
 
-	@Override
 	public void onRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler) {
 		// no action needed
 	}
 
-	@Override
 	public void onRequestHandlerScheduled(RequestCycle cycle, IRequestHandler handler) {
 		// no action needed
 	}
@@ -127,24 +122,20 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 	 * Closes and reopens sessions for this request cycle. Unrelated models may try to load 
 	 * themselves after this point. 
 	 */
-	@Override
 	public IRequestHandler onException(RequestCycle cycle, Exception ex) {
 		onEndRequest(cycle);
 		onBeginRequest(cycle);
 		return null;
 	}
 
-	@Override
 	public void onExceptionRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler, Exception exception) {
 		// no action needed
 	}
 
-	@Override
 	public void onRequestHandlerExecuted(RequestCycle cycle, IRequestHandler handler) {
 		// no action needed
 	}
 
-	@Override
 	public void onUrlMapped(RequestCycle cycle, IRequestHandler handler, Url url) {
 		// no action needed
 	}

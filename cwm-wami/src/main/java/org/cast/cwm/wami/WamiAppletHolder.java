@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,22 +17,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.component;
+package org.cast.cwm.wami;
 
-import java.util.Collection;
-
-import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 
 /**
- * An AJAX component that disables other components while it is doing its AJAX behavior.
+ * This is a placeholder for the embedded SWF that is be used by {@link PlayerPanel} and {@link RecorderPanel}.
+ * Put it on the page somewhere that it will not be removed or replaced by AJAX updates.
+ * It should be a nice visible location, though, so that the settings panel can be seen. 
+ *
+ * @author bgoldowsky
  *
  */
-public interface IDisablingComponent {
+public class WamiAppletHolder extends WebMarkupContainer {
 
-	/**
-	 * Returns the components that should be disabled while AJAX is processing.
-	 * @return collection of Components.
-	 */
-	public abstract Collection<? extends Component> getComponents();
+	private static final long serialVersionUID = 1L;
+
+	public WamiAppletHolder(String id) {
+		super(id);
+		setOutputMarkupId(true);
+	}
 
 }

@@ -858,7 +858,5 @@ function toggleModelHighlightDisplay(arg1, arg2, arg3, arg4) {
 
 // log the state change - to be stored in the db for persistence
 function highlightStateChangeEvent(highlightColor, highlightOn) {
-	// wicketAjaxGet(highlightStateChangeCallbackUrl + '&highlightColor=' +  highlightColor + '&highlightOn=' + highlightOn , function() {}, function() {});
-	// TODO: fix this; include highlightColor and highlightOn params
-	Wicket.Ajax.get({"u":highlightStateChangeCallbackUrl});
+	wicketAjaxGet(highlightStateChangeCallbackUrl + '&highlightColor=' +  highlightColor + '&highlightOn=' + highlightOn , function() {}, function() {});
 }

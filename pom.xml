@@ -5,7 +5,7 @@
     <groupId>org.cast.cwm</groupId>
     <artifactId>cwm-parent</artifactId>
     <name>CWM parent project</name>
-    <version>3.0-SNAPSHOT</version>
+    <version>2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     
     <url>http://code.google.com/p/cast-wicket-modules</url>
@@ -41,7 +41,7 @@
     <distributionManagement>
         <repository>
             <id>CAST</id>
-            <url>scpexe://comp.cast.org/var/www/html/maven2</url>
+            <url>scpexe://xander.cast.org/shared/maven2-repository</url>
         </repository>
         <!-- todo: site -->
     </distributionManagement>
@@ -138,18 +138,13 @@
                 <artifactId>cwm-xml</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-            	<groupId>org.cast.cwm</groupId>
-            	<artifactId>cwm-db</artifactId>
-            	<version>${project.version}</version>
-            </dependency>
             
             <!-- drawtool has its own Google Code project,
                  and its own release cycle -->
             <dependency>
                 <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-drawtool</artifactId>
-                <version>3.0-SNAPSHOT</version>
+                <version>2.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.cast</groupId>
@@ -188,10 +183,9 @@
                 <version>6.0.16</version>
                 <scope>provided</scope>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.wicket</groupId>
-                <artifactId>wicket-core</artifactId>
+                <artifactId>wicket</artifactId>
                 <version>${wicket.version}</version>
                 <exclusions>
                     <exclusion>
@@ -199,6 +193,7 @@
                         <groupId>org.slf4j</groupId>
                     </exclusion>
                 </exclusions>
+                <type>pom</type>
             </dependency>	  	
             <dependency>
                 <groupId>org.apache.wicket</groupId>
@@ -214,6 +209,8 @@
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-devutils</artifactId>
                 <version>${wicket.version}</version>
+                <type>jar</type>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.wicket</groupId>
@@ -221,22 +218,10 @@
                 <version>${wicket.version}</version>
             </dependency>	  	
             <dependency>
-            	<groupId>org.apache.wicket</groupId>
-            	<artifactId>wicket-guice</artifactId>
-            	<version>${wicket.version}</version>
-            </dependency>
-            
-            <dependency>
-            	<groupId>org.wicketstuff</groupId>
-            	<artifactId>wicketstuff-jslibraries</artifactId>
-            	<version>${wicketstuff.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wicketstuff</groupId>
                 <artifactId>wicketstuff-tinymce</artifactId>
-                <version>${wicketstuff.version}</version>
+                <version>${wicket.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.sanselan</groupId>
                 <artifactId>sanselan</artifactId>
@@ -283,6 +268,8 @@
                 <groupId>HTTPClient</groupId>
                 <artifactId>HTTPClient</artifactId>
                 <version>0.3-3</version>
+                <type>jar</type>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -293,6 +280,7 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernate.version}</version>
+                <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
@@ -357,16 +345,21 @@
                 <version>1.2</version>
             </dependency>
             <dependency>
+            	<groupId>org.apache.wicket</groupId>
+            	<artifactId>wicket-guice</artifactId>
+            	<version>${wicket.version}</version>
+            </dependency>
+            <dependency>
             	<groupId>org.mockito</groupId>
             	<artifactId>mockito-all</artifactId>
             	<version>1.9.0</version>
             </dependency>
-			<dependency>
-				<groupId>com.google.code.gson</groupId>
-				<artifactId>gson</artifactId>
-				<version>2.2.4</version>
-	        </dependency>
-		</dependencies>
+            <dependency>
+            	<groupId>org.wicketstuff</groupId>
+            	<artifactId>wicketstuff-jslibraries</artifactId>
+            	<version>${wicket.version}</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <build>
@@ -375,7 +368,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>               
                 <version>2.5.1</version>
                 <configuration>                
-                    <source>1.6</source>    
+                    <source>1.6</source>         
                     <target>1.6</target>
                 </configuration>
             </plugin>
@@ -411,10 +404,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.8</version>
                 <configuration>
-                    <!-- currently skipping javadoc, it was causing release problems -->
-                    <skip>true</skip>
                     <!-- this will create Javadocs in an "apidocs" directory
                          that is a sister to the "trunk" directory.
                          This location works well on Google Code.
@@ -466,12 +457,11 @@
     </build>
   
     <properties>
-        <wicket.version>6.14.0</wicket.version>
-        <wicketstuff.version>6.14.0</wicketstuff.version>
+        <wicket.version>1.5.9</wicket.version>
         <hibernate.version>4.2.0.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
-        <copyright.year>2014</copyright.year>
+        <copyright.year>2013</copyright.year>
     </properties>
   
 </project>

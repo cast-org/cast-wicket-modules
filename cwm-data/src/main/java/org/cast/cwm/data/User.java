@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -144,7 +144,6 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		return role.subsumes(r);
 	}
 
-	@Override
 	public boolean hasRole(String roleString) {
 		return hasRole(Role.forRoleString(roleString));
 	}
@@ -199,7 +198,6 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		return getFullName();
 	}
 	
-	@Override
 	public int compareTo(User o) {
 		if (o == null)
 			return 1;		

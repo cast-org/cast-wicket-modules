@@ -34,7 +34,6 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 	public LoadableWritableModel() {
 	}
 
-	@Override
 	public final void detach() {
 		if (attached) {
 			attached = false;
@@ -43,7 +42,6 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 		}
 	}
 
-	@Override
 	public T getObject() {
 		if (!attached) {
 			attached = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,18 +17,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.event;
-
-import org.apache.wicket.ajax.AjaxRequestTarget;
+package org.cast.cwm.wami;
 
 /**
- * @AjaxMessage sent when the session's current Period is changing.
+ * Indicates a component that supports the wami audio recorder by having a WamiAppletHolder on the page.
+ * Use of this interface is not required may be convenient for early detection of cases where the holder has
+ * been omitted.
+ *  
+ * @author bgoldowsky
  *
  */
-public class UpdateCurrentPeriodMessage extends AjaxMessage {
+public interface IWamiSupportingComponent {
 
-	public UpdateCurrentPeriodMessage(AjaxRequestTarget target) {
-		super(target);
-	}
-
+	public WamiAppletHolder getWamiAppletHolder();
+	
 }

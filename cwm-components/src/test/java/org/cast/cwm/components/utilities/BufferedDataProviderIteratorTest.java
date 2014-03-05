@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -116,7 +116,7 @@ public class BufferedDataProviderIteratorTest {
 		final Iterator<? extends String> secondIterator = mock(Iterator.class);
 		stubDataProvider(firstIterator, 0, 5);
 		stubDataProvider(secondIterator, 5, 5);
-		when(dataProvider.size()).thenReturn(8L);
+		when(dataProvider.size()).thenReturn(8);
 		when(firstIterator.hasNext()).thenReturn(true, true, true, true, true, false);
 		when(secondIterator.hasNext()).thenReturn(true);
 		iterator.next();
@@ -136,7 +136,7 @@ public class BufferedDataProviderIteratorTest {
 	public void stopsAtDataProviderSize() {
 		final Iterator<? extends String> firstIterator = mock(Iterator.class);
 		stubDataProvider(firstIterator, 0, 5);
-		when(dataProvider.size()).thenReturn(5L);
+		when(dataProvider.size()).thenReturn(5);
 		when(firstIterator.hasNext()).thenReturn(true, true, true, true, true, false);
 		iterator.next();
 		iterator.next();

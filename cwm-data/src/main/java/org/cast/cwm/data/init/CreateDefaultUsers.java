@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -42,17 +42,14 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateDefaultUsers.class);
 
-	@Override
 	public String getName() {
 		return "create default users";
 	}
 
-	@Override
 	public boolean isOneTimeOnly() {
 		return true;
 	}
 
-	@Override
 	public boolean run(IAppConfiguration appProperties) {
 		String userSpreadsheet = appProperties.getProperty("cwm.defaultUserFile");
 		if (userSpreadsheet != null) {

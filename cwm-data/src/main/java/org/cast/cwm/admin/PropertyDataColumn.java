@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -31,7 +31,7 @@ import org.apache.wicket.model.Model;
  * @author bgoldowsky
  *
  */
-public class PropertyDataColumn<E> extends PropertyColumn<E,String> implements IDataColumn<E> {
+public class PropertyDataColumn<E> extends PropertyColumn<E> implements IDataColumn<E> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,14 +44,12 @@ public class PropertyDataColumn<E> extends PropertyColumn<E,String> implements I
 		super(new Model<String>(headerString), sortProperty, propertyExpression);
 	}
 
-	@Override
 	public String getHeaderString() {
 		return getDisplayModel().getObject().toString();
 	}
 
-	@Override
 	public String getItemString(IModel<E> rowModel) {
-		Object rowObj = getDataModel(rowModel).getObject();
+		Object rowObj = createLabelModel(rowModel).getObject();
 		return rowObj==null ? "" : rowObj.toString();
 	}
 

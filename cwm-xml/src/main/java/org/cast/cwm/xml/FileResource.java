@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -58,7 +58,6 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 * @param relativePath path relative to the path of this Resource
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
-	@Override
 	public ResourceReference getRelativeReference (final String relativePath) {
 		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
 		return new ResourceReference(FileResource.class, filePath) {

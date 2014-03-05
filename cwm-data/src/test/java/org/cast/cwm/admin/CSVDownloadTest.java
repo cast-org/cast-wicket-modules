@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -80,7 +80,6 @@ public class CSVDownloadTest {
 			super(headerString);
 		}
 
-		@Override
 		public String getItemString(IModel<Event> rowModel) {
 			return "data";
 		}

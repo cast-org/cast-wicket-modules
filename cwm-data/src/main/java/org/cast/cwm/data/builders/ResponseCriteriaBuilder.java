@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -44,11 +44,11 @@ import org.hibernate.criterion.Restrictions;
 @Setter
 
 // TODO: ResponseType should be a set
-public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String>, IDetachable {
+public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator, IDetachable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private ISortState<String> sortState = new SingleSortState<String>();
+	private ISortState sortState = new SingleSortState();
 	
 	private IModel<? extends Prompt> promptModel;
 	private IModel<User> userModel;
@@ -60,13 +60,12 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	private Date toDate;
 	
 	public ResponseCriteriaBuilder() {
-		((SingleSortState<String>) getSortState()).setSort(new SortParam<String>("lastUpdated", true));
+		((SingleSortState) getSortState()).setSort(new SortParam("lastUpdated", true));
 	}
 	
-	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
-		SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
+		SortParam sort = ((SingleSortState) getSortState()).getSort();
 		if (sort != null) {
 			if (sort.isAscending())
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());
@@ -75,7 +74,6 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 		}
 	}
 
-	@Override
 	public void buildUnordered(Criteria criteria) {
 		if (promptModel != null && promptModel.getObject() != null)
 			criteria.add(Restrictions.eq("prompt", promptModel.getObject()));
@@ -96,12 +94,10 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 	}
 
 	
-	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}	
 	
-	@Override
 	public void detach() {
 		if (promptModel != null)
 			promptModel.detach();

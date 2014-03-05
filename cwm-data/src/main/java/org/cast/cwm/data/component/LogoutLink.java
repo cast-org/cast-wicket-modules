@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.component;
 
-import net.databinder.auth.AuthDataSessionBase;
+import net.databinder.auth.hib.AuthDataSession;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.link.StatelessLink;
@@ -46,7 +46,7 @@ public class LogoutLink extends StatelessLink<Void> {
 
 	@Override
 	public void onClick() {
-		AuthDataSessionBase.get().signOut();
+		AuthDataSession.get().signOut();
 		setResponsePage(Application.get().getHomePage());
 	}
 }

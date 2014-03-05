@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -51,8 +51,7 @@ public class TagPlusIntNameComparator implements Comparator<TagPlusInt> {
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    @Override
-	public int compare (TagPlusInt o1, TagPlusInt o2) {
+    public int compare (TagPlusInt o1, TagPlusInt o2) {
         return direction * o1.getTag().getName().compareToIgnoreCase(o2.getTag().getName());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.admin;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,7 +64,6 @@ import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -110,9 +110,9 @@ public class EventLog extends AdminPage {
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
 		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
-		ArrayList<IColumn<Event,String>> colList = new ArrayList<IColumn<Event,String>>(columns);
-		DataTable<Event,String> table = new DataTable<Event,String>("eventtable", colList, eventsprovider, 30);
-		table.addTopToolbar(new HeadersToolbar<String>(table, eventsprovider));
+		ArrayList<IColumn<Event>> colList = new ArrayList<IColumn<Event>>(columns);
+		DataTable<Event> table = new DataTable<Event>("eventtable", colList, eventsprovider, 30);
+		table.addTopToolbar(new HeadersToolbar(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
@@ -125,8 +125,8 @@ public class EventLog extends AdminPage {
 
 	protected OrderingCriteriaBuilder makeCriteriaBuilder() {
 		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
-		SingleSortState<String> defaultSort = new SingleSortState<String>();
-		defaultSort.setSort(new SortParam<String>("insertTime", false)); // Sort by Insert Time by default
+		SingleSortState defaultSort = new SingleSortState();
+		defaultSort.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
 		eventCriteriaBuilder.setSortState(defaultSort);
 		return eventCriteriaBuilder;
 	}
@@ -198,9 +198,10 @@ public class EventLog extends AdminPage {
 				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "insertTime"), eventDateFormat));				
 			}
 
-			@Override
 			public String getItemString(IModel<Event> rowModel) {
-				return rowModel.getObject().getInsertTime().toString(); // TODO: string format?
+				Event event = rowModel.getObject();
+				Date insertTime = event.getInsertTime();
+				return new SimpleDateFormat(eventDateFormat).format(insertTime); 
 			}
 		});
 		
@@ -220,7 +221,6 @@ public class EventLog extends AdminPage {
 			// TODO: this should do something more useful for audio, drawing, upload, and table responses.
 			// The raw data display is not very usable inside a spreadsheet; and for audio and upload we don't display anything at all.
 			// Perhaps we could include a link to display the item?  Or some metadata about it?
-			@Override
 			public String getItemString(IModel<Event> rowModel) {
 				if (!rowModel.getObject().hasResponses()) {
 					return "";
@@ -273,7 +273,6 @@ public class EventLog extends AdminPage {
 		@Getter @Setter private ISortState sortState;
 ;
 		
-		@Override
 		public void buildUnordered(Criteria criteria) {
 			
 			// Type check
@@ -292,7 +291,7 @@ public class EventLog extends AdminPage {
 				criteria.setMaxResults(0);
 			}
 			criteria.add(siteRestriction);
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
 			
 			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
 				Date startDate = midnightStart(fromDateM.getObject());
@@ -311,10 +310,9 @@ public class EventLog extends AdminPage {
 
 		}
 
-		@Override
 		public void buildOrdered(Criteria criteria) {
 			buildUnordered(criteria);
-			SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
+			SortParam sort = ((SingleSortState) getSortState()).getSort();
 			if (sort != null) {
 				if (sort.isAscending())
 					criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());

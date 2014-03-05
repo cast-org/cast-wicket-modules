@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.validator;
 
-import net.databinder.auth.AuthDataSessionBase;
+import net.databinder.auth.hib.AuthDataSession;
 
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
@@ -37,7 +37,7 @@ public class CorrectPasswordValidator extends AbstractValidator<String> {
 
 	@Override
 	protected void onValidate(IValidatable<String> validatable) {		
-		if (!AuthDataSessionBase.get().getUser().getPassword().matches(validatable.getValue())) {
+		if (!AuthDataSession.get().getUser().getPassword().matches(validatable.getValue())) {
 			error(validatable);
 		}
 	}
