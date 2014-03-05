@@ -1,0 +1,15 @@
+/*================================================================ */
+/* Skip link styling starts here. */
+/* First, the positioning CSS for the skip link and the skip target. Changing any of this will most likely break the skip link in one browser or another, so if you change it then TEST IT */
+#skiplinkholder p { padding: 0px; margin: 0px; }
+#skiplinkholder a, #skiplinkholder a:link, #skiplinkholder a:visited {display: block; width: 99%; position: absolute; top: 0; left: -200%; z-index: 2}
+#skiplinkholder a:focus, #skiplinkholder a:active {left: 0; top: 0; z-index: 100}
+#skiptargetholder {position: absolute; left: -200%}
+/* You may find on certain page layouts that the skip link is appearing underneath other elements on the page in IE7 and below. If this is the case then try uncommenting the two statements below, and if that does not work then try increasing the z-index value above as well */
+/*
+*+html #skiplinkholder a:focus, *+html #skip a:active {position: relative}
+* html #skiplinkholder a:active {position: relative}
+*/
+/* Now, the visual styling. Change this as desired */
+#skiplinkholder a, #skiplinkholder a:link, #skiplinkholder a:visited {font-size: 0.9em; color: #000000; background: #F8F8F8; text-decoration: none; border-bottom: solid #D4D4D4 2px; padding: 5px}
+/* End of skip link styling */
