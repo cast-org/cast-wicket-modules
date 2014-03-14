@@ -160,6 +160,37 @@ public class AppConfiguration implements IAppConfiguration {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getBoolean(String, String)
+	 */
+	@Override
+	public Boolean getBoolean(String key, Boolean defaultValue) {
+		String value = properties.getProperty(key);
+		if (value==null)
+			return defaultValue;
+		if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") 
+				|| value.equalsIgnoreCase("on") || value.equals("1"))
+			return Boolean.TRUE;
+		if (value.equalsIgnoreCase("false") || value.equalsIgnoreCase("no") 
+				|| value.equalsIgnoreCase("off") || value.equals("0"))
+			return Boolean.FALSE;
+		throw new ConfigurationException(
+				String.format("Configuration property %s should have boolean value, but was \"%s\"",
+				key, value));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.IAppConfiguratio#getBoolean(String)
+	 */
+	@Override
+	public boolean getBoolean(String key) {
+		Boolean value = getBoolean(key, null);
+		if (value==null)
+			throw new ConfigurationException(
+					String.format("Required configuration property \"%s\" was not set", key));
+		return value;			
+	}
+
+	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getOptionalFile(java.lang.String)
 	 */	
 	@Override
