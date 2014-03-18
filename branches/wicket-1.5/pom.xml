@@ -410,8 +410,10 @@
                          that is a sister to the "trunk" directory.
                          This location works well on Google Code.
                          Run "mvn javadoc:aggregate" to update. -->
+                    <!-- comment out, it breaks release plugin 
                     <reportOutputDirectory>${basedir}/..</reportOutputDirectory>
                     <outputDirectory>${basedir}/..</outputDirectory>
+                    -->
                     <author>false</author>
                     <quiet>true</quiet>
                 </configuration>
