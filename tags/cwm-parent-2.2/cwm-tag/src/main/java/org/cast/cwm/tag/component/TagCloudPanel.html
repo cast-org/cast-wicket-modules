@@ -1,0 +1,31 @@
+<wicket:panel>
+  <p wicket:id="container" class="tagCloud">
+    <span wicket:id="tagView">
+      <a wicket:id="link" href="#">
+        <span wicket:id="tag">rules</span>
+      </a>
+        <wicket:enclosure>
+        (<span wicket:id="tagFreq">4</span>)
+        <br />
+        </wicket:enclosure>
+    </span>
+  </p>
+        
+  <h4>Tag Options</h4>
+  <ul class="tagOptions">
+    <wicket:enclosure>
+      <li>view as: <strong>cloud</strong> | <a wicket:id="setList" href="#">list</a></li>
+    </wicket:enclosure>
+    <wicket:enclosure>
+      <li>view as: <a wicket:id="setCloud">cloud</a> | <strong>list</strong></li>
+    </wicket:enclosure>
+
+    <wicket:enclosure>
+      <li>sort by: <strong>alph</strong> | <a wicket:id="setFreq" href="#">frequency</a></li>
+    </wicket:enclosure>
+    <wicket:enclosure>
+      <li>sort by: <a wicket:id="setAlpha">alph</a> | <strong>frequency</strong></li>
+    </wicket:enclosure>
+  </ul>
+
+ </wicket:panel>
