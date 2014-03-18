@@ -138,11 +138,6 @@
                 <artifactId>cwm-xml</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-            	<groupId>org.cast.cwm</groupId>
-            	<artifactId>cwm-db</artifactId>
-            	<version>${project.version}</version>
-            </dependency>
             
             <!-- drawtool has its own Google Code project,
                  and its own release cycle -->
