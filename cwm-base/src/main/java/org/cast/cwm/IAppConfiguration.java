@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -69,28 +69,6 @@ public interface IAppConfiguration {
 	 * @throws ConfigurationException if the property value can't be converted to an integer
 	 */
 	public abstract int getInteger(String key);
-	
-	/**
-	 * Find and return a required boolean configuration property. 
-	 * If the property is not set, and exception will be thrown.
-	 * @param key name of the configuration property
-	 * @return the specified property value
-	 * 
-	 * @throws ConfigurationException if the property value can't be converted to a boolean.
-	 */
-	public abstract boolean getBoolean(String key);
-
-	/**
-	 * Find and return an optional boolean configuration property.
-	 * If the property is not found, the given defaultValue will be returned instead,
-	 * the default may be null or a Boolean value.
-	 * @param key name of the configuration property
-	 * @param defaultValue value to return if not found
-	 * @return specified or default value.
-	 * 
-	 * @throws ConfigurationException if the property value can't be converted to a boolean.
-	 */
-	public abstract Boolean getBoolean(String key, Boolean defaultValue);
 
 	/**
 	 * Return optional property value, which should be a filename, as a File.

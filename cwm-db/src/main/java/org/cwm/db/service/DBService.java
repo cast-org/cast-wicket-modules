@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -41,17 +41,14 @@ public class DBService implements IDBService {
 	public DBService() {
 	}
 
-	@Override
 	public Session getHibernateSession() {
 		return Databinder.getHibernateSession();
 	}
 
-	@Override
 	public Object ensureHibernateSession(SessionUnit unit) {
 		return Databinder.ensureSession(unit);
 	}
 
-	@Override
 	public Serializable save(Object persistableObject) {
 		return getHibernateSession().save(persistableObject);
 	}

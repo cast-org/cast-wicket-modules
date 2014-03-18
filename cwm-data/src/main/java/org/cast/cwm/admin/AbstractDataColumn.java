@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,7 +35,7 @@ import org.apache.wicket.model.Model;
  * @author bgoldowsky
  *
  */
-public abstract class AbstractDataColumn<E> extends AbstractColumn<E,String> implements IDataColumn<E> {
+public abstract class AbstractDataColumn<E> extends AbstractColumn<E> implements IDataColumn<E> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -47,13 +47,11 @@ public abstract class AbstractDataColumn<E> extends AbstractColumn<E,String> imp
 		super(new Model<String>(headerString), sortProperty);
 	}
 
-	@Override
 	public String getHeaderString() {
 		return getDisplayModel().getObject().toString();
 	}
 	
 	// Default implementation
-	@Override
 	public void populateItem(Item<ICellPopulator<E>> cellItem, String componentId, IModel<E> rowModel) {
 		cellItem.add(new Label(componentId, getItemString(rowModel)));
 	}

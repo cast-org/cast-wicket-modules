@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -74,7 +74,6 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 	}
 
 	// Mapper is compatible with any URL that starts with one of the prefixes
-	@Override
 	public int getCompatibilityScore(Request request) {
 		String url = request.getUrl().toString();
 		for (String prefix : prefixes)
@@ -83,7 +82,6 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 		return 0;
 	}
 
-	@Override
 	public IRequestHandler mapRequest(Request request) {
 		String path = request.getUrl().getPath();
 		for (String prefix : prefixes) {
@@ -100,7 +98,6 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 		return null;
 	}
 
-	@Override
 	public Url mapHandler(IRequestHandler requestHandler) {
 		// TODO can we reverse-map requests like this?   Perhaps if we generate something more sophisticated than the ResourceStreamRequestHandler?
 		return null;

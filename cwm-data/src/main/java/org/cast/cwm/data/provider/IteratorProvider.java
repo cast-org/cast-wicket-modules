@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.search;
+package org.cast.cwm.data.provider;
 
-import net.databinder.hib.Databinder;
+import java.io.Serializable;
+import java.util.Iterator;
 
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
+public interface IteratorProvider<T> extends Serializable {
 
-/**
- * Hibernate-search related service methods.
- * 
- * @author bgoldowsky
- *
- */
-public class SearchService implements ISearchService {
-
-	@Override
-	public void indexObject(Object object) {
-		FullTextSession fullTextSession = Search.getFullTextSession(Databinder.getHibernateSession());
-		fullTextSession.index(object);
-	}
-
+	Iterator<? extends T> getIterator();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -46,7 +46,6 @@ public class ShyContainer extends WebMarkupContainer {
 	private boolean someChildVisible() {
 		Boolean found = this.visitChildren(new IVisitor<Component,Boolean>(){
 
-			@Override
 			public void component(Component component, final IVisit<Boolean> visit) {
 				if (determineVisibility(component)) {
 					visit.stop(true);

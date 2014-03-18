@@ -29,12 +29,9 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
  * The CriteriaBuilder that handles the sorting should also implement ISortStateLocator (such as CriteriaSorter).</p>
  * 
  * @author Mark Southern (southern at scripps dot edu)
- * 
- * TODO: allow the second parameter of ISortableDataProvider to be also parameterized here, rather than insisting on String.
- * 
  */
 
-public class SortableHibernateProvider<T> extends HibernateProvider<T> implements ISortableDataProvider<T,String> {
+public class SortableHibernateProvider<T> extends HibernateProvider<T> implements ISortableDataProvider<T> {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,8 +51,7 @@ public class SortableHibernateProvider<T> extends HibernateProvider<T> implement
             sortStateLocator = (ISortStateLocator) criteriaBuilder;
     }
 
-    @Override
-	public ISortState getSortState() {
+    public ISortState getSortState() {
         return (sortStateLocator != null) ? sortStateLocator.getSortState() : sortState;
     }
 

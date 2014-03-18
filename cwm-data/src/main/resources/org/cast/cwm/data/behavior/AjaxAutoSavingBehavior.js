@@ -15,6 +15,35 @@ var AutoSaver = {
 	    formsInProgress: new Array(), // Collection of forms that are being saved
 	    
 		/**
+		 * Check to see if any forms need saving.
+		 * 
+		 */
+		autoSaveCheck: function() {
+
+	        $.each(AutoSaver.onBeforeSaveCallBacks, function(key, value) {
+				try {
+					value.call();
+				} catch (err) {
+					AutoSaver.onBeforeSaveCallBacks.splice(key, 1) /* Probably a stale callback; remove it. */
+				}
+	        });
+
+			var needsave = false;
+
+			$("form.ajaxAutoSave").each(function() {
+                var newValues = $(this).serialize();
+				var oldValues = $(this).data('autosaveOrigValues');
+                if (newValues != oldValues) {
+                    AutoSaver.logger("AutoSave: form " + $(this).attr('id') + " changed");
+                    AutoSaver.logger("Old: " + oldValues);
+                    AutoSaver.logger("New: " + newValues);
+                    needsave = true;
+                }
+	        });
+			return needsave;
+		},
+
+		/**
 		 * Check to see if any forms need saving and save them.
 		 * 
 		 * @param {Object} onSuccessCallBack - callback run after all forms are processed
@@ -25,7 +54,6 @@ var AutoSaver = {
 				try {
 					value.call();
 				} catch (err) {
-					AutoSaver.logger("Removing failing callback: ", value, "cause:", err);
 					AutoSaver.onBeforeSaveCallBacks.splice(key, 1) /* Probably a stale callback; remove it. */
 				}
 	        });
@@ -35,9 +63,7 @@ var AutoSaver = {
 			$('.autosave_info').each(function() {	
             	$(this).html('<strong>Auto Saving...</strong>');
             });
-
-			var statusObject = { hasErrors: false, callbackDone: false }; // this will collect any errors
-			
+						
 	        $("form.ajaxAutoSave").each(function() {
 
 	                var newValues = $(this).serialize();
@@ -47,29 +73,28 @@ var AutoSaver = {
 	                } else {
 	                    AutoSaver.addFormToProcessing($(this).attr('id'));
 						var form = $(this);
-						var id = form.attr('id');
 						var callback = form.data('ajaxCallbackUrl');
 						if (callback == null) {
-							AutoSaver.logger("AutoSave: form " + id + " has no callback URL set");
+							AutoSaver.logger("AutoSave: form " + form.attr('id') + " has no callback URL set");
 						} else {
-							AutoSaver.logger("AutoSave: saving form " +id + " to " + callback);
-							Wicket.Ajax.post({ u: callback, 
-								f: form.attr('id'), 
-								ep: {autosave: 'true'},
-								sh: [function() { // Success Handler
-									form.data('autosaveOrigValues', newValues);
-								}],
-								fh: [function() { // Failure Handler
-									alert ("Autosave Failed for form: " + id);
-									AutoSaver.logger("Autosave Failed for form ", id);
-									statusObject.hasErrors = true;
-								}],
-								coh: [function() { // Complete handler
-									AutoSaver.removeFormFromProcessing(id);
-									AutoSaver.runIfNoneProcessing(statusObject, onSuccessCallBack);
-								}],
-							});	
-
+							AutoSaver.logger("AutoSave: saving form " + form.attr('id') + " to " + callback);
+							wicketSubmitFormById(
+									form.attr('id'), // Form Id
+									callback + '&autosave=true', // Wicket Ajax Behavior URL 
+									null, // Submit Button
+									function() { // Success Handler
+										form.data('autosaveOrigValues', newValues);
+										AutoSaver.removeFormFromProcessing(form.attr('id'));
+										AutoSaver.runIfNoneProcessing(onSuccessCallBack);
+									},
+									function() { // Failure Handler
+										alert ("Autosave Failed for form: " + form.attr('id'));
+										AutoSaver.logger("Autosave Failed");
+									}, 
+									function() { // Precondition
+										return Wicket.$$(this) && Wicket.$$($(this).attr('id'));
+									}.bind(this)
+							);
 						}
 	                }
 	        });
@@ -77,33 +102,33 @@ var AutoSaver = {
 			AutoSaver.logger("AutoSave AJAX calls complete...");
 			
 			// Run callback in case there were no changes that needed to be saved.
-			AutoSaver.runIfNoneProcessing(statusObject, onSuccessCallBack);
+			AutoSaver.runIfNoneProcessing(onSuccessCallBack);
 	    },
 		
 		/**
 		 * Register a form that is processing.
 		 * 
-		 * see: AutoSaver.runIfNoneProcessing(status, fn)
+		 * see: AutoSaver.runIfNoneProcessing(fn)
 		 * 
 		 * @param {Object} id
 		 */
 		addFormToProcessing: function(id) {
 			AutoSaver.formsInProgress.push(id);
-			AutoSaver.logger("AutoSaving form: ", id, "; now in progress: ", AutoSaver.formsInProgress.length);
+			AutoSaver.logger("AutoSaving form: " + id);
 		},
 		
 		/**
 		 * Indicate that a form is done processing.
 		 * 
-		 * see: AutoSaver.runIfNoneProcessing(status, fn)
+		 * see: AutoSaver.runIfNoneProcessing(fn)
 		 * 
-		 * @param {Object} id - id of the form
+		 * @param {Object} id
 		 */
 		removeFormFromProcessing: function(id) {
 			var index = $.inArray(id, AutoSaver.formsInProgress);
 			if (index > -1) {
 				AutoSaver.formsInProgress.splice(index, 1);
-				AutoSaver.logger("Finished AutoSaving form: ", id, "; in progress: ",  AutoSaver.formsInProgress.length);
+				AutoSaver.logger("Finished AutoSaving form: " + id);
 			}
 		},
 		
@@ -113,16 +138,14 @@ var AutoSaver = {
 		 * see: AutoSaver.addFormToProcessing(id)
 		 * see: AutoSaver.removeFormFromProcessing(id)
 		 * 
-		 * @param {Object} statusObj - holds status information booleans
 		 * @param {Object} fn
 		 */
-		runIfNoneProcessing: function(statusObj, fn) {
+		runIfNoneProcessing: function(fn) {
 			if ($.isFunction(fn) && AutoSaver.formsInProgress.length == 0) {
-				if (!statusObj.hasErrors && !statusObj.callbackDone) {
-					fn.call();
-					AutoSaver.logger("AutoSave Complete, callback run.");
-					statusObj.callbackDone = true;
-				}
+				fn.call();
+				AutoSaver.logger("AutoSave Complete!")
+			} else {
+				AutoSaver.logger("Attempt to run function failed; forms in progress: " + AutoSaver.formsInProgress.length);
 			}
 		},
 		
@@ -233,12 +256,15 @@ var AutoSaver = {
 			AutoSaver.logger("AutoSave: Registering Form " + formId + " with URL " + $('#' + formId).data('ajaxCallbackUrl'));
 		},
 		
-		// No-op by default, but will be Firebug's console.log if DEBUG is set and console.log is available.
-		logger: function() { }
+		/**
+		 * Log a message to Firebug's console
+		 * 
+		 * @param {Object} val
+		 */
+		logger: function(val) {
+			if (AutoSaver.DEBUG && window.console)
+				console.log(val);
+		}
 };
-
-if (AutoSaver.DEBUG && window.console) {
-	AutoSaver.logger = console.log;
-}
 
 

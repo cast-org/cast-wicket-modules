@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -91,7 +91,7 @@ public class TagList extends WebMarkupContainer {
 					@Override
 					public void onClick(AjaxRequestTarget ajaxtarget) {
 						TagService.get().findTaggingCreate(user, target, t.getName());
-						ajaxtarget.add(TagList.this);
+						ajaxtarget.addComponent(TagList.this);
 						ajaxtarget.addChildren(findParent(TagPanel.class), TaggingsListPanel.class);
 					}
 				};

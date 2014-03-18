@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -74,12 +74,10 @@ public class DuplicateInputValidator extends AbstractFormValidator {
 	}
 	
 	
-	@Override
 	public FormComponent<?>[] getDependentFormComponents() {
 		return components;
 	}
 
-	@Override
 	public void validate(Form<?> form) {
 		int in = 0;
 		List<FormComponent<?>> inputs = new ArrayList<FormComponent<?>>();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -23,15 +23,16 @@ import java.io.OutputStream;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.components.DeployJava;
+import org.wicketstuff.jslibraries.JSLib;
+import org.wicketstuff.jslibraries.Library;
+import org.wicketstuff.jslibraries.VersionDescriptor;
 
 /**
  * A component that holds the Java audio applet, and HTML to communicate with it for playing audio.
@@ -163,17 +164,17 @@ public class AudioPlayer extends Panel implements IHeaderContributor {
 				getAppletMarkupId(), message);
 	}
 
-	@Override
 	public void renderHead(IHeaderResponse response) {
-		response.render(CssHeaderItem.forReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.css")));
-		response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.js")));
+		response.renderCSSReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.css"));
+		// TODO - centralize JQuery versioning
+		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.JQUERY, 1, 8));
+		response.renderJavaScriptReference(new PackageResourceReference(AudioPlayer.class, "audio_applet.js"));
 	}
 
 	class AudioFileLoadAjaxBehavior extends AbstractAjaxBehavior {
 
 		private static final long serialVersionUID = 1L;
 
-		@Override
 		public void onRequest() {
 			try {
 				OutputStream os = RequestCycle.get().getOriginalResponse().getOutputStream();

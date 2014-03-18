@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -84,14 +84,12 @@ public class FileDownloadLink extends Link<byte[]> implements IDetachable {
 
 			private transient InputStream inputStream;
 
-			@Override
 			public InputStream getInputStream()
 					throws ResourceStreamNotFoundException {
 				inputStream = new ByteArrayInputStream(getModelObject());
 				return inputStream;
 			}
 
-			@Override
 			public void close() throws IOException {
 				if (inputStream != null) {
 					inputStream.close();

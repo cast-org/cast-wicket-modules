@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -59,7 +59,6 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 		setObject(s);
 	}
 
-	@Override
 	public void setObject (XmlSection section) {
 		if (section != null) {
 			docName   = section.getXmlDocument().getName();
@@ -67,7 +66,6 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 		}
 	}
 
-	@Override
 	public XmlSection getObject () {
 		XmlDocument doc = getDocument();
 		if (doc == null)
@@ -75,7 +73,6 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 		return doc.getById(sectionId);
 	}
 
-	@Override
 	public Time getLastModified() {
 		return getDocument().getLastModified();
 	}
@@ -84,16 +81,13 @@ public class XmlSectionModel implements IModel<XmlSection>, ICacheableModel<XmlS
 		return xmlService.getDocument(docName);
 	}
 
-	@Override
 	public Serializable getKey() {
 		return docName + "_" + sectionId;
 	}
 	
-	@Override
 	public void detach() {		
 	}
 	
-	@Override
 	public String toString() {
 		return "XmlSectionModel[" + getKey() + "]";
 	}

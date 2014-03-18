@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -235,7 +235,6 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 		return this;
 	}
 
-	@Override
 	public int compareTo(XmlDocument other) {
 		return this.getSortOrder() - other.getSortOrder();
 	}

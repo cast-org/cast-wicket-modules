@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -30,11 +30,9 @@ import org.apache.wicket.model.IModel;
  * @see org.apache.wicket.Component.IColumn 
  * 
  * @author bgoldowsky
- * 
- * TODO: allow parameterization of sort field type
  *
  */
-public interface IDataColumn<E> extends IColumn<E,String> {
+public interface IDataColumn<E> extends IColumn<E> {
 
 	public String getHeaderString();
 	

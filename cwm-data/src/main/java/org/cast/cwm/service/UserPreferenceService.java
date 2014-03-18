@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -45,10 +45,9 @@ public class UserPreferenceService implements IUserPreferenceService {
 	@Inject
 	private ICwmService cwmService;
 	
-	protected UserPreferenceService() { /* Protected Constructor - use injection */
+	public UserPreferenceService() {
 	}
 		
-	@Override
 	public void setUserPreferenceBoolean(IModel<User> mUser, String name, Boolean booleanValue) {
 					
 		// if a user preference doesn't exist, create it, otherwise update
@@ -66,7 +65,6 @@ public class UserPreferenceService implements IUserPreferenceService {
 		
 	}
 	
-	@Override
 	public Boolean getUserPreferenceBoolean(IModel<User> mUser, String name) {
 		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreferenceCriteria(UserPreferenceBoolean.class, mUser, name).uniqueResult();
 		if (userPreference == null) {
@@ -75,7 +73,6 @@ public class UserPreferenceService implements IUserPreferenceService {
 		return userPreference.getBooleanValue();
 	}
 		
-	@Override
 	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
 		// if a user preference doesn't exist, create it, otherwise update
 		UserPreferenceString userPreference = (UserPreferenceString) getUserPreferenceCriteria(UserPreferenceString.class, mUser, name).uniqueResult();
@@ -94,7 +91,6 @@ public class UserPreferenceService implements IUserPreferenceService {
 		cwmService.flushChanges();
 	}
 
-	@Override
 	public String getUserPreferenceString(IModel<User> mUser, String name) {
 		Criteria criteria = getUserPreferenceCriteria(UserPreferenceString.class, mUser, name);
 		UserPreferenceString preference = (UserPreferenceString) criteria.uniqueResult();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -62,20 +62,18 @@ public class EventService implements IEventService {
 	private final static Logger log = LoggerFactory.getLogger(EventService.class);
 	
 	@Inject
-	private ICwmService cwmService;
+	protected ICwmService cwmService;
 
 	/** 
 	 * Create a new Event instance.
 	 * Applications that use a subclass of Event can override this factory method to create it.
 	 */
-	@Override
 	public Event newEvent() {
 		return new Event();
 	}
 	
 	/**
-	 * Save an actual event object.  Private and final because I feel
-	 * everyone should call {@link #saveEvent(String, String, String)}.
+	 * Save an actual event object.  
 	 * 
 	 * @param e
 	 * @return model wrapping the event that was saved
@@ -89,38 +87,26 @@ public class EventService implements IEventService {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String)
 	 */
-	@Override
-	public IModel<? extends Event> saveEvent(String type, String detail, String pageName, String componentPath) {
+	public IModel<? extends Event> saveEvent(String type, String detail, String pageName) {
 		Event e = newEvent();
 		e.setType(type);
 		e.setDetail(detail);
 		e.setPage(pageName);
-		e.setComponentPath(componentPath);
 		return saveEvent(e);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public IModel<? extends Event> saveEvent(String type, String detail, String pageName) {
-		return saveEvent(type, detail, pageName, null);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#saveLoginEvent()
 	 */
-	@Override
 	public IModel<? extends Event> saveLoginEvent() {
-		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null, null);
+		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#savePageViewEvent(java.lang.String, java.lang.String)
 	 */
-	@Override
 	public IModel<? extends Event> savePageViewEvent (String detail, String pageName) {
 		return saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
 	}
@@ -128,7 +114,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#savePostEvent(boolean, java.lang.String)
 	 */
-	@Override
 	public IModel<? extends Event> savePostEvent(boolean hasResponses, String pageName) {
 		Event e = newEvent();
 		e.setType(RequestCycle.get().getRequest().getRequestParameters().getParameterValue("autosave").toBoolean() ? AUTOSAVE_POST_TYPE_NAME : POST_TYPE_NAME);
@@ -142,7 +127,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#newLoginSession()
 	 */
-	@Override
 	public LoginSession newLoginSession() {
 		return new LoginSession();
 	}
@@ -150,7 +134,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#createLoginSession(org.apache.wicket.Request)
 	 */
-	@Override
 	public LoginSession createLoginSession (Request r) {
 		LoginSession loginSession = newLoginSession();
 		CwmSession cwmSession = CwmSession.get();
@@ -162,14 +145,14 @@ public class EventService implements IEventService {
 		
 		loginSession.setCookiesEnabled(false);
 		if (cwmSession.getClientInfo() instanceof WebClientInfo) {
-			ClientProperties info = cwmSession.getClientInfo().getProperties();
+			ClientProperties info = ((WebClientInfo) cwmSession.getClientInfo()).getProperties();
 			loginSession.setScreenHeight(info.getBrowserHeight());
 			loginSession.setScreenWidth(info.getBrowserWidth());
 			if (info.getTimeZone() != null)
 				loginSession.setTimezoneOffset(info.getTimeZone().getOffset(new Date().getTime()));
 			loginSession.setCookiesEnabled(info.isCookiesEnabled());
 			loginSession.setPlatform(info.getNavigatorPlatform());
-			loginSession.setUserAgent(cwmSession.getClientInfo().getUserAgent());
+			loginSession.setUserAgent(((WebClientInfo)cwmSession.getClientInfo()).getUserAgent());
 			// TODO
 			//loginSession.setflashVersion(flashVersion)
 			// isJavaEnabled
@@ -187,7 +170,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#closeLoginSession(org.cast.cwm.data.LoginSession, java.util.Date)
 	 */
-	@Override
 	public void closeLoginSession (LoginSession loginSession, Date closeTime) {
 		loginSession.setEndTime(closeTime);
 	}
@@ -195,7 +177,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#recordLogout()
 	 */
-	@Override
 	public void recordLogout() {
 		LoginSession ls = CwmSession.get().getLoginSession();
 
@@ -218,7 +199,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#getLoginSessionBySessionId(java.lang.String)
 	 */
-	@Override
 	public IModel<LoginSession> getLoginSessionBySessionId(String httpSessionId) {
 		return new HibernateObjectModel<LoginSession>(LoginSession.class,
 				new BasicCriteriaBuilder(Restrictions.eq("sessionId", httpSessionId)));
@@ -227,7 +207,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#forceCloseLoginSession(org.hibernate.Session, org.cast.cwm.data.LoginSession, java.lang.String)
 	 */
-	@Override
 	public void forceCloseLoginSession(LoginSession loginSession, String comment) {
 		Date now = new Date();
 		closeLoginSession(loginSession, now); // TODO: consider setting this to date of last Event
@@ -245,7 +224,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#getEventTypes()
 	 */
-	@Override
 	public IModel<List<String>> getEventTypes() {
 		return new HibernateListModel<String>("select distinct type from Event", true);
 	}
@@ -253,7 +231,6 @@ public class EventService implements IEventService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#getLastEventTime(org.cast.cwm.data.LoginSession)
 	 */
-	@Override
 	public Date getLastEventTime (LoginSession ls) {
 		Session session = Databinder.getHibernateSession();
 		Criteria criteria = session.createCriteria(Event.class);

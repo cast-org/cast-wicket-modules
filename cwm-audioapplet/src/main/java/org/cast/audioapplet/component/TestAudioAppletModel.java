@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -71,22 +71,18 @@ public class TestAudioAppletModel implements IAudioAppletModel {
 		this.maxLength = maxLength;
 	}
 
-	@Override
 	public boolean isReadOnly() {
 		return readOnly;
 	}
 
-	@Override
 	public byte[] getObject() {
 		return audio;
 	}
 
-	@Override
 	public int getMaxLength() {
 		return maxLength;
 	}
 
-	@Override
 	public void setObject(byte[] audio) {
 		if(readOnly) {
 			throw new RuntimeException("Audio is read-only");
@@ -94,7 +90,6 @@ public class TestAudioAppletModel implements IAudioAppletModel {
 		else this.audio = audio;
 	}
 
-	@Override
 	public void detach() {
 
 	}

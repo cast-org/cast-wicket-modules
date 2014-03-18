@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.search;
+package org.cast.cwm.wami;
+
+import org.apache.wicket.markup.html.WebMarkupContainer;
 
 /**
- * Hibernate-search related service methods.
- * 
+ * This is a placeholder for the embedded SWF that is be used by {@link PlayerPanel} and {@link RecorderPanel}.
+ * Put it on the page somewhere that it will not be removed or replaced by AJAX updates.
+ * It should be a nice visible location, though, so that the settings panel can be seen. 
+ *
  * @author bgoldowsky
  *
  */
-public interface ISearchService {
-	
-	/**
-	 * Add or update the object in the search index.
-	 * Hibernate Search automatically updates the index when changes are committed to an object,
-	 * so this is not normally needed.  However, you may need it if you have index fields based on
-	 * getter methods, and you know that the value returned by the getter will have changed 
-	 * even though no changes have been made to the object itself.
-	 *  
-	 * @param object
-	 */
-	public void indexObject (Object object);
+public class WamiAppletHolder extends WebMarkupContainer {
+
+	private static final long serialVersionUID = 1L;
+
+	public WamiAppletHolder(String id) {
+		super(id);
+		setOutputMarkupId(true);
+	}
 
 }

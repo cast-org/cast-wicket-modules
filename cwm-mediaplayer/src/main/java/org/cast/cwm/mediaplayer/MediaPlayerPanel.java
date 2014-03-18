@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,10 +21,8 @@ package org.cast.cwm.mediaplayer;
 
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -166,10 +164,9 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		add(playResponse);
 	}
 
-	@Override
 	public void renderHead(IHeaderResponse r) {
 
-		r.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js")));
+		r.renderJavaScriptReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js"));
 
 		StringBuffer jsString = new StringBuffer();
 		jsString.append("jwplayer(" + "\"" + getMarkupId() + "\").setup({" +
@@ -203,10 +200,10 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		jsString.append("}"); // end plugins
 
 		jsString.append("});"); // end setup
-		r.render(OnDomReadyHeaderItem.forScript(jsString.toString()));
+		r.renderOnDomReadyJavaScript(jsString.toString());
 		
 		if (useOnPlay) {
-			r.render(OnDomReadyHeaderItem.forScript(getEventScript()));
+			r.renderOnDomReadyJavaScript(getEventScript());
 		}
 	}
 	
@@ -219,19 +216,19 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 				"			status = 'resume'; } " +
 				"	   else {" +
 				"      		status = 'play';\n };" +
-				"      Wicket.Ajax.get({u:url, ep:{ status: status}});\n" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
 				" 	});\n" +
 
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onPause(function() {" +
 				"      status = 'paused';\n "  +
-				"      Wicket.Ajax.get({u:url, ep:{status: status}});\n" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
 				" 	});\n" +
 
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onComplete(function() {" +
 				"      status = 'completed';\n "  +
-				"      Wicket.Ajax.get({u:url, ep:{status: status}});\n" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
 				" 	});\n";
-		return jsString;
+		return jsString;		
 	}
 
 	

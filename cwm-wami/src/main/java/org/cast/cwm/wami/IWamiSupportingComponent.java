@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.event;
-
-import lombok.Getter;
-
-import org.apache.wicket.ajax.AjaxRequestTarget;
+package org.cast.cwm.wami;
 
 /**
- * Superclass for all Messages that are tied to Ajax events,
- * and thus have an AjaxRequestTarget.  A Message in CWM
- * is the payload of an {@link org.apache.wicket.event.IEvent}
+ * Indicates a component that supports the wami audio recorder by having a WamiAppletHolder on the page.
+ * Use of this interface is not required may be convenient for early detection of cases where the holder has
+ * been omitted.
+ *  
+ * @author bgoldowsky
  *
  */
-public class AjaxMessage {
+public interface IWamiSupportingComponent {
 
-	@Getter
-	private AjaxRequestTarget target;
-
-	public AjaxMessage(AjaxRequestTarget target) {
-		this.target = target;
-	}
-
+	public WamiAppletHolder getWamiAppletHolder();
+	
 }

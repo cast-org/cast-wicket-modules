@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,18 +17,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.event;
+package org.cast.cwm;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
+import org.wicketstuff.jslibraries.JSLib;
+import org.wicketstuff.jslibraries.Library;
+import org.wicketstuff.jslibraries.VersionDescriptor;
 
 /**
- * @AjaxMessage sent when the session's current Period is changing.
+ * Loads a version of jQuery that is consistent across all CWM components that need it.
+ * Can probably be dropped in Wicket 6 since the framework itself will depend on jQuery.
+ * 
+ * @author bgoldowsky
  *
  */
-public class UpdateCurrentPeriodMessage extends AjaxMessage {
+public class JQueryHeaderContributor implements IHeaderContributor {
 
-	public UpdateCurrentPeriodMessage(AjaxRequestTarget target) {
-		super(target);
+	private static final long serialVersionUID = 1L;
+
+	public void renderHead(IHeaderResponse response) {
+		JSLib.getHeaderContribution(VersionDescriptor.exactVersion(Library.JQUERY, 1, 7, 1)).renderHead(response);
 	}
 
 }

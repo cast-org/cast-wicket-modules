@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -107,7 +107,6 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 * This function is careful to avoid NPEs and avoids returning 0 for two 
 	 * Periods that have different IDs.
 	 */
-	@Override
 	public int compareTo(Period other) {
 		if (other == null)
 			return 1;

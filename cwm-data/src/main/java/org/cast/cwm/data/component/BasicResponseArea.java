@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -36,9 +36,8 @@ import org.apache.wicket.authroles.authorization.strategies.role.annotations.Aut
 import org.apache.wicket.datetime.PatternDateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -191,7 +190,7 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		responseListContainer.setOutputMarkupId(true);
 		add(responseListContainer);
 		
-		ISortableDataProvider<Response,String> provider = responseService.getResponseProviderForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel());
+		ISortableDataProvider<Response> provider = responseService.getResponseProviderForPrompt(prompt, showAll ? null : CwmSession.get().getUserModel());
 		
 		dataView = new DataView<Response>("responseList", provider) {
 
@@ -432,7 +431,6 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 	private void addEditLinksToTarget(final AjaxRequestTarget target) {
 		
 		responseListContainer.visitChildren(EditResponseLink.class, new IVisitor<EditResponseLink,Void>() {
-			@Override
 			public void component(EditResponseLink component, IVisit<Void> visit) {
 				target.add(component);
 			}
@@ -461,9 +459,8 @@ public class BasicResponseArea extends Panel implements IHeaderContributor {
 		stampURLs.add(s);
 	}
 	
-	@Override
 	public void renderHead(IHeaderResponse response) {
-		response.render(CssHeaderItem.forReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css")));
+		response.renderCSSReference(new PackageResourceReference(BasicResponseArea.class, "buttons.css"));
 	} 
 	
 	@Override

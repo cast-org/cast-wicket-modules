@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,8 @@
  */
 package org.cast.cwm.wami;
 
-import java.util.Iterator;
-
-import org.apache.wicket.Component;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnLoadHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.data.Response;
@@ -78,12 +72,12 @@ public class PlayerResponsePanel<T extends Response> extends BaseAudioPanel<T> i
 		
 		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.SWFOBJECT, 2)).renderHead(response);
 
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "audio_applet.js", null, null, getVariation())));
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "wami-recorder.js", null, null, getVariation())));
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "castrecorder.js", null, null, getVariation())));
+        response.renderJavaScriptReference(new PackageResourceReference(PlayerResponsePanel.class, "audio_applet.js", null, null, getVariation()));
+        response.renderJavaScriptReference(new PackageResourceReference(PlayerResponsePanel.class, "wami-recorder.js", null, null, getVariation()));
+        response.renderJavaScriptReference(new PackageResourceReference(PlayerResponsePanel.class, "castrecorder.js", null, null, getVariation()));
 
         if (audioSkin.isHasCss())
-        	response.render(CssHeaderItem.forReference(new PackageResourceReference(PlayerResponsePanel.class, "audio_applet.css", null, null, getVariation())));
+        	response.renderCSSReference(new PackageResourceReference(PlayerResponsePanel.class, "audio_applet.css", null, null, getVariation()));
 
         configureRecorder(response);
 	}
@@ -93,8 +87,8 @@ public class PlayerResponsePanel<T extends Response> extends BaseAudioPanel<T> i
         RecorderOptions recorderOptions = getRecorderOptions();
 
         Gson gson = new Gson();
-        response.render(OnLoadHeaderItem.forScript(String.format("createCastRecorder('%s', %s);", 
-        		this.getMarkupId(), gson.toJson(recorderOptions))));
+        response.renderOnLoadJavaScript(String.format("createCastRecorder('%s', %s);", 
+        		this.getMarkupId(), gson.toJson(recorderOptions)));
 	}
 
 	protected RecorderOptions getRecorderOptions() {

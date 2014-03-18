@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,7 +35,6 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.hib.Databinder;
-import net.databinder.models.hib.HibernateObjectModel;
 
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
@@ -43,6 +42,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
+import org.cast.cwm.data.models.UserModel;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -61,13 +61,10 @@ import com.google.inject.Inject;
 public class UserSpreadsheetReader implements Serializable {
 	
 	@Inject
-	protected ICwmService cwmService;
+	private ICwmService cwmService;
 	
 	@Inject
-	protected ISiteService siteService;
-	
-	@Inject
-	protected IUserService userService;
+	private ISiteService siteService;
 
 	@Getter @Setter
 	protected IModel<Site> defaultSite;
@@ -183,21 +180,21 @@ public class UserSpreadsheetReader implements Serializable {
   				}
   				
   				// Create a transient User Object from imported data
-  				IModel<User> user = new HibernateObjectModel<User>(userService.getUserClass());
+  				IModel<User> user = new UserModel();
   				messages += populateUserObject(user, map);
   				
   				// Check database for duplicate username
-  				if (userService.getByUsername(user.getObject().getUsername()).getObject() != null) {
+  				if (UserService.get().getByUsername(user.getObject().getUsername()).getObject() != null) {
   					messages += "Username " + user.getObject().getUsername() + " already exists in database. \n";
   				}
   				
   				// Check database for duplicate subjectId
-  				if (userService.getBySubjectId(user.getObject().getSubjectId()).getObject() != null) {
+  				if (UserService.get().getBySubjectId(user.getObject().getSubjectId()).getObject() != null) {
   					messages += "SubjectId " + user.getObject().getSubjectId() + " already exists in database. \n";
   				}
 
   				// Check database for duplicate email addresses when an email address exists 				
-  				if (user.getObject().getEmail() != null && userService.getByEmail(user.getObject().getEmail()).getObject() != null) {
+  				if (user.getObject().getEmail() != null && UserService.get().getByEmail(user.getObject().getEmail()).getObject() != null) {
   					messages += "Email " + user.getObject().getEmail() + " already exists in database. \n";
   				}
   				
@@ -428,9 +425,10 @@ public class UserSpreadsheetReader implements Serializable {
 	
 
 	/**
-	 * A simple object used for creating a set of Person objects from an uploaded CSV file.
+	 * A simple object used by {@link UserService} for creating a set of Person objects from an uploaded CSV file.
 	 * Each instance will either have a valid user object, or a non-empty error saying why.
 	 * 
+	 * @see UserService#generateUsers(InputStream, Site)
 	 * @author jbrookover
 	 *
 	 */

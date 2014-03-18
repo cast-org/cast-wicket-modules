@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,7 +21,6 @@ package org.cast.cwm.xml.service;
 
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.NamespaceContext;
 
 import org.apache.wicket.util.file.File;

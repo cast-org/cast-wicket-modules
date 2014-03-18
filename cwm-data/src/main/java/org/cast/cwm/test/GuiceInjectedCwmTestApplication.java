@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,8 +22,8 @@ package org.cast.cwm.test;
 import java.util.Map;
 
 import org.apache.wicket.Page;
-import org.apache.wicket.util.file.Path;
 import org.apache.wicket.util.tester.DummyHomePage;
+import org.cast.cwm.test.GuiceInjectedTestApplication;
 
 public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplication<T> {
 
@@ -35,7 +35,7 @@ public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplica
     public void init() {
             super.init();
             // Check separate "theme" folder for markup and XSL styles.
-            getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));
+            getResourceSettings().addResourceFolder(getThemeDir());
     }
 
     protected String getThemeDir() {

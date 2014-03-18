@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,12 @@
  */
 package org.cast.cwm.test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -33,9 +35,14 @@ import java.util.List;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
+import org.apache.wicket.behavior.AbstractAjaxBehavior;
+import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.html.form.LabeledWebMarkupContainer;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.tester.WicketTester;
 
 public class CwmWicketTester extends WicketTester {
@@ -85,12 +92,76 @@ public class CwmWicketTester extends WicketTester {
 
 	public void assertAttribute(String message, String expected,
 			Component component, String attribute) {
-		assertTrue(message, getTagByWicketId(component.getId()).getAttributeIs(attribute, expected));
+		AttributeModifier behavior = getAttributeModifier(component, attribute);
+		if (behavior != null) {
+			try {
+				IModel<?> model = (IModel<?>) getReplaceModelMethod
+						.invoke(behavior);
+				assertThat(message, model.getObject().toString(), equalTo(expected));
+				return;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		SimpleAttributeModifier simpleBehavior = getSimpleAttributeModifier(component, attribute);
+		if (simpleBehavior != null) {
+			assertThat(message, simpleBehavior.getValue().toString(), equalTo(expected));
+			return;
+		}
+
+		fail("Attribute " + attribute + " not found.");
 	}
 
 	public void assertNotAttribute(String message, String expected,
 			Component component, String attribute) {
-		assertFalse(message, getTagByWicketId(component.getId()).getAttributeIs(attribute, expected));
+		AttributeModifier behavior = getAttributeModifier(component, attribute);
+		SimpleAttributeModifier simpleBehavior = getSimpleAttributeModifier(component, attribute);
+		if (behavior != null) {
+			try {
+				IModel<?> model = (IModel<?>) getReplaceModelMethod
+						.invoke(behavior);
+				assertThat(message, model.getObject().toString(), not(equalTo(expected)));
+				return;
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		else if (simpleBehavior != null) {
+			assertThat(message, simpleBehavior.getValue().toString(), not(equalTo(expected)));
+			return;
+		}
+		else {
+			return;
+		}
+
+	}
+
+	private AttributeModifier getAttributeModifier(Component component,
+			String attribute) {
+		List<? extends Behavior> behaviors = component.getBehaviors();
+		for (Behavior behavior : behaviors) {
+			if (AttributeModifier.class.isAssignableFrom(behavior.getClass())) {
+				AttributeModifier attributeModifier = (AttributeModifier) behavior;
+				if (attribute.equals(attributeModifier.getAttribute()))
+					return attributeModifier;
+			}
+		}
+		return null;
+	}
+
+	private SimpleAttributeModifier getSimpleAttributeModifier(Component component,
+			String attribute) {
+		List<? extends Behavior> behaviors = component.getBehaviors();
+		for (Behavior behavior : behaviors) {
+			if (SimpleAttributeModifier.class.isAssignableFrom(behavior.getClass())) {
+				SimpleAttributeModifier attributeModifier = (SimpleAttributeModifier) behavior;
+				if (attribute.equals(attributeModifier.getAttribute()))
+					return attributeModifier;
+			}
+
+		}
+		return null;
 	}
 
 	public void assertErrorMessagesContain(String expectedMessage) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.admin.EditUserPanel;
-import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -32,19 +31,6 @@ import org.cast.cwm.data.models.UserListModel;
 import org.cast.cwm.service.UserService.LoginData;
 
 public interface IUserService {
-	
-	/**
-	 * Return the proper type of User objects for this application.
-	 * Normally @User, but subclassses may override it with a customized subclass.
-	 * @return class of User
-	 */
-	public Class<? extends User> getUserClass();
-
-	/**
-	 * Create a new transient User object of the correct class.
-	 * (Applications may override this in a subclass to use a customized User class).
-	 */
-	public User newUser();
 
 	/**
 	 * Mark a user as valid in the database.  Commits changes
@@ -56,52 +42,35 @@ public interface IUserService {
 	 *
 	 * @param user
 	 */
-	public void confirmUser(User user);
+	void confirmUser(User user);
 
-	public void generateSecurityToken(IModel<User> mUser);
+	void generateSecurityToken(IModel<User> mUser);
 
-	public IModel<List<User>> getAllUsers();
+	IModel<List<User>> getAllUsers();
 
-	public IModel<User> getById(long userId);
+	IModel<User> getById(long userId);
 
-	public IModel<User> getByUsername(String username);
+	IModel<User> getByUsername(String username);
 
-	public IModel<User> getBySubjectId(String subjectId);
+	IModel<User> getBySubjectId(String subjectId);
 
-	public IModel<User> getByEmail(String email);
+	IModel<User> getByEmail(String email);
 
 	// gets both valid and invalid users
-	public IModel<User> getAllByEmail(String email);
+	IModel<User> getAllByEmail(String email);
 
-	public IModel<User> getByFullnameFromPeriod(String firstName,
+	IModel<User> getByFullnameFromPeriod(String firstName,
 			String lastName, IModel<Period> period);
 
-	public UserListModel getByRole(Role role);
+	UserListModel getByRole(Role role);
 
-	public ISortableDataProvider<User,String> getUserListProvider();
+	ISortableDataProvider<User> getUserListProvider();
 
-	public ISortableDataProvider<User,String> getUserListProvider(
+	ISortableDataProvider<User> getUserListProvider(
 			IModel<Period> mPeriod);
 
-	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role);
-
-	public ISortableDataProvider<User,String> getUncachedUserListProvider(
+	ISortableDataProvider<User> getUncachedStudentListProvider(
 			IModel<Period> mPeriod);
-
-	/**
-	 * Return any open LoginSession for this user.
-	 * (That is, where the end time is null). 
-	 * @param user
-	 * @return Model of a List of LoginSessions.
-	 */
-	public IModel<List<LoginSession>> getOpenLoginSessions(IModel<User> mUser);
-
-	/**
-	 * Return a list of all LoginSessions for the given User.
-	 * @param mUser Model of a User
-	 * @return Model of the list of LoginSessions.
-	 */
-	IModel<List<LoginSession>> getAllLoginSessions(IModel<User> mUser);
 
 	/**
 	 * Get an object that will give the total number of logins
@@ -111,7 +80,8 @@ public interface IUserService {
 	 * @param user
 	 * @return
 	 */
-	public LoginData getLoginSessions(IModel<User> user);
+	LoginData getLoginSessions(IModel<User> user);
 
+	User newUser();
 
 }

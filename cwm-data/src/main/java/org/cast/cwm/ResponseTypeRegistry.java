@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -47,7 +47,6 @@ public class ResponseTypeRegistry implements IResponseTypeRegistry {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IResponseTypeRegistry#registerResponseType((java.lang.String, org.cast.cwm.data.IResponseType)
 	 */
-	@Override
 	public void registerResponseType(String name, IResponseType type) {
 		legalResponseTypes.put(name, type);
 		
@@ -56,7 +55,6 @@ public class ResponseTypeRegistry implements IResponseTypeRegistry {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IResponseTypeRegistry#getResponseType(java.lang.String)
 	 */
-	@Override
 	public IResponseType getResponseType(String name) {
 		return legalResponseTypes.get(name);
 	}
@@ -64,7 +62,6 @@ public class ResponseTypeRegistry implements IResponseTypeRegistry {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IResponseTypeRegistry#getLegalResposeTypes()
 	 */
-	@Override
 	public Collection<IResponseType> getLegalResponseTypes() {
 		return legalResponseTypes.values();
 	}

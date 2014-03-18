@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -67,16 +67,15 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 		this.builder = builder;
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
-	public Iterator<? extends T> iterator(long first, long count) {
+	public Iterator<? extends T> iterator(int first, int count) {
 		FullTextQuery query = getQuery();
 		if (query == null) {
 			List<T> empty = Collections.emptyList();
 			return empty.iterator();
 		}
-		query.setFirstResult((int)first);
-		query.setMaxResults((int)count);
+		query.setFirstResult(first);
+		query.setMaxResults(count);
 		onBeforeSearchExecution(query);
 		long startTime = System.currentTimeMillis();
 		Iterator<? extends T> iterator = query.iterate();
@@ -89,8 +88,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	protected void onBeforeSearchExecution(FullTextQuery query) {
 	}
 	
-	@Override
-	public long size() {
+	public int size() {
 		FullTextQuery query = getQuery();
 		return query == null ? 0 : query.getResultSize();
 	}

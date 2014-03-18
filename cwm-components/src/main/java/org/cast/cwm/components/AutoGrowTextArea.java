@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,9 +19,7 @@
  */
 package org.cast.cwm.components;
 
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnLoadHeaderItem;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
@@ -67,12 +65,11 @@ public class AutoGrowTextArea<T> extends TextArea<T> {
 		this.setOutputMarkupId(true);
 	}
 
-	@Override
 	public void renderHead(IHeaderResponse response) {
 		// This script works well but requires the text area to have cols and rows attributes - CSS sizing doesn't work
-		 response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js")));
+		 response.renderJavaScriptReference(new PackageResourceReference(AutoGrowTextArea.class, "jquery.autogrow.techno.js"));
 		 // Must be onLoad, not onDomReady, or else it happens too early in AJAX insertion
-		 response.render(OnLoadHeaderItem.forScript(String.format("$('#%s').autoGrow();", getMarkupId())));
+		 response.renderOnLoadJavaScript(String.format("$('#%s').autoGrow();", getMarkupId()));
 	}
 
 

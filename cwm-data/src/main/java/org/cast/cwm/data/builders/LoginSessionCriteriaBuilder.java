@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,34 +35,26 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String> {
+public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator {
 
 	@Getter @Setter
-	private ISortState<String> sortState;
-	
-	@Getter @Setter
-	private boolean openOnly = true;
-	
-	@Getter @Setter
-	private Long userId = null;
+	private ISortState sortState;
 	
 	private static final long serialVersionUID = 1L;
 
 	public LoginSessionCriteriaBuilder() {
-		SingleSortState<String> sort = new SingleSortState<String>();
-		sort.setSort(new SortParam<String>("startTime", true));
+		SingleSortState sort = new SingleSortState();
+		sort.setSort(new SortParam("startTime", true));
 		sortState = sort;
 	}
 
-	@Override
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}
 
-	@Override
 	public void buildOrdered(Criteria criteria) {
 		buildUnordered(criteria);
-		SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
+		SortParam sort = ((SingleSortState) getSortState()).getSort();
 		if (sort != null) {
 			if (sort.isAscending())
 				criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());
@@ -71,15 +63,9 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 		}
 	}
 
-	@Override
 	public void buildUnordered(Criteria criteria) {
-		if (openOnly)
-			criteria.add(Restrictions.isNull("endTime"));
-
+		criteria.add(Restrictions.isNull("endTime"));
 		criteria.createAlias("user", "user"); // Must be joined for sort on username to work.
-		if (userId != null)
-			criteria.add(Restrictions.eq("user.id", userId));
-		
 		criteria.setCacheable(true);			
 	}
 	

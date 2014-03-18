@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2013 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -323,7 +323,6 @@ public class XmlSection implements IXmlPointer, Serializable, Comparable<XmlSect
 				&& this.getXmlDocument().equals(osection.getXmlDocument()));
 	}
 
-	@Override
 	public int compareTo(XmlSection other) {
 		if (this.getXmlDocument().equals(other.getXmlDocument())) {
 			return this.getSortOrder() - other.getSortOrder();
