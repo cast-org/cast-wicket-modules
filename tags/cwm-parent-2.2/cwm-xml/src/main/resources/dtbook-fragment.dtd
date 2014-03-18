@@ -1,0 +1,9 @@
+<!-- DTBook Extension for Dtbook Fragments -->
+<!-- Last modified: Jacob Brookover, 11/17/2010 -->
+
+<!ENTITY % dtbook-iss PUBLIC "-//CAST//DTD Dtbook Extended V1//EN" "dtbook-iss.dtd">
+
+%dtbook-iss;
+
+<!ELEMENT dbfragment (level|div|prompt|clozepassage|annotation)>
+<!ATTLIST dbfragment xmlns   %URI; #FIXED 'http://www.daisy.org/z3986/2005/dtbook/'>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+
+<wicket:extend>
+  <h2>Hibernate Cache Management</h2>
+
+  <p>Statistics collection appears to be: <strong wicket:id="statisticsEnabled">on</strong>.</p>
+  
+  <table>
+  	<thead>
+  		<tr>
+  			<th>Puts</th>
+  			<th>Hits</th>
+  			<th>Misses</th>
+  		</tr>
+  	</thead>
+  	<tbody>
+  		<tr>
+  			<td><span wicket:id="slcPut"></span></td>
+  			<td><span wicket:id="slcHit"></span> (<span wicket:id="slcHitP"></span>%)</td>
+  			<td><span wicket:id="slcMiss"></span> (<span wicket:id="slcMissP"></span>%)</td>
+  		</tr>
+  	</tbody>
+  </table>
+  
+  <br />
+  
+  <table>
+  	<thead>
+  		<tr>
+  			<th>Name</th>
+  			<th># Items cached</th>
+  		</tr>
+  	</thead>
+  	<tbody>
+  		<tr wicket:id="cacheView">
+  			<td><span wicket:id="name"></span></td>
+  			<td><span wicket:id="items"></span></td>
+  		</tr>
+  	</tbody>
+  </table>
+  
+  <br />
+  
+  <p>
+  	<button wicket:id="clear" type="button">Clear caches</button>
+  </p>
+  
+</wicket:extend>
+</body>
+</html>

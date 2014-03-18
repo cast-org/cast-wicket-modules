@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.cast.cwm</groupId>
+        <artifactId>cwm-parent</artifactId>
+        <version>2.2</version>
+    </parent>
+
+	<artifactId>cwm-dav</artifactId>
+	<name>cwm-dav</name>
+	<description>Access to content on a DAV server</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.wicket</groupId>
+			<artifactId>wicket</artifactId>
+			<type>pom</type>
+		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>HTTPClient</groupId>
+			<artifactId>HTTPClient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.xmlmind</groupId>
+			<artifactId>davclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.xmlmind</groupId>
+			<artifactId>davclient_util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.cast.cwm</groupId>
+			<artifactId>cwm-base</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
