@@ -1,4 +1,0 @@
-type,period,username,password,first name,last name
-s,Period 1,student1,123456,Student,One
-s,Period 2,student2,123456,Student,Two
-t,Period 1,teacher1,123456,Teacher,One
