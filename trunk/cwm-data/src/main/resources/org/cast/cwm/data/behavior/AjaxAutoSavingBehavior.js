@@ -15,6 +15,35 @@ var AutoSaver = {
 	    formsInProgress: new Array(), // Collection of forms that are being saved
 	    
 		/**
+		 * Check to see if any forms need saving.
+		 * 
+		 */
+		autoSaveCheck: function() {
+
+	        $.each(AutoSaver.onBeforeSaveCallBacks, function(key, value) {
+				try {
+					value.call();
+				} catch (err) {
+					AutoSaver.onBeforeSaveCallBacks.splice(key, 1) /* Probably a stale callback; remove it. */
+				}
+	        });
+
+			var needsave = false;
+
+			$("form.ajaxAutoSave").each(function() {
+                var newValues = $(this).serialize();
+				var oldValues = $(this).data('autosaveOrigValues');
+                if (newValues != oldValues) {
+                    AutoSaver.logger("AutoSave: form " + $(this).attr('id') + " changed");
+                    AutoSaver.logger("Old: " + oldValues);
+                    AutoSaver.logger("New: " + newValues);
+                    needsave = true;
+                }
+	        });
+			return needsave;
+		},
+
+		/**
 		 * Check to see if any forms need saving and save them.
 		 * 
 		 * @param {Object} onSuccessCallBack - callback run after all forms are processed
