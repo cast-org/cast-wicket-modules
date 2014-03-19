@@ -43,7 +43,7 @@ import com.generationjava.io.CsvWriter;
  * A CSV-formatted downloadable dump of data.
  *
  */
-class CSVDownload<E extends Serializable> extends AbstractResource {
+public class CSVDownload<E extends Serializable> extends AbstractResource {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(CSVDownload.class);
@@ -56,7 +56,7 @@ class CSVDownload<E extends Serializable> extends AbstractResource {
 	 * @param columns
 	 * @param interatorProvider
 	 */
-	CSVDownload (final List<IDataColumn<E>> columns, final IteratorProvider<E> iteratorProvider) {
+	public CSVDownload (final List<IDataColumn<E>> columns, final IteratorProvider<E> iteratorProvider) {
 		super();
 		this.columns = columns;
 		this.iteratorProvider = iteratorProvider;
@@ -67,7 +67,7 @@ class CSVDownload<E extends Serializable> extends AbstractResource {
 	 * @param columns
 	 * @param dataProvider
 	 */
-	CSVDownload (final List<IDataColumn<E>> columns, final IDataProvider<E> dataProvider) {
+	public CSVDownload (final List<IDataColumn<E>> columns, final IDataProvider<E> dataProvider) {
 		this(columns, new IteratorProvider<E>(){
 
 			private static final long serialVersionUID = 1L;

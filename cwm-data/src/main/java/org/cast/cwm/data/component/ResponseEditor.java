@@ -64,6 +64,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.WebRequest;
@@ -782,14 +783,17 @@ public abstract class ResponseEditor extends Panel {
 					FileUpload fileUpload = ((FileUploadField) this.get("fileUploadField")).getFileUpload();
 					if (fileUpload != null) {
 						responseService.saveBinaryResponse(getModel(), fileUpload.getBytes(), fileUpload.getContentType(), fileUpload.getClientFileName(), pageName);
-					}
+					}					
 				}
 			};
+			add(form);
 			form.setOutputMarkupId(true);
 			form.setMultiPart(true);
-			add(form);
 						
-			form.add(new FileUploadField("fileUploadField").setRequired(true));
+			FileUploadField fileUploadField = new FileUploadField("fileUploadField", new ListModel<FileUpload>());
+			fileUploadField.setOutputMarkupPlaceholderTag(true);
+			fileUploadField.setRequired(true);
+			form.add(fileUploadField);
 			form.setMaxSize(Bytes.megabytes(2));
 			
 			DisablingIndicatingAjaxSubmitLink save = new DisablingIndicatingAjaxSubmitLink("save", form) {
@@ -814,7 +818,7 @@ public abstract class ResponseEditor extends Panel {
 				@Override
 				protected void onAfterSubmit(AjaxRequestTarget target, Form<?> form) {
 					super.onAfterSubmit(target, form);
-					onSave(target);		
+					onSave(target);	
 				}
 
 			};

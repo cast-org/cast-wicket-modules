@@ -92,8 +92,7 @@ public interface IUserService {
 
 	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role);
 
-	public ISortableDataProvider<User,String> getUncachedUserListProvider(
-			IModel<Period> mPeriod);
+	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<Period> mPeriod);
 
 	/**
 	 * Return any open LoginSession for this user.
