@@ -23,6 +23,7 @@ import java.util.Iterator;
 import net.databinder.hib.Databinder;
 import net.databinder.models.PropertyDataProvider;
 
+import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -162,7 +163,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	 * @param key session factory key
 	 * @return this, for chaining
 	 */
-	public HibernateProvider setFactoryKey(Object key) {
+	public HibernateProvider<T> setFactoryKey(Object key) {
 		this.factoryKey = key;
 		return this;
 	}
@@ -220,8 +221,12 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 		return new HibernateObjectModel<T>(object);
 	}
 	
-	/** does nothing */
+	/** Detach the QueryBuilder or CriteriaBuilder if needed. */
 	@Override
 	public void detach() {
+		if (queryBuilder != null && queryBuilder instanceof IDetachable)
+			((IDetachable)queryBuilder).detach();
+		if (criteriaBuilder != null && criteriaBuilder instanceof IDetachable)
+			((IDetachable)criteriaBuilder).detach();
 	}
 }

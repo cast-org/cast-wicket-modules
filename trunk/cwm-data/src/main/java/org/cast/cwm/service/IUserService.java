@@ -57,6 +57,13 @@ public interface IUserService {
 	 * @param user
 	 */
 	public void confirmUser(User user);
+	
+	/**
+	 * Override to take action after a User is updated by some administrative action.
+	 * Does nothing by default.
+	 * @param mUser Model of the User that was changed.
+	 */
+	public void onUserUpdated(IModel<User> mUser);
 
 	public void generateSecurityToken(IModel<User> mUser);
 

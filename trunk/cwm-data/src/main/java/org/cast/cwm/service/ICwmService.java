@@ -57,6 +57,13 @@ public interface ICwmService {
 	 * @param objectModel
 	 */
 	void delete(IModel<? extends PersistedObject> objectModel);
+	
+	/**
+	 * Delete a {@link PersistedObject} from the datastore.
+	 * 
+	 * @param object
+	 */
+	void delete(PersistedObject object);
 
 	/**
 	 * Flush changes to the datastore.  Essentially, this commits the previous

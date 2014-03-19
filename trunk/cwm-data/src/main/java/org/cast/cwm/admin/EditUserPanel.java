@@ -252,10 +252,8 @@ public class EditUserPanel extends Panel {
 	 * @param mUser
 	 */
 	protected void onUserUpdated(IModel<User> mUser) {
-		// No action by default
+		userService.onUserUpdated(mUser);
 	}
-	
-	
 	
 	/**
 	 * A Hibernate DataForm for modifying or creating a user account.

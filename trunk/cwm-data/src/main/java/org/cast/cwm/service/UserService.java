@@ -101,8 +101,15 @@ public class UserService implements IUserService {
 		mUser.getObject().generateSecurityToken();
 		cwmService.flushChanges();
 	}
-
 	
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#onUserUpdated(org.apache.wicket.model.IModel)
+	 */
+	@Override
+	public void onUserUpdated(IModel<User> mUser) {
+		// Does nothing by default.
+	}
+
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getAllUsers()
 	 */
