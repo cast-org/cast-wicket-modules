@@ -17,39 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.test;
+package org.cast.cwm.data.provider;
 
-import org.apache.wicket.mock.MockApplication;
-import org.apache.wicket.util.tester.WicketTester;
-import org.junit.Before;
+import java.io.Serializable;
+import java.util.Iterator;
 
-public abstract class CwmBaseTestCase {
+public interface IteratorProvider<T> extends Serializable {
 
-	protected WicketTester tester;
-	protected InjectionTestHelper injectionHelper;
-
-	public CwmBaseTestCase() {
-		super();
-	}
-
-	@Before
-	public void setup() throws Exception {
-		injectionHelper = getInjectionTestHelper();
-		populateInjection();
-		setUpTester();
-	}
-
-	public void setUpTester() throws Exception {
-		tester = new CwmWicketTester(getTestApplication());		
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private MockApplication getTestApplication() {
-		return new CwmTestApplication(injectionHelper.getMap());
-	}
-
-	public void populateInjection() throws Exception {
-	}
-
-	protected abstract InjectionTestHelper getInjectionTestHelper();
+	Iterator<? extends T> getIterator();
 }

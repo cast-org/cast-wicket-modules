@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.admin;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -195,7 +196,10 @@ public class UserContentLogPage extends AdminPage {
 
 			@Override
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
-				return rowModel.getObject().getInfo().getRevisionDate().toString();
+				AuditTriple<UserContent, DefaultRevisionEntity> triple = rowModel.getObject();
+				DefaultRevisionEntity info = triple.getInfo();
+				Date revisionDate = info.getRevisionDate();
+				return new SimpleDateFormat(eventDateFormat).format(revisionDate);			
 			}
 		});
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev Type", "type"));

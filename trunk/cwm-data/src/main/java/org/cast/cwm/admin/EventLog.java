@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.admin;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -200,7 +201,9 @@ public class EventLog extends AdminPage {
 
 			@Override
 			public String getItemString(IModel<Event> rowModel) {
-				return rowModel.getObject().getInsertTime().toString(); // TODO: string format?
+				Event event = rowModel.getObject();
+				Date insertTime = event.getInsertTime();
+				return new SimpleDateFormat(eventDateFormat).format(insertTime); 			
 			}
 		});
 		
