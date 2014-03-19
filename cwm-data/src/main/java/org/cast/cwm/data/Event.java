@@ -79,6 +79,8 @@ public class Event extends PersistedObject {
 	
 	protected boolean hasResponses = false;
 	
+	protected boolean hasUserContent = false;
+	
 	@OneToMany(mappedBy="event", fetch=FetchType.LAZY)
 	protected Set<ResponseData> responseData = new HashSet<ResponseData>();
 	
@@ -106,7 +108,7 @@ public class Event extends PersistedObject {
 			insertTime = new Date();
 		if (loginSession == null)
 			loginSession = CwmSession.get().getLoginSession();
-		if (user == null)
+		if ((user == null) && (loginSession != null))
 			user = loginSession.getUser();
 	}
 	
