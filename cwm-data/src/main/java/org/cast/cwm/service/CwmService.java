@@ -78,6 +78,15 @@ public class CwmService implements ICwmService {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#delete(org.cast.cwm.data.PersistedObject)
+	 */
+	@Override
+	public void delete(PersistedObject object) {
+		Databinder.getHibernateSession().delete(object);
+		flushChanges();
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#flushChanges()
 	 */
 	@Override
