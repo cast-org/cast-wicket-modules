@@ -21,6 +21,7 @@ package org.cast.cwm.test;
 
 import static org.mockito.Mockito.mock;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class InjectionTestHelper {
@@ -29,6 +30,7 @@ public class InjectionTestHelper {
 
 	public InjectionTestHelper() {
 		super();
+		injectionMap = new HashMap<Class<? extends Object>, Object>();
 	}
 
 	public <T> T injectMock(Class<T> clazz) {
