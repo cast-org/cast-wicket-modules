@@ -26,13 +26,14 @@ import net.databinder.hib.Databinder;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.builders.ISortableAuditQueryBuilder;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditQuery;
 import org.hibernate.envers.query.criteria.AuditProperty;
-import org.hibernate.envers.query.property.RevisionNumberPropertyName;
+import org.hibernate.envers.query.internal.property.RevisionNumberPropertyName;
 
 /**
  * A sortable DataProvider for views of audit data.
@@ -53,11 +54,6 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 
 	public AuditDataProvider (ISortableAuditQueryBuilder builder) {
 		this.builder = builder;
-	}
-
-	@Override
-	public void detach() {
-		// TODO Auto-generated method stub
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,6 +82,12 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 	public ISortState<String> getSortState() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void detach() {
+		if (builder!=null && builder instanceof IDetachable)
+			((IDetachable)builder).detach();
 	}
 
 
