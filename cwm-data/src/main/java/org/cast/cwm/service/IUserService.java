@@ -90,6 +90,13 @@ public interface IUserService {
 	public ISortableDataProvider<User,String> getUserListProvider(
 			IModel<Period> mPeriod);
 
+	/**
+	 * Find Users with a given Role in a given Period.
+	 * For instance, this can find all the students in a classroom.
+	 * @param mPeriod
+	 * @param role
+	 * @return a sortable DataProvider with the list.
+	 */
 	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role);
 
 	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<Period> mPeriod);
