@@ -45,7 +45,7 @@ public abstract class CwmBaseTestCase {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private MockApplication getTestApplication() {
-		return new CwmTestApplication(injectionHelper.getMap());
+		return new CwmTestThemedApplication(injectionHelper.getMap());
 	}
 
 	public void populateInjection() throws Exception {

@@ -21,15 +21,29 @@ package org.cast.cwm.test;
 
 import java.util.Map;
 
-/**
- * @deprecated  Use  {@link #CwmTestApplication} for a fake application with injection (which may be empty)
- *  or {@link #CwmTestThemedApplication} for a fake application injection that also uses the usual CAST theme directory.
- */
-@Deprecated
-public class GuiceInjectedCwmTestApplication<T> extends CwmTestThemedApplication<T> {
+import org.apache.wicket.util.file.Path;
 
-	public GuiceInjectedCwmTestApplication(Map<Class<T>, T> injectionMap) {
+
+
+public class CwmTestThemedApplication<T> extends CwmTestApplication<T> {
+
+	public CwmTestThemedApplication() {
+		super();
+	}
+	
+	public CwmTestThemedApplication(Map<Class<T>, T> injectionMap) {
 		super(injectionMap);
+	}
+
+	@Override
+	public void init() {
+		super.init();
+	    // Check separate "theme" folder for markup and XSL styles.
+	    getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));		
+	}
+
+	protected String getThemeDir() {
+	    return "theme";
 	}
 
 }
