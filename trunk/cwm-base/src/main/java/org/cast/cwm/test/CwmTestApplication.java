@@ -18,13 +18,11 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.cast.cwm.test;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.mock.MockApplication;
-import org.apache.wicket.util.file.Path;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -42,17 +40,10 @@ public class CwmTestApplication<T> extends MockApplication {
 		this.injectionMap = injectionMap;
 	}
 
-
 	@Override
 	public void init() {
 		super.init();
 		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getGuiceInjector()));
-	    // Check separate "theme" folder for markup and XSL styles.
-	    getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));		
-	}
-
-	protected String getThemeDir() {
-	    return "theme";
 	}
 
 	protected Injector getGuiceInjector() {
