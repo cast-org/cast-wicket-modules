@@ -56,6 +56,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	
 	protected int width;
 	protected int height;
+	protected String aspectRatio;  // ww:hh  width followed by height
 	protected String markupId;
 	protected String videoHRef = null;
 	protected String previewHRef = null;
@@ -66,6 +67,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	protected boolean showDownloadLink = false;
 	protected boolean useOnPlay = false;
 	protected boolean fullScreen = false;
+	protected boolean responsive = false;
 	protected String stopString = "jwplayer().stop();";
 	protected String fallbackText = "Click to watch video";
 	protected String downloadText = "Download video";
@@ -90,7 +92,12 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		this.height = height;
 		setOutputMarkupId(true);
 		markupId = getMarkupId();
+	}
+
+	@Override
+	protected void onBeforeRender() {
 		addComponents();		
+		super.onBeforeRender();
 	}
 
 	public String getFlashHRef() {
@@ -153,17 +160,20 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 //		link.add(new Image("button", new ResourceReference(MediaPlayerPanel.class, "download_arrow.png")));
 //		link.add(new Label("text", new PropertyModel<String>(this, "downloadText")));
 		
-		playResponse = new AbstractDefaultAjaxBehavior() {
-			private static final long serialVersionUID = 1L;
+		if (useOnPlay) {
+			playResponse = new AbstractDefaultAjaxBehavior() {
+				private static final long serialVersionUID = 1L;
 
-			@Override
-			protected void respond(AjaxRequestTarget target) {
-				StringValue status = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("status");
-				if (useOnPlay)
-					onPlay(status.toString(""));
-			}
-		};
-		add(playResponse);
+				@Override
+				protected void respond(AjaxRequestTarget target) {
+					if (useOnPlay) {
+						StringValue status = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("status");
+						onPlay(status.toString(""));
+					}
+				}
+			};
+			add(playResponse);			
+		}
 	}
 
 	@Override
@@ -174,10 +184,15 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		StringBuffer jsString = new StringBuffer();
 		jsString.append("jwplayer(" + "\"" + getMarkupId() + "\").setup({" +
 				"flashplayer: " + "\"" + getFlashHRef() + "\", " +
-				"file: " + "\"" + getVideoHRef() +"\", " +
-				"height: " + String.valueOf(getHeight()) + ", " +
-				"width: " + String.valueOf(getWidth()));
+				"file: " + "\"" + getVideoHRef() +"\""
+				);
 
+		if (isResponsive()) {
+			jsString.append(", " + "aspectratio: " + "\"" + aspectRatio + "\"");
+			jsString.append(", " + "width: " + "\"" +"100%" + "\" ");
+		} else {
+			jsString.append(", " + "height: " + String.valueOf(getHeight()) + ", " + "width: " + String.valueOf(getWidth()));
+		}
 		if (!Strings.isEmpty(previewHRef))
 			jsString.append(", " + "image: " + "\"" + previewHRef +  "\"");
 		
@@ -283,12 +298,24 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		this.height = height;
 	}
 
+	public void setAspectRatio(String aspectRatio) {
+		this.aspectRatio = aspectRatio;
+	}
+
 	public boolean isFullScreen() {
 		return fullScreen;
 	}
 
 	public void setFullScreen(boolean fullScreen) {
 		this.fullScreen = fullScreen;
+	}
+
+	public boolean isResponsive() {
+		return responsive;
+	}
+
+	public void setResponsive(boolean responsive) {
+		this.responsive = responsive;
 	}
 
 	public String getVideoHRef() {
