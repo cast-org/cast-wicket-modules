@@ -270,10 +270,10 @@ public class EventLog extends AdminPage {
 		return adjustedDateTime.toDate();
 	}
 
-	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator {
+	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator<String> {
 
 		private static final long serialVersionUID = 1L;
-		@Getter @Setter private ISortState sortState;
+		@Getter @Setter private ISortState<String> sortState;
 ;
 		
 		@Override
