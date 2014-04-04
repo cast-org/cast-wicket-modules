@@ -35,13 +35,13 @@ import org.apache.wicket.request.Response;
 public class GoogleAnalyticsHeaderItem extends HeaderItem {
 	
 	private static final String format = "<script>\n"
-			+ "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n"
-			+ "(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n"
-			+ "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n"
-			+ "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n"
+			+ "  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){\n"
+			+ "  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),\n"
+			+ "  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)\n"
+			+ "  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');\n"
 			+ "\n"
-			+ "ga('create', '%s', '%s');\n"
-			+ "ga('send', 'pageview');\n"
+			+ "  ga('create', '%s', '%s');\n"
+			+ "  ga('send', 'pageview');\n"
 			+ "</script>\n";
 
 	private String trackingId;
@@ -52,6 +52,7 @@ public class GoogleAnalyticsHeaderItem extends HeaderItem {
 	public GoogleAnalyticsHeaderItem(String trackingId, String accountId) {
 		super();
 		this.trackingId = trackingId;
+		this.accountId = accountId;
 	}
 
 	@Override
