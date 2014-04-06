@@ -145,6 +145,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	 * If so, update the XMLDocument.
 	 */
 	synchronized protected void updateIfModified() {
+		log.trace("checking last modified time of {}", this);
 		lastCheckedTime = Time.now();
 		Time newLM = xmlFile.lastModifiedTime();
 		if (lastModified==null || newLM.after(lastModified)) {

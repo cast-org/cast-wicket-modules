@@ -324,21 +324,26 @@ public class XmlService implements IXmlService {
 	 */
 	@Override
 	public TransformResult getTransformed (ICacheableModel<? extends IXmlPointer> mXmlPtr, String transformName, TransformParameters params) {
+		log.trace("Entering getTransformed({}, {})", mXmlPtr, transformName);
 		IDOMTransformer transformer = getTransformer(transformName);
-		// First, check the cache.
+		// Getting the last modified time of these resources has the side effect of updating them if necessary.
+		// Do that whether or not we have a cached DOM.
+		Time xmlTime = mXmlPtr.getLastModified();
+		Time transTime = transformer.getLastModified(params);
+		// Now check the cache to see if it's as up to date as the XML and XSL files.
 		net.sf.ehcache.Element cacheElement = getDomCache().get(mXmlPtr, transformName, params);
 		if (cacheElement != null) {
 			// Compare last-modified times of cache, XML, and transformer.
 			Time cacheTime = Time.millis(cacheElement.getLastUpdateTime() != 0 ? cacheElement.getLastUpdateTime() : cacheElement.getCreationTime());
 			// This call to getLastModified() will also update the XML if necessary
-			Time xmlTime = mXmlPtr.getLastModified();
-			Time transTime = transformer.getLastModified(params);
 			if ((xmlTime==null || xmlTime.before(cacheTime)) && (transTime==null || transTime.before(cacheTime))) {
 				// Cache is still valid
+				log.trace("Returning cached DOM");
 				return (TransformResult) cacheElement.getObjectValue();
 			}
 		}
 		// Still here?  Cache was empty or outdated.  Do a new transform.
+		log.trace("Cache {}, running transform", cacheElement==null ? "empty" : "outdated");
 		IDOMTransformer trans = getTransformer(transformName);
 		if (trans == null)
 			throw new IllegalArgumentException("Transformer not registered: " + transformName);
