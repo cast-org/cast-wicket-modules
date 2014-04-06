@@ -48,8 +48,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-ehcache</artifactId>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
 		</dependency>
 	</dependencies>
 	
