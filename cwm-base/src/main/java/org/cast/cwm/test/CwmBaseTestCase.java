@@ -20,12 +20,11 @@
 package org.cast.cwm.test;
 
 import org.apache.wicket.mock.MockApplication;
-import org.apache.wicket.util.tester.WicketTester;
 import org.junit.Before;
 
 public abstract class CwmBaseTestCase {
 
-	protected WicketTester tester;
+	protected CwmWicketTester tester;
 	protected InjectionTestHelper injectionHelper;
 
 	public CwmBaseTestCase() {
@@ -44,7 +43,7 @@ public abstract class CwmBaseTestCase {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private MockApplication getTestApplication() {
+	protected MockApplication getTestApplication() {
 		return new CwmTestThemedApplication(injectionHelper.getMap());
 	}
 
