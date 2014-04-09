@@ -54,4 +54,10 @@ public class TestDataUtil {
 		user.setRole(role);
 		return user;
 	}
+
+	public static User makeUser(Long id, String first, String last, Role role, String username) {
+		User user = makeUser(id, first, last, role);
+		user.setUsername(username);
+		return user;
+	}
 }
