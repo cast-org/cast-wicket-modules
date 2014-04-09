@@ -52,6 +52,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.annotations.SortType;
 import org.hibernate.envers.Audited;
 
@@ -103,7 +104,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 			name="perioduser",
 			joinColumns={@JoinColumn(name="user_id")},
 			inverseJoinColumns={@JoinColumn(name="period_id")})
-	@Sort(type=SortType.NATURAL)
+	@SortNatural
 	protected SortedSet<Period> periods = new TreeSet<Period>();
 
 	/**

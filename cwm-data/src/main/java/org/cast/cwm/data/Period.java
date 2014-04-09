@@ -37,8 +37,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
+import org.hibernate.annotations.SortNatural;
 import org.hibernate.envers.Audited;
 
 /**
@@ -76,7 +75,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	private String name;
 	
 	@ManyToMany(mappedBy="periods")
-	@Sort(type=SortType.NATURAL)
+	@SortNatural
 	private SortedSet<User> users = new TreeSet<User>();
 	
 	public Period() { /* No Arg Constructor for the datastore */ }
@@ -111,7 +110,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	public int compareTo(Period other) {
 		if (other == null)
 			return 1;
-		int idDiff = Long.valueOf(id).compareTo(Long.valueOf(other.id));
+		int idDiff = getId().compareTo(other.getId());
 		if (name == null || other.name == null)
 			return idDiff;
 		int nameDiff = name.compareTo(other.name);
