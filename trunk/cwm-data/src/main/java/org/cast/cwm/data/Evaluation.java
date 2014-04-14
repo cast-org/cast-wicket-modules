@@ -25,9 +25,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,7 +39,6 @@ import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Index;
 import org.hibernate.envers.Audited;
 
 /**
@@ -50,6 +51,10 @@ import org.hibernate.envers.Audited;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
+@Table(indexes={
+		@Index(columnList="user_id"),
+		@Index(columnList="userContent_id"),
+})
 @Getter 
 @Setter
 @ToString(of={"id"})
@@ -69,7 +74,6 @@ public class Evaluation extends PersistedObject{
 	 * May be null if automatically scored.
 	 */
 	@ManyToOne
-	@Index(name="evaluation_user_idx")
 	private User user;
 	
 	/**
@@ -77,7 +81,6 @@ public class Evaluation extends PersistedObject{
 	 * May be null if some other type of thing is being evaluated.
 	 */
 	@ManyToOne
-	@Index(name="evaluation_usercontent_idx")
 	private UserContent userContent;
 	
 	@Column(nullable=false)
