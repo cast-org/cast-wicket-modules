@@ -53,7 +53,7 @@ import org.hibernate.envers.Audited;
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
 @Table(indexes={
 		@Index(columnList="user_id"),
-		@Index(columnList="userContent_id"),
+		@Index(columnList="userContent_id")
 })
 @Getter 
 @Setter
