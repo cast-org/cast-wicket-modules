@@ -39,7 +39,7 @@ public class CwmTestThemedApplication<T> extends CwmTestApplication<T> {
 	public void init() {
 		super.init();
 	    // Check separate "theme" folder for markup and XSL styles.
-	    getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));		
+	    getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));
 	}
 
 	protected String getThemeDir() {
