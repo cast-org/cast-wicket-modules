@@ -113,8 +113,9 @@ public interface IEventService extends IEventLogger {
 
 	/**
 	 * Close the current {@link LoginSession} and save a Logout Event
+	 * @return 
 	 */
-	public abstract void recordLogout();
+	public abstract IModel<? extends Event> recordLogout();
 
 	/**
 	 * 
