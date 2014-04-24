@@ -195,7 +195,7 @@ public class EventService implements IEventService {
 	 * @see org.cast.cwm.service.IEventService#recordLogout()
 	 */
 	@Override
-	public void recordLogout() {
+	public IModel<? extends Event> recordLogout() {
 		LoginSession ls = CwmSession.get().getLoginSession();
 
 		String sesLength = "";
@@ -211,7 +211,7 @@ public class EventService implements IEventService {
 			log.debug ("recordLogout found no LoginSession");
 		}
 		// saveEvent will commit the transaction
-		saveEvent(LOGOUT_TYPE_NAME, sesLength, null);
+		return saveEvent(LOGOUT_TYPE_NAME, sesLength, null);
 	}
 	
 	/* (non-Javadoc)
