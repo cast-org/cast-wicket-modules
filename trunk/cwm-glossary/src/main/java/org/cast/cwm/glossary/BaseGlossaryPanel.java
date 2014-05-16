@@ -213,7 +213,7 @@ public abstract class BaseGlossaryPanel extends Panel {
 				container.add(newLink(letter, e));
 
 				if (e.equals(current))
-					container.add(AttributeModifier.replace("class", "current"));
+					container.add(AttributeModifier.replace("class", getCurrentCssClass()));
 				if (getGlossary().getEntryById(e.getIdentifier()) != null) {
 					container.add(new WebMarkupContainer("wordCardIcon").setVisible(false));
 				} else {
@@ -284,6 +284,10 @@ public abstract class BaseGlossaryPanel extends Panel {
 		for (String id : glossary.getEntryIdsByFirstChar(letter))
 			list.add (glossary.getEntryById(id));
 		return list;
+	}
+	
+	protected String getCurrentCssClass() {
+		return "current";
 	}
 
 }
