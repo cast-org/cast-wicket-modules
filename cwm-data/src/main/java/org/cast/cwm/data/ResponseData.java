@@ -26,9 +26,11 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,7 +42,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Index;
 
 /**
  * <p>
@@ -60,6 +61,9 @@ import org.hibernate.annotations.Index;
 @Getter 
 @Setter
 @ToString(of="id")
+@Table(indexes={
+		@Index(columnList="response_id", name="responsedata_response_idx")
+})
 public class ResponseData extends PersistedObject {
 
 	private static final long serialVersionUID = 1L;
@@ -68,8 +72,7 @@ public class ResponseData extends PersistedObject {
 	@Setter(AccessLevel.NONE) 
 	private Long id;
 	
-	@Index(name="responsedata_response_idx")
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch=FetchType.LAZY)
 	private Response response;
 	
 	@Column(nullable=false)
