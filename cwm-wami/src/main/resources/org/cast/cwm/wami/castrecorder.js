@@ -222,6 +222,7 @@ function castRecorderBuilder () {
         
         // Called by the GUI "Play" button
         play: function (button) {
+        	this.stop();   
         	var applet = $(button).parent('.audio_applet').find('object').get();
         	this.status("PLAY button pressed: " + applet);
             if ( isPaused ) {
