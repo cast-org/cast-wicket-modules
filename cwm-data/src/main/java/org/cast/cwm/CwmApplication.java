@@ -193,6 +193,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		getDebugSettings().setOutputMarkupContainerClassName(true);		
 
 		initResponseTypes();
+		loadContent();
 		runDatabaseInitializers();
 		configureMountPaths();
 		
@@ -231,6 +232,13 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		return modules;
 	}
 
+	/**
+	 * Connect to the application's content.  
+	 * To be overridden as necessary by applications.
+	 */
+	protected void loadContent() {
+	}
+	
 	/**
 	 * Returns the list of database initialization methods that will be run at startup.
 	 * Applications should override this method if they want to define additional
