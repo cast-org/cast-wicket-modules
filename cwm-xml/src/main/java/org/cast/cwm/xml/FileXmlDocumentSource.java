@@ -29,6 +29,7 @@ import lombok.ToString;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
+import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
@@ -52,6 +53,16 @@ public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLin
 			return new FileInputStream(file);
 		} catch (FileNotFoundException e) {
 			throw new InputStreamNotFoundException(e); 
+		}
+	}
+
+	@Override
+	public InputStream getInputStream(String relativePath)
+			throws InputStreamNotFoundException {
+		try {
+			return getRelativeResource(relativePath).getResourceStream().getInputStream();
+		} catch (ResourceStreamNotFoundException e) {
+			throw new InputStreamNotFoundException(e);
 		}
 	}
 
@@ -84,6 +95,5 @@ public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLin
 			}
 		};
 	}
-
 
 }

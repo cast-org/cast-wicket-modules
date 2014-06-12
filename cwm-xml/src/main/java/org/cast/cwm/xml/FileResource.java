@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.xml;
 
+import java.io.InputStream;
+
 import lombok.ToString;
 
 import org.apache.wicket.request.resource.IResource;
@@ -49,10 +51,17 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 * Return a FileResource at a location relative to this one.
 	 */
 	public FileResource getRelativeResource (String relativePath) {
-		File fullPath = new File(file.getParentFile(), relativePath);
-		return new FileResource(fullPath);
+		return new FileResource(getRelativeFile(relativePath));
 	}
-	
+
+	/**
+	 * Return an InputStream for a file relative to this one.
+	 */
+	@Override
+	public InputStream getInputStream(String relativePath) {
+		return null;
+	}
+
 	/** Return a ResourceReference to a relatively-addressed item
 	 * 
 	 * @param relativePath path relative to the path of this Resource
@@ -60,7 +69,7 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 */
 	@Override
 	public ResourceReference getRelativeReference (final String relativePath) {
-		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
+		String filePath = getRelativeFile(relativePath).getAbsolutePath().substring(1);
 		return new ResourceReference(FileResource.class, filePath) {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -70,4 +79,8 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 		};
 	}
 
+	private File getRelativeFile (String relativePath) {
+		return new File(file.getParentFile(), relativePath);
+	}
+	
 }
