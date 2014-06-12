@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data.init;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 
 	@Override
 	public boolean run(IAppConfiguration appProperties) {
-		String userSpreadsheet = appProperties.getProperty("cwm.defaultUserFile");
+		File userSpreadsheet = appProperties.getOptionalFile("cwm.defaultUserFile");
 		if (userSpreadsheet != null) {
 			log.debug("Reading {}", userSpreadsheet);
 			try {

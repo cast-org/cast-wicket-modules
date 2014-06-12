@@ -143,6 +143,9 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 		return fileSize;
 	}
 	
+	/**
+	 * Return an InputStream for this resource.
+	 */
 	@Override
 	public InputStream getInputStream() throws InputStreamNotFoundException {
 		try {
@@ -152,6 +155,14 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 		}
 	}
 
+	/**
+	 * Return an InputStream for a resource relative to this one.
+	 */
+	@Override
+	public InputStream getInputStream(String relativePath) throws InputStreamNotFoundException {
+		return getRelativeResource(relativePath).getInputStream();
+	}
+	
 	/** Return a ResourceReference to a relatively-addressed item
 	 * 
 	 * @param relativePath path relative to the path of this Resource

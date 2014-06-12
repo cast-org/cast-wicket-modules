@@ -110,7 +110,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	public int compareTo(Period other) {
 		if (other == null)
 			return 1;
-		int idDiff = getId().compareTo(other.getId());
+		int idDiff = (getId()==null) ? 0 : getId().compareTo(other.getId());
 		if (name == null || other.name == null)
 			return idDiff;
 		int nameDiff = name.compareTo(other.name);
