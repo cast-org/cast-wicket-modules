@@ -59,7 +59,7 @@ public class BrowserInfoGatheringFormBorder<T> extends Border {
 	protected void onSubmit() {
 	}
 
-	BrowserInfoGatheringForm<T> getForm() {
+	protected BrowserInfoGatheringForm<T> getForm() {
 		return form;
 	}
 	
