@@ -80,8 +80,9 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 		onBeforeSearchExecution(query);
 		long startTime = System.currentTimeMillis();
 		Iterator<? extends T> iterator = query.iterate();
-		if (log.isDebugEnabled())
-			log.debug("Query took {}ms", System.currentTimeMillis()-startTime);
+		if (log.isDebugEnabled()) {
+			log.debug("Query took {}ms, returned {} results", System.currentTimeMillis()-startTime, query.getResultSize());
+		}
 		return iterator;
 	}
 
@@ -124,7 +125,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 				luceneQuery = builder.build (queryBuilder);
 			} catch (SearchException e) {
 				// query building can fail e.g. if search string contains only stopwords.
-				log.debug("Search query construction failed: {}", e);
+				log.warn("Search query construction failed: {}", e);
 				return null;
 			}
 			query = fullTextSession.createFullTextQuery(luceneQuery);
