@@ -34,6 +34,7 @@ public abstract class CwmBaseTestCase {
 	@Before
 	public void setup() throws Exception {
 		injectionHelper = getInjectionTestHelper();
+		setUpData();
 		populateInjection();
 		setUpTester();
 	}
@@ -44,11 +45,19 @@ public abstract class CwmBaseTestCase {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected MockApplication getTestApplication() {
-		return new CwmTestThemedApplication(injectionHelper.getMap());
+		if (isApplicationThemed())
+			return new CwmTestThemedApplication(injectionHelper.getMap());
+		else
+			return new CwmTestApplication(injectionHelper.getMap());
+	}
+	
+	public void setUpData() {
 	}
 
 	public void populateInjection() throws Exception {
 	}
 
+	protected abstract boolean isApplicationThemed();
+	
 	protected abstract InjectionTestHelper getInjectionTestHelper();
 }

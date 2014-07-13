@@ -19,74 +19,42 @@
  */
 package org.cast.cwm.data.component;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import lombok.Getter;
-
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.tester.FormTester;
 import org.cast.cwm.data.Period;
-import org.cast.cwm.data.PersistedObject;
-import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
-import org.cast.cwm.test.CwmWicketTester;
-import org.cast.cwm.test.GuiceInjectedTestApplication;
+import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.cast.cwm.test.TestDataUtil;
-import org.junit.Before;
 import org.junit.Test;
 
-public class PeriodChoicePanelTest {
+public class PeriodChoicePanelTest extends CwmDataBaseTestCase {
 
-	private CwmWicketTester tester;
-	private ArrayList<Period> periods;
-	private User mockUser;
+	private Period period2;
+	private SortedSet<Period> periods;
+
 	private ICwmSessionService cwmSessionService;
 
-	@Getter
-	private Period currentPeriod;
+	@Override
+	public void setUpData() {
+		super.setUpData();
+		periods = new TreeSet<Period>();
+		periods.add(period);
+		period.setName("Period A");
+		period2 = new Period();
+		TestDataUtil.setId(period2, 2L);
+		period2.setName("Period B");
+		periods.add(period2);
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Before
-	public void setUp() {
-		setUpData();
-
-		HashMap<Class<? extends Object>, Object> injectionMap = new HashMap<Class<? extends Object>, Object>();
-        populateInjectionMap(injectionMap);
-		tester = new CwmWicketTester(new GuiceInjectedTestApplication(injectionMap));		
-	}
-
-	private void setUpData() {
-		periods = new ArrayList<Period>();
-		Period p = new Period();
-		TestDataUtil.setId(p, 1L);
-		p.setName("Period A");
-		periods.add(p);
-		p = new Period();
-		TestDataUtil.setId(p, 2L);
-		p.setName("Period B");
-		periods.add(p);
-		
-		currentPeriod = periods.get(0);
-		
-		mockUser = mock(User.class);
-		when(mockUser.getPeriodsAsList()).thenReturn(periods);
+		loggedInUser.setPeriods(periods);
 	}
 	
-	private void populateInjectionMap(HashMap<Class<? extends Object>, Object> injectionMap) {
-		cwmSessionService = mock(ICwmSessionService.class);
-        when(cwmSessionService.getCurrentPeriodModel()).thenReturn(new PropertyModel<Period>(this, "currentPeriod"));
-        when(cwmSessionService.getUserModel()).thenReturn(Model.of(mockUser));
-        injectionMap.put(ICwmSessionService.class, cwmSessionService);
+	@Override
+	public void populateInjection() {
+		cwmSessionService = getHelper().injectAndStubCwmSessionService(this);
 	}
 
 	@Test
@@ -103,8 +71,8 @@ public class PeriodChoicePanelTest {
 		ft.select("periodChoice", 1);
 		ft.submit("view");
 		tester.clickLink("panel:selectForm:view");
-		tester.assertModelValue("panel:selectForm:periodChoice", periods.get(1));
-		assertEquals("Session current period wasn't set to new value", periods.get(1), cwmSessionService.getCurrentPeriodModel().getObject());
+		tester.assertModelValue("panel:selectForm:periodChoice", period2);
+		assertEquals("Session current period wasn't set to new value", period2, cwmSessionService.getCurrentPeriodModel().getObject());
 		// Not verifying call to sessionservice setter, since it's already set by virtue of sharing a model.
 	}
 	

@@ -315,4 +315,13 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	public void setRetainUnsaved(boolean retainUnsaved) {
 		this.retainUnsaved = retainUnsaved;
 	}
+	
+	/**
+	 * Return the id of the model object, if the model is storing it.
+	 * Will be null for unbound model or if model is bound using a criteria builder etc.
+	 * @return id, or null.
+	 */
+	protected Serializable getObjectId() {
+		return objectId;
+	}
 }
