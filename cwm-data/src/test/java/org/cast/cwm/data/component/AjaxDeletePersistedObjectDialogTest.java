@@ -32,19 +32,11 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.test.CwmWicketTester;
-import org.junit.Before;
+import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.junit.Test;
 
-public class AjaxDeletePersistedObjectDialogTest {
+public class AjaxDeletePersistedObjectDialogTest extends CwmDataBaseTestCase {
 
-	private CwmWicketTester tester;
-
-	@Before
-	public void setUp() {
-		tester = new CwmWicketTester();
-	}
-	
 	@Test
 	public void canRender() {
 		tester.startComponentInPage(getResponseDeletingDialog());

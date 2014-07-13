@@ -23,6 +23,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -85,7 +86,8 @@ public class CwmWicketTester extends WicketTester {
 
 	public void assertAttribute(String message, String expected,
 			Component component, String attribute) {
-		assertTrue(message, getTagByWicketId(component.getId()).getAttributeIs(attribute, expected));
+		String value = getTagByWicketId(component.getId()).getAttribute(attribute);
+		assertEquals(String.format("%s: expected \"%s\", got \"%s\"", message, expected, value), expected, value);
 	}
 
 	public void assertNotAttribute(String message, String expected,
