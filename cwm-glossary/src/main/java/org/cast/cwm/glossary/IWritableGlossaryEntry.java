@@ -36,28 +36,28 @@ public interface IWritableGlossaryEntry extends IGlossaryEntry {
 	/**
 	 * Set the persistent unique identifier of this glossary entry.
 	 */
-	public void setIdentifier(String identifier);
+	public IWritableGlossaryEntry setIdentifier(String identifier);
 	
 	/**
 	 * Set the glossary word that this entry represents.
 	 * 
 	 * @param name
 	 */
-	public void setHeadword(String name);
+	public IWritableGlossaryEntry setHeadword(String name);
 	
 	/**
 	 * Set the sortForm of this entry.
 	 * 
 	 * @param sortForm
 	 */
-	public void setSortForm(String sortForm);
+	public IWritableGlossaryEntry setSortForm(String sortForm);
 	
 	/**
 	 * Set the short definition of the entry.
 	 * 
 	 * @param shortDef
 	 */
-	public void setShortDef(String shortDef);
+	public IWritableGlossaryEntry setShortDef(String shortDef);
 	
 	/**
 	 * Set the list of alternate forms for this entry.
@@ -69,6 +69,6 @@ public interface IWritableGlossaryEntry extends IGlossaryEntry {
 	/**
 	 * Set the pointer to the XML for the glossary item's definition.
 	 */
-	public void setXmlPointer(ICacheableModel<? extends IXmlPointer> pointer);
+	public IWritableGlossaryEntry setXmlPointer(ICacheableModel<? extends IXmlPointer> pointer);
 	
 }
