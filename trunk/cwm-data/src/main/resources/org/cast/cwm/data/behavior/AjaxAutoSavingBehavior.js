@@ -207,8 +207,8 @@ var AutoSaver = {
 		 * @param {Object} base the base page (to eliminate in-page links)
 		 */
 	    needsHandler: function(url, base) {
-	        return (url &&
-	                url.indexOf('#') != 0 
+	        return (url
+	                && url.indexOf('#') != 0 
 	                && url.indexOf("javascript") != 0 
 	                && url.indexOf(".mp3") != (url.length - 4) 
 	                && url.indexOf(base + "#") != 0); 
@@ -220,7 +220,7 @@ var AutoSaver = {
 	    makeLinksSafe: function() {
 	        var base = window.location.href;
 	        $('a, area').each(function() {
-        		if ($(this).data("ParsedAutoSaveLink") != true && !this.onclick && !this.target && AutoSaver.needsHandler(this.href, base)) {
+	        	if ($(this).data("ParsedAutoSaveLink") != true && !this.onclick && !this.target && AutoSaver.needsHandler($(this).attr('href'), base)) {
         			$(this).bind("click", AutoSaver.autoSaveOnLink);
 					$(this).data("ParsedAutoSaveLink", true);
         		}
