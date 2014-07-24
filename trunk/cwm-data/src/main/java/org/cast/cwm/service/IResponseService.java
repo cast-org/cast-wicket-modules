@@ -47,7 +47,7 @@ public interface IResponseService {
 	 * 
 	 * @param responseClass
 	 */
-	void setResponseClass(Class<? extends Response> responseClass);
+	IResponseService setResponseClass(Class<? extends Response> responseClass);
 	
 	/** 
 	 * Create a new Response object of the application's preferred class,
