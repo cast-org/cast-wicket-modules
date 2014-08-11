@@ -114,7 +114,7 @@
 	correct (true|false) #IMPLIED
 >
 
-<!ELEMENT label (%inline;)*>
+<!ELEMENT label (#PCDATA|p|list|div|blockquote|poem|linegroup|table|line|prodnote)*>
 <!ATTLIST label %attrs; >	
 
 <!ELEMENT message (#PCDATA|p|list|div|blockquote|poem|linegroup|table|line|prodnote)*>
