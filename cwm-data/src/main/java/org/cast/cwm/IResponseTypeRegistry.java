@@ -46,6 +46,7 @@ public interface IResponseTypeRegistry {
 	 * 
 	 * @param name a String name used as lookup key
 	 * @return the associated response type
+	 * @throws IllegalArgumentException if the name is not a registered IResponseType
 	 */
 	IResponseType getResponseType(String name);
 
