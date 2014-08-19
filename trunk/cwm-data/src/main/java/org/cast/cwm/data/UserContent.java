@@ -31,6 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -38,6 +39,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,7 +54,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
@@ -60,10 +61,16 @@ import org.hibernate.envers.RelationTargetAuditMode;
 /**
  * A UserContent object represents a single chunk of user input.
  * Most often it is a response to a {@link Prompt} object.
+ * 
+ * It is an audited object, so it can be modified at will and the 
+ * history of revisions will be available in the audit table.
  */
 @Entity
 @Audited
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(indexes={
+		@Index(columnList="user_id")
+})
 @DiscriminatorColumn(discriminatorType=DiscriminatorType.CHAR)
 @DiscriminatorValue(value="-")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -79,7 +86,6 @@ public class UserContent extends PersistedObject {
 	@Setter(AccessLevel.NONE) 
 	private Long id;
 	
-	@Index(name="usercontent_user_idx")
 	@ManyToOne(optional=false)
 	private User user;
 	
@@ -206,15 +212,24 @@ public class UserContent extends PersistedObject {
 		this.primaryFile = primaryFile;
 	}
 	
+	/**
+	 * Check whether this object has content that is considered empty based on its data type.
+	 * This incorporates rules and esoteric knowledge about a few commonly-used data types.
+	 * Probably needs rethinking to make this more general somehow.
+	 * @return
+	 */
 	public boolean isEmpty() {
-						
-		if (this.getDataType().getName().equals(("TEXT"))) {
+		if (dataType == null)
+			throw new IllegalStateException("UserContent dataType is null");
+		String dtName = dataType.getName();
+		if (dtName.equals("TEXT") ||
+				dtName.equals("SINGLE_SELECT")) {
 			if (this.getText() == null || (StringUtils.isBlank(this.getText()))) {
 					return true;
 			}
 			return false;
 		}
-		else if (this.getDataType().getName().equals(("SVG"))) {
+		else if (dtName.equals(("SVG"))) {
 			if (this.getText() == null ||
 				(StringUtils.isBlank(text))  ||  
 				(this.getText().trim().replaceAll("\\s[\\s]*", "").equals("<svgwidth=\"535\"height=\"325\"xmlns=\"http://www.w3.org/2000/svg\"><gdisplay=\"inline\"><title>Layer1</title></g></svg>")) || 
@@ -224,13 +239,13 @@ public class UserContent extends PersistedObject {
 			}
 			return false;
 		}
-		else if (this.getDataType().getName().equals(("AUDIO"))) {
+		else if (dtName.equals(("AUDIO"))) {
 			if (this.getPrimaryFile() == null) {
 					return true;
 			}
 			return false;
 		}
-		else if (this.getDataType().getName().equals(("ARTIMAGE"))) {
+		else if (dtName.equals(("ARTIMAGE"))) {
 			return false;
 		}
 		else {

@@ -58,6 +58,9 @@ public class ResponseTypeRegistry implements IResponseTypeRegistry {
 	 */
 	@Override
 	public IResponseType getResponseType(String name) {
+		if (!legalResponseTypes.containsKey(name))
+			throw new IllegalArgumentException("Response type " + name + " is not defined");
+
 		return legalResponseTypes.get(name);
 	}
 	
