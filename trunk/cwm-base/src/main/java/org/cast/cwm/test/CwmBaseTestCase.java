@@ -51,7 +51,7 @@ public abstract class CwmBaseTestCase {
 			return new CwmTestApplication(injectionHelper.getMap());
 	}
 	
-	public void setUpData() {
+	public void setUpData() throws Exception {
 	}
 
 	public void populateInjection() throws Exception {
