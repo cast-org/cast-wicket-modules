@@ -19,6 +19,10 @@
  */
 package org.cast.cwm.xml;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.ByteArrayInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,8 +32,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import junit.framework.TestCase;
-
+import org.cast.cwm.test.CwmBaseTestCase;
+import org.cast.cwm.test.InjectionTestHelper;
+import org.cast.cwm.xml.service.IXmlService;
 import org.cast.cwm.xml.service.XmlService;
 import org.cast.cwm.xml.transform.FilterElements;
 import org.cast.cwm.xml.transform.TransformParameters;
@@ -38,7 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class TestXPath extends TestCase {
+public class TestXPath extends CwmBaseTestCase {
 	
 	private static final XPathFactory factory = XPathFactory.newInstance();
 	
@@ -49,22 +54,35 @@ public class TestXPath extends TestCase {
 		+ "<level2><p>First p</p><p><em>Second p</em></p></level2><level2><p>Third p</p></level2><p>Fourth p</p></level1>").getBytes();
 	
 	@Override
-	public void setUp() {
+	protected boolean isApplicationThemed() {
+		return false;
+	}
+
+
+	@Override
+	protected InjectionTestHelper getInjectionTestHelper() {
+		return new InjectionTestHelper(); 
+	}
+
+	@Override
+	public void setUpData() throws Exception {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		Document document;
-		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			document = db.parse(new ByteArrayInputStream(doc));
-			dom = document.getDocumentElement();
-		} catch (Exception e) {
-			fail();
-		}
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		document = db.parse(new ByteArrayInputStream(doc));
+		dom = document.getDocumentElement();
 
 		xPath = factory.newXPath();
-		xPath.setNamespaceContext(XmlService.get().getNamespaceContext());
+		xPath.setNamespaceContext(new XmlService().getNamespaceContext());
 	}
 	
+	@Override
+	public void populateInjection() throws Exception {
+		IXmlService xmlService = mock(IXmlService.class);
+		when(xmlService.getNamespaceContext()).thenReturn(new XmlService.CwmNamespaceContext());
+		injectionHelper.injectObject(IXmlService.class, xmlService);
+	}
 	
 	@Test
 	public void testSimpleXPath() throws XPathExpressionException {
@@ -127,6 +145,8 @@ public class TestXPath extends TestCase {
 		//output = new FilterElements().applyTransform((Element) node.cloneNode(true), params);
 		//assertEquals("Second p", output.getTextContent());
 	}
+
+
 	
 
 }

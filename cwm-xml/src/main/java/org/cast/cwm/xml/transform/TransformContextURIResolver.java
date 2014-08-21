@@ -30,10 +30,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.protocol.http.RequestUtils;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
 
 
 /**
@@ -46,6 +49,13 @@ import org.slf4j.LoggerFactory;
 public class TransformContextURIResolver implements URIResolver {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformContextURIResolver.class);
+	
+	@Inject
+	IXmlService xmlService;
+	
+	public TransformContextURIResolver() {
+		Injector.get().inject(this);
+	}
 	
 	@Override
 	public Source resolve(String href, String base) throws TransformerException {
@@ -61,7 +71,7 @@ public class TransformContextURIResolver implements URIResolver {
 	}
 
 	private File findTransformFile(String href, String base) {
-		File file = XmlService.get().findTransformFile(href);
+		File file = xmlService.findTransformFile(href);
 		if (file != null) 
 			return file;
 		return findRelativeToCurrentTransformationDirectory(href, base);

@@ -26,13 +26,16 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
-import org.cast.cwm.xml.service.XmlService;
+import org.cast.cwm.xml.service.IXmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.google.inject.Inject;
 
 /**
  * <p>
@@ -55,8 +58,15 @@ public class FilterElements implements IDOMTransformer, Serializable {
 	
 	private static final XPathFactory factory = XPathFactory.newInstance();
 	
+	@Inject
+	IXmlService xmlService;
+	
 	private static final Logger log = LoggerFactory.getLogger(FilterElements.class);
 
+	public FilterElements() {
+		Injector.get().inject(this);
+	}
+	
 	@Override
 	public Element applyTransform(Element n, TransformParameters params) {
 		
@@ -69,7 +79,7 @@ public class FilterElements implements IDOMTransformer, Serializable {
 			synchronized(factory) {  // XPathFactory is not thread-safe
 				xPath = factory.newXPath();
 			}
-			xPath.setNamespaceContext(XmlService.get().getNamespaceContext());
+			xPath.setNamespaceContext(xmlService.getNamespaceContext());
 			NodeList keep = (NodeList) xPath.evaluate((String) params.get(XPATH), n, XPathConstants.NODESET);
 
 			log.trace("FilterElements using {} found {} nodes", params.get(XPATH), keep.getLength());
