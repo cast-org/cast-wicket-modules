@@ -40,6 +40,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
 import org.cast.cwm.CwmSession;
@@ -49,8 +50,10 @@ import org.cast.cwm.data.Response;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.service.HighlightService.HighlightType;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IHighlightService;
 import org.cast.cwm.service.IResponseService;
+import org.cast.cwm.service.IUserPreferenceService;
 
 import com.google.inject.Inject;
 
@@ -88,6 +91,12 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	@Inject
 	protected IHighlightService highlightService;
 	
+	@Inject
+	protected IUserPreferenceService preferenceService;
+
+	@Inject
+	protected ICwmSessionService cwmSessionService;
+
 	public HighlightDisplayPanel(String id, IModel<Prompt> model) {
 		this(id, model, null);
 	}
@@ -180,12 +189,24 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 	}
 
 	private String getHighlighterInitScript() {
+		// determine initially-selected color, if any
+		IModel<User> mUser = cwmSessionService.getUserModel();
+		Boolean prefValue = preferenceService.getUserPreferenceBoolean(mUser, "highlightOn");
+		boolean highlightOn = (prefValue==null) ? false : prefValue;
+
+		String highlightColor = "";
+		if (highlightOn) {
+			highlightColor = preferenceService.getUserPreferenceString(mUser, "highlightColor");
+		}
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("$().CAST_Highlighter({colors:[");
 		sb.append(getColors());
 		sb.append("], readonly: ");
 		sb.append(readOnly);
 		sb.append(", saveState: " + saveState);
+		if (saveState && !Strings.isEmpty(highlightColor))
+			sb.append(", initialColor: '" + highlightColor + "'");
 		sb.append("});");
 		return sb.toString();
 	}
