@@ -51,7 +51,10 @@ public class TestXPath extends CwmBaseTestCase {
 	private XPath xPath;
 	
 	private static final byte[] doc = ("<level1 xmlns=\"http://www.daisy.org/z3986/2005/dtbook/\">"
-		+ "<level2><p>First p</p><p><em>Second p</em></p></level2><level2><p>Third p</p></level2><p>Fourth p</p></level1>").getBytes();
+		+ "<level2><p>First p</p><p><em>Second p</em></p></level2>"
+		+ "<level2><p>Third p</p></level2>"
+		+ "<p>Fourth p</p></level1>")
+		.getBytes();
 	
 	@Override
 	protected boolean isApplicationThemed() {
@@ -128,7 +131,42 @@ public class TestXPath extends CwmBaseTestCase {
 	}
 	
 	@Test
+	public void testCountFollowing() throws XPathExpressionException {
+		Element node = (Element) dom.getElementsByTagName("level2").item(0);
+
+		Double n = (Double) xPath.evaluate("count(following::dtb:level2)", node, XPathConstants.NUMBER);
+		assertEquals("Should be 1 level2 after the first level2", Double.valueOf(1.0), n);
+		
+		n = (Double) xPath.evaluate("count(following::dtb:p)", node, XPathConstants.NUMBER);
+		assertEquals("Should be 2 <p> after the first level2", Double.valueOf(2.0), n);
+		
+		n = (Double) xPath.evaluate("count(following::dtb:p)", node.getChildNodes().item(0), XPathConstants.NUMBER);
+		assertEquals("Should be 3 <p> after the first p inside the first level2", Double.valueOf(3.0), n);
+		
+		n = (Double) xPath.evaluate("count(following::dtb:em)", node, XPathConstants.NUMBER);
+		assertEquals("Should be no <em> after the first level2", Double.valueOf(0.0), n);
+	}
+	
+	@Test
+	public void testCountPreceding() throws XPathExpressionException {
+		Element node = (Element) dom.getElementsByTagName("level2").item(1);
+
+		Double n = (Double) xPath.evaluate("count(preceding::dtb:level2)", node, XPathConstants.NUMBER);
+		assertEquals("Should be 1 level2 before the second level2", Double.valueOf(1.0), n);
+		
+		n = (Double) xPath.evaluate("count(preceding::dtb:p)", node, XPathConstants.NUMBER);
+		assertEquals("Should be 2 <p> before the second level2", Double.valueOf(2.0), n);
+		
+		n = (Double) xPath.evaluate("count(preceding::dtb:p)", node.getChildNodes().item(0), XPathConstants.NUMBER);
+		assertEquals("Should be 2 <p> before the p inside the second level2", Double.valueOf(2.0), n);		
+
+		n = (Double) xPath.evaluate("count(preceding::dtb:em)", node, XPathConstants.NUMBER);
+		assertEquals("Should be 1 <em> before the second level2", Double.valueOf(1.0), n);
+	}
+	
+	@Test
 	public void testFilterElements() {
+		// Use first <level2> as the context node
 		Element node = (Element) dom.getElementsByTagName("level2").item(0);
 		TransformParameters params = new TransformParameters();
 		
@@ -144,9 +182,6 @@ public class TestXPath extends CwmBaseTestCase {
 		//params.put(FilterElements.XPATH, "//dtb:p/dtb:em");
 		//output = new FilterElements().applyTransform((Element) node.cloneNode(true), params);
 		//assertEquals("Second p", output.getTextContent());
-	}
-
-
-	
+	}	
 
 }
