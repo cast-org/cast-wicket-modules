@@ -62,7 +62,7 @@ public class StringTruncatingModelTest {
 	public void rendersCorrectLengthWithDefaultSuffix () {
 		StringTruncatingModel model = new StringTruncatingModel(delegate, 10);
 		model.setBreakAtWordBoundary(false);
-		assertEquals("012345678???", model.getObject());
+		assertEquals("012345678…", model.getObject());
 	}
 	
 	@Test
