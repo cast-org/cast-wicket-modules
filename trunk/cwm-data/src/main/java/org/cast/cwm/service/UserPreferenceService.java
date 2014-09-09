@@ -76,6 +76,15 @@ public class UserPreferenceService implements IUserPreferenceService {
 	}
 		
 	@Override
+	public boolean getUserPreferenceBoolean(IModel<User> mUser, String name, boolean defaultValue) {
+		UserPreferenceBoolean userPreference = (UserPreferenceBoolean) getUserPreferenceCriteria(UserPreferenceBoolean.class, mUser, name).uniqueResult();
+		if (userPreference == null) {
+			return defaultValue;
+		}
+		return userPreference.getBooleanValue();
+	}
+
+	@Override
 	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
 		// if a user preference doesn't exist, create it, otherwise update
 		UserPreferenceString userPreference = (UserPreferenceString) getUserPreferenceCriteria(UserPreferenceString.class, mUser, name).uniqueResult();
@@ -100,7 +109,14 @@ public class UserPreferenceService implements IUserPreferenceService {
 		UserPreferenceString preference = (UserPreferenceString) criteria.uniqueResult();
 		return (preference==null) ? null : preference.getStringValue();
 	}
-	
+
+	@Override
+	public String getUserPreferenceString(IModel<User> mUser, String name, String defaultValue) {
+		Criteria criteria = getUserPreferenceCriteria(UserPreferenceString.class, mUser, name);
+		UserPreferenceString preference = (UserPreferenceString) criteria.uniqueResult();
+		return (preference==null) ? defaultValue : preference.getStringValue();
+	}
+
 	/**
 	 * Retrieve the user preference from DB
 	 * @param userPreferenceClass

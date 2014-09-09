@@ -41,11 +41,21 @@ public class GuestUserPreferenceService implements IUserPreferenceService {
 		return null;
 	}
 		
+	@Override
+	public boolean getUserPreferenceBoolean(IModel<User> mUser, String name, boolean defaultValue) {
+		return defaultValue;
+	}
+
 	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
 	}
 
 	public String getUserPreferenceString(IModel<User> mUser, String name) {
 		return null;
+	}
+
+	@Override
+	public String getUserPreferenceString(IModel<User> mUser, String name, String defaultValue) {
+		return defaultValue;
 	}
 
 }
