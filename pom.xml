@@ -319,7 +319,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.14.4</version>
+                <version>1.14.6</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -461,8 +461,8 @@
     </build>
   
     <properties>
-        <wicket.version>6.15.0</wicket.version>
-        <wicketstuff.version>6.15.0</wicketstuff.version>
+        <wicket.version>6.17.0</wicket.version>
+        <wicketstuff.version>6.17.0</wicketstuff.version>
         <hibernate.version>4.3.4.Final</hibernate.version>
         <hibernate.search.version>4.5.0.Final</hibernate.search.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
