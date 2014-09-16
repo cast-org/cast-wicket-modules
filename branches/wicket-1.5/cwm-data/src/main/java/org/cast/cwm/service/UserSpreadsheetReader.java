@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -305,6 +306,8 @@ public class UserSpreadsheetReader implements Serializable {
   		}
   		
   		// Determine period(s)
+  		if (user.getObject().getPeriods() == null)
+  			user.getObject().setPeriods(new TreeSet<Period>());
   		if (map.containsKey("period")) {
   			for (String periodName : map.get("period").split(","))
   				user.getObject().getPeriods().add(getPeriod(site, periodName.trim()));
