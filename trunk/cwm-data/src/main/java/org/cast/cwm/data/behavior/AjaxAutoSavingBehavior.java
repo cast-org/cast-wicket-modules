@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data.behavior;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
@@ -29,7 +30,6 @@ import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.cast.cwm.components.ClassAttributeModifier;
 
 /**
  * This behavior will submit a form at regular intervals.  Any HTML element
@@ -73,7 +73,7 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	 */
 	protected void init() {
 		getForm().setOutputMarkupId(true);
-		getForm().add(new ClassAttributeModifier("ajaxAutoSave"));		
+		getForm().add(AttributeModifier.append("class", "ajaxAutoSave"));
 	}
 
 	@Override
