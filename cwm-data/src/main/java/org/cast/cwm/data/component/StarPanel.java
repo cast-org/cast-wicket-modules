@@ -42,7 +42,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.IResponseTypeRegistry;
-import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
@@ -92,7 +91,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 		super(id, model);
 
 		setOutputMarkupId(true);
-		add(new ClassAttributeModifier("starPanel"));
+		add(AttributeModifier.append("class", "starPanel"));
 
 		if (model == null || model.getObject() == null) {
 			setVisible(false);
