@@ -144,7 +144,7 @@
             <dependency>
                 <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-drawtool</artifactId>
-                <version>3.0-SNAPSHOT</version>
+                <version>3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.cast</groupId>
