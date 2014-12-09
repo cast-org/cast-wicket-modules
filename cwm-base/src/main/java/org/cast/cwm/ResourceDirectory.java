@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
+import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.PackageResource.PackageResourceBlockedException;
 import org.apache.wicket.util.file.File;
@@ -32,6 +33,7 @@ import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,8 @@ import org.slf4j.LoggerFactory;
 public class ResourceDirectory extends AbstractResource {
 	private static final Logger log = LoggerFactory.getLogger(ResourceDirectory.class);
 
+	private static final Duration DEFAULT_CACHE_DURATION = Duration.hours(1);
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -68,6 +72,8 @@ public class ResourceDirectory extends AbstractResource {
 	private final File resourceDirectory;
 	
 	private final String removePrefix;
+
+	private Duration cacheDuration = DEFAULT_CACHE_DURATION;
 
 	/**
 	 * Construct a with a given directory of resource files.
@@ -112,10 +118,12 @@ public class ResourceDirectory extends AbstractResource {
 					HttpServletResponse.SC_NOT_FOUND, "Unable to find resource");
 		}
 
-		// add Last-Modified header (to support HEAD requests and If-Modified-Since)
-		final Time lastModified = resourceStream.lastModifiedTime();
+		// allow caching
+		resourceResponse.setCacheScope(WebResponse.CacheScope.PUBLIC);
+		resourceResponse.setCacheDuration(cacheDuration);
 
-		resourceResponse.setLastModified(lastModified);
+		// add Last-Modified header (to support HEAD requests and If-Modified-Since)
+		resourceResponse.setLastModified(resourceStream.lastModifiedTime());
 
 		if (resourceResponse.dataNeedsToBeWritten(attributes)) {
 			String contentType = resourceStream.getContentType();
@@ -248,6 +256,15 @@ public class ResourceDirectory extends AbstractResource {
 			return false;
 
 		return true;
+	}
+
+
+	public Duration getCacheDuration() {
+		return cacheDuration;
+	}
+
+	public void setCacheDuration(Duration cacheDuration) {
+		this.cacheDuration = cacheDuration;
 	}
 
 }

@@ -95,9 +95,8 @@ public class EditUserPanel extends Panel {
 	private FeedbackPanel feedbackPanel;
 	
 	/**
-	 * Construct a panel for creating a new user of the given role.
+	 * Construct a panel for creating a new user.
 	 * @param id
-	 * @param role
 	 */
 	public EditUserPanel(String id) {
 		super(id);
