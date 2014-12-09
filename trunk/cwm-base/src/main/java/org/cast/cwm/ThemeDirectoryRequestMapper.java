@@ -49,6 +49,9 @@ import org.slf4j.LoggerFactory;
  *  
  * @author bgoldowsky
  *
+ * @deprecated The ResourceDirectoryReference accomplishes the same thing in a simpler way,
+ * and does a better job with setting cache headers.
+ *
  */
 public class ThemeDirectoryRequestMapper extends AbstractMapper {
 

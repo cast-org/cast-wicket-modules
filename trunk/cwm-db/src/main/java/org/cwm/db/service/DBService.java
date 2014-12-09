@@ -24,7 +24,9 @@ import java.io.Serializable;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.hibernate.proxy.HibernateProxy;
 
 /**
  * An injectable service for interacting with Hibernate and cwm-db classes.
@@ -56,4 +58,19 @@ public class DBService implements IDBService {
 		return getHibernateSession().save(persistableObject);
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T initializeAndUnproxy(T entity) {
+		if (entity == null) {
+			throw new
+					NullPointerException("Entity passed for initialization is null");
+		}
+
+		Hibernate.initialize(entity);
+		if (entity instanceof HibernateProxy) {
+			entity = (T) ((HibernateProxy) entity).getHibernateLazyInitializer()
+					.getImplementation();
+		}
+		return entity;
+	}
 }
