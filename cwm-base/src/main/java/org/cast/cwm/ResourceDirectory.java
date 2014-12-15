@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
 import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.PackageResource.PackageResourceBlockedException;
 import org.apache.wicket.util.file.File;
@@ -34,7 +35,6 @@ import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Duration;
-import org.apache.wicket.util.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +42,7 @@ import org.slf4j.LoggerFactory;
  * <p>Represents a directory in which all of the files can be used as resources
  * (eg, images). Which file to send in response to a particular request is based
  * on the URL, which is appended to the given resource directory path.
- * If there is an extra prefix in the URL that should <em>not</em> be used in the
- * path name, it can be specified as a second argument to the constructor.</p>
- * 
+ *
  * <p>See {@link ResourceDirectoryReference} for usage examples.</p>
 
  * <p>The installed PackageResourceGuard will be checked to make sure the file is
@@ -69,24 +67,17 @@ public class ResourceDirectory extends AbstractResource {
 	/**
 	 * The path to the directory of resources
 	 */
-	private final File resourceDirectory;
+	private final File sourceDirectory;
 	
-	private final String removePrefix;
-
 	private Duration cacheDuration = DEFAULT_CACHE_DURATION;
 
 	/**
 	 * Construct a with a given directory of resource files.
 	 * 
-	 * @param directory
+	 * @param directory the directory containing public files
 	 */
 	public ResourceDirectory(File directory) {
-		this(directory, "");
-	}
-	
-	public ResourceDirectory(File directory, String removePrefix) {
-		this.resourceDirectory = directory;
-		this.removePrefix = removePrefix;
+		this.sourceDirectory = directory;
 	}
 
 	/**
@@ -98,14 +89,17 @@ public class ResourceDirectory extends AbstractResource {
 	 */
 	@Override
 	protected ResourceResponse newResourceResponse(Attributes attributes) {
-		String relativePath = attributes.getRequest().getUrl().toString();
-		if (relativePath.startsWith(removePrefix)) {
-			relativePath = relativePath.substring(removePrefix.length());
-		} else {
-			return sendResourceError(relativePath, null,
-					HttpServletResponse.SC_NOT_FOUND, "URL does not start with expected prefix");			
+		String relativePath = "";
+		PageParameters parameters = attributes.getParameters();
+		for (int i=0; i< parameters.getIndexedCount(); i++) {
+			relativePath += parameters.get(i);
+			relativePath += '/';
 		}
-		String absolutePath = new File(resourceDirectory, relativePath)
+		if (relativePath.endsWith("/"))
+			relativePath = relativePath.substring(0, relativePath.length()-1);
+		log.debug("relativePath is {}", relativePath);
+
+		String absolutePath = new File(sourceDirectory, relativePath)
 				.getAbsolutePath();
 
 		final ResourceResponse resourceResponse = new ResourceResponse();
@@ -199,7 +193,7 @@ public class ResourceDirectory extends AbstractResource {
 	 * @return resource stream or <code>null</code> if not found
 	 */
 	public IResourceStream getResourceStream(String absolutePath) {
-		if (accept(Application.class, absolutePath) == false) {
+		if (!accept(Application.class, absolutePath)) {
 			throw new PackageResourceBlockedException(
 					"Access denied to (static) package resource "
 							+ absolutePath + ". See IPackageResourceGuard");
@@ -223,10 +217,7 @@ public class ResourceDirectory extends AbstractResource {
 
 	@Override
 	public String toString() {
-		final StringBuilder result = new StringBuilder();
-		result.append('[').append(getClass().getSimpleName()).append(' ')
-				.append("dir = ").append(resourceDirectory).append(']');
-		return result.toString();
+		return "[" + getClass().getSimpleName() + ' ' + "dir = " + sourceDirectory + ']';
 	}
 
 	@Override
@@ -235,7 +226,7 @@ public class ResourceDirectory extends AbstractResource {
 		int result = 1;
 		result = prime
 				* result
-				+ ((resourceDirectory == null) ? 0 : resourceDirectory
+				+ ((sourceDirectory == null) ? 0 : sourceDirectory
 						.hashCode());
 		return result;
 	}
@@ -249,15 +240,14 @@ public class ResourceDirectory extends AbstractResource {
 		if (getClass() != obj.getClass())
 			return false;
 		ResourceDirectory other = (ResourceDirectory) obj;
-		if (resourceDirectory == null) {
-			if (other.resourceDirectory != null)
+		if (sourceDirectory == null) {
+			if (other.sourceDirectory != null)
 				return false;
-		} else if (!resourceDirectory.equals(other.resourceDirectory))
+		} else if (!sourceDirectory.equals(other.sourceDirectory))
 			return false;
 
 		return true;
 	}
-
 
 	public Duration getCacheDuration() {
 		return cacheDuration;
