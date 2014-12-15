@@ -26,17 +26,12 @@ import org.apache.wicket.util.file.File;
 /**
  * Mountable {@link ResourceReference} for a {@link ResourceDirectory}.
  * 
- * <p>Examples:</P
+ * <p>Example:</P
  * 
- * <ul>
- * <li><code>mountResource("img", new ResourceDirectoryReference(themeDir));</code><br />
- * maps {@code http://host/context/img/foo.png} to {@code themeDir/img/foo.png} ; that is,
- * all files in the "img" directory are available under the "img" top-level URL path.</li>
- * 
- * <li><code>mountResource("static", new ResourceDirectoryReference(themeDir, "static"));</code><br />
- * maps {@code http://host/context/static/foo.png} to {@code themeDir/foo.png} .
- * This form is useful if your directory name doesn't match the URL you want to mount it on.</li>
- * </ul>
+ * <code>mountResource("image", new ResourceDirectoryReference(themeDir));</code><br />
+ * maps {@code http://host/context/image/foo.png} to {@code themeDir/foo.png} ; that is,
+ * all files in the "img" directory are available under the "image" top-level URL path.
+ * Multiple levels of subdirectories may exist under img.
  *
  * @see ResourceDirectory
  * 
@@ -49,32 +44,25 @@ public class ResourceDirectoryReference extends ResourceReference {
 	
 	private final File resourceDirectory;
 	
-	private final String removePrefix;
-
 	/**
 	 * Construct for a given directory.
-	 * @param themeDirectory
+	 * @param directory the directory to map as static resource files
 	 */
-	public ResourceDirectoryReference(File themeDirectory) {
-		this(themeDirectory, "");
-	}
-
-	/**
-	 * Convenience constructor where a base directory and subdirectory within it are specified.
-	 * Useful if you are building several ResourceDirectoryReferences that are siblings to each other.
-	 * @param themeDir base directory within which the resources directory is found
-	 * @param subdirectory name of the subdirectory
-	 */
-	public ResourceDirectoryReference (File directory, String removePrefix) {
+	public ResourceDirectoryReference (File directory) {
 		super(directory.getAbsolutePath());  // Use pathname as ResourceReference key
 		resourceDirectory = directory;
-		this.removePrefix = removePrefix;
 	}
 	
 	@Override
 	public IResource getResource() {
-		return new ResourceDirectory(resourceDirectory, removePrefix);
-
+		return new ResourceDirectory(resourceDirectory);
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof ResourceDirectoryReference))
+			return false;
+		ResourceDirectoryReference rdr = (ResourceDirectoryReference)other;
+		return (resourceDirectory.equals(rdr.resourceDirectory));
+	}
 }
