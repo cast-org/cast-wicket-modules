@@ -134,17 +134,32 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	 * otherwise returning the remembered value.
 	 */
 	public Time getLastModified() {
-		// Only actually look at the disk to find last-modified time every 10 seconds or so (whatever value is set in XmlService)
-		if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > xmlService.getUpdateCheckInterval())
-			updateIfModified();
+        doUpdateCheck();
 		return lastModified;
 	}
+
+    /**
+     * Do a routine check to see if document needs updating.
+     * This method can be called frequently; it will do nothing if the update-check interval
+     * has not elapsed since the last check.  If we haven't checked recently, then the
+     * underlying file will be checked to see if it has changed, and if so, this XmlDocument object
+     * will be updated.
+     *
+     * @return true if an update was actually made.
+     */
+    public boolean doUpdateCheck() {
+        // Only actually look at the disk to find last-modified time every 10 seconds or so (whatever value is set in XmlService)
+        if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > xmlService.getUpdateCheckInterval())
+            return updateIfModified();
+        return false;
+    }
 
 	/**
 	 * Check the disk (or DAV server, etc) to see if underlying file has been modified.
 	 * If so, update the XMLDocument.
+     * @return true if the document was updated.
 	 */
-	synchronized protected void updateIfModified() {
+	synchronized protected boolean updateIfModified() {
 		log.trace("checking last modified time of {}", this);
 		lastCheckedTime = Time.now();
 		Time newLM = xmlFile.lastModifiedTime();
@@ -152,11 +167,13 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 			lastModified = newLM;
 			try {
 				readXML();
+                return true;
 			} catch (Exception e) {
 				// Log error, but allow program to go ahead with previously cached doc.
 				e.printStackTrace();
 			}
 		}
+        return false;
 	}
 	
 	/**
@@ -171,9 +188,9 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	
 	/**
 	 * Get an XmlSection from this book by its label and (1-based) count within the book.  Applications
-	 * must override {@link XmlSection#getLabel()} for this to function properly.
+	 * must override {@link XmlSection#getLabels()} for this to function properly.
 	 * 
-	 * @param label a label as defined by {@link XmlSection#getLabel()}
+	 * @param label a label as defined by {@link XmlSection#getLabels()}
 	 * @param num specifying the nth instance of this labeled section in the book
 	 * @return the matching XmlSection, or null if not found.
 	 */
