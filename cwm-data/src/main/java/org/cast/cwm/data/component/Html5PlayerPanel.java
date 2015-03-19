@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data.component;
 
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.BinaryFileData;
@@ -30,10 +31,7 @@ import org.cast.cwm.data.BinaryFileData;
  *
  * The audio element will have browser-determined styling and controls, and is set to a width of 100%,
  * so put it in a container of the width you want or use an AttributeModifier on this component.
- * 
- * TODO: consider showing a message in the null-model case (we're seeing this sometimes in logs).
- * TODO: consider using attributes to control whether audio content is loaded eagerly or lazily.
- * 
+ *
  * @author bgoldowsky
  *
  */
@@ -43,7 +41,21 @@ public class Html5PlayerPanel extends GenericPanel<BinaryFileData> {
 
 	public Html5PlayerPanel(String id, IModel<BinaryFileData> model) {
 		super(id, model);
-		add(new Mp3AudioSource("source", model));
+        boolean hasData = (model != null
+                && model.getObject()!=null
+                && model.getObject().getData() != null
+                && model.getObject().getData().length>0);
+
+        WebMarkupContainer message = new WebMarkupContainer("noaudio");
+        message.setVisibilityAllowed(!hasData);
+        add(message);
+
+        WebMarkupContainer audio = new WebMarkupContainer("audio");
+        audio.setVisibilityAllowed(hasData);
+        add(audio);
+
+        audio.add(new Mp3AudioSource("source", model));
+
 	}
 
 }
