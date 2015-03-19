@@ -144,6 +144,13 @@
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>
         </dependency>
+
+        <!-- required for non-parallelizable tests -->
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 	<build>
