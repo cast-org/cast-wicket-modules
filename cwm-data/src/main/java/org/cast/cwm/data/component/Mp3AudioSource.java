@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.data.component;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
