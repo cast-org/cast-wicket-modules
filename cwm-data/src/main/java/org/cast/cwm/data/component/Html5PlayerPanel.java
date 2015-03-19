@@ -17,22 +17,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.wami;
+package org.cast.cwm.data.component;
 
-import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.data.resource.UploadedFileResourceReference;
 
 /**
- * Simple audio player for WAV based on HTML5 <audio> element.
+ * Simple HTML5 audio player for BinaryFileData objects.
+ * Converts WAV data in the BFD into mp3 for compatibility with most browsers.
  * No extra script, flash, etc needs to be loaded so this should be good for inserting into reports, etc.
- * Currently <audio> with WAV content is not supported by Internet Explorer, however.
+ *
  * The audio element will have browser-determined styling and controls, and is set to a width of 100%,
- * so put it in a container of the width you want (eg with an AttributeModifier on this component).
+ * so put it in a container of the width you want or use an AttributeModifier on this component.
  * 
  * TODO: consider showing a message in the null-model case (we're seeing this sometimes in logs).
  * TODO: consider using attributes to control whether audio content is loaded eagerly or lazily.
@@ -46,16 +43,7 @@ public class Html5PlayerPanel extends GenericPanel<BinaryFileData> {
 
 	public Html5PlayerPanel(String id, IModel<BinaryFileData> model) {
 		super(id, model);
-		
-		// Determine URL for audio
-		PageParameters pp = new PageParameters();
-		if (model != null && model.getObject() != null)
-			pp.add("id", model.getObject().getId());
-		CharSequence url = getRequestCycle().urlFor(new UploadedFileResourceReference(), pp);
-		
-		WebMarkupContainer source = new WebMarkupContainer("source");
-		source.add(AttributeModifier.replace("src", url.toString()));
-		add(source);
+		add(new Mp3AudioSource("source", model));
 	}
 
 }

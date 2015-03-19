@@ -119,6 +119,7 @@
  	  			</exclusion>
  	  		</exclusions>
  	  	</dependency>
+
  	  	<dependency>
  	  		<groupId>org.apache.wicket</groupId>
  	  		<artifactId>wicket-devutils</artifactId>
@@ -131,6 +132,18 @@
  	  		<groupId>org.cast.cwm</groupId>
  	  		<artifactId>cwm-db</artifactId>
  	  	</dependency>
+
+        <!-- lamejb for mp3 conversion -->
+        <dependency>
+            <groupId>lamejb</groupId>
+            <artifactId>lamejb</artifactId>
+        </dependency>
+
+        <!-- jna is required by lamejb -->
+        <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
     </dependencies>
 
 	<build>
