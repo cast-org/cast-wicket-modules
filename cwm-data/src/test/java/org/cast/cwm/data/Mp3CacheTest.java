@@ -23,12 +23,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import net.jcip.annotations.NotThreadSafe;
+
 import java.util.Date;
 import java.util.concurrent.Exchanger;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
+@NotThreadSafe
 public class Mp3CacheTest {
 
     private Mp3Cache cache;
