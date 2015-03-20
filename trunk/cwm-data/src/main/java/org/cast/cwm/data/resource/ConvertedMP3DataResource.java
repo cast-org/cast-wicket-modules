@@ -76,49 +76,49 @@ public class ConvertedMP3DataResource extends AbstractResource {
 
         response.setLastModified(Time.valueOf(bfd.getLastModified()));
 
-//		response.setContentLength(bfd.getData().length);
+        // Test the BFD for sanity
+        if (!"audio/wav".equals(bfd.getMimeType())) {
+            log.error("Cannot convert BinaryFileData {} with mime type {} to mp3", id, bfd.getMimeType());
+        } else if (bfd.getData() == null) {
+            log.warn("Request for mp3 version of empty BinaryFileData {}", id);
+        } else {
+            // Check if we have cached the converted mp3 data; if not, start conversion.
+            Mp3Cache cache = getCache();
+            Date cachedDate = cache.getCachedDate(id);
+
+            if (cachedDate != null && cachedDate.after(bfd.getLastModified())) {
+                // Cached version exists, and is more recent than BFD's last modified
+                log.debug("Returning cached mp3 for BFD {}", id);
+                response.setContentLength(cache.getCachedMp3(id).length);
+            } else {
+                // Cached version doesn't exist, it must be created.
+                InputStream inputStream;
+                long startTime = System.currentTimeMillis();
+                try {
+                    inputStream = new BufferedInputStream(new ByteArrayInputStream(bfd.getData()));
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    convert(inputStream, outputStream);
+                    byte[] bytes = outputStream.toByteArray();
+                    float elapsedTime = (System.currentTimeMillis() - startTime) / 1000f;
+                    log.debug(String.format("MP3 conversion of BFD %d: %.2fsec, %d bytes converted to %d bytes",
+                            id, elapsedTime, bfd.getData().length, bytes.length));
+                    cache.storeInCache(id, bytes);
+                    // Set Content-Length header
+                    response.setContentLength(bytes.length);
+                } catch (Exception e) {
+                    // exception will generally result in no audio data being written.
+                    e.printStackTrace();
+                }
+            }
+        }
 
         if (response.dataNeedsToBeWritten(attributes)) {
             response.setWriteCallback(new WriteCallback() {
                 @Override
                 public void writeData(final Attributes attributes) {
-                    BinaryFileData bfd = cwmService.getById(BinaryFileData.class, id).getObject();
-
-                    if (bfd == null || bfd.getData() == null)
-                        return;
-
-                    // Test the BFD for sanity
-                    if (!"audio/wav".equals(bfd.getMimeType())) {
-                        log.error("Cannot convert BinaryFileData {} with mime type {} to mp3",
-                                id, bfd.getMimeType());
-                        return;
-                    }
-
-                    // Check whether cached version exists, and is more recent than BFD last modified
-                    Mp3Cache cache = getCache();
-                    Date cachedDate = cache.getCachedDate(id);
-                    if (cachedDate != null && cachedDate.after(bfd.getLastModified())) {
-                        log.debug("Returning cached mp3 for BFD {}", id);
-                        attributes.getResponse().write(cache.getCachedMp3(id));
-
-                    } else {
-                        InputStream inputStream;
-                        long startTime = System.currentTimeMillis();
-                        try {
-                            inputStream = new BufferedInputStream(new ByteArrayInputStream(bfd.getData()));
-                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                            convert(inputStream, outputStream);
-                            byte[] bytes = outputStream.toByteArray();
-                            float elapsedTime = (System.currentTimeMillis() - startTime)/1000f;
-                            log.debug(String.format("MP3 conversion of BFD %d: %.2fsec, %d bytes converted to %d bytes",
-                                            id, elapsedTime, bfd.getData().length, bytes.length));
-                            attributes.getResponse().write(bytes);
-                            cache.storeInCache(id, bytes);
-                        } catch (Exception e) {
-                            // exception will generally result in no audio data being written.
-                            e.printStackTrace();
-                        }
-                    }
+                    // Pull mp3 data from cache and write to response.
+                    // Cache will have been filled by code above.
+                    attributes.getResponse().write(getCache().getCachedMp3(id));
                 }
             });
         }
