@@ -72,7 +72,7 @@ public class ConvertedMP3DataResourceTest {
 	public void canRetrieveResource() {
 		PageParameters pp = new PageParameters().add("id", 1);
 		tester.startResourceReference(new ConvertedMP3DataResourceReference(), pp);
-		verify(cwmService, times(2)).getById(BinaryFileData.class, 1L);
+		verify(cwmService).getById(BinaryFileData.class, 1L);
 		assertEquals("audio/mpeg", tester.getLastResponse().getContentType());
         byte[] bytes = tester.getLastResponse().getBinaryContent();
         // FF FB is magic number for basic mp3 file
