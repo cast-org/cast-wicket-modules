@@ -19,21 +19,20 @@
 
 package net.databinder.models.hib;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import javax.persistence.Version;
-
 import net.databinder.hib.Databinder;
 import net.databinder.models.BindingModel;
 import net.databinder.models.LoadableWritableModel;
-
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.model.IDetachable;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.proxy.HibernateProxyHelper;
+
+import javax.persistence.Version;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Model loaded and persisted by Hibernate. This central Databinder class can be initialized with an
@@ -43,7 +42,8 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * @author Nathan Hamblen
  */
 public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements BindingModel<T> {
-	private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 1L;
 	private Class objectClass;
 	private Serializable objectId;
 	private QueryBuilder queryBuilder;
@@ -269,9 +269,17 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 			return super.hashCode();
 		return target.hashCode();
 	}
-	
 
-	/**
+
+    @Override
+    protected void onDetach() {
+        super.onDetach();
+        // The CriteriaBuilder might have underlying connections to models
+        if (criteriaBuilder != null && criteriaBuilder instanceof IDetachable)
+            ((IDetachable)criteriaBuilder).detach();
+    }
+
+    /**
 	 * Disassociates this object from any persistent object, but retains the class
 	 * for constructing a blank copy if requested.
 	 * @see HibernateObjectModel#HibernateObjectModel(Class objectClass)
@@ -324,4 +332,5 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	protected Serializable getObjectId() {
 		return objectId;
 	}
+
 }
