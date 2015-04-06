@@ -70,7 +70,7 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(super.toString());
+		StringBuffer sb = new StringBuffer(getClass().getName());
 		sb.append(":attached=").append(attached).append(":tempModelObject=[")
 				.append(this.tempModelObject).append("]");
 		return sb.toString();

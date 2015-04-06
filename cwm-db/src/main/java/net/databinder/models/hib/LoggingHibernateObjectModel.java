@@ -19,10 +19,10 @@
  */
 package net.databinder.models.hib;
 
-import java.io.Serializable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 public class LoggingHibernateObjectModel<T> extends HibernateObjectModel<T> {
 
@@ -64,6 +64,7 @@ public class LoggingHibernateObjectModel<T> extends HibernateObjectModel<T> {
 	protected void onAttach() {
 		super.onAttach();
 		log.debug("Attached object for id={}: {}", getObjectId(), this);
+        // Thread.dumpStack();
 	}
 
 	@Override

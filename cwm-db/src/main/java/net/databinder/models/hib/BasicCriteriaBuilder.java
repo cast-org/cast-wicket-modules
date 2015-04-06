@@ -19,6 +19,7 @@
  */
 package net.databinder.models.hib;
 
+import org.apache.wicket.model.IDetachable;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -26,6 +27,9 @@ import org.hibernate.criterion.Order;
 /**
  * A simple implementation of a CriteriaBuilder that applies some given Restrictions
  * and, optionally, an Order.
+ *
+ * When detached, this class will detach any detachable criteria
+ * (eg, {@link net.databinder.models.hib.ModelRestrictions}).
  * 
  * This does not set the query to be cachable; if it should be, use {@link BasicCacheableCriteriaBuilder}.
  * 
@@ -36,7 +40,7 @@ import org.hibernate.criterion.Order;
  * @author bgoldowsky
  *
  */
-public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder {
+public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, IDetachable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -77,5 +81,13 @@ public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBu
 	public void build(Criteria criteria) {
 		buildOrdered(criteria);
 	}
+
+    @Override
+    public void detach() {
+        for (Criterion c : requestedCriteria) {
+            if (c instanceof IDetachable)
+                ((IDetachable)c).detach();
+        }
+    }
 
 }
