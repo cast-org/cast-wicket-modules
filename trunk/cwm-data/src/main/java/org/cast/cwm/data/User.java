@@ -19,42 +19,24 @@
  */
 package org.cast.cwm.data;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.auth.data.DataUser;
 import net.databinder.auth.data.hib.BasicPassword;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.wicket.util.string.Strings;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortNatural;
-import org.hibernate.annotations.SortType;
 import org.hibernate.envers.Audited;
+
+import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * A person who uses the application.  Almost all persistent data in the application
@@ -205,6 +187,24 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		if (o == null)
 			return 1;		
 		return getSortName().compareTo(o.getSortName());
+	}
+
+	/**
+	 * Determine whether this User is in the same period as another User.
+	 * @param other another User object to compare against
+	 * @return true if they have at least one Period in common
+	 */
+	public boolean hasPeriodInCommonWith(User other) {
+		SortedSet<Period> myPeriods = this.getPeriods();
+		Hibernate.initialize(myPeriods);
+		SortedSet<Period> otherPeriods = other.getPeriods();
+		Hibernate.initialize(otherPeriods);
+
+		for (Period p : myPeriods) {
+			if (otherPeriods.contains(p))
+				return true;
+		}
+		return false;
 	}
 	
 	/** Set password to a string value.  The string will be converted to a hashed value before saving.
