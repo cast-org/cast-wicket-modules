@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:wicket="http://wicket.apache.org">
+<head></head>
+<body>
+	<!-- Core Viewing Panel -->
+	<wicket:panel>
+		<div wicket:id="response"></div>
+	</wicket:panel>
+
+	<!-- Text and WYSIWYG Html -->
+	<wicket:fragment wicket:id="textFragment">
+		<div wicket:id="text">Content</div>
+	</wicket:fragment>
+
+	<!-- Audio Recorder -->
+	<wicket:fragment wicket:id="audioFragment">
+		<div wicket:id="applet"></div>
+	</wicket:fragment>
+
+	<!-- File Upload -->
+	<wicket:fragment wicket:id="uploadFragment">
+		<wicket:enclosure child="filename">
+		File: <span wicket:id="filename">example.txt</span><br />
+		</wicket:enclosure>
+		<img wicket:id="imageDisplay" /><br />
+		<wicket:enclosure child="download">
+		Download: <a href="#" wicket:id="download"><span wicket:id="filename">example.txt</span></a><br />
+		</wicket:enclosure>
+	</wicket:fragment>
+	
+	<!-- SVG Drawing -->
+	<wicket:fragment wicket:id="drawingFragment">
+		<iframe wicket:id="drawing" scrolling="no"></iframe>
+	</wicket:fragment>
+	
+	<!-- Flash Audio Recorder -->
+	<wicket:fragment wicket:id="flashAudioFragment">
+		<div wicket:id="audio"></div>
+	</wicket:fragment>
+	
+	<wicket:fragment wicket:id="svgNotSupportedFragment">
+		<div class="warning" role="alert">
+			<p>
+				Internet Explorer does not support the SVG-based images that are used by this drawing tool.  If you would like to use this feature, please install
+				the <a href="http://www.google.com/chromeframe/eula.html">Google Chrome Frame Plugin</a>.  Once it is installed, restart your browser and you will be 
+				able to use the tool.
+			</p>
+		</div>
+	</wicket:fragment>
+
+</body>
+</html>

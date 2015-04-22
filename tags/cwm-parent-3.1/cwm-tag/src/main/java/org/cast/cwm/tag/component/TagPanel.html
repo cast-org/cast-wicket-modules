@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/" lang="en" xml:lang="en">
+<head>
+<title>Tag Form</title>
+</head>
+<body>
+<wicket:panel>
+  <h3>Tags:</h3>
+  <div wicket:id="current" class="tagCurrentList">
+    <span class="tagItem">current <a href="#">[x]</a></span>
+  </div>
+  <div class="boxData">
+    <h4 wicket:id="tagsSubHeader">Add Tags:</h4>
+    <p wicket:id="taglist" class="tagCloud">
+      <span wicket:id="tag">
+        <a wicket:id="link" href="#" class="s2">
+      	  <span wicket:id="name">example</span>
+	    </a>
+	  </span>
+    </p>
+    <form wicket:id="form" class="tagAddForm">
+    	<div>
+      <input wicket:id="term" type="text" value="" class="tagTerm" maxlength="15"/>
+      <input wicket:id="add" type="submit" value="Add" />
+      </div>
+   	</form>
+  </div>
+</wicket:panel>
+</body>
+</html>

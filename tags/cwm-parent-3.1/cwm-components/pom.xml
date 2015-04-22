@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.cast.cwm</groupId>
+        <artifactId>cwm-parent</artifactId>
+        <version>3.1</version>
+    </parent>
+
+    <artifactId>cwm-components</artifactId>
+    <name>cwm-components</name>
+
+    <description>A collection of general-purpose wicket components</description>
+
+	<repositories>
+		<repository>
+			<id>Lombok</id>
+			<url>http://projectlombok.org/mavenrepo</url>
+		</repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.wicket</groupId>
+            <artifactId>wicket-extensions</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.wicket</groupId>
+        	<artifactId>wicket-datetime</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.wicketstuff</groupId>
+        	<artifactId>wicketstuff-rome</artifactId>
+        	<version>1.4</version>
+        	<exclusions>
+        		<exclusion>
+        			<artifactId>wicket</artifactId>
+        			<groupId>org.apache.wicket</groupId>
+        		</exclusion>
+        	</exclusions>
+        </dependency>
+	  <dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-all</artifactId>
+	  </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+     </dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<filtering>false</filtering>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+	</build>
+
+</project>

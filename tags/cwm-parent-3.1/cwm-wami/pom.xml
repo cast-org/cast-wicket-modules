@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.cast.cwm</groupId>
+		<artifactId>cwm-parent</artifactId>
+		<version>3.1</version>
+	</parent>
+	
+	<artifactId>cwm-wami</artifactId>
+	<name>cwm-wami</name>
+
+	<description>WAMI Audio Recorder integration for CAST Wicket Modules</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.cast.cwm</groupId>
+			<artifactId>cwm-data</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+		<dependency>
+		    <groupId>org.wicketstuff</groupId>
+		    <artifactId>wicketstuff-jslibraries</artifactId>
+		</dependency>        
+	</dependencies>
+	
+	<build>
+	</build>
+
+</project>
