@@ -19,23 +19,22 @@
  */
 package org.cast.cwm.service;
 
-import java.util.Date;
-import java.util.List;
-
+import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.BasicCriteriaBuilder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
-
+import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.ClientProperties;
-import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
+import org.cast.cwm.data.component.IEventDataContributor;
+import org.cwm.db.service.IModelProvider;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -43,7 +42,8 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Methods for working with Events and related information in the database.
@@ -63,7 +63,10 @@ public class EventService implements IEventService {
 	private final static Logger log = LoggerFactory.getLogger(EventService.class);
 	
 	@Inject
-	protected ICwmService cwmService;
+	private ICwmService cwmService;
+
+	@Inject
+	private IModelProvider modelProvider;
 
 	/** 
 	 * Create a new Event instance.
@@ -73,11 +76,47 @@ public class EventService implements IEventService {
 	public Event newEvent() {
 		return new Event();
 	}
-	
+
+	/**
+	 * Save event to DB, after allowing all containing Components to embellish it.
+	 * Before committing to database, each Component, starting with the Page
+	 * and working down to the triggeringComponent, can add any relevant contextual
+	 * information to the Event.  Any component that wants to add information should
+	 * implement the {@link IEventDataContributor} interface.
+	 *
+	 * @param event the Event to be filled out and saved
+	 * @param triggeringComponent the Component where the event was initiated (eg, a button)
+	 * @return the persisted Event wrapped in an IModel
+	 */
+	public IModel<? extends Event> storeEvent (Event event, Component triggeringComponent) {
+		gatherEventDataContributions(event, triggeringComponent);
+		event.setComponentPath(triggeringComponent.getPageRelativePath());
+		event.setDefaultValues();
+		cwmService.save(event);
+		cwmService.flushChanges();
+		log.debug("Saved event: {}", event);
+		return modelProvider.modelOf(event);
+	}
+
+	// Recursively collect information in the Event from all ancestors of the given Component.
+	// The top-level Component (page) will contribute its data first, moving down the chain
+	// to the triggering component last, so that more specific components can override values
+	// set by more general ones.
+	// Unchecked cast below - we assume that the Event will be of the correct subtype for each contributor.
+	// Not sure how that could be avoided.
+	@SuppressWarnings("unchecked")
+	protected void gatherEventDataContributions (Event event, Component component) {
+		if (component.getParent() != null)
+			gatherEventDataContributions(event, component.getParent());
+		if (component instanceof IEventDataContributor) {
+			((IEventDataContributor) component).contributeEventData(event);
+		}
+	}
+
 	/**
 	 * Save an actual event object.  
 	 * 
-	 * @param e
+	 * @param e the Event to be saved
 	 * @return model wrapping the event that was saved
 	 */
 	protected IModel<? extends Event> saveEvent (Event e) {
@@ -161,7 +200,7 @@ public class EventService implements IEventService {
 			loginSession.setIpAddress(((ServletWebRequest)r).getContainerRequest().getRemoteAddr());
 		
 		loginSession.setCookiesEnabled(false);
-		if (cwmSession.getClientInfo() instanceof WebClientInfo) {
+		if (cwmSession.getClientInfo() != null) {
 			ClientProperties info = cwmSession.getClientInfo().getProperties();
 			loginSession.setScreenHeight(info.getBrowserHeight());
 			loginSession.setScreenWidth(info.getBrowserWidth());
