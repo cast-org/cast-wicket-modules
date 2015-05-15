@@ -463,7 +463,7 @@
         <hibernate.version>4.2.0.Final</hibernate.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
-        <copyright.year>2013</copyright.year>
+        <copyright.year>2015</copyright.year>
     </properties>
   
 </project>
