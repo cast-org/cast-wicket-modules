@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,11 +22,14 @@ package org.cast.cwm.data.component;
 import java.util.Collection;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.ajax.IAjaxIndicatorAware;
-import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.extensions.ajax.markup.html.AjaxIndicatorAppender;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
+import org.cast.cwm.JQueryHeaderContributor;
 
 /**
  * An instance of {@link AjaxSubmitLink} that can disable components during
@@ -38,8 +41,8 @@ import org.apache.wicket.markup.html.form.Form;
  * @param <T>
  */
 public abstract class DisablingIndicatingAjaxSubmitLink 
-		extends AjaxSubmitLink 
-		implements IAjaxIndicatorAware {
+extends AjaxSubmitLink 
+implements IAjaxIndicatorAware, IHeaderContributor {
 
 	private static final long serialVersionUID = 1L;
 	private final AjaxIndicatorAppender indicatorAppender = new AjaxIndicatorAppender();
@@ -57,18 +60,21 @@ public abstract class DisablingIndicatingAjaxSubmitLink
 	/**
 	 * @see org.apache.wicket.ajax.IAjaxIndicatorAware#getAjaxIndicatorMarkupId()
 	 */
-	@Override
 	public String getAjaxIndicatorMarkupId()
 	{
 		return indicatorAppender.getMarkupId();
 	}
 	
 	@Override
-	protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-		super.updateAjaxAttributes(attributes);
-		attributes.getAjaxCallListeners().add(new DisablingAjaxCallListener());
+	protected IAjaxCallDecorator getAjaxCallDecorator() {
+		return new DisablingAjaxCallDecorator(getComponents());
 	}
-
+	
+	public void renderHead(final IHeaderResponse response) {
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
+	}
+	
 	/**
 	 * Returns a list of components (including containers) that should be disabled
 	 * during the Ajax request.

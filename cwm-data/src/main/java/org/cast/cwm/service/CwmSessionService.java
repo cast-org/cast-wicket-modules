@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,72 +35,58 @@ import org.cast.cwm.data.User;
  */
 public class CwmSessionService implements ICwmSessionService {
 
-	@Override
 	public IModel<LoginSession> getLoginSessionModel() {
 		return CwmSession.get().getLoginSessionModel();
 	}
 
-	@Override
 	public IModel<Site> getCurrentSiteModel() {
 		return CwmSession.get().getCurrentSiteModel();
 	}
 
-	@Override
 	public IModel<Period> getCurrentPeriodModel() {
 		return CwmSession.get().getCurrentPeriodModel();
 	}
 
-	@Override
 	public Long getLoginSessionId() {
 		return CwmSession.get().getLoginSessionId();
 	}
 
-	@Override
 	public LoginSession getLoginSession() {
 		return CwmSession.get().getLoginSession();
 	}
 
-	@Override
 	public void setLoginSessionModel(IModel<LoginSession> model) {
 		CwmSession.get().setLoginSessionModel(model);
 	}
 
-	@Override
 	public IModel<User> createUserModel(User user) {
 		return CwmSession.get().createUserModel(user);
 	}
 
-	@Override
 	public User getUser() {
 		return CwmSession.get().getUser();
 	}
 
-	@Override
 	public IModel<User> getUserModel() {
 		return CwmSession.get().getUserModel();
 	}
 
-	@Override
 	public boolean isSignedIn() {
 		return CwmSession.get().isSignedIn();
 	}
 
-	@Override
 	public boolean signIn(String username, String password) {
 		return CwmSession.get().signIn(username, password);
 	}
 
-	@Override
 	public boolean signIn(String username, String password, boolean setCookie) {
 		return CwmSession.get().signIn(username, password, setCookie);
 	}
 
-	@Override
 	public void signOut() {
 		CwmSession.get().signOut();
 	}
 
-	@Override
 	public void setCurrentPeriodModel(IModel<Period> model) {
 		CwmSession.get().setCurrentPeriodModel(model);
 	}

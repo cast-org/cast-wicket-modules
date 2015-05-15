@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,9 +27,7 @@ import org.apache.wicket.model.Model;
  * A behavior that makes it easy to add or remove 'class'
  * attributes from HTML elements.
  *
- *@deprecated This is superseded by standard Wicket AttributeModifer now. 
  */
-@Deprecated
 public class ClassAttributeModifier extends AttributeModifier {
 
   private static final long serialVersionUID = 1L;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,6 @@
  */
 package org.cast.cwm.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.ByteArrayInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -32,9 +28,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.cast.cwm.test.CwmBaseTestCase;
-import org.cast.cwm.test.InjectionTestHelper;
-import org.cast.cwm.xml.service.IXmlService;
+import junit.framework.TestCase;
+
 import org.cast.cwm.xml.service.XmlService;
 import org.cast.cwm.xml.transform.FilterElements;
 import org.cast.cwm.xml.transform.TransformParameters;
@@ -43,7 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class TestXPath extends CwmBaseTestCase {
+public class TestXPath extends TestCase {
 	
 	private static final XPathFactory factory = XPathFactory.newInstance();
 	
@@ -51,41 +46,25 @@ public class TestXPath extends CwmBaseTestCase {
 	private XPath xPath;
 	
 	private static final byte[] doc = ("<level1 xmlns=\"http://www.daisy.org/z3986/2005/dtbook/\">"
-		+ "<level2><p>First p</p><p><em>Second p</em></p></level2>"
-		+ "<level2><p>Third p</p></level2>"
-		+ "<p>Fourth p</p></level1>")
-		.getBytes();
+		+ "<level2><p>First p</p><p><em>Second p</em></p></level2><level2><p>Third p</p></level2><p>Fourth p</p></level1>").getBytes();
 	
 	@Override
-	protected boolean isApplicationThemed() {
-		return false;
-	}
-
-
-	@Override
-	protected InjectionTestHelper getInjectionTestHelper() {
-		return new InjectionTestHelper(); 
-	}
-
-	@Override
-	public void setUpData() throws Exception {
+	public void setUp() {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		Document document;
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		document = db.parse(new ByteArrayInputStream(doc));
-		dom = document.getDocumentElement();
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			document = db.parse(new ByteArrayInputStream(doc));
+			dom = document.getDocumentElement();
+		} catch (Exception e) {
+			fail();
+		}
 
 		xPath = factory.newXPath();
-		xPath.setNamespaceContext(new XmlService().getNamespaceContext());
+		xPath.setNamespaceContext(XmlService.get().getNamespaceContext());
 	}
 	
-	@Override
-	public void populateInjection() throws Exception {
-		IXmlService xmlService = mock(IXmlService.class);
-		when(xmlService.getNamespaceContext()).thenReturn(new XmlService.CwmNamespaceContext());
-		injectionHelper.injectObject(IXmlService.class, xmlService);
-	}
 	
 	@Test
 	public void testSimpleXPath() throws XPathExpressionException {
@@ -131,42 +110,7 @@ public class TestXPath extends CwmBaseTestCase {
 	}
 	
 	@Test
-	public void testCountFollowing() throws XPathExpressionException {
-		Element node = (Element) dom.getElementsByTagName("level2").item(0);
-
-		Double n = (Double) xPath.evaluate("count(following::dtb:level2)", node, XPathConstants.NUMBER);
-		assertEquals("Should be 1 level2 after the first level2", Double.valueOf(1.0), n);
-		
-		n = (Double) xPath.evaluate("count(following::dtb:p)", node, XPathConstants.NUMBER);
-		assertEquals("Should be 2 <p> after the first level2", Double.valueOf(2.0), n);
-		
-		n = (Double) xPath.evaluate("count(following::dtb:p)", node.getChildNodes().item(0), XPathConstants.NUMBER);
-		assertEquals("Should be 3 <p> after the first p inside the first level2", Double.valueOf(3.0), n);
-		
-		n = (Double) xPath.evaluate("count(following::dtb:em)", node, XPathConstants.NUMBER);
-		assertEquals("Should be no <em> after the first level2", Double.valueOf(0.0), n);
-	}
-	
-	@Test
-	public void testCountPreceding() throws XPathExpressionException {
-		Element node = (Element) dom.getElementsByTagName("level2").item(1);
-
-		Double n = (Double) xPath.evaluate("count(preceding::dtb:level2)", node, XPathConstants.NUMBER);
-		assertEquals("Should be 1 level2 before the second level2", Double.valueOf(1.0), n);
-		
-		n = (Double) xPath.evaluate("count(preceding::dtb:p)", node, XPathConstants.NUMBER);
-		assertEquals("Should be 2 <p> before the second level2", Double.valueOf(2.0), n);
-		
-		n = (Double) xPath.evaluate("count(preceding::dtb:p)", node.getChildNodes().item(0), XPathConstants.NUMBER);
-		assertEquals("Should be 2 <p> before the p inside the second level2", Double.valueOf(2.0), n);		
-
-		n = (Double) xPath.evaluate("count(preceding::dtb:em)", node, XPathConstants.NUMBER);
-		assertEquals("Should be 1 <em> before the second level2", Double.valueOf(1.0), n);
-	}
-	
-	@Test
 	public void testFilterElements() {
-		// Use first <level2> as the context node
 		Element node = (Element) dom.getElementsByTagName("level2").item(0);
 		TransformParameters params = new TransformParameters();
 		
@@ -182,6 +126,7 @@ public class TestXPath extends CwmBaseTestCase {
 		//params.put(FilterElements.XPATH, "//dtb:p/dtb:em");
 		//output = new FilterElements().applyTransform((Element) node.cloneNode(true), params);
 		//assertEquals("Second p", output.getTextContent());
-	}	
+	}
+	
 
 }

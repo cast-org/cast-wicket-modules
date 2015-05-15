@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -60,9 +61,8 @@ public class UserListPage extends AdminPage {
 
 			@Override
 			protected void populateItem(ListItem<Role> item) {
-				PageParameters pp = new PageParameters();
-				pp.set("role", item.getModelObject().getRoleString());
-				item.add(new BookmarkablePageLink<Page>("addLink", UserFormPage.class, pp)
+				item.add(new BookmarkablePageLink<Page>("addLink", UserFormPage.class)
+						.setParameter("role", item.getModelObject().getRoleString())
 						.add(new Label("role", item.getModelObject().toString())));
 				if (item.getIndex() != 0)
 					item.add(AttributeModifier.replace("class", "addSeparator"));

@@ -11,14 +11,13 @@
 <!ENTITY % mathML2 PUBLIC "-//W3C//DTD MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd">
 %mathML2;
 
-<!-- externalFlow elements allowed in block or inline context -->
 <!ENTITY % externalFlow " | m:math">
 <!ENTITY % externalNamespaces "xmlns:m CDATA #FIXED  'http://www.w3.org/1998/Math/MathML'">
 
-<!-- Extend inline and block element definitions with our custom elements -->
+<!-- Extend inline and block element definitions with our extension elements -->
 
 <!ENTITY % externalinline " | clozeword">
-<!ENTITY % externalblock " | responsegroup | object | section">
+<!ENTITY % externalblock " | responsegroup | object">
 
 %dtbook;
 
@@ -41,13 +40,6 @@
 <!ATTLIST level5 %behaviorAttribute; >
 <!ATTLIST level6 %behaviorAttribute; >
 <!ATTLIST level  %behaviorAttribute; >
-
-<!-- Section: structured content with headings that is not part
-     of the overall book's TOC, for example inside a <div> or <td>.
-     Use is similar to the HTML5 <section> element. -->
-
-<!ELEMENT section (hd, (%block;)+) >
-<!ATTLIST section %attrs;>
 
 <!-- Responsegroup: indicates where a user response is expected.
      Various types are supported: general "response" allows the user
@@ -114,7 +106,7 @@
 	correct (true|false) #IMPLIED
 >
 
-<!ELEMENT label (#PCDATA|p|list|div|blockquote|poem|linegroup|table|line|prodnote)*>
+<!ELEMENT label (%inline;)*>
 <!ATTLIST label %attrs; >	
 
 <!ELEMENT message (#PCDATA|p|list|div|blockquote|poem|linegroup|table|line|prodnote)*>

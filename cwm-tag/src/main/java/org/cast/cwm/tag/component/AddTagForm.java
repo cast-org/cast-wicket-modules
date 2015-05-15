@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.tag.component;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.model.Model;
@@ -42,7 +42,6 @@ public class AddTagForm extends Form<Object> {
 	protected Long targetId;
 	
 	private static final long serialVersionUID = 1L;
-	private RequiredTextField<String> input;
 
 	public AddTagForm(String id, PersistedObject target) {
 		super(id);
@@ -50,26 +49,27 @@ public class AddTagForm extends Form<Object> {
 		targetType = target.getClass();
 		targetId = target.getId();
 		
-		input = new RequiredTextField<String>("term", new Model<String>(""));
+		final RequiredTextField<String> input = new RequiredTextField<String>("term", new Model<String>(""));
 		input.setOutputMarkupId(true);
-		input.add(AttributeModifier.replace("maxlength", Integer.toString(TagService.get().getMaxTagLength())));
+		input.add(new SimpleAttributeModifier("maxlength", Integer.toString(TagService.get().getMaxTagLength())));
 		add(input);
 		
 		add(new AjaxButton("add", this) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+			protected void onSubmit(AjaxRequestTarget ajaxtarget, Form<?> form) {
 				TagService.get().findTaggingCreate(CwmSession.get().getUser(), targetType, targetId, input.getModelObject());
 				input.setModelObject(""); // clear input box
-				target.add(input);
+				ajaxtarget.addComponent(input);
 				MarkupContainer tp = findParent(TagPanel.class);
 				if (tp != null) {
-					target.addChildren(tp, TaggingsListPanel.class);
-					target.addChildren(tp, TagList.class);
+					ajaxtarget.addChildren(tp, TaggingsListPanel.class);
+					ajaxtarget.addChildren(tp, TagList.class);
 				}
 			}
+			
 		});
 	}
-	
+
 }

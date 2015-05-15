@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -69,7 +69,6 @@ public class TransformChain implements IDOMTransformer {
 	/**
 	 * Apply the chain of transforms to the given DOM and return the result.
 	 */
-	@Override
 	public Element applyTransform(Element n, TransformParameters params) {
 		for (IDOMTransformer trans : transforms) {
 			n = trans.applyTransform(n, params);
@@ -83,7 +82,6 @@ public class TransformChain implements IDOMTransformer {
 	 * Last modified date of any transform in the chain.
 	 * If all report null, then null will be returned (meaning the entire chain is unmodifiable).
 	 */
-	@Override
 	public Time getLastModified(TransformParameters params) {
 		Time lastMod = null;
 		for (IDOMTransformer trans : transforms) {

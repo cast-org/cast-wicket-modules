@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -33,7 +33,6 @@ public class CachingCriteriaBuilder implements CriteriaBuilder {
 
 	private static final long serialVersionUID = 1L;
 
-	@Override
 	public void build(Criteria criteria) {
 		criteria.setCacheable(true);		
 	}

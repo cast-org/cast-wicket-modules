@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -23,10 +23,8 @@ import java.io.Serializable;
 
 import lombok.Getter;
 
+import org.cast.cwm.xml.service.XmlService;
 import org.w3c.dom.Element;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSSerializer;
 
 /**
  * Holds both the Element and serialized String form of the result of a transformation.
@@ -50,35 +48,8 @@ public class TransformResult implements Serializable {
 	
 	public String getString() {
 		if (string == null && element != null) {
-			string = serialize(element);
+			string = XmlService.get().serialize(element);
 		}
 		return string;
 	}
-	
-	/**
-	 * @param res
-	 * @return
-	 * 
-	 * This will return a string of the elements children.  Can be used to get the html content from a child/children.
-	 */
-	public String serialize (Element res) {
-		DOMImplementationRegistry registry;
-		try {
-			registry = DOMImplementationRegistry.newInstance();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		DOMImplementationLS impl = 
-			(DOMImplementationLS)registry.getDOMImplementation("LS");
-		if (impl == null) {
-			throw new RuntimeException ("Could not find appropriate DOM implementation");
-		} else {
-			LSSerializer writer = impl.createLSSerializer();
-			writer.getDomConfig().setParameter("xml-declaration", false);
-			// May want to set a filter to deal with Components embedded in XML
-			// writer.setFilter(filter);
-			return writer.writeToString(res);
-		}
-	}
-
 }

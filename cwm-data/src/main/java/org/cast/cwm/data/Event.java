@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -94,11 +94,6 @@ public class Event extends PersistedObject {
 	protected String detail;
 	
 	protected String page;
-	
-	/**
-	 * The wicket ID path of the component that was clicked to generate this event. 
-	 */
-	protected String componentPath;
 	
 	/** Called just before saving Event to database to set various fields
 	 * whose values are predictable.  Override as necessary for you application.

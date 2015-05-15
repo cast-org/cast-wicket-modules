@@ -44,7 +44,6 @@ public abstract class PropertyDataProvider<T> implements IDataProvider<T> {
 	 * @param object object DataView would like to wrap
 	 * @return object wrapped in a peristent model and possibly CompoundPropertyModel
 	 */
-	@Override
 	public IModel<T> model(T object) {
 		IModel<T> model = dataModel(object);
 		if (wrapWithPropertyModel)
@@ -55,6 +54,5 @@ public abstract class PropertyDataProvider<T> implements IDataProvider<T> {
 	/** Wrap in appropriate persistent model in subclass */
 	protected abstract IModel<T> dataModel(T object);
 	
-	@Override
 	public void detach() { }
 }

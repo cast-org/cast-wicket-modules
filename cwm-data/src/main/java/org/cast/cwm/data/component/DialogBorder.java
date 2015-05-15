@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -30,11 +30,8 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.border.Border;
 import org.apache.wicket.model.IModel;
@@ -42,6 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.cast.cwm.JQueryHeaderContributor;
 import org.cast.cwm.components.ShyLabel;
 import org.cast.cwm.service.IEventService;
 
@@ -346,7 +344,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
         result.append("if (typeof(modalInit)==='function') modalInit(); ");
         result.append("DialogBorder.focusDialog('" + contentContainer.getMarkupId() + "', " + (storeCallingButton? "true" : "false") + ");");
         if (logEvents)
-        	result.append("Wicket.Ajax.get({u:'" + openEventBehavior.getCallbackUrl() + "'});");
+        	result.append("wicketAjaxGet('" + openEventBehavior.getCallbackUrl() + "');");
         return result.toString();	
     }
     
@@ -395,7 +393,6 @@ public class DialogBorder extends Border implements IHeaderContributor {
         return result.toString();
     }
 
-	@Override
 	public void renderHead(final IHeaderResponse response) {
 		renderJSinclusions(response);
         renderCSSinclusions(response);
@@ -404,25 +401,26 @@ public class DialogBorder extends Border implements IHeaderContributor {
         // and so that they display on top of other content in older IE versions that don't respect z-index.
         if (moveContainer != null && moveContainer.contains(this, true)) {
         	moveContainer.setOutputMarkupId(true);
-        	response.render(OnDomReadyHeaderItem.forScript("$('#" + moveContainer.getMarkupId() + "').detach().appendTo('body');"));
+        	response.renderOnDomReadyJavaScript("$('#" + moveContainer.getMarkupId() + "').detach().appendTo('body');");
         } else {
-        	response.render(OnDomReadyHeaderItem.forScript(
+        	response.renderOnDomReadyJavaScript(
 				"$('#" + contentContainer.getMarkupId() + "').detach().appendTo('body');"
-				+ (masking ? "$('#" + overlay.getMarkupId() + "').detach().appendTo('body');" : "")));
+				+ (masking ? "$('#" + overlay.getMarkupId() + "').detach().appendTo('body');" : ""));
         }
 	}
 	
 	protected void renderJSinclusions(final IHeaderResponse response) {
-		response.render(JavaScriptHeaderItem.forReference(JS_REFERENCE));
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(JS_REFERENCE);
 	}
 
 	protected void renderCSSinclusions(final IHeaderResponse response) {
-		response.render(CssHeaderItem.forReference(BLOCKING_CSS_REFERENCE));
+		response.renderCSSReference(BLOCKING_CSS_REFERENCE);
 		if (styleReferences == null)
-			response.render(CssHeaderItem.forReference(new PackageResourceReference(DialogBorder.class, "modal.css")));
+			response.renderCSSReference(new PackageResourceReference(DialogBorder.class, "modal.css"));
 		else
 			for (ResourceReference ref : styleReferences)
-				response.render(CssHeaderItem.forReference(ref));
+				response.renderCSSReference(ref);
 	}
 	
 	/**

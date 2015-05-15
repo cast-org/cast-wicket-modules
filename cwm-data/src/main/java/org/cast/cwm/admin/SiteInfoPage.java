@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,9 +19,14 @@
  */
 package org.cast.cwm.admin;
 
-import com.google.inject.Inject;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
+
 import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -45,6 +50,8 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.util.file.Files;
+import org.apache.wicket.util.file.Folder;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
@@ -61,9 +68,7 @@ import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.inject.Inject;
 
 /**
  * Page for editing an individual site.  Link to periods and allows uploading files of users
@@ -147,7 +152,11 @@ public class SiteInfoPage extends AdminPage {
 		add(new ResourceLink<Void>("sampleLink", new PackageResourceReference(SiteInfoPage.class, "sample_class_list.csv")));
 		
 		// Upload CSV File to populate Site
-		add(new UserFileUploadForm("upload-form", mSite));
+		Folder uploadFolder = new Folder(System.getProperty("java.io.tmpdir"), "wicket-uploads");
+		uploadFolder.mkdirs();
+		add(new UserFileUploadForm("upload-form", mSite, uploadFolder));
+		
+		
 	}
 
 	/**
@@ -247,10 +256,13 @@ public class SiteInfoPage extends AdminPage {
 		private UserSpreadsheetReader reader;
 		private WebMarkupContainer resultsContainer = new WebMarkupContainer("results-container");
 		private Label uploadResults = new Label("upload-results", "UploadedData");
+		private Folder uploadFolder;
 
 
-		public UserFileUploadForm(String id, IModel<Site> site) {
+		public UserFileUploadForm(String id, IModel<Site> site, Folder uploadFolder) {
 			super(id, site);
+			
+			this.uploadFolder = uploadFolder;
 
 			setMultiPart(true);
 			setMaxSize(Bytes.megabytes(10));
@@ -316,13 +328,28 @@ public class SiteInfoPage extends AdminPage {
 			clearResults();
 			final FileUpload upload = getFileUpload();
 			if (upload != null) {
+				// Create a new file
+				File newFile = new File(uploadFolder, upload.getClientFileName());
+				if(newFile.exists()) {
+					if(!Files.remove(newFile)) {
+						throw new IllegalStateException("File already exists and can't be deleted");
+					}
+				}
+				try {
+					// Save to new file
+					newFile.createNewFile();
+					upload.writeTo(newFile);
+				}
+				catch (Exception e) {
+					throw new IllegalStateException("Unable to write file");
+				}
+
 				reader = new UserSpreadsheetReader();
 				reader.setDefaultSite(getModel());
 				boolean success;
 				try {
 					success = reader.readInput(upload.getInputStream());
 				} catch (IOException e) {
-                    e.printStackTrace();
 					success = false;
 				}
 
@@ -332,9 +359,9 @@ public class SiteInfoPage extends AdminPage {
 					for (PotentialUserSave pus : reader.getPotentialUsers()) {
 						if (!pus.getError().equals("")) {
 							String[] errors = pus.getError().split("\n");
-                            for (String error : errors) {
-                                error("Error on line " + pus.getLine() + ": " + error);
-                            }
+							for (int i = 0; i < errors.length; i++) {
+								error("Error on line " + pus.getLine() + ": " + errors[i]);
+							}
 						}
 					}
 				}

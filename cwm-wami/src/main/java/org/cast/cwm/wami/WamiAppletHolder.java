@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.search;
+package org.cast.cwm.wami;
 
-import net.databinder.hib.Databinder;
-
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 
 /**
- * Hibernate-search related service methods.
- * 
+ * This is a placeholder for the embedded SWF that is be used by {@link PlayerPanel} and {@link RecorderPanel}.
+ * Put it on the page somewhere that it will not be removed or replaced by AJAX updates.
+ * It should be a nice visible location, though, so that the settings panel can be seen. 
+ *
  * @author bgoldowsky
  *
  */
-public class SearchService implements ISearchService {
+public class WamiAppletHolder extends WebMarkupContainer {
 
-	@Override
-	public void indexObject(Object object) {
-		FullTextSession fullTextSession = Search.getFullTextSession(Databinder.getHibernateSession());
-		fullTextSession.index(object);
+	private static final long serialVersionUID = 1L;
+
+	public WamiAppletHolder(String id) {
+		super(id);
+		setOutputMarkupId(true);
 	}
 
 }

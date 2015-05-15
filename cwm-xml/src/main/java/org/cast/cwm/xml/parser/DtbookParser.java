@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -89,8 +89,8 @@ public class DtbookParser extends XmlParser implements Serializable {
 	protected static final Map<String,DtbookElement> elements = new HashMap<String,DtbookElement>();
 	
 	static {
-		elements.put("dtbook",     new DtbookElement(null, "book", false));
-		elements.put("book",       new DtbookElement(null, "bodymatter", false));
+		elements.put("dtbook", new DtbookElement(null, "book", false));
+		elements.put("book", new DtbookElement("doctitle", "bodymatter", false));
 		elements.put("bodymatter", new DtbookElement(null, "level1", true));
 		
 		// Standard Level Elements
@@ -141,15 +141,12 @@ public class DtbookParser extends XmlParser implements Serializable {
 		
 		// Create the Root XmlSection
 		XmlSection root = xmlService.newXmlSection(); 
-		root.init(doc, null, XmlSection.DOCUMENT_ID, document.getDocumentElement(), "title will be set later");
+		root.init(doc, null, XmlSection.DOCUMENT_ID, document.getDocumentElement(), "DocumentTitle");
 
 		addToIdMap(XmlSection.DOCUMENT_ID, root);
 	
 		// Recursively create child XmlSections
 		fillIn(root, document.getDocumentElement());
-		
-		// Find & set title of entire document
-		root.setTitle(findTitle(document.getDocumentElement()));
 		
 		return root;
 	}
@@ -274,22 +271,6 @@ public class DtbookParser extends XmlParser implements Serializable {
 		return idFinder;
 	}
 	
-	protected String findTitle(Element element) {
-		XPathFactory factory= XPathFactory.newInstance();
-		XPath xPath=factory.newXPath();
-		xPath.setNamespaceContext(xmlService.getNamespaceContext());
-		
-		try {
-			XPathExpression xp = xPath.compile("/dtb:dtbook/dtb:book/dtb:frontmatter/dtb:doctitle");
-			Node doctitle = (Node) xp.evaluate(element, XPathConstants.NODE);
-			if (doctitle != null)
-				return normalizeTitle(doctitle.getTextContent());
-		} catch (XPathExpressionException e) {
-			e.printStackTrace();
-		}
-		
-		return "";
-	}
 
 	
 	private static class DtbookElement {

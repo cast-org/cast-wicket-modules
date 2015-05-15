@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,15 +22,12 @@ package org.cast.cwm.data.component;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -41,7 +38,9 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.IResponseTypeRegistry;
+import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.ResponseType;
 import org.cast.cwm.data.Role;
@@ -91,7 +90,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 		super(id, model);
 
 		setOutputMarkupId(true);
-		add(AttributeModifier.append("class", "starPanel"));
+		add(new ClassAttributeModifier("starPanel"));
 
 		if (model == null || model.getObject() == null) {
 			setVisible(false);
@@ -130,7 +129,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 			
 			Label label = new Label("label", i == 1 ? i + " Star" : i + " Stars");
 			label.setRenderBodyOnly(true);
-			item.add(AttributeModifier.replace("for", radio.getMarkupId()));
+			item.add(new SimpleAttributeModifier("for", radio.getMarkupId()));
 			item.add(radio);
 			item.add(label);
 		}
@@ -142,7 +141,7 @@ public class StarPanel extends Panel implements IHeaderContributor {
 			@Override
 			protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 				onSave(target);
-				target.add(StarPanel.this);
+				target.addComponent(StarPanel.this);
 			}
 			
 			@Override
@@ -167,12 +166,12 @@ public class StarPanel extends Panel implements IHeaderContributor {
 		super.onBeforeRender();
 	}
 	
-	@Override
 	public void renderHead(IHeaderResponse response) {
 		
-		response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(StarPanel.class, "star_rating.js"), "StarRating"));
-		response.render(CssHeaderItem.forReference(getStarCSSReference()));
-		response.render(OnDomReadyHeaderItem.forScript("starRating.create('#" + getMarkupId() + " .stars')"));
+		response.renderJavaScriptReference(new PackageResourceReference(StarPanel.class, "star_rating.js"), "StarRating");
+		response.renderCSSReference(getStarCSSReference());
+		
+		response.renderOnDomReadyJavaScript("starRating.create('#" + getMarkupId() + " .stars')");
 	}
 	
 	/**

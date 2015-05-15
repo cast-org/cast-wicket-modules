@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -102,7 +102,6 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getProperty(java.lang.String)
 	 */
-	@Override
 	public String getProperty (String key) {
 		String value = properties.getProperty(key);
 		return value==null ? null : value.trim();
@@ -111,7 +110,6 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getString(java.lang.String, java.lang.String)
 	 */
-	@Override
 	public String getString (String key, String defaultValue) {
 		String value = getProperty(key);
 		if (value == null)
@@ -122,7 +120,6 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getString(java.lang.String)
 	 */
-	@Override
 	public String getString (String key) {
 		String value = getProperty(key);
 		if (value == null)
@@ -133,7 +130,6 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getInteger(java.lang.String, java.lang.Integer)
 	 */
-	@Override
 	public Integer getInteger (String key, Integer defaultValue) {
 		String value = properties.getProperty(key);
 		if (value==null)
@@ -150,7 +146,6 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getInteger(java.lang.String)
 	 */
-	@Override
 	public int getInteger (String key) {
 		Integer value = getInteger(key, null);
 		if (value==null)
@@ -160,40 +155,8 @@ public class AppConfiguration implements IAppConfiguration {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.IAppConfiguratio#getBoolean(String, String)
-	 */
-	@Override
-	public Boolean getBoolean(String key, Boolean defaultValue) {
-		String value = properties.getProperty(key);
-		if (value==null)
-			return defaultValue;
-		if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") 
-				|| value.equalsIgnoreCase("on") || value.equals("1"))
-			return Boolean.TRUE;
-		if (value.equalsIgnoreCase("false") || value.equalsIgnoreCase("no") 
-				|| value.equalsIgnoreCase("off") || value.equals("0"))
-			return Boolean.FALSE;
-		throw new ConfigurationException(
-				String.format("Configuration property %s should have boolean value, but was \"%s\"",
-				key, value));
-	}
-
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.IAppConfiguratio#getBoolean(String)
-	 */
-	@Override
-	public boolean getBoolean(String key) {
-		Boolean value = getBoolean(key, null);
-		if (value==null)
-			throw new ConfigurationException(
-					String.format("Required configuration property \"%s\" was not set", key));
-		return value;			
-	}
-
-	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getOptionalFile(java.lang.String)
 	 */	
-	@Override
 	public File getOptionalFile (String key) {
 		String fileName = getProperty(key);
 		if (fileName == null)
@@ -213,7 +176,6 @@ public class AppConfiguration implements IAppConfiguration {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.IAppConfiguratio#getFile(java.lang.String)
 	 */
-	@Override
 	public File getFile (String key) {
 		File file = getOptionalFile(key);
 		if (file == null)

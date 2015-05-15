@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -47,7 +47,7 @@ public interface IResponseService {
 	 * 
 	 * @param responseClass
 	 */
-	IResponseService setResponseClass(Class<? extends Response> responseClass);
+	void setResponseClass(Class<? extends Response> responseClass);
 	
 	/** 
 	 * Create a new Response object of the application's preferred class,
@@ -112,11 +112,11 @@ public interface IResponseService {
 	IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p,
 			IModel<Period> period);
 
-	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p);
+	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p);
 
-	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u);
+	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u);
 
-	public ISortableDataProvider<Response,String> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod);
+	public ISortableDataProvider<Response> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod);
 	
 	/**
 	 * Get the total number of valid responses for the given prompt.

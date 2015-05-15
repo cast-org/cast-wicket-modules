@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -67,22 +67,20 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 		this.builder = builder;
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
-	public Iterator<? extends T> iterator(long first, long count) {
+	public Iterator<? extends T> iterator(int first, int count) {
 		FullTextQuery query = getQuery();
 		if (query == null) {
 			List<T> empty = Collections.emptyList();
 			return empty.iterator();
 		}
-		query.setFirstResult((int)first);
-		query.setMaxResults((int)count);
+		query.setFirstResult(first);
+		query.setMaxResults(count);
 		onBeforeSearchExecution(query);
 		long startTime = System.currentTimeMillis();
 		Iterator<? extends T> iterator = query.iterate();
-		if (log.isDebugEnabled()) {
-			log.debug("Query took {}ms, returned {} results", System.currentTimeMillis()-startTime, query.getResultSize());
-		}
+		if (log.isDebugEnabled())
+			log.debug("Query took {}ms", System.currentTimeMillis()-startTime);
 		return iterator;
 	}
 
@@ -90,8 +88,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 	protected void onBeforeSearchExecution(FullTextQuery query) {
 	}
 	
-	@Override
-	public long size() {
+	public int size() {
 		FullTextQuery query = getQuery();
 		return query == null ? 0 : query.getResultSize();
 	}
@@ -125,7 +122,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 				luceneQuery = builder.build (queryBuilder);
 			} catch (SearchException e) {
 				// query building can fail e.g. if search string contains only stopwords.
-				log.warn("Search query construction failed: {}", e);
+				log.debug("Search query construction failed: {}", e);
 				return null;
 			}
 			query = fullTextSession.createFullTextQuery(luceneQuery);

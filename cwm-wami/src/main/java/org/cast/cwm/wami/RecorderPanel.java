@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -64,6 +64,12 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 	
 	private static final long serialVersionUID = 1L;
 
+	public RecorderPanel(String id, IModel<T> mUserContent, AudioSkin skin, WamiAppletHolder appletHolder) {
+		super(id, mUserContent, skin, appletHolder);
+		listener = new AudioDataListenerBehavior();
+		add(listener);
+	}
+
 	public RecorderPanel(String id, IModel<T> mUserContent, AudioSkin skin) {
 		super(id, mUserContent, skin);
 		listener = new AudioDataListenerBehavior();
@@ -114,7 +120,6 @@ public class RecorderPanel<T extends UserContent> extends PlayerPanel<T> impleme
 	protected class AudioDataListenerBehavior extends AbstractAjaxBehavior {
 		private static final long serialVersionUID = 1L;
 
-		@Override
 		public void onRequest() {
 			Request request = getRequest();
 		    RequestCycle requestCycle = RequestCycle.get();

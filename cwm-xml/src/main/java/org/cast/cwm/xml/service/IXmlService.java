@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,7 +21,6 @@ package org.cast.cwm.xml.service;
 
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.xml.namespace.NamespaceContext;
 
 import org.apache.wicket.util.file.File;
@@ -49,16 +48,25 @@ import org.w3c.dom.NodeList;
  */
 public interface IXmlService {
 
-	/**
-	 * The number of seconds to wait before checking for new versions of XML files.
-	 * @return
-	 */
-	public int getUpdateCheckInterval();
-	
 	/*
 	 * TODO: hide this implementation detail
 	 */
-	public NamespaceContext getNamespaceContext();
+	void setXmlSectionClass(Class<? extends XmlSection> clazz);
+
+	/*
+	 * TODO: hide this implementation detail
+	 */
+	void setUpdateCheckInterval(int interval);
+
+	/*
+	 * TODO: hide this implementation detail
+	 */
+	int getUpdateCheckInterval();
+
+	/*
+	 * TODO: hide this implementation detail
+	 */
+	NamespaceContext getNamespaceContext();
 
 	/**
 	 * Add a directory to the list of known transformer directories.
@@ -66,27 +74,27 @@ public interface IXmlService {
 	 * search order.  In general, load any custom directories first.
 	 * @param name
 	 */
-	public void addTransformerDirectory(String dir);
+	void addTransformerDirectory(String dir);
 
 	/**
 	 * Fetch an XmlDocument by name from the ones registered with this object.
 	 * @param name
 	 * @return the XmlDocument, or null.
 	 */
-	public XmlDocument getDocument(String name);
+	XmlDocument getDocument(String name);
 
 	/**
 	 * Fetch a transformer by name from the ones registered with this object.
 	 * @param name
 	 * @return the transformer, or null.
 	 */
-	public IDOMTransformer getTransformer(String name);
+	IDOMTransformer getTransformer(String name);
 
 	/**
 	 * Return new XmlSection, or a subclass as set in this object's xmlSectionClass.
 	 * @return the newly instantiated object
 	 */
-	public XmlSection newXmlSection();
+	XmlSection newXmlSection();
 
 	/**
 	 * Find a file, either by absolute pathname or relative to one of the defined transfomerDirectories.
@@ -94,7 +102,7 @@ public interface IXmlService {
 	 * @param xslFileName
 	 * @return a File, or null if not found.
 	 */
-	public File findXslFile(String xslFileName);
+	File findXslFile(String xslFileName);
 
 	/**
 	 * Find a file, either by absolute pathname or relative to one of the defined transfomerDirectories,
@@ -103,7 +111,7 @@ public interface IXmlService {
 	 * @param xslFileName
 	 * @return a FileResource, or null if not found.
 	 */
-	public FileXmlDocumentSource findXslResource(String xslFileName);
+	FileXmlDocumentSource findXslResource(String xslFileName);
 
 	/**
 	 * Load an XML document from a File and register it by name with this object.  
@@ -114,7 +122,7 @@ public interface IXmlService {
 	 * @param observers (optional) list of initial document observers 
 	 * @return the loaded and registered XmlDocument
 	 */
-	public XmlDocument loadXmlDocument(String name, File file, XmlParser parser,
+	XmlDocument loadXmlDocument(String name, File file, XmlParser parser,
 			List<IDocumentObserver> observers);
 
 	/** 
@@ -127,7 +135,7 @@ public interface IXmlService {
 	 * @param observers (optional) list of initial document observers
 	 * @return the XmlDocument
 	 */
-	public XmlDocument loadXmlDocument(String name, IInputStreamProvider xmlSource,
+	XmlDocument loadXmlDocument(String name, IInputStreamProvider xmlSource,
 			XmlParser parser, List<IDocumentObserver> observers);
 
 	/** 
@@ -135,7 +143,7 @@ public interface IXmlService {
 	 * @param name
 	 * @param document
 	 */
-	public void registerXmlDocument(String name, XmlDocument document);
+	void registerXmlDocument(String name, XmlDocument document);
 
 	/**
 	 * Create and load a transformer based on the given XSL File.
@@ -146,7 +154,7 @@ public interface IXmlService {
 	 * @param forceUniqueWicketIds
 	 * @return the transformer
 	 */
-	public IDOMTransformer loadXSLTransformer(String name, File xslFile,
+	IDOMTransformer loadXSLTransformer(String name, File xslFile,
 			boolean forceUniqueWicketIds, File... dependentFiles);
 
 	/**
@@ -158,7 +166,7 @@ public interface IXmlService {
 	 * @param forceUniqueWicketIds
 	 * @return the transformer
 	 */
-	public IDOMTransformer loadXSLTransformer(String name, String xslFile,
+	IDOMTransformer loadXSLTransformer(String name, String xslFile,
 			boolean forceUniqueWicketIds, String... dependentFiles);
 
 	/**
@@ -170,7 +178,7 @@ public interface IXmlService {
 	 * @param forceUniqueWicketIds
 	 * @return the transformer
 	 */
-	public IDOMTransformer loadXSLTransformer(String name, String xslFileName,
+	IDOMTransformer loadXSLTransformer(String name, String xslFileName,
 			boolean forceUniqueWicketIds);
 
 	/**
@@ -189,7 +197,7 @@ public interface IXmlService {
 	/**
 	 * Register the provided DOM Transformer under the name provided.
 	 */
-	public void registerTransformer(String name, IDOMTransformer transformer);
+	void registerTransformer(String name, IDOMTransformer transformer);
 
 	/**
 	 * Get transformed version of given XML, either from cache or by executing transform.
@@ -197,7 +205,7 @@ public interface IXmlService {
 	 * @param transformName
 	 * @return the transformed DOM Element.
 	 */
-	public TransformResult getTransformed(
+	TransformResult getTransformed(
 			ICacheableModel<? extends IXmlPointer> mXmlPtr, String transformName);
 
 	/**
@@ -208,11 +216,19 @@ public interface IXmlService {
 	 * @param transformName
 	 * @return the transformed DOM Element.
 	 */
-	public TransformResult getTransformed(
+	TransformResult getTransformed(
 			ICacheableModel<? extends IXmlPointer> mXmlPtr,
 			String transformName, TransformParameters params);
 
-	public void addNamespaceContext(String prefix, String uri);
+	/**
+	 * @param res
+	 * @return
+	 * 
+	 * This will return a string of the elements children.  Can be used to get the html content from a child/children.
+	 */
+	String serialize(Element res);
+
+	void addNamespaceContext(String prefix, String uri);
 
 	/**
 	 * Finds wicket nodes for a given element. This method either returns all of the 
@@ -223,8 +239,8 @@ public interface IXmlService {
 	 * @param all true, if searching the entire tree.  false, if just searching for the first wicket children.
 	 * @return
 	 */
-	public NodeList getWicketNodes(Element elt, boolean all);
+	NodeList getWicketNodes(Element elt, boolean all);
 
-	public File findTransformFile(String href);
+	File findTransformFile(String href);
 
 }

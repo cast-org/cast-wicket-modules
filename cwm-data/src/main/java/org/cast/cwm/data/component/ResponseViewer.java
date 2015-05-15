@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -23,11 +23,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
@@ -175,19 +172,18 @@ public class ResponseViewer extends Panel {
 			super.onBeforeRender();
 		}
 
-		@Override
 		public void renderHead(IHeaderResponse response) {
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js")));
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js")));
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js"))); // tabbing
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js")));
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js")));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
 
-			response.render(CssHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css")));
+			response.renderCSSReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available in the hidden text field make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', \"true\");");
-			response.render(OnDomReadyHeaderItem.forScript(jsString));			
+			response.renderOnDomReadyJavaScript(jsString);			
 		}
 	}
 

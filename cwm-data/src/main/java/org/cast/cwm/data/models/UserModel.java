@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,43 +19,38 @@
  */
 package org.cast.cwm.data.models;
 
-import org.apache.wicket.injection.Injector;
-import org.apache.wicket.model.AbstractPropertyModel;
-import org.apache.wicket.model.IModel;
+import net.databinder.models.hib.HibernateObjectModel;
+
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.ICwmSessionService;
+import org.cast.cwm.data.builders.UserCriteriaBuilder;
+import org.cast.cwm.service.UserService;
 
-import com.google.inject.Inject;
+public class UserModel extends HibernateObjectModel<User> {
 
-public class UserDisplayNameModel extends AbstractPropertyModel<String> {
-
-	@Inject
-	protected ICwmSessionService cwmSessionService;
-	
 	private static final long serialVersionUID = 1L;
+	private UserCriteriaBuilder criteria;
 	
-	public UserDisplayNameModel (IModel<User> mUser) {
-		super(mUser);
-		Injector.get().inject(this);
+	public UserModel() {
+		super(UserService.get().getUserClass());
+	}
+	
+	public UserModel(User user) {
+		super(user);
 	}
 
+	public UserModel(Long id) {
+		super(UserService.get().getUserClass(), id);
+	}
+	
+	public UserModel(UserCriteriaBuilder c) {
+		super(UserService.get().getUserClass(), c);
+		this.criteria = c;
+	}
+	
 	@Override
-	protected String propertyExpression() {
-		User user = cwmSessionService.getUser();
-		if (user == null)
-			return "username";
-		switch (user.getRole()) {
-		case ADMIN:
-		case RESEARCHER:
-			return "subjectId";
-		case TEACHER:
-			return "fullName";
-		case STUDENT:
-		case GUEST:
-			return "username";
-		default:
-			throw new IllegalArgumentException("Unknown role: " + user);
-		}
+	protected void onDetach() {
+		if (criteria != null)
+			criteria.detach();
+		super.onDetach();
 	}
-
 }

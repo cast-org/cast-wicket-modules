@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -84,7 +84,7 @@ public class UserContentLogPage extends AdminPage {
 	protected int numberOfSites;
 	protected String urlPrefix;
 	
-	protected static final long ITEMS_PER_PAGE = 50;
+	protected static final int ITEMS_PER_PAGE = 50;
 
 	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 	
@@ -97,12 +97,12 @@ public class UserContentLogPage extends AdminPage {
 		
 		List<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>> columns = makeColumns();
 		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
-		ArrayList<IColumn<AuditTriple<UserContent,DefaultRevisionEntity>,String>> colList 
-			= new ArrayList<IColumn<AuditTriple<UserContent,DefaultRevisionEntity>,String>>(columns);
-		DataTable<AuditTriple<UserContent,DefaultRevisionEntity>,String> table 
-			= new DataTable<AuditTriple<UserContent,DefaultRevisionEntity>,String>("table", colList, provider, ITEMS_PER_PAGE);
+		ArrayList<IColumn<AuditTriple<UserContent,DefaultRevisionEntity>>> colList 
+			= new ArrayList<IColumn<AuditTriple<UserContent,DefaultRevisionEntity>>>(columns);
+		DataTable<AuditTriple<UserContent,DefaultRevisionEntity>> table 
+			= new DataTable<AuditTriple<UserContent,DefaultRevisionEntity>>("table", colList, provider, ITEMS_PER_PAGE);
 
-		table.addTopToolbar(new HeadersToolbar<String>(table, provider));
+		table.addTopToolbar(new HeadersToolbar(table, provider));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No revisions found")));
 		add(table);
@@ -194,12 +194,11 @@ public class UserContentLogPage extends AdminPage {
 				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "info.revisionDate"), eventDateFormat));				
 			}
 
-			@Override
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
 				AuditTriple<UserContent, DefaultRevisionEntity> triple = rowModel.getObject();
 				DefaultRevisionEntity info = triple.getInfo();
 				Date revisionDate = info.getRevisionDate();
-				return new SimpleDateFormat(eventDateFormat).format(revisionDate);			
+				return new SimpleDateFormat(eventDateFormat).format(revisionDate);
 			}
 		});
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev Type", "type"));
@@ -227,7 +226,6 @@ public class UserContentLogPage extends AdminPage {
 					item.add(new EmptyPanel(componentId));										
 				}
 			}
-			@Override
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
 				if (uc.getDataType().getName().equals("TEXT")) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,7 +27,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -35,7 +34,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,6 +45,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Type;
 
 /**
@@ -68,9 +67,6 @@ import org.hibernate.annotations.Type;
 @Getter 
 @Setter
 @ToString(of={"id","type","lastUpdated"})
-@Table(indexes={
-		@Index(columnList="prompt_id, user_id", name="response_idx")
-})
 public class Response extends PersistedObject {
 
 	private static final long serialVersionUID = 1L;
@@ -79,10 +75,12 @@ public class Response extends PersistedObject {
 	@Setter(AccessLevel.NONE) 
 	private Long id;
 
-	@ManyToOne(fetch=FetchType.LAZY)
+	@Index(name="response_prompt_idx")
+	@ManyToOne
 	private Prompt prompt;
 	
-	@ManyToOne(optional=false, fetch=FetchType.LAZY)
+	@Index(name="response_user_idx")
+	@ManyToOne(optional=false)
 	private User user;
 	
 	@Type(type="org.cast.cwm.data.ResponseTypeHibernateType")
@@ -124,7 +122,7 @@ public class Response extends PersistedObject {
 	 */
 	private Integer sortOrder;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne
 	@Cascade(CascadeType.ALL)
 	private ResponseData responseData; // Latest Response Data
 	

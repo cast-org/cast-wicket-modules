@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -32,39 +32,11 @@ import org.hibernate.Session;
  *
  */
 public interface IDBService {
+	
+	public abstract Session getHibernateSession();
 
-	/**
-	 * Get the Hibernate session attached to the current thread.
-	 * @return the Hibernate session
-	 */
-	public Session getHibernateSession();
-
-	/**
-	 * Run the given SessionUnit in a thread with a Hibernate session.
-	 * See {@link net.databinder.hib.Databinder#ensureSession}
-	 * @param unit SessionUnit to be run
-	 * @return value returned by the SessionUnit
-	 */
-	public Object ensureHibernateSession(SessionUnit unit);
-
-	/**
-	 * Persist the given object into the database.
-	 *
-	 * @param persistableObject an object mapped to a database class
-	 * @return the saved object.  An identifier will have been generated.
-	 */
-	public Serializable save(Object persistableObject);
-
-	/**
-	 * Take an object that might be a Hibernate proxy, initialize lazy values and unwrap it from the proxy.
-	 * Useful since proxies are not necessarily <code>instanceof</code> the proper class.
-	 *
-	 * Taken from http://stackoverflow.com/questions/2216547/converting-hibernate-proxy-to-real-object .
-	 *
-	 * @param entity Hibernate proxy object (or something that might be one)
-	 * @param <T> can be of any type.
-	 * @return the initialized "real" object represented by the proxy.
-	 */
-	public <T> T initializeAndUnproxy(T entity);
+	public abstract Object ensureHibernateSession(SessionUnit unit);
+	
+	public abstract Serializable save(Object persistableObject);
 
 }

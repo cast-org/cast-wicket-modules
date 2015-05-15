@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,11 +22,11 @@ package org.cast.cwm.xml.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.cast.cwm.xml.handler.DefaultDynamicComponentHandler;
 import org.cast.cwm.xml.handler.IDynamicComponentHandler;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * A  basic Component Resolver which can be constructed with a default handler and a list of handlers.
@@ -63,7 +63,6 @@ public class BaseDynamicComponentResolver implements IDynamicComponentResolver {
 		getHandlers().add(handler);
 	}
 
-	@Override
 	public IDynamicComponentHandler getHandler(String wicketId) {
 		for (IDynamicComponentHandler handler: getHandlers()) {
 			if (handler.canHandle(wicketId))

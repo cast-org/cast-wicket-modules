@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -41,17 +41,6 @@ public interface IUserPreferenceService {
 	 * @return booleanValue
 	 */
 	public Boolean getUserPreferenceBoolean(IModel<User> mUser, String name);
-	
-	/**
-	 * Get the boolean-valued user preference, with a specified default value.
-	 * If no preference exists in the database, the given default will be returned.
-	 * 
-	 * @param mUser
-	 * @param identifier
-	 * @param defaultValue
-	 * @return boolean value
-	 */
-	public boolean getUserPreferenceBoolean(IModel<User> mUser, String name, boolean defaultValue);
 
 	/**
 	 * Set the string-valued user preference.  Create it if it doesn't exist.
@@ -68,18 +57,4 @@ public interface IUserPreferenceService {
 	 * @param identifier
 	 * @return string value
 	 */
-	public String getUserPreferenceString(IModel<User> mUser, String name);
-	
-	/**
-	 * Get the string-valued user preference, with the specified default value.
-	 * If no preference exists in the database, the given default will be returned.
-	 * 
-	 * @param mUser
-	 * @param identifier
-	 * @param defaultValue
-	 * @return string value
-	 */
-	public String getUserPreferenceString(IModel<User> mUser, String name, String defaultValue);
-
-
-}
+	public String getUserPreferenceString(IModel<User> mUser, String name);}

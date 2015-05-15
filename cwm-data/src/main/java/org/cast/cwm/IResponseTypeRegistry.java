@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -46,7 +46,6 @@ public interface IResponseTypeRegistry {
 	 * 
 	 * @param name a String name used as lookup key
 	 * @return the associated response type
-	 * @throws IllegalArgumentException if the name is not a registered IResponseType
 	 */
 	IResponseType getResponseType(String name);
 

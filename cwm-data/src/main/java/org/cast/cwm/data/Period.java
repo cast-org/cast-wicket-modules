@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -37,7 +37,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.SortNatural;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.envers.Audited;
 
 /**
@@ -75,7 +76,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	private String name;
 	
 	@ManyToMany(mappedBy="periods")
-	@SortNatural
+	@Sort(type=SortType.NATURAL)
 	private SortedSet<User> users = new TreeSet<User>();
 	
 	public Period() { /* No Arg Constructor for the datastore */ }
@@ -106,7 +107,6 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 * This function is careful to avoid NPEs and avoids returning 0 for two 
 	 * Periods that have different IDs.
 	 */
-	@Override
 	public int compareTo(Period other) {
 		if (other == null)
 			return 1;

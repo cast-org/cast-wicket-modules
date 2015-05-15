@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,10 +21,8 @@ package org.cast.cwm.mediaplayer;
 
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -56,7 +54,6 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	
 	protected int width;
 	protected int height;
-	protected String aspectRatio;  // ww:hh  width followed by height
 	protected String markupId;
 	protected String videoHRef = null;
 	protected String previewHRef = null;
@@ -67,7 +64,6 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 	protected boolean showDownloadLink = false;
 	protected boolean useOnPlay = false;
 	protected boolean fullScreen = false;
-	protected boolean responsive = false;
 	protected String stopString = "jwplayer().stop();";
 	protected String fallbackText = "Click to watch video";
 	protected String downloadText = "Download video";
@@ -92,12 +88,7 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		this.height = height;
 		setOutputMarkupId(true);
 		markupId = getMarkupId();
-	}
-
-	@Override
-	protected void onBeforeRender() {
 		addComponents();		
-		super.onBeforeRender();
 	}
 
 	public String getFlashHRef() {
@@ -160,39 +151,30 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 //		link.add(new Image("button", new ResourceReference(MediaPlayerPanel.class, "download_arrow.png")));
 //		link.add(new Label("text", new PropertyModel<String>(this, "downloadText")));
 		
-		if (useOnPlay) {
-			playResponse = new AbstractDefaultAjaxBehavior() {
-				private static final long serialVersionUID = 1L;
+		playResponse = new AbstractDefaultAjaxBehavior() {
+			private static final long serialVersionUID = 1L;
 
-				@Override
-				protected void respond(AjaxRequestTarget target) {
-					if (useOnPlay) {
-						StringValue status = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("status");
-						onPlay(status.toString(""));
-					}
-				}
-			};
-			add(playResponse);			
-		}
+			@Override
+			protected void respond(AjaxRequestTarget target) {
+				StringValue status = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("status");
+				if (useOnPlay)
+					onPlay(status.toString(""));
+			}
+		};
+		add(playResponse);
 	}
 
-	@Override
 	public void renderHead(IHeaderResponse r) {
 
-		r.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js")));
+		r.renderJavaScriptReference(new PackageResourceReference(MediaPlayerPanel.class, "jwplayer.js"));
 
 		StringBuffer jsString = new StringBuffer();
 		jsString.append("jwplayer(" + "\"" + getMarkupId() + "\").setup({" +
 				"flashplayer: " + "\"" + getFlashHRef() + "\", " +
-				"file: " + "\"" + getVideoHRef() +"\""
-				);
+				"file: " + "\"" + getVideoHRef() +"\", " +
+				"height: " + String.valueOf(getHeight()) + ", " +
+				"width: " + String.valueOf(getWidth()));
 
-		if (isResponsive()) {
-			jsString.append(", " + "aspectratio: " + "\"" + aspectRatio + "\"");
-			jsString.append(", " + "width: " + "\"" +"100%" + "\" ");
-		} else {
-			jsString.append(", " + "height: " + String.valueOf(getHeight()) + ", " + "width: " + String.valueOf(getWidth()));
-		}
 		if (!Strings.isEmpty(previewHRef))
 			jsString.append(", " + "image: " + "\"" + previewHRef +  "\"");
 		
@@ -218,10 +200,10 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		jsString.append("}"); // end plugins
 
 		jsString.append("});"); // end setup
-		r.render(OnDomReadyHeaderItem.forScript(jsString.toString()));
+		r.renderOnDomReadyJavaScript(jsString.toString());
 		
 		if (useOnPlay) {
-			r.render(OnDomReadyHeaderItem.forScript(getEventScript()));
+			r.renderOnDomReadyJavaScript(getEventScript());
 		}
 	}
 	
@@ -234,19 +216,19 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 				"			status = 'resume'; } " +
 				"	   else {" +
 				"      		status = 'play';\n };" +
-				"      Wicket.Ajax.get({u:url, ep:{ status: status}});\n" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
 				" 	});\n" +
 
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onPause(function() {" +
 				"      status = 'paused';\n "  +
-				"      Wicket.Ajax.get({u:url, ep:{status: status}});\n" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
 				" 	});\n" +
 
 				"	jwplayer(" + "\"" + getMarkupId() + "\").onComplete(function() {" +
 				"      status = 'completed';\n "  +
-				"      Wicket.Ajax.get({u:url, ep:{status: status}});\n" +
+				"      wicketAjaxGet(url + '&status=' + status, function() {}, function() {});\n" +
 				" 	});\n";
-		return jsString;
+		return jsString;		
 	}
 
 	
@@ -298,24 +280,12 @@ public class MediaPlayerPanel extends Panel implements IHeaderContributor {
 		this.height = height;
 	}
 
-	public void setAspectRatio(String aspectRatio) {
-		this.aspectRatio = aspectRatio;
-	}
-
 	public boolean isFullScreen() {
 		return fullScreen;
 	}
 
 	public void setFullScreen(boolean fullScreen) {
 		this.fullScreen = fullScreen;
-	}
-
-	public boolean isResponsive() {
-		return responsive;
-	}
-
-	public void setResponsive(boolean responsive) {
-		this.responsive = responsive;
 	}
 
 	public String getVideoHRef() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -33,7 +33,6 @@ public class ImageComponentHandler extends BaseDynamicComponentHandler implement
 		super(prefix);
 	}
 
-	@Override
 	public Component getComponent(String wicketId, Element element,
 			IRelativeLinkSource linkSource, IModel<? extends IXmlPointer> secMod) {
 		String src = element.getAttributeNS(null, "src");

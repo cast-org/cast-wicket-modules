@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -30,9 +30,8 @@ import org.apache.wicket.SharedResources;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.MarkupStream;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.ContextRelativeResource;
@@ -212,7 +211,6 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	// Look for a file beginning with the given prefix in the given folder.
 	private File findMatchingFile (Folder folder, final String prefix) {
 		File[] options = folder.listFiles(new FilenameFilter() {
-			@Override
 			public boolean accept(File dir, String file) {
 				return (file.startsWith(prefix));
 			}
@@ -328,8 +326,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 		final IValueMap tagAttributes = tag.getAttributes();
 		appletAttributes.putAll(tagAttributes);
 		tagAttributes.clear();
-		AjaxRequestTarget target = getRequestCycle().find(AjaxRequestTarget.class);
-		if (target == null) {
+		if (AjaxRequestTarget.get() == null) {
 			tag.setName("script");
 			tagAttributes.put("type", "text/javascript");
 		} else {
@@ -349,8 +346,7 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	public void onComponentTagBody(MarkupStream markupStream, ComponentTag openTag) {
 
 		// If this is being directly rendered, use Sun's Deployment Toolkit.
-		AjaxRequestTarget target = getRequestCycle().find(AjaxRequestTarget.class);
-		if (target == null) {
+		if (AjaxRequestTarget.get() == null) {
 			final StringBuilder deployScript = new StringBuilder();
 			if (appletAttributes.size() > 0) {
 				deployScript.append("var attributes = {");
@@ -396,10 +392,8 @@ public class DeployJava extends WebComponent implements IHeaderContributor {
 	 *
 	 * @param response Header response.
 	 */
-	@Override
 	public void renderHead(IHeaderResponse response) {
-		AjaxRequestTarget target = getRequestCycle().find(AjaxRequestTarget.class);
-		if (target == null)
-			response.render(JavaScriptHeaderItem.forUrl(JAVASCRIPT_URL));
+		if (AjaxRequestTarget.get() == null)
+			response.renderJavaScriptReference(JAVASCRIPT_URL);
 	}
 }

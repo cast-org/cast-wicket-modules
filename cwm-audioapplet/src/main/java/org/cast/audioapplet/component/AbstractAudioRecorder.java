@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,9 +27,8 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
@@ -152,16 +151,15 @@ public abstract class AbstractAudioRecorder extends AudioPlayer implements IHead
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
-		response.render(JavaScriptHeaderItem.forScript("function save_" + getMarkupId() + "() {" +
-				"Wicket.Ajax.get({u:'" + notifyBehavior.getCallbackUrl() + "'}); }", 
-				"save_" + getMarkupId()));
+		response.renderJavaScript("function save_" + getMarkupId() + "() {" +
+				"wicketAjaxGet('" + notifyBehavior.getCallbackUrl() + "'); }", 
+				"save_" + getMarkupId());
 	}
 
 	class AudioFileSaveAjaxBehavior extends AbstractAjaxBehavior {
 
 		private static final long serialVersionUID = 1L;
 
-		@Override
 		public void onRequest() {
 			// TODO - rewritten.. does this work??
 			

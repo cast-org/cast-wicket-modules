@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.search;
+package org.cast.cwm.wami;
 
 /**
- * Hibernate-search related service methods.
- * 
+ * Indicates a component that supports the wami audio recorder by having a WamiAppletHolder on the page.
+ * Use of this interface is not required may be convenient for early detection of cases where the holder has
+ * been omitted.
+ *  
  * @author bgoldowsky
  *
  */
-public interface ISearchService {
-	
-	/**
-	 * Add or update the object in the search index.
-	 * Hibernate Search automatically updates the index when changes are committed to an object,
-	 * so this is not normally needed.  However, you may need it if you have index fields based on
-	 * getter methods, and you know that the value returned by the getter will have changed 
-	 * even though no changes have been made to the object itself.
-	 *  
-	 * @param object
-	 */
-	public void indexObject (Object object);
+public interface IWamiSupportingComponent {
 
+	public WamiAppletHolder getWamiAppletHolder();
+	
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -38,7 +38,6 @@ public abstract class BaseDynamicComponentHandler  implements IDynamicComponentH
 		this.prefix = prefix;
 	}
 
-	@Override
 	public boolean canHandle(String wicketId) {
 		return wicketId.startsWith(prefix);
 	}

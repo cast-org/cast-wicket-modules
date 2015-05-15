@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -44,7 +44,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#confirmDatastoreModel(org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public void confirmDatastoreModel(IModel<? extends PersistedObject> objectModel) {
 		if ((objectModel instanceof IChainingModel && !(((IChainingModel<? extends PersistedObject>) objectModel).getChainedModel() instanceof HibernateObjectModel))
 				&& !(objectModel instanceof HibernateObjectModel))
@@ -54,7 +53,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#getById(java.lang.Class, long)
 	 */
-	@Override
 	public <T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id) {
 		return new HibernateObjectModel<T>(clazz, id);
 	}
@@ -62,7 +60,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#save(org.cast.cwm.data.PersistedObject)
 	 */
-	@Override
 	public void save(PersistedObject object) {
 		Databinder.getHibernateSession().save(object);
 	}
@@ -70,7 +67,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#delete(org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public void delete(IModel<? extends PersistedObject> objectModel) {
 		confirmDatastoreModel(objectModel);
 		Databinder.getHibernateSession().delete(objectModel.getObject());
@@ -78,18 +74,8 @@ public class CwmService implements ICwmService {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#delete(org.cast.cwm.data.PersistedObject)
-	 */
-	@Override
-	public void delete(PersistedObject object) {
-		Databinder.getHibernateSession().delete(object);
-		flushChanges();
-	}
-	
-	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#flushChanges()
 	 */
-	@Override
 	public void flushChanges() {
 		flushChanges(false);
 	}
@@ -97,7 +83,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#flushChanges(boolean)
 	 */
-	@Override
 	public void flushChanges(boolean catchErrors) {
 		
 		Session session = Databinder.getHibernateSession();
@@ -106,9 +91,9 @@ public class CwmService implements ICwmService {
 			session.getTransaction().commit();
 			
 		} catch (HibernateException ex) {
-			session.getTransaction().rollback();
 			if (catchErrors) {
 				// Note: Hibernate Logging will often print the stack trace anyways
+				session.getTransaction().rollback();
 				log.info("Ignored exception during commit: {}", ex.getMessage());
 			} else {
 				throw ex;
@@ -121,7 +106,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#getInitializationNames()
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public List<String> getInitializationNames() {
 		Criteria criteria = Databinder.getHibernateSession().createCriteria(Initialization.class);
@@ -132,7 +116,6 @@ public class CwmService implements ICwmService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#saveInitialization(org.cast.cwm.data.init.IDatabaseInitializer)
 	 */
-	@Override
 	public void saveInitialization (IDatabaseInitializer izer) {
 		Initialization init = new Initialization();
 		init.setName(izer.getName());

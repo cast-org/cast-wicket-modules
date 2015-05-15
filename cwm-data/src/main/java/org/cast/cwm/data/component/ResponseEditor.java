@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,16 +35,13 @@ import lombok.Setter;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.attributes.AjaxCallListener;
-import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
+import org.apache.wicket.ajax.IAjaxCallDecorator;
+import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -336,7 +333,7 @@ public abstract class ResponseEditor extends Panel {
 						super.renderHead(c, response);
 						// Ensure TinyMCE saves to form before we check to see if the form changed.
 						if (useWysiwyg)
-							response.render(JavaScriptHeaderItem.forScript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave"));
+							response.renderJavaScript("AutoSaver.addOnBeforeSaveCallBack(function() {tinyMCE.triggerSave();});", "tinyMCEAutoSave");					
 					}
 
 					@Override
@@ -431,27 +428,29 @@ public abstract class ResponseEditor extends Panel {
 				}
 
 				@Override
-				protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-					super.updateAjaxAttributes(attributes);
-					// Call the Javascript to actually add the sentence starter into the text area. 
-				    AjaxCallListener adder = new AjaxCallListener() {
-				        private static final long serialVersionUID = 1L;
-						@Override
-				        public CharSequence getBeforeSendHandler(Component component) {
+				protected IAjaxCallDecorator getAjaxCallDecorator() {
+					return new AjaxCallDecorator() {
+						private static final long serialVersionUID = 1L;
+						public CharSequence decorateScript(Component c, CharSequence script) {
+							// The Javascript to actually add the sentence starter into the text area. 
+							String adder;
 							if (useWysiwyg)
-								return String.format("tinyMCE.get('%s').setContent(tinyMCE.get('%s').getContent() + $('#%s').val());",
+								adder = String.format("tinyMCE.get('%s').setContent(tinyMCE.get('%s').getContent() + $('#%s').val());",
 										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
 							else
-								return String.format("$('#%s').val($('#%s').val() + $('#%s').val());",
+								adder = String.format("$('#%s').val($('#%s').val() + $('#%s').val());",
 										textArea.getMarkupId(), textArea.getMarkupId(), choiceList.getMarkupId(true));
-				        }
-				    };
-				    attributes.getAjaxCallListeners().add(adder);
+
+							return adder + script; 
+						}						
+					};
 				}
 			};
 			add(addStarterLink);
 			
-			// label is linked to the sentence starter dropdown		
+			// add the sentence starter chosen to the text area response
+
+	         // label is linked to the sentence starter dropdown		
 			FormComponentLabel choiceListLabel = (new FormComponentLabel("sentenceStartersLabel", choiceList));
 			add(choiceListLabel);
 		}
@@ -472,7 +471,6 @@ public abstract class ResponseEditor extends Panel {
 		private class SentenceStarterRenderer implements IChoiceRenderer<String> {
 			private static final long serialVersionUID = 1L;
 
-			@Override
 			public String getDisplayValue(String object) {
 				if ("default".equals(object))
 					return new StringResourceModel("sentenceStarters.null", null, "Choose a Sentence Starter").getString();
@@ -480,7 +478,6 @@ public abstract class ResponseEditor extends Panel {
 					return object;
 			}
 
-			@Override
 			public String getIdValue(String object, int index) {
 				if ("default".equals(object))
 					return " ";
@@ -565,7 +562,7 @@ public abstract class ResponseEditor extends Panel {
 						// Autosave will then submit the form to store the text area back to the db
 						String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
 						String script = "AutoSaver.addOnBeforeSaveCallBack(function() { " + jsString + "});";
-						response.render(JavaScriptHeaderItem.forScript(script, "interactiveAutosave-" + textAreaMarkupId));
+						response.renderJavaScript(script, "interactiveAutosave-" + textAreaMarkupId);					
 					}
 
 					@Override
@@ -581,17 +578,17 @@ public abstract class ResponseEditor extends Panel {
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-					super.updateAjaxAttributes(attributes);
-				    AjaxCallListener exporter = new AjaxCallListener() {
-				        private static final long serialVersionUID = 1L;
+				protected IAjaxCallDecorator getAjaxCallDecorator() {
+					return new DisablingAjaxCallDecorator(getComponents()) {
+						private static final long serialVersionUID = 1L;
+
 						@Override
-				        public CharSequence getBeforeSendHandler(Component component) {
-							// this is what needs to be called right before the submit - send the table value to the hidden text field
-							return "cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");";
+						// this is what needs to be called right before the submit - send the table value to the hidden text field
+						public CharSequence decorateScript(Component c, CharSequence script) {
+							String jsString = new String("cwmExportGrid(" + "\"" + textAreaMarkupId + "\", \"" + divMarkupId + "\");");
+							return jsString + super.decorateScript(c, script);
 						}
 					};
-					attributes.getAjaxCallListeners().add(exporter);
 				}
 
 				@Override
@@ -712,19 +709,18 @@ public abstract class ResponseEditor extends Panel {
 			super.onBeforeRender();
 		}
 
-		@Override
 		public void renderHead(IHeaderResponse response) {		
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js")));
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js")));
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js"))); // tabbing
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js")));
-			response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js")));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_renderers.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_editors.js")); // tabbing
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_utils.js"));
+			response.renderJavaScriptReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid_cast.js"));
 
-			response.render(CssHeaderItem.forReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css")));
+			response.renderCSSReference(new PackageResourceReference(ResponseEditor.class, "editablegrid/editablegrid.css"));
 
 			// once the text for the grid is available via the url make this js call 
 			String jsString = new String("cwmImportGrid(" + "\'" + divMarkupId + "\', \'"   + tableUrl + "\', 'false');");
-			response.render(OnDomReadyHeaderItem.forScript(jsString));
+			response.renderOnDomReadyJavaScript(jsString);
 		}
 	}
 
@@ -890,7 +886,7 @@ public abstract class ResponseEditor extends Panel {
 							"AutoSaver.addOnBeforeSaveCallBack(function() { " +
 							"   $('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString()));" +
 							"});";
-						response.render(JavaScriptHeaderItem.forScript(script, "SvgEditorAutosave-" + svg.getMarkupId()));
+						response.renderJavaScript(script, "SvgEditorAutosave-" + svg.getMarkupId());					
 					}
 
 					@Override
@@ -916,18 +912,18 @@ public abstract class ResponseEditor extends Panel {
 				protected void onError(AjaxRequestTarget target, Form<?> form) {
 					target.add(feedbackPanel);
 				}
-
+					
 				@Override
-				protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-					super.updateAjaxAttributes(attributes);
-				    AjaxCallListener svgExporter = new AjaxCallListener() {
-				        private static final long serialVersionUID = 1L;
+				protected IAjaxCallDecorator getAjaxCallDecorator() {
+					return new DisablingAjaxCallDecorator(getComponents()) {
+						
+						private static final long serialVersionUID = 1L;
+
 						@Override
-				        public CharSequence getBeforeSendHandler(Component component) {
-							return "$('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString())); ";
+						public CharSequence decorateScript(Component c, CharSequence script) {
+							return "$('#" + svg.getMarkupId() + "').val(unescape($('#" + frame.getMarkupId() + "').get(0).contentDocument.svgCanvas.getSvgString())); " + super.decorateScript(c, script);
 						}
 					};
-					attributes.getAjaxCallListeners().add(svgExporter);
 				}
 
 				@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -29,7 +29,6 @@ import lombok.ToString;
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
@@ -47,7 +46,6 @@ public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLin
 		file = f;
 	}
 	
-	@Override
 	public InputStream getInputStream () throws InputStreamNotFoundException { 
 		try {
 			return new FileInputStream(file);
@@ -56,17 +54,6 @@ public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLin
 		}
 	}
 
-	@Override
-	public InputStream getInputStream(String relativePath)
-			throws InputStreamNotFoundException {
-		try {
-			return getRelativeResource(relativePath).getResourceStream().getInputStream();
-		} catch (ResourceStreamNotFoundException e) {
-			throw new InputStreamNotFoundException(e);
-		}
-	}
-
-	@Override
 	public Time lastModifiedTime() {
 		return file.lastModifiedTime();
 	}
@@ -84,7 +71,6 @@ public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLin
 	 * @param relativePath path relative to the path of this Resource
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
-	@Override
 	public ResourceReference getRelativeReference (final String relativePath) {
 		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
 		return new ResourceReference(FileXmlDocumentSource.class, filePath) {
@@ -95,5 +81,6 @@ public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLin
 			}
 		};
 	}
+
 
 }

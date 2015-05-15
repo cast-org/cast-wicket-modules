@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,12 @@
  */
 package org.cast.cwm;
 
-import java.io.InputStream;
-
 import org.apache.wicket.request.resource.ResourceReference;
 
 /**
  * An object (typically a Resource) that can be used to locate resources via relative links.
  * This is used eg for XML files that contain links to images.  These relative links can be
- * used to obtain a ResourceReference or InputStream for those images.
+ * used to obtain a Resource or ResourceReference for those images.
  *
  * @author bgoldowsky
  *
@@ -34,8 +32,5 @@ import org.apache.wicket.request.resource.ResourceReference;
 public interface IRelativeLinkSource {
 
 	public ResourceReference getRelativeReference (String relativePath);
-	
-	public InputStream getInputStream (String relativePath) 
-			throws InputStreamNotFoundException;
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,16 +26,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
-import org.cast.cwm.xml.service.IXmlService;
+import org.cast.cwm.xml.service.XmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.google.inject.Inject;
 
 /**
  * <p>
@@ -58,16 +55,8 @@ public class FilterElements implements IDOMTransformer, Serializable {
 	
 	private static final XPathFactory factory = XPathFactory.newInstance();
 	
-	@Inject
-	IXmlService xmlService;
-	
 	private static final Logger log = LoggerFactory.getLogger(FilterElements.class);
 
-	public FilterElements() {
-		Injector.get().inject(this);
-	}
-	
-	@Override
 	public Element applyTransform(Element n, TransformParameters params) {
 		
 		// Check to see if we need to apply the transform
@@ -79,7 +68,7 @@ public class FilterElements implements IDOMTransformer, Serializable {
 			synchronized(factory) {  // XPathFactory is not thread-safe
 				xPath = factory.newXPath();
 			}
-			xPath.setNamespaceContext(xmlService.getNamespaceContext());
+			xPath.setNamespaceContext(XmlService.get().getNamespaceContext());
 			NodeList keep = (NodeList) xPath.evaluate((String) params.get(XPATH), n, XPathConstants.NODESET);
 
 			log.trace("FilterElements using {} found {} nodes", params.get(XPATH), keep.getLength());
@@ -120,7 +109,6 @@ public class FilterElements implements IDOMTransformer, Serializable {
 		return null;
 	}
 
-	@Override
 	public Time getLastModified(TransformParameters params) {
 		return null;  // this transformation will not change over time.
 	}

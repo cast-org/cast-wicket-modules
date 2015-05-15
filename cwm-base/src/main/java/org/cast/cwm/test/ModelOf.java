@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -34,7 +34,6 @@ public class ModelOf<T> extends BaseMatcher<IModel<T>> {
         object = modelArg;
     }
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public boolean matches(Object item) {
 		if (!(item instanceof IModel))
@@ -43,7 +42,6 @@ public class ModelOf<T> extends BaseMatcher<IModel<T>> {
 		return equalMatcher.matches(((IModel<T>) item).getObject());
 	}
 
-	@Override
 	public void describeTo(Description description) {
 		description.appendText("model containing ");
 		description.appendValue(object);

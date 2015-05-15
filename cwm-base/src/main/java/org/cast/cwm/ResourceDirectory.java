@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.html.IPackageResourceGuard;
-import org.apache.wicket.request.http.WebResponse;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.PackageResource.PackageResourceBlockedException;
 import org.apache.wicket.util.file.File;
@@ -34,7 +32,7 @@ import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
-import org.apache.wicket.util.time.Duration;
+import org.apache.wicket.util.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +40,9 @@ import org.slf4j.LoggerFactory;
  * <p>Represents a directory in which all of the files can be used as resources
  * (eg, images). Which file to send in response to a particular request is based
  * on the URL, which is appended to the given resource directory path.
- *
+ * If there is an extra prefix in the URL that should <em>not</em> be used in the
+ * path name, it can be specified as a second argument to the constructor.</p>
+ * 
  * <p>See {@link ResourceDirectoryReference} for usage examples.</p>
 
  * <p>The installed PackageResourceGuard will be checked to make sure the file is
@@ -60,24 +60,27 @@ import org.slf4j.LoggerFactory;
 public class ResourceDirectory extends AbstractResource {
 	private static final Logger log = LoggerFactory.getLogger(ResourceDirectory.class);
 
-	private static final Duration DEFAULT_CACHE_DURATION = Duration.hours(1);
-
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The path to the directory of resources
 	 */
-	private final File sourceDirectory;
+	private final File resourceDirectory;
 	
-	private Duration cacheDuration = DEFAULT_CACHE_DURATION;
+	private final String removePrefix;
 
 	/**
 	 * Construct a with a given directory of resource files.
 	 * 
-	 * @param directory the directory containing public files
+	 * @param directory
 	 */
 	public ResourceDirectory(File directory) {
-		this.sourceDirectory = directory;
+		this(directory, "");
+	}
+	
+	public ResourceDirectory(File directory, String removePrefix) {
+		this.resourceDirectory = directory;
+		this.removePrefix = removePrefix;
 	}
 
 	/**
@@ -89,17 +92,14 @@ public class ResourceDirectory extends AbstractResource {
 	 */
 	@Override
 	protected ResourceResponse newResourceResponse(Attributes attributes) {
-		String relativePath = "";
-		PageParameters parameters = attributes.getParameters();
-		for (int i=0; i< parameters.getIndexedCount(); i++) {
-			relativePath += parameters.get(i);
-			relativePath += '/';
+		String relativePath = attributes.getRequest().getUrl().toString();
+		if (relativePath.startsWith(removePrefix)) {
+			relativePath = relativePath.substring(removePrefix.length());
+		} else {
+			return sendResourceError(relativePath, null,
+					HttpServletResponse.SC_NOT_FOUND, "URL does not start with expected prefix");			
 		}
-		if (relativePath.endsWith("/"))
-			relativePath = relativePath.substring(0, relativePath.length()-1);
-		log.debug("relativePath is {}", relativePath);
-
-		String absolutePath = new File(sourceDirectory, relativePath)
+		String absolutePath = new File(resourceDirectory, relativePath)
 				.getAbsolutePath();
 
 		final ResourceResponse resourceResponse = new ResourceResponse();
@@ -112,12 +112,10 @@ public class ResourceDirectory extends AbstractResource {
 					HttpServletResponse.SC_NOT_FOUND, "Unable to find resource");
 		}
 
-		// allow caching
-		resourceResponse.setCacheScope(WebResponse.CacheScope.PUBLIC);
-		resourceResponse.setCacheDuration(cacheDuration);
-
 		// add Last-Modified header (to support HEAD requests and If-Modified-Since)
-		resourceResponse.setLastModified(resourceStream.lastModifiedTime());
+		final Time lastModified = resourceStream.lastModifiedTime();
+
+		resourceResponse.setLastModified(lastModified);
 
 		if (resourceResponse.dataNeedsToBeWritten(attributes)) {
 			String contentType = resourceStream.getContentType();
@@ -193,7 +191,7 @@ public class ResourceDirectory extends AbstractResource {
 	 * @return resource stream or <code>null</code> if not found
 	 */
 	public IResourceStream getResourceStream(String absolutePath) {
-		if (!accept(Application.class, absolutePath)) {
+		if (accept(Application.class, absolutePath) == false) {
 			throw new PackageResourceBlockedException(
 					"Access denied to (static) package resource "
 							+ absolutePath + ". See IPackageResourceGuard");
@@ -217,7 +215,10 @@ public class ResourceDirectory extends AbstractResource {
 
 	@Override
 	public String toString() {
-		return "[" + getClass().getSimpleName() + ' ' + "dir = " + sourceDirectory + ']';
+		final StringBuilder result = new StringBuilder();
+		result.append('[').append(getClass().getSimpleName()).append(' ')
+				.append("dir = ").append(resourceDirectory).append(']');
+		return result.toString();
 	}
 
 	@Override
@@ -226,7 +227,7 @@ public class ResourceDirectory extends AbstractResource {
 		int result = 1;
 		result = prime
 				* result
-				+ ((sourceDirectory == null) ? 0 : sourceDirectory
+				+ ((resourceDirectory == null) ? 0 : resourceDirectory
 						.hashCode());
 		return result;
 	}
@@ -240,21 +241,13 @@ public class ResourceDirectory extends AbstractResource {
 		if (getClass() != obj.getClass())
 			return false;
 		ResourceDirectory other = (ResourceDirectory) obj;
-		if (sourceDirectory == null) {
-			if (other.sourceDirectory != null)
+		if (resourceDirectory == null) {
+			if (other.resourceDirectory != null)
 				return false;
-		} else if (!sourceDirectory.equals(other.sourceDirectory))
+		} else if (!resourceDirectory.equals(other.resourceDirectory))
 			return false;
 
 		return true;
-	}
-
-	public Duration getCacheDuration() {
-		return cacheDuration;
-	}
-
-	public void setCacheDuration(Duration cacheDuration) {
-		this.cacheDuration = cacheDuration;
 	}
 
 }

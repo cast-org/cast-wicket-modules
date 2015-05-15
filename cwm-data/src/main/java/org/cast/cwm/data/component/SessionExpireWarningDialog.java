@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,10 +26,8 @@ import net.databinder.auth.AuthDataSessionBase;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -155,7 +153,9 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			cwmService.flushChanges();
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();
-			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters().set("expired", "true"));
+			PageParameters pageParameters = new PageParameters();
+			pageParameters.add("expired", "true");
+			setResponsePage(CwmApplication.get().getSignInPageClass(), pageParameters);
 		
 		// We're not signed in; redirect to home because page is no longer functional
 		} else {
@@ -163,7 +163,6 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		}			
 	}
 
-	@Override
 	public void renderHead(IHeaderResponse response) {
 		if (warningTime <= responseTime) {
 			throw new IllegalStateException("Warning time must be greater than response time.");
@@ -173,15 +172,15 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 			throw new IllegalStateException("Warning time must be less than session time.");
 		}
 
-		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
-
+		response.renderJavaScriptReference(JAVASCRIPT_REFERENCE);
+		
 		// initialize the warning js by calling SessionExpireWarning.init with the following params
 		//	sessionLength - length, in seconds, of the HttpSession
 		//	warningTime - time, in seconds, before HttpSession ends to trigger a warning
 		//	warningCallbackFunction - function that is triggered to warn the user of impending session expiration
 		//	responseTime - time, in seconds, the user has to respond to the warning
 		//	inactiveCallbackFunction - function that is triggered if the user does not respond to warning
-		
+
 		StringBuffer script = new StringBuffer();
 		script.append("SessionExpireWarning.init(");
 		script.append(CwmApplication.get().getSessionTimeout() + ", ");
@@ -190,11 +189,11 @@ public class SessionExpireWarningDialog extends Panel implements IHeaderContribu
 		script.append(responseTime + ", ");
 		script.append("function() { ");
 		script.append(getBeforeInactiveTimeoutJavaScript());
-		script.append("Wicket.Ajax.get({u:'" + inactiveBehavior.getCallbackUrl() + "'}); ");
+		script.append("wicketAjaxGet('" + inactiveBehavior.getCallbackUrl() + "'); ");
 		script.append("}");
 		script.append(");"); 
 		
-		response.render(OnDomReadyHeaderItem.forScript(script.toString()));
+		response.renderOnDomReadyJavaScript(script.toString());
 	}
 	
 	protected String getBeforeInactiveTimeoutJavaScript() {

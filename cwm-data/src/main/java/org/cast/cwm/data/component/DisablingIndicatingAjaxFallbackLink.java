@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,9 +22,12 @@ package org.cast.cwm.data.component;
 import java.util.Collection;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
+import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxFallbackLink;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.JQueryHeaderContributor;
 
 /**
  * An instance of {@link IndicatingAjaxFallbackLink} that can disable components during
@@ -34,7 +37,7 @@ import org.apache.wicket.model.IModel;
  *
  * @param <T>
  */
-public abstract class DisablingIndicatingAjaxFallbackLink<T> extends IndicatingAjaxFallbackLink<T> {
+public abstract class DisablingIndicatingAjaxFallbackLink<T> extends IndicatingAjaxFallbackLink<T> implements IHeaderContributor {
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,9 +50,13 @@ public abstract class DisablingIndicatingAjaxFallbackLink<T> extends IndicatingA
 	}
 	
 	@Override
-	protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
-		super.updateAjaxAttributes(attributes);
-		attributes.getAjaxCallListeners().add(new DisablingAjaxCallListener());
+	protected IAjaxCallDecorator getAjaxCallDecorator() {
+		return new DisablingAjaxCallDecorator(getComponents());
+	}
+	
+	public void renderHead(final IHeaderResponse response) {
+		new JQueryHeaderContributor().renderHead(response);
+		response.renderJavaScriptReference(DisablingAjaxCallDecorator.getJSResourceReference());
 	}
 	
 	/**

@@ -25,8 +25,9 @@ import net.databinder.DataApplicationBase;
 
 import org.apache.wicket.WicketRuntimeException;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 /**
  * Optional Databinder base Application class for configuration and session management. 
@@ -90,14 +91,14 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * through configureHibernate methods.
 	 * @param key session factory key; the default key is null
 	 * @param config annotation conifuration
-	 * @see #configureHibernateEssentials(Configuration)
-	 * @see #configureHibernate(Configuration, Object) 
+	 * @see #configureHibernateEssentials(AnnotationConfiguration)
+	 * @see #configureHibernate(AnnotationConfiguration, Object) 
 	 */
 	final public void buildHibernateSessionFactory(Object key, Configuration config) {
 		configureHibernateEssentials(config);
 		configureHibernate(config, key);
-		StandardServiceRegistryBuilder regBuilder = new StandardServiceRegistryBuilder().applySettings(config.getProperties());
-		setHibernateSessionFactory(key, config.buildSessionFactory(regBuilder.build()));
+		ServiceRegistryBuilder regBuilder = new ServiceRegistryBuilder().applySettings(config.getProperties());
+		setHibernateSessionFactory(key, config.buildSessionFactory(regBuilder.buildServiceRegistry()));
 	}
 	
 	/**
@@ -146,7 +147,6 @@ public abstract class DataApplication extends DataApplicationBase implements Hib
 	 * @param key object, or null for the default factory
 	 * @return the retained session factory
 	 */
-	@Override
 	public SessionFactory getHibernateSessionFactory(Object key) {
 		SessionFactory sf = hibernateSessionFactories.get(key);
 		if (sf == null)

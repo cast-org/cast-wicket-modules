@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -41,21 +41,11 @@ public class GuestUserPreferenceService implements IUserPreferenceService {
 		return null;
 	}
 		
-	@Override
-	public boolean getUserPreferenceBoolean(IModel<User> mUser, String name, boolean defaultValue) {
-		return defaultValue;
-	}
-
 	public void setUserPreferenceString(IModel<User> mUser, String name, String stringValue) {
 	}
 
 	public String getUserPreferenceString(IModel<User> mUser, String name) {
 		return null;
-	}
-
-	@Override
-	public String getUserPreferenceString(IModel<User> mUser, String name, String defaultValue) {
-		return defaultValue;
 	}
 
 }

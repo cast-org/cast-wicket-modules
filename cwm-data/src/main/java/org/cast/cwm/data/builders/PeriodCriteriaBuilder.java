@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -46,7 +46,6 @@ public class PeriodCriteriaBuilder implements CriteriaBuilder {
 		
 	}
 	
-	@Override
 	public void build(Criteria criteria) {
 		if (name != null)
 			criteria.add(Restrictions.eq("name", name));

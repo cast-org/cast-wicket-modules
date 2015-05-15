@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -36,28 +36,28 @@ public interface IWritableGlossaryEntry extends IGlossaryEntry {
 	/**
 	 * Set the persistent unique identifier of this glossary entry.
 	 */
-	public IWritableGlossaryEntry setIdentifier(String identifier);
+	public void setIdentifier(String identifier);
 	
 	/**
 	 * Set the glossary word that this entry represents.
 	 * 
 	 * @param name
 	 */
-	public IWritableGlossaryEntry setHeadword(String name);
+	public void setHeadword(String name);
 	
 	/**
 	 * Set the sortForm of this entry.
 	 * 
 	 * @param sortForm
 	 */
-	public IWritableGlossaryEntry setSortForm(String sortForm);
+	public void setSortForm(String sortForm);
 	
 	/**
 	 * Set the short definition of the entry.
 	 * 
 	 * @param shortDef
 	 */
-	public IWritableGlossaryEntry setShortDef(String shortDef);
+	public void setShortDef(String shortDef);
 	
 	/**
 	 * Set the list of alternate forms for this entry.
@@ -69,6 +69,6 @@ public interface IWritableGlossaryEntry extends IGlossaryEntry {
 	/**
 	 * Set the pointer to the XML for the glossary item's definition.
 	 */
-	public IWritableGlossaryEntry setXmlPointer(ICacheableModel<? extends IXmlPointer> pointer);
+	public void setXmlPointer(ICacheableModel<? extends IXmlPointer> pointer);
 	
 }

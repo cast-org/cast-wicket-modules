@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -102,7 +102,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#newResponse(org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType, org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public IModel<Response> newResponse (IModel<User> user, IResponseType type, IModel<? extends Prompt> prompt) {
 		Response instance = newResponse();
 		instance.setUser(user.getObject());
@@ -114,7 +113,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponsesForPrompt(org.apache.wicket.model.IModel)
 	 */
-	@Override
 	@Deprecated
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p) {
 		return getResponsesForPrompt(p, null);
@@ -123,7 +121,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponseForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public IModel<Response> getResponseForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -134,7 +131,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponsesForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
-	@Override
 	@Deprecated
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
@@ -146,7 +142,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponsesForPrompt(org.apache.wicket.model.IModel, java.util.Date, java.util.Date)
 	 */
-	@Override
 	public IModel<List<Response>> getResponsesForPrompt(IModel<? extends Prompt> p, Date from, Date to) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -158,7 +153,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponsesForPeriod(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public IModel<List<Response>> getResponsesForPeriod(IModel<? extends Prompt> p, IModel<Period> period) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -169,24 +163,21 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponseProviderForPrompt(org.apache.wicket.model.IModel)
 	 */
-	@Override
-	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p) {
+	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p) {
 		return getResponseProviderForPrompt(p, null);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponseProviderForPrompt(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
-	@Override
-	public ISortableDataProvider<Response,String> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
+	public ISortableDataProvider<Response> getResponseProviderForPrompt(IModel<? extends Prompt> p, IModel<User> u) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setUserModel(u);
 		return new SortableHibernateProvider<Response>(Response.class, c);
 	}
 	
-	@Override
-	public ISortableDataProvider<Response,String> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod) {
+	public ISortableDataProvider<Response> getResponseProviderForPromptAndPeriod(IModel<? extends Prompt> p, IModel<Period> mPeriod) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
 		c.setPeriodModel(mPeriod);
@@ -196,7 +187,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponseCountForPrompt(org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType, org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public Long getResponseCountForPrompt(IModel<? extends Prompt> mPrompt, IResponseType type, IModel<? extends User> mUser) {
 		Criteria c = Databinder.getHibernateSession().createCriteria(Response.class);
 		c.add(Restrictions.eq("prompt", mPrompt.getObject()));
@@ -213,7 +203,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getLatestResponseByType(org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType)
 	 */
-	@Override
 	public IModel<Response> getLatestResponseByType(IModel<? extends Prompt> p, IResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -225,7 +214,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getLatestResponseByTypeForUser(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel, org.cast.cwm.data.IResponseType)
 	 */
-	@Override
 	public IModel<Response> getLatestResponseByTypeForUser(IModel<? extends Prompt> p, IModel<User> u, IResponseType type) {
 		ResponseCriteriaBuilder c = new ResponseCriteriaBuilder();
 		c.setPromptModel(p);
@@ -240,7 +228,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#saveTextResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public void saveTextResponse(IModel<Response> response, String message, String pageName) {
 		genericSaveResponse(response, message, null, null, null, null, pageName);
 	}
@@ -248,7 +235,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#saveStarRating(org.apache.wicket.model.IModel, int)
 	 */
-	@Override
 	public void saveStarRating(IModel<Response> mResponse, int score) {
 		genericSaveResponse(mResponse, null, score, null, score, null, null);
 	}
@@ -256,7 +242,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#saveBinaryResponse(org.apache.wicket.model.IModel, byte[], java.lang.String, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public void saveBinaryResponse(IModel<Response> r, byte[] bytes, String mimeType, String fileName, String pageName) {
 		BinaryFileData bd = new BinaryFileData(fileName, mimeType, bytes);
 		genericSaveResponse(r, null, null, null, null, bd, pageName);
@@ -265,7 +250,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#attachBinaryResponse(org.apache.wicket.model.IModel, org.apache.wicket.markup.html.form.upload.FileUpload)
 	 */
-	@Override
 	public IModel<BinaryFileData> attachBinaryResponse(IModel<Response> mResponse, FileUpload file) {
 
 		// If the response is transient, create it
@@ -294,7 +278,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#saveSVGResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public void saveSVGResponse(IModel<Response> mResponse, String svg, String pageName) {
 		saveTextResponse(mResponse, svg, pageName);
 	}
@@ -302,7 +285,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#saveFlashAudioResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public void saveFlashAudioResponse(IModel<Response> response, String audioId, String pageName) {
 		saveTextResponse(response, audioId, pageName); // Flash audio just saves id in 3rd party server
 	}
@@ -310,7 +292,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#genericSaveResponse(org.apache.wicket.model.IModel, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Integer, org.cast.cwm.data.BinaryFileData, java.lang.String)
 	 */
-	@Override
 	public void genericSaveResponse(IModel<Response> mResponse, String text, Integer score, Integer attempted, Integer total, BinaryFileData bd, String pageName) {		
 		
 		saveResponseWithoutData (mResponse);
@@ -340,7 +321,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#saveResponseWithoutData(org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public void saveResponseWithoutData (IModel<Response> mResponse) {
 		cwmService.confirmDatastoreModel(mResponse);
 		Response response = mResponse.getObject();
@@ -362,16 +342,15 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#setResponseSortOrder(org.apache.wicket.model.IModel, org.apache.wicket.model.IModel, java.lang.Integer)
 	 */
-	@Override
 	public void setResponseSortOrder(IModel<? extends Prompt> mPrompt, IModel<Response> mResponse, Integer index) {
 		
 		// DataProvider for Responses for this Prompt.
 		// It is assumed that the target Response is included in this list.
-		ISortableDataProvider<Response,String> dataProvider = getResponseProviderForPrompt(mPrompt);
+		ISortableDataProvider<Response> dataProvider = getResponseProviderForPrompt(mPrompt);
 		dataProvider.getSortState().setPropertySortOrder("sortOrder", SortOrder.ASCENDING);
 		
 		if (index == null)
-			index = (int)dataProvider.size() - 1;
+			index = dataProvider.size() - 1;
 		
 		if (index < 0)
 			throw new IllegalArgumentException("Index cannot be negative.");
@@ -411,7 +390,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#deleteResponse(org.apache.wicket.model.IModel)
 	 */
-	@Override
 	public void deleteResponse(IModel<Response> r) {
 
 		cwmService.confirmDatastoreModel(r);
@@ -437,7 +415,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getResponseById(java.lang.Long)
 	 */
-	@Override
 	public IModel<Response> getResponseById(Long id) {
 		return new ResponseModel(id);
 	}
@@ -445,7 +422,6 @@ public class ResponseService implements IResponseService {
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IResponseService#getPromptById(java.lang.Long)
 	 */
-	@Override
 	public IModel<Prompt> getPromptById(Long id) {
 		return new PromptModel(id);
 	}

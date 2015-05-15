@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -57,20 +57,20 @@ public class SessionListPage extends AdminPage {
 		LoginSessionCriteriaBuilder builder = new LoginSessionCriteriaBuilder();
 		SortableHibernateProvider<LoginSession> provider = new SortableHibernateProvider<LoginSession>(LoginSession.class, builder);
 		provider.setWrapWithPropertyModel(false);
-		DefaultDataTable<LoginSession,String> table = new DefaultDataTable<LoginSession,String>("sessionList", makeColumns(), provider, 25);
+		DefaultDataTable<LoginSession> table = new DefaultDataTable<LoginSession>("sessionList", makeColumns(), provider, 25);
 		table.addBottomToolbar(new NavigationToolbar(table));
 		add(table);		
 	}
 	
-	protected List<IColumn<LoginSession,String>> makeColumns() {
-		List<IColumn<LoginSession,String>> columns = new ArrayList<IColumn<LoginSession,String>>();
+	protected List<IColumn<LoginSession>> makeColumns() {
+		List<IColumn<LoginSession>> columns = new ArrayList<IColumn<LoginSession>>();
 	
-		columns.add(new PropertyColumn<LoginSession,String>(new Model<String>("User Name"), "user.username", "user.username"));
-		columns.add(new PropertyColumn<LoginSession,String>(new Model<String>("Start time"), "startTime", "startTime"));
+		columns.add(new PropertyColumn<LoginSession>(new Model<String>("User Name"), "user.username", "user.username"));
+		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Start time"), "startTime", "startTime"));
 		// TODO the getSecondsSinceLastEvent() method doesn't currently exist.
 		// columns.add(new PropertyColumn<LoginSession>(new Model<String>("Time since last event"), "secondsSinceLastEvent")); // cannot sort since it's not a field Hibernate knows about
-		columns.add(new PropertyColumn<LoginSession,String>(new Model<String>("Browser"), "userAgent"));
-		columns.add(new PropertyColumn<LoginSession,String>(new Model<String>("IP Address"), "ipAddress"));
+		columns.add(new PropertyColumn<LoginSession>(new Model<String>("Browser"), "userAgent"));
+		columns.add(new PropertyColumn<LoginSession>(new Model<String>("IP Address"), "ipAddress"));
 	
 		return columns;
 	}

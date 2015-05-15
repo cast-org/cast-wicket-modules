@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -59,7 +59,7 @@ public class BrowserInfoGatheringFormBorder<T> extends Border {
 	protected void onSubmit() {
 	}
 
-	protected BrowserInfoGatheringForm<T> getForm() {
+	BrowserInfoGatheringForm<T> getForm() {
 		return form;
 	}
 	

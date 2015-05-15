@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -213,7 +213,7 @@ public abstract class BaseGlossaryPanel extends Panel {
 				container.add(newLink(letter, e));
 
 				if (e.equals(current))
-					container.add(AttributeModifier.replace("class", getCurrentCssClass()));
+					container.add(AttributeModifier.replace("class", "current"));
 				if (getGlossary().getEntryById(e.getIdentifier()) != null) {
 					container.add(new WebMarkupContainer("wordCardIcon").setVisible(false));
 				} else {
@@ -284,10 +284,6 @@ public abstract class BaseGlossaryPanel extends Panel {
 		for (String id : glossary.getEntryIdsByFirstChar(letter))
 			list.add (glossary.getEntryById(id));
 		return list;
-	}
-	
-	protected String getCurrentCssClass() {
-		return "current";
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -18,8 +18,6 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.cast.cwm.xml;
-
-import java.io.InputStream;
 
 import lombok.ToString;
 
@@ -51,25 +49,17 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 	 * Return a FileResource at a location relative to this one.
 	 */
 	public FileResource getRelativeResource (String relativePath) {
-		return new FileResource(getRelativeFile(relativePath));
+		File fullPath = new File(file.getParentFile(), relativePath);
+		return new FileResource(fullPath);
 	}
-
-	/**
-	 * Return an InputStream for a file relative to this one.
-	 */
-	@Override
-	public InputStream getInputStream(String relativePath) {
-		return null;
-	}
-
+	
 	/** Return a ResourceReference to a relatively-addressed item
 	 * 
 	 * @param relativePath path relative to the path of this Resource
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
-	@Override
 	public ResourceReference getRelativeReference (final String relativePath) {
-		String filePath = getRelativeFile(relativePath).getAbsolutePath().substring(1);
+		String filePath = new File(file.getParentFile(), relativePath).getAbsolutePath().substring(1);
 		return new ResourceReference(FileResource.class, filePath) {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -79,8 +69,4 @@ public class FileResource extends PackageResource implements IRelativeLinkSource
 		};
 	}
 
-	private File getRelativeFile (String relativePath) {
-		return new File(file.getParentFile(), relativePath);
-	}
-	
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -59,33 +59,32 @@ public class ApproximateDateLabel extends DateLabel {
 		}
 
 		@Override
-		public String convertToString(Date value, Locale locale) {
-            TimeZone zone = getClientTimeZone();
-            if (getApplyTimeZoneDifference() && zone != null) {
-                // Determine format to use, based on the what day the given date
-                // falls on in the client's time zone.
-                DateTimeZone ctz = DateTimeZone.forTimeZone(getClientTimeZone());
-                DateTime dt = new DateTime(value.getTime(), ctz);
-                DateTimeFormatter format = getFormat(dt);
-                format = format.withZone(DateTimeZone.forTimeZone(zone));
-                return format.print(dt);
-            } else {
-                // Client time zone is unknown or turned off.
-                // Same as above but using default time zone.
-                DateTime dt = new DateTime(value);
-                DateTimeFormatter format = getFormat(dt);
-                return format.print(dt);
-            }
+		public String convertToString(Date value, Locale locale)
+		{
+			DateTime dt = new DateTime(value.getTime(), getTimeZone());
+			DateTimeFormatter format = getFormat(dt);
+
+			if (getApplyTimeZoneDifference())
+			{
+				TimeZone zone = getClientTimeZone();
+				if (zone != null)
+				{
+					// apply time zone to formatter
+					format = format.withZone(DateTimeZone.forTimeZone(zone));
+				}
+			}
+			return format.print(dt);
 		}
 
 
 		protected DateTimeFormatter getFormat(DateTime dt) {
 			String pattern;
-            // First check if given time is yesterday - might be in a different year...
-			DateTime now = new DateTime(dt.getZone());
+			DateTime now = new DateTime();
+			// First check if it's yesterday - might be in a different year...
 			if (now.minusDays(1).toDateMidnight().isEqual(dt.toDateMidnight())) {
 				pattern = YESTERDAY_PATTERN;
 			} else if (dt.getYear() == now.getYear()) {
+				// same year
 				if (dt.getDayOfYear() == now.getDayOfYear())
 					pattern = TODAY_PATTERN;
 				else
@@ -93,7 +92,7 @@ public class ApproximateDateLabel extends DateLabel {
 			} else {
 				pattern = DEFAULT_PATTERN;
 			}
-			return DateTimeFormat.forPattern(pattern);
+			return DateTimeFormat.forPattern(pattern).withLocale(getLocale()).withPivotYear(2000);
 		}
 
 		@Override

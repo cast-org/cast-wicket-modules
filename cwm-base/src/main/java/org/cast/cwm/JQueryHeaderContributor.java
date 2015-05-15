@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -17,25 +17,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.event;
+package org.cast.cwm;
 
-import lombok.Getter;
-
-import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
+import org.wicketstuff.jslibraries.JSLib;
+import org.wicketstuff.jslibraries.Library;
+import org.wicketstuff.jslibraries.VersionDescriptor;
 
 /**
- * Superclass for all Messages that are tied to Ajax events,
- * and thus have an AjaxRequestTarget.  A Message in CWM
- * is the payload of an {@link org.apache.wicket.event.IEvent}
+ * Loads a version of jQuery that is consistent across all CWM components that need it.
+ * Can probably be dropped in Wicket 6 since the framework itself will depend on jQuery.
+ * 
+ * @author bgoldowsky
  *
  */
-public class AjaxMessage {
+public class JQueryHeaderContributor implements IHeaderContributor {
 
-	@Getter
-	private AjaxRequestTarget target;
+	private static final long serialVersionUID = 1L;
 
-	public AjaxMessage(AjaxRequestTarget target) {
-		this.target = target;
+	public void renderHead(IHeaderResponse response) {
+		JSLib.getHeaderContribution(VersionDescriptor.exactVersion(Library.JQUERY, 1, 7, 1)).renderHead(response);
 	}
 
 }

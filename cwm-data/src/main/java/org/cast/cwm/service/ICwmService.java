@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -57,13 +57,6 @@ public interface ICwmService {
 	 * @param objectModel
 	 */
 	void delete(IModel<? extends PersistedObject> objectModel);
-	
-	/**
-	 * Delete a {@link PersistedObject} from the datastore.
-	 * 
-	 * @param object
-	 */
-	void delete(PersistedObject object);
 
 	/**
 	 * Flush changes to the datastore.  Essentially, this commits the previous

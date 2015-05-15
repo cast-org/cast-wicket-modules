@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,13 +35,11 @@ import org.hibernate.criterion.Restrictions;
 
 public class UserContentService implements IUserContentService {
 	
-	@Override
 	public UserContent newUserContent (User author, IResponseType dataType) {
 		return new UserContent(author, dataType);
 	}
 
 
-	@Override
 	public IModel<UserContent> getUserContentForPrompt(IModel<? extends Prompt> mPrompt, IModel<User> mUser) {
 		return new HibernateObjectModel<UserContent>(UserContent.class, 
 				new BasicCriteriaBuilder(
@@ -50,7 +48,6 @@ public class UserContentService implements IUserContentService {
 	}
 
 
-	@Override
 	public IModel<List<UserContent>> getUserContentListForPrompt(
 			IModel<? extends Prompt> mPrompt, IModel<User> mUser) {
 		return new HibernateListModel<UserContent>(UserContent.class,

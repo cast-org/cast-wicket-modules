@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.components;
 
-import org.apache.wicket.core.request.ClientInfo;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.StatelessForm;
 import org.apache.wicket.markup.html.pages.BrowserInfoForm.ClientPropertiesBean;
@@ -28,6 +27,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
+import org.apache.wicket.request.ClientInfo;
 import org.apache.wicket.request.cycle.RequestCycle;
 
 /**

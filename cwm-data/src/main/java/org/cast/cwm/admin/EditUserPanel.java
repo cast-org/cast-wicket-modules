@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -57,7 +57,7 @@ import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator;
 import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.IUserService;
+import org.cast.cwm.service.UserService;
 
 import com.google.inject.Inject;
 
@@ -78,9 +78,6 @@ public class EditUserPanel extends Panel {
 	@Inject
 	protected ISiteService siteService;
 	
-	@Inject 
-	IUserService userService;
-	
 	private Form<User> userForm;
 	private Map<String, FormComponentContainer> components = new HashMap<String, FormComponentContainer>();
 	
@@ -95,8 +92,9 @@ public class EditUserPanel extends Panel {
 	private FeedbackPanel feedbackPanel;
 	
 	/**
-	 * Construct a panel for creating a new user.
+	 * Construct a panel for creating a new user of the given role.
 	 * @param id
+	 * @param role
 	 */
 	public EditUserPanel(String id) {
 		super(id);
@@ -241,7 +239,7 @@ public class EditUserPanel extends Panel {
 	 */
 	protected void onUserCreated(IModel<User> mUser) {
 		if (autoConfirmNewUser)
-			userService.confirmUser(mUser.getObject());
+			UserService.get().confirmUser(mUser.getObject());
 	}
 	
 	/**
@@ -251,8 +249,10 @@ public class EditUserPanel extends Panel {
 	 * @param mUser
 	 */
 	protected void onUserUpdated(IModel<User> mUser) {
-		userService.onUserUpdated(mUser);
+		// No action by default
 	}
+	
+	
 	
 	/**
 	 * A Hibernate DataForm for modifying or creating a user account.
@@ -274,8 +274,7 @@ public class EditUserPanel extends Panel {
 		 */
 		@SuppressWarnings("unchecked")
 		public UserForm(String id) {
-			// FIXME I don't think this will work if userService returns something other than User.class.
-			super(id, (Class<User>) userService.getUserClass());
+			super(id, (Class<User>) UserService.get().getUserClass());
 			addFields();
 		}
 		

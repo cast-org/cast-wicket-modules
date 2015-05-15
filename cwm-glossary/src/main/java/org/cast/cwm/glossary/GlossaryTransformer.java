@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -130,7 +130,6 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 		this.glossaryMap = (glossary == null ? null : glossary.getMapTermToId());
 	}
 	
-	@Override
 	public Element applyTransform(Element elt, TransformParameters params) {
 		if (glossaryMap != null) {
 			usedEntryIds = new TreeSet<String>();
@@ -146,7 +145,6 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 	 * this to provide an accurate time.
 	 * 
 	 */
-	@Override
 	public Time getLastModified(TransformParameters params) {
 		if (glossary != null)
 			return null;  // FIXME this no longer works:  glossary.getDocument().getLastModified();
@@ -309,7 +307,6 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 	}
 	
 	protected class WordLocComparator implements Comparator<WordLocation> {
-		@Override
 		public int compare(WordLocation o1, WordLocation o2) {
 			// If the locations have the same start point, they overlap - choose the longer word first
 			if (((Integer)o1.start).equals(o2.start)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -20,6 +20,7 @@
 package org.cast.cwm.data.init;
 
 import java.util.Date;
+import java.util.Properties;
 
 import net.databinder.models.hib.HibernateListModel;
 
@@ -55,17 +56,14 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 		Injector.get().inject(this);
 	}
 
-	@Override
 	public String getName() {
 		return "close old loginsessions";
 	}
 
-	@Override
 	public boolean isOneTimeOnly() {
 		return false;
 	}
 
-	@Override
 	public boolean run(IAppConfiguration appProperties) {
 		boolean changesMade = false;
 		Date now = new Date();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -38,6 +38,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
@@ -63,7 +64,6 @@ import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -83,12 +83,8 @@ import com.google.inject.Inject;
 @AuthorizeInstantiation("RESEARCHER")
 public class EventLog extends AdminPage {
 
-	protected int numberOfEventTypes;
-	
 	protected IModel<List<String>> showEventTypesM;
-	protected int numberOfSites;
 	protected IModel<List<Site>> showSitesM;
-
 	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<Boolean> inAPeriod;
 	protected IModel<Boolean> showPermissionUsers;
@@ -113,8 +109,10 @@ public class EventLog extends AdminPage {
 		OrderingCriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
-		DataTable<Event,String> table = new DataTable<Event,String>("eventtable", columns, eventsprovider, 30);
-		table.addTopToolbar(new HeadersToolbar<String>(table, eventsprovider));
+		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
+		ArrayList<IColumn<Event>> colList = new ArrayList<IColumn<Event>>(columns);
+		DataTable<Event> table = new DataTable<Event>("eventtable", colList, eventsprovider, 30);
+		table.addTopToolbar(new HeadersToolbar(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
@@ -122,12 +120,13 @@ public class EventLog extends AdminPage {
 
 		CSVDownload<Event> download = new CSVDownload<Event>(columns, eventsprovider);
 		add(new ResourceLink<Object>("downloadLink", download));
+
 	}
 
 	protected OrderingCriteriaBuilder makeCriteriaBuilder() {
 		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
-		SingleSortState<String> defaultSort = new SingleSortState<String>();
-		defaultSort.setSort(new SortParam<String>("insertTime", false)); // Sort by Insert Time by default
+		SingleSortState defaultSort = new SingleSortState();
+		defaultSort.setSort(new SortParam("insertTime", false)); // Sort by Insert Time by default
 		eventCriteriaBuilder.setSortState(defaultSort);
 		return eventCriteriaBuilder;
 	}
@@ -151,7 +150,6 @@ public class EventLog extends AdminPage {
 		IModel<List<String>> allEventTypes = eventService.getEventTypes();
 		List<String> eventTypes = new ArrayList<String>();
 		eventTypes.addAll(allEventTypes.getObject());
-		numberOfEventTypes = eventTypes.size();
 		showEventTypesM = new ListModel<String>(eventTypes);
 		form.add(new CheckBoxMultipleChoice<String>("type", showEventTypesM, allEventTypes));
 	}
@@ -169,7 +167,6 @@ public class EventLog extends AdminPage {
 		IModel<List<Site>> allSites = siteService.listSites();
 		List<Site> sites = new ArrayList<Site>();
 		sites.addAll(allSites.getObject());
-		numberOfSites = sites.size();
 		showSitesM = new ListModel<Site>(sites);
 		if (!allSites.getObject().isEmpty())
 			form.add(new CheckBoxMultipleChoice<Site>("site", showSitesM, allSites, new ChoiceRenderer<Site>("name", "id")));
@@ -178,11 +175,13 @@ public class EventLog extends AdminPage {
 	}
 	
 	protected void addOtherFilters(Form<Object> form) {
-		inAPeriod = new Model<Boolean>(false);
+		inAPeriod = new Model<Boolean>(true);
 		form.add(new CheckBox("showNoSite", inAPeriod));		
 
 		showPermissionUsers = new Model<Boolean>(true);
 		form.add(new CheckBox("showPermissionUsers", showPermissionUsers));
+		
+		
 	}
 
 	protected List<IDataColumn<Event>> makeColumns() {
@@ -199,11 +198,10 @@ public class EventLog extends AdminPage {
 				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "insertTime"), eventDateFormat));				
 			}
 
-			@Override
 			public String getItemString(IModel<Event> rowModel) {
 				Event event = rowModel.getObject();
 				Date insertTime = event.getInsertTime();
-				return new SimpleDateFormat(eventDateFormat).format(insertTime); 			
+				return new SimpleDateFormat(eventDateFormat).format(insertTime); 
 			}
 		});
 		
@@ -223,7 +221,6 @@ public class EventLog extends AdminPage {
 			// TODO: this should do something more useful for audio, drawing, upload, and table responses.
 			// The raw data display is not very usable inside a spreadsheet; and for audio and upload we don't display anything at all.
 			// Perhaps we could include a link to display the item?  Or some metadata about it?
-			@Override
 			public String getItemString(IModel<Event> rowModel) {
 				if (!rowModel.getObject().hasResponses()) {
 					return "";
@@ -270,41 +267,31 @@ public class EventLog extends AdminPage {
 		return adjustedDateTime.toDate();
 	}
 
-	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator<String> {
+	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator {
 
-		@Getter @Setter 
-		private ISortState<String> sortState;
-		
 		private static final long serialVersionUID = 1L;
-
-		@Override
+		@Getter @Setter private ISortState sortState;
+;
+		
 		public void buildUnordered(Criteria criteria) {
 			
 			// Type check
-			if (showEventTypesM.getObject().size() < numberOfEventTypes)
-				criteria.add(Restrictions.in("type", showEventTypesM.getObject()));
-			else
-				log.debug("Not filtering by event type");
+			criteria.add(Restrictions.in("type", showEventTypesM.getObject()));
 
-			criteria.createAlias("user", "user");
-			
 			// Site Check
 			List<Site> siteList = showSitesM.getObject();
-			if (siteList.size() < numberOfSites || inAPeriod.getObject()) {
-				criteria.createAlias("user.periods", "period", JoinType.LEFT_OUTER_JOIN);
-				Disjunction siteRestriction = Restrictions.disjunction();
-				if (!inAPeriod.getObject())
-					siteRestriction.add(Restrictions.isEmpty("user.periods")); // Show users with no periods
-				if (!siteList.isEmpty())
-					siteRestriction.add(Restrictions.in("period.site",siteList)); // Show users with matching periods
-				if (inAPeriod.getObject() && siteList.isEmpty()) {
-					siteRestriction.add(Restrictions.idEq(-1L)); // Halt query early; don't show anyone.
-					criteria.setMaxResults(0);
-				}
-				criteria.add(siteRestriction);
-			} else {
-				log.debug("Not filtering by period/site");
+			criteria.createAlias("user", "user").createAlias("user.periods", "period", JoinType.LEFT_OUTER_JOIN);
+			Disjunction siteRestriction = Restrictions.disjunction();
+			if (!inAPeriod.getObject())
+				siteRestriction.add(Restrictions.isEmpty("user.periods")); // Show users with no periods
+			if (!siteList.isEmpty())
+				siteRestriction.add(Restrictions.in("period.site",siteList)); // Show users with matching periods
+			if (inAPeriod.getObject() && siteList.isEmpty()) {
+				siteRestriction.add(Restrictions.idEq(-1L)); // Halt query early; don't show anyone.
+				criteria.setMaxResults(0);
 			}
+			criteria.add(siteRestriction);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
 			
 			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
 				Date startDate = midnightStart(fromDateM.getObject());
@@ -321,16 +308,11 @@ public class EventLog extends AdminPage {
 			// Also load ResponseData elements in the same query, to avoid thousands of subsequent queries.
 			criteria.setFetchMode("responseData", FetchMode.JOIN);
 
-			// The join with periods results in multiple rows for multi-period users.
-			// Unfortunately, this confuses the dataprovider, which still counts the duplicates
-			// and therefore doesn't return a full page full of items each time.
-			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);  // Remove duplicate rows as a result of the INNER JOIN
 		}
 
-		@Override
 		public void buildOrdered(Criteria criteria) {
 			buildUnordered(criteria);
-			SortParam<String> sort = ((SingleSortState<String>) getSortState()).getSort();
+			SortParam sort = ((SingleSortState) getSortState()).getSort();
 			if (sort != null) {
 				if (sort.isAscending())
 					criteria.addOrder(Order.asc(sort.getProperty()).ignoreCase());

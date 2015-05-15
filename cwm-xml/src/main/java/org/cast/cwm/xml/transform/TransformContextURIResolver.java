@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -30,13 +30,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.wicket.injection.Injector;
 import org.apache.wicket.protocol.http.RequestUtils;
-import org.cast.cwm.xml.service.IXmlService;
+import org.cast.cwm.xml.service.XmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 
 /**
@@ -50,14 +47,6 @@ public class TransformContextURIResolver implements URIResolver {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformContextURIResolver.class);
 	
-	@Inject
-	IXmlService xmlService;
-	
-	public TransformContextURIResolver() {
-		Injector.get().inject(this);
-	}
-	
-	@Override
 	public Source resolve(String href, String base) throws TransformerException {
 		File file = findTransformFile(href, base);
 		
@@ -71,7 +60,7 @@ public class TransformContextURIResolver implements URIResolver {
 	}
 
 	private File findTransformFile(String href, String base) {
-		File file = xmlService.findTransformFile(href);
+		File file = XmlService.get().findTransformFile(href);
 		if (file != null) 
 			return file;
 		return findRelativeToCurrentTransformationDirectory(href, base);

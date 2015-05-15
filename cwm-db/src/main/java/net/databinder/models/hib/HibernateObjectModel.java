@@ -19,20 +19,21 @@
 
 package net.databinder.models.hib;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import javax.persistence.Version;
+
 import net.databinder.hib.Databinder;
 import net.databinder.models.BindingModel;
 import net.databinder.models.LoadableWritableModel;
+
 import org.apache.wicket.WicketRuntimeException;
-import org.apache.wicket.model.IDetachable;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.proxy.HibernateProxyHelper;
-
-import javax.persistence.Version;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * Model loaded and persisted by Hibernate. This central Databinder class can be initialized with an
@@ -42,8 +43,7 @@ import java.lang.reflect.Method;
  * @author Nathan Hamblen
  */
 public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements BindingModel<T> {
-
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 	private Class objectClass;
 	private Serializable objectId;
 	private QueryBuilder queryBuilder;
@@ -147,7 +147,6 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	 * are removed if present.
 	 * @param object must be an entity contained in the current Hibernate session, or Serializable, or null
 	 */
-	@Override
 	public void setObject(T object) {
 		unbind();	// clear everything but class, name
 		objectClass = null;
@@ -269,23 +268,14 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 			return super.hashCode();
 		return target.hashCode();
 	}
+	
 
-
-    @Override
-    protected void onDetach() {
-        super.onDetach();
-        // The CriteriaBuilder might have underlying connections to models
-        if (criteriaBuilder != null && criteriaBuilder instanceof IDetachable)
-            ((IDetachable)criteriaBuilder).detach();
-    }
-
-    /**
+	/**
 	 * Disassociates this object from any persistent object, but retains the class
 	 * for constructing a blank copy if requested.
 	 * @see HibernateObjectModel#HibernateObjectModel(Class objectClass)
 	 * @see #isBound()
 	 */
-	@Override
 	public void unbind() {
 		objectId = null;
 		queryBuilder = null;
@@ -301,7 +291,6 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	 * behavior is dictated by the value of retanUnsaved.
 	 * @return true if information needed to load from Hibernate (identifier, query, or criteria) is present
 	 */
-	@Override
 	public boolean isBound() {
 		return objectId != null || criteriaBuilder != null || queryBuilder != null;
 	}
@@ -323,14 +312,4 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	public void setRetainUnsaved(boolean retainUnsaved) {
 		this.retainUnsaved = retainUnsaved;
 	}
-	
-	/**
-	 * Return the id of the model object, if the model is storing it.
-	 * Will be null for unbound model or if model is bound using a criteria builder etc.
-	 * @return id, or null.
-	 */
-	protected Serializable getObjectId() {
-		return objectId;
-	}
-
 }

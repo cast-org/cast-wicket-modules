@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,15 +21,36 @@ package org.cast.cwm.test;
 
 import java.util.Map;
 
-/**
- * @deprecated  Use  {@link #CwmTestApplication} for a fake application with injection (which may be empty)
- *  or {@link #CwmTestThemedApplication} for a fake application injection that also uses the usual CAST theme directory.
- */
-@Deprecated
-public class GuiceInjectedTestApplication<T> extends CwmTestApplication<T> {
+import org.apache.wicket.guice.GuiceComponentInjector;
+import org.apache.wicket.mock.MockApplication;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
+public class GuiceInjectedTestApplication<T> extends MockApplication {
+
+	Map<Class<T>, T> injectionMap;
 
 	public GuiceInjectedTestApplication(Map<Class<T>, T> injectionMap) {
-		super(injectionMap);
+		this.injectionMap = injectionMap;
 	}
 
+	@Override
+	public void init() {
+		super.init();
+		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getGuiceInjector()));
+	}
+
+	protected Injector getGuiceInjector()
+	{
+		return Guice.createInjector(new AbstractModule(){
+			@Override
+			protected void configure() {
+				for (Class<T> keyClass: injectionMap.keySet()) {
+					bind(keyClass).toInstance(injectionMap.get(keyClass));
+				}
+			}
+		});
+	}
 }

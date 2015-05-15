@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,15 +21,31 @@ package org.cast.cwm.test;
 
 import java.util.Map;
 
-/**
- * @deprecated  Use  {@link #CwmTestApplication} for a fake application with injection (which may be empty)
- *  or {@link #CwmTestThemedApplication} for a fake application injection that also uses the usual CAST theme directory.
- */
-@Deprecated
-public class GuiceInjectedCwmTestApplication<T> extends CwmTestThemedApplication<T> {
+import org.apache.wicket.Page;
+import org.apache.wicket.util.tester.DummyHomePage;
+import org.cast.cwm.test.GuiceInjectedTestApplication;
+
+public class GuiceInjectedCwmTestApplication<T> extends GuiceInjectedTestApplication<T> {
 
 	public GuiceInjectedCwmTestApplication(Map<Class<T>, T> injectionMap) {
 		super(injectionMap);
 	}
+	
+    @Override
+    public void init() {
+            super.init();
+            // Check separate "theme" folder for markup and XSL styles.
+            getResourceSettings().addResourceFolder(getThemeDir());
+    }
+
+    protected String getThemeDir() {
+            return "theme";
+    }
+
+    @Override
+    public Class<? extends Page> getHomePage() {
+            return DummyHomePage.class;
+    }
+
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -42,7 +42,6 @@ public class EnsureUniqueWicketIds implements IDOMTransformer {
 		Injector.get().inject(this);
 	}
 
-	@Override
 	public Element applyTransform(Element elt, TransformParameters params) {
 		List<String> wicketIds = new ArrayList<String>();
 		NodeList wicketChildren = xmlService.getWicketNodes(elt, false);
@@ -66,7 +65,6 @@ public class EnsureUniqueWicketIds implements IDOMTransformer {
 		return elt;
 	}
 
-	@Override
 	public Time getLastModified(TransformParameters params) {
 		return null;  // this transformation will not change over time.
 	}

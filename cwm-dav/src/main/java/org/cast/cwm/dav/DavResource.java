@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -42,7 +42,6 @@ import org.cast.cwm.InputStreamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xmlmind.davclient.Constants;
 import com.xmlmind.davclient.Content;
 import com.xmlmind.davclient.DAVClient;
 import com.xmlmind.davclient.DAVException;
@@ -132,7 +131,6 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 		return DavClientManager.get().getClient(clientName);
 	}
 
-	@Override
 	public Time lastModifiedTime() {
 		retrieveProperties();
 		return lastModified;
@@ -143,10 +141,6 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 		return fileSize;
 	}
 	
-	/**
-	 * Return an InputStream for this resource.
-	 */
-	@Override
 	public InputStream getInputStream() throws InputStreamNotFoundException {
 		try {
 			return new DavResourceStream().getInputStream();
@@ -155,20 +149,11 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 		}
 	}
 
-	/**
-	 * Return an InputStream for a resource relative to this one.
-	 */
-	@Override
-	public InputStream getInputStream(String relativePath) throws InputStreamNotFoundException {
-		return getRelativeResource(relativePath).getInputStream();
-	}
-	
 	/** Return a ResourceReference to a relatively-addressed item
 	 * 
 	 * @param relativePath path relative to the path of this Resource
 	 * @return a ResourceReference that will resolve to {@link #getRelative(relativePath)}
 	 */
-	@Override
 	public ResourceReference getRelativeReference (final String relativePath) {
 		String childPath = path.substring(1, path.lastIndexOf('/')+1) + relativePath;
 		return new ResourceReference (DavResource.class, childPath) {
@@ -254,11 +239,11 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 	}
 
 	protected Time getLastModifiedValue(Property[] properties) {
-		return Time.valueOf ((Date) getValue(Constants.GETLASTMODIFIED_PROP, properties));
+		return Time.valueOf ((Date) getValue(DAVClient.GETLASTMODIFIED_PROP, properties));
 	}
 
 	protected Long getLengthValue (Property[] properties) {
-		return (Long) getValue(Constants.GETCONTENTLENGTH_PROP, properties);
+		return (Long) getValue(DAVClient.GETCONTENTLENGTH_PROP, properties);
 	}
 
 	// Method adapted from src/com/xmlmind/davclient/DavClientTool.java
@@ -282,13 +267,11 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 
 		private static final long serialVersionUID = 1L;
 
-		@Override
 		public void close() throws IOException {
 			if (stream != null)
 				stream.close();
 		}
 
-		@Override
 		public InputStream getInputStream() throws ResourceStreamNotFoundException {
 			Content content = null;
 			try {
@@ -311,7 +294,6 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 			}
 		}
 
-		@Override
 		public Bytes length() {
 			return Bytes.bytes(getFileSize());
 		}

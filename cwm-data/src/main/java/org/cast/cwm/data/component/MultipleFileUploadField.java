@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -27,10 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
@@ -203,11 +201,10 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 	/**
 	 * @see org.apache.wicket.markup.html.IHeaderContributor#renderHead(org.apache.wicket.markup.html.IHeaderResponse)
 	 */
-	@Override
 	public void renderHead(IHeaderResponse response)
 	{
 		// initialize the (custom) javascript library
-		response.render(JavaScriptHeaderItem.forReference(JS));
+		response.renderJavaScriptReference(JS);
 		
 		StringBuffer js = new StringBuffer();
 		
@@ -229,7 +226,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 		js.append(jsVarName + ".addElement(document.getElementById('" + upload.getMarkupId() + "'));");
 
 		// Render
-		response.render(OnDomReadyHeaderItem.forScript(js.toString()));
+		response.renderOnDomReadyJavaScript(js.toString());
 	}
 
 	/**

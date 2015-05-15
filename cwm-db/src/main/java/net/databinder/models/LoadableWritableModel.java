@@ -34,7 +34,6 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 	public LoadableWritableModel() {
 	}
 
-	@Override
 	public final void detach() {
 		if (attached) {
 			attached = false;
@@ -43,7 +42,6 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 		}
 	}
 
-	@Override
 	public T getObject() {
 		if (!attached) {
 			attached = true;
@@ -70,7 +68,7 @@ public abstract class LoadableWritableModel<T> implements IModel<T> {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer(getClass().getName());
+		StringBuffer sb = new StringBuffer(super.toString());
 		sb.append(":attached=").append(attached).append(":tempModelObject=[")
 				.append(this.tempModelObject).append("]");
 		return sb.toString();

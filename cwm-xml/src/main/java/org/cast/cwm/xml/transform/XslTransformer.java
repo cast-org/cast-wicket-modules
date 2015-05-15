@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,18 +35,15 @@ import javax.xml.transform.stream.StreamSource;
 
 import lombok.Getter;
 
-import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.InputStreamNotFoundException;
 import org.cast.cwm.xml.FileXmlDocumentSource;
-import org.cast.cwm.xml.service.IXmlService;
+import org.cast.cwm.xml.service.XmlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import com.google.inject.Inject;
 
 public class XslTransformer implements IDOMTransformer {
 	
@@ -55,9 +52,6 @@ public class XslTransformer implements IDOMTransformer {
 	
 	protected Time lastCheckedTime;
 	private Time xslLastModified;
-	
-	@Inject
-	IXmlService xmlService;
 
 	/** 
 	 * Files, other than the main XSL file, to check for modifications.
@@ -69,7 +63,6 @@ public class XslTransformer implements IDOMTransformer {
 
 	public XslTransformer (IInputStreamProvider xslFile) {
 		this.xslFile = xslFile;
-		Injector.get().inject(this);
 	}
 	
 	/**
@@ -91,7 +84,6 @@ public class XslTransformer implements IDOMTransformer {
 	/**
 	 * Runs the transformation, returns the result.
 	 */
-	@Override
 	public Element applyTransform(Element element, TransformParameters params) {
 		DOMResult res = new DOMResult();
 		log.debug("Running XSLT {} on {}", xslFile, element.getAttributeNS(null, "id"));
@@ -117,9 +109,8 @@ public class XslTransformer implements IDOMTransformer {
 	 * To avoid constantly reading the disk or DAV connection, this will only check as often as
 	 * specified by XmlService's updateCheckInterval; otherwise returning a remembered value.
 	 */
-	@Override
 	public Time getLastModified(TransformParameters params) {
-		if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > xmlService.getUpdateCheckInterval())
+		if (lastCheckedTime == null || lastCheckedTime.elapsedSince().seconds() > XmlService.get().getUpdateCheckInterval())
 			updateLastModified();
 		return xslLastModified;
 	}

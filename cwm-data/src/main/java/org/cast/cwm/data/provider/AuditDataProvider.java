@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,14 +26,13 @@ import net.databinder.hib.Databinder;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
-import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.builders.ISortableAuditQueryBuilder;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditQuery;
 import org.hibernate.envers.query.criteria.AuditProperty;
-import org.hibernate.envers.query.internal.property.RevisionNumberPropertyName;
+import org.hibernate.envers.query.property.RevisionNumberPropertyName;
 
 /**
  * A sortable DataProvider for views of audit data.
@@ -43,11 +42,9 @@ import org.hibernate.envers.query.internal.property.RevisionNumberPropertyName;
  *
  * @param <E> type of the @Audited @Entity being queried.
  * @param <R> type of the @RevisionEntity in your app.
- * 
- * TODO: allow parameterization of sort field type
  */
 public  class AuditDataProvider<E extends Serializable, R extends Serializable> 
-		implements ISortableDataProvider<AuditTriple<E,R>,String> {
+		implements ISortableDataProvider<AuditTriple<E,R>> {
 
 	private static final long serialVersionUID = 1L;
 	private ISortableAuditQueryBuilder builder;
@@ -56,21 +53,26 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 		this.builder = builder;
 	}
 
+	@Override
+	public void detach() {
+		// TODO Auto-generated method stub
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public Iterator<? extends AuditTriple<E, R>> iterator(long first, long count) {
+	public Iterator<? extends AuditTriple<E, R>> iterator(int first, int count) {
 		AuditQuery query = builder.buildSorted(Databinder.getHibernateSession());
-		query.setFirstResult((int)first);
-		query.setMaxResults((int)count);
+		query.setFirstResult(first);
+		query.setMaxResults(count);
 		return new AuditIteratorAdapter<E,R>(query.getResultList().iterator());
 	}
 
 	@Override
-	public long size() {
+	public int size() {
 		AuditQuery query = builder.build(Databinder.getHibernateSession());
 		query.addProjection(new AuditProperty<Long>(new RevisionNumberPropertyName()).count());
 		Number size = (Number) query.getSingleResult();
-		return size == null ? 0 : size.longValue();
+		return size == null ? 0 : size.intValue();
 	}
 
 	@Override
@@ -79,15 +81,9 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 	}
 
 	@Override
-	public ISortState<String> getSortState() {
+	public ISortState getSortState() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void detach() {
-		if (builder!=null && builder instanceof IDetachable)
-			((IDetachable)builder).detach();
 	}
 
 

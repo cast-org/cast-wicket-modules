@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,15 +21,12 @@ package org.cast.cwm.data.init;
 
 import net.databinder.hib.Databinder;
 
-import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.IUserService;
+import org.cast.cwm.service.UserService;
 import org.hibernate.Session;
-
-import com.google.inject.Inject;
 
 /**
  * This initializer makes sure that an administrative user is defined.
@@ -49,25 +46,15 @@ public class CreateAdminUser implements IDatabaseInitializer {
 	private static final String DEFAULT_ADMIN_USERNAME = "admin";
 	private static final String DEFAULT_ADMIN_PASSWORD = "admin";
 
-	@Inject 
-	IUserService userService;
-	
-	public CreateAdminUser() {
-		Injector.get().inject(this);
-	}
-	
-	@Override
 	public String getName() {
 		return "create admin user";
 	}
 	
-	@Override
 	public boolean isOneTimeOnly() {
 		// False because this also can be used to reset the admin user's password in case of forgetfulness.
 		return false;
 	}
 
-	@Override
 	public boolean run(IAppConfiguration props) {
 		String username = props.getProperty("cwm.adminUsername");
 		if (Strings.isEmpty(username))
@@ -100,9 +87,9 @@ public class CreateAdminUser implements IDatabaseInitializer {
      */
 	public boolean createAdminUser (final String username, final String password, String email, final boolean resetPassword) {
 		Session session = Databinder.getHibernateSession();
-		User admin = userService.getByUsername(username).getObject();
+		User admin = UserService.get().getByUsername(username).getObject();
 		if (admin == null) {
-			admin = userService.newUser();
+			admin = UserService.get().newUser();
 			admin.setRole(Role.ADMIN);
 			admin.setFirstName("Administrator");
 			admin.setLastName("Account");

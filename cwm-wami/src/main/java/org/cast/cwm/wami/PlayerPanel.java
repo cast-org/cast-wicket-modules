@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,11 @@
  */
 package org.cast.cwm.wami;
 
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.apache.wicket.markup.head.OnLoadHeaderItem;
+import java.util.Iterator;
+
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.data.UserContent;
@@ -56,7 +57,17 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 		
 	private AudioSkin audioSkin;
 	
+	/**
+	 * The place where the SWF may be inserted.
+	 */
+	private WamiAppletHolder appletHolder;
+
 	private static final long serialVersionUID = 1L;
+
+	public PlayerPanel(String id, IModel<T> mUserContent, AudioSkin skin, WamiAppletHolder appletHolder) {
+		this(id, mUserContent, skin);
+		this.appletHolder = appletHolder;
+	}
 
 	public PlayerPanel(String id, IModel<T> mUserContent, AudioSkin skin) {
 		super(id, mUserContent);
@@ -66,26 +77,35 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 
 	@Override
 	protected void onInitialize() {
-		super.onInitialize();		
+		super.onInitialize();
+		
+		// If no appletHolder was specified in the constructor, search for one on the page.
+		if (appletHolder == null) {
+			Iterator<Component> iterator = getPage().visitChildren(WamiAppletHolder.class).iterator();
+			if (iterator.hasNext())
+				appletHolder = (WamiAppletHolder) iterator.next();
+			else
+				throw new RuntimeException("This component must be used on a page with a WamiAppletHolder");
+		}
 	}
 	
 	@Override
 	public String getVariation() {
 		return audioSkin.getVariationName();
 	}
-	
+
 	@Override
 	public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
 		
 		JSLib.getHeaderContribution(VersionDescriptor.alwaysLatestOfVersion(Library.SWFOBJECT, 2)).renderHead(response);
 
-//        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "normalize.css"));
-//        response.renderCSSReference(new PackageResourceReference(CastRecorderPanel.class, "edit.css"));
-
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "audio_applet.js", null, null, getVariation()), "wami-applet"));
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "wami-recorder.js", null, null, getVariation()), "wami-recorder"));
-        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PlayerPanel.class, "castrecorder.js", null, null, getVariation()), "wami-cast"));
+        response.renderJavaScriptReference(new PackageResourceReference(PlayerPanel.class, "audio_applet.js"));
+        response.renderJavaScriptReference(new PackageResourceReference(PlayerPanel.class, "wami-recorder.js"));
+        response.renderJavaScriptReference(new PackageResourceReference(PlayerPanel.class, "castrecorder.js"));
+        
+        if (audioSkin.isHasCss())
+        	response.renderCSSReference(new PackageResourceReference(PlayerPanel.class, "audio_applet.css"));
 
         configureRecorder(response);
 	}
@@ -95,8 +115,8 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
         RecorderOptions recorderOptions = getRecorderOptions();
 
         Gson gson = new Gson();
-        response.render(OnLoadHeaderItem.forScript(String.format("createCastRecorder('%s', %s);", 
-        		this.getMarkupId(), gson.toJson(recorderOptions))));
+        response.renderOnLoadJavaScript(String.format("createCastRecorder('%s', %s);", 
+        		this.getMarkupId(), gson.toJson(recorderOptions)));
 	}
 
 	protected RecorderOptions getRecorderOptions() {
@@ -106,6 +126,7 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
 		String wamiURL = urlFor(wamiRR, null).toString();
 
 		return new RecorderOptions(
+        		appletHolder.getMarkupId(),
                 wamiURL,
                 null,
                 BINARY_FILE_DATA_MAPPER_PREFIX + "/",
@@ -119,13 +140,15 @@ public class PlayerPanel<T extends UserContent> extends BaseAudioPanel<T> implem
      *
      */
 	static class RecorderOptions {
+		String swfId;
         String swfUrl;
         String recordUrl;
         String playPrefix;
         Long userContentId;
         Long binaryFileId;
 
-        RecorderOptions(String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
+        RecorderOptions(String swfId, String swfUrl, String recordUrl, String playPrefix, Long userContentId, Long binaryFileId) {
+        	this.swfId = swfId;
             this.swfUrl = swfUrl;
             this.recordUrl = recordUrl;
             this.playPrefix = playPrefix;

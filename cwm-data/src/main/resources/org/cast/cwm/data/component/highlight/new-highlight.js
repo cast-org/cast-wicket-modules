@@ -39,6 +39,7 @@ hintHide    - when a hitn is turned off and no longer visible
         // Default Settings
         'colors'            : ['Y'],        // Available highlighter color definitions, this should be an array
         'readonly'          : false,        // Whether the highlights on this page can be changed
+        'initialColor'      : null,         // Color to be selected at initialization time.
 
         // State Indicators
         'currentColor'      : null,         // Highlighter color: null=none, 'X'=Color X
@@ -71,6 +72,9 @@ hintHide    - when a hitn is turned off and no longer visible
             methods.initHint();
             // Indicators on buttons to show that highlights exist
             methods.indicatorsUpdate();
+            // Set initial color, if any
+            if (settings.initialColor)
+            	methods.modifyWithoutSave(settings.initialColor);
 
             methods._trigger("create");
         },
@@ -237,9 +241,10 @@ hintHide    - when a hitn is turned off and no longer visible
          * highlighter on page load
          */
         modifyWithoutSave : function (clicked, id) {
+        	var prevState = settings.saveState;
         	settings.saveState = false;
         	methods.modify(clicked, id);
-        	settings.saveState = true;
+        	settings.saveState = prevState;
         },
 
         /**
@@ -257,7 +262,7 @@ hintHide    - when a hitn is turned off and no longer visible
 
         rangeHighlight : function(color, id, range, erase) {
 
-            if (settings.readonly) {
+            if (settings.readonly || range.collapsed) {
                 return;
             }
 
@@ -310,8 +315,6 @@ hintHide    - when a hitn is turned off and no longer visible
                             // Do not highlight previous word that is not visibly selected (Firefox)
                         } else if ((i == ((wordList.length)-1)) && (range.endOffset == 0)) {
                             // Do not highlight next word that is not visibly selected (Firefox)
-                        } else if (range.startOffset == range.endOffset && !$.browser.msie) {
-                            // Do not highlight current word that is not visibly selected (Firefox)
                         } else {
                             // Looks good, add to valid word list
                             valWord = wordList[i];
@@ -858,7 +861,5 @@ function toggleModelHighlightDisplay(arg1, arg2, arg3, arg4) {
 
 // log the state change - to be stored in the db for persistence
 function highlightStateChangeEvent(highlightColor, highlightOn) {
-	// wicketAjaxGet(highlightStateChangeCallbackUrl + '&highlightColor=' +  highlightColor + '&highlightOn=' + highlightOn , function() {}, function() {});
-	// TODO: fix this; include highlightColor and highlightOn params
-	Wicket.Ajax.get({"u":highlightStateChangeCallbackUrl});
+	wicketAjaxGet(highlightStateChangeCallbackUrl + '&highlightColor=' +  highlightColor + '&highlightOn=' + highlightOn , function() {}, function() {});
 }

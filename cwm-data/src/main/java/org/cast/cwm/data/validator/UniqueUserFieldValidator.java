@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,15 +21,12 @@ package org.cast.cwm.data.validator;
 
 import java.util.Map;
 
-import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.IUserService;
-
-import com.google.inject.Inject;
+import org.cast.cwm.service.UserService;
 
 /**
  * Validate that the username is not already in use in the database by a different
@@ -48,9 +45,6 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 	private IModel<User> currentUser;
 	private Field field;
 	
-	@Inject 
-	protected IUserService userService;
-	
 	public UniqueUserFieldValidator(Field field) {
 		this(new Model<User>(null), field);
 	}
@@ -58,7 +52,6 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 	public UniqueUserFieldValidator(IModel<User> currentUser, Field field) {
 		this.currentUser = currentUser;
 		this.field = field;
-		Injector.get().inject(this);
 	}
 
 	@Override
@@ -68,13 +61,13 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 		
 		switch(field) {
 		case USERNAME:
-			other = userService.getByUsername(validatable.getValue());
+			other = UserService.get().getByUsername(validatable.getValue());
 			break;
 		case EMAIL:
-			other = userService.getByEmail(validatable.getValue());
+			other = UserService.get().getByEmail(validatable.getValue());
 			break;
 		case SUBJECTID:
-			other = userService.getBySubjectId(validatable.getValue());
+			other = UserService.get().getBySubjectId(validatable.getValue());
 			break;
 		default:
 			throw new IllegalArgumentException("Invalid User Field");

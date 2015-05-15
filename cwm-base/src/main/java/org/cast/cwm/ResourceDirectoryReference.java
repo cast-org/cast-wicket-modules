@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,12 +26,17 @@ import org.apache.wicket.util.file.File;
 /**
  * Mountable {@link ResourceReference} for a {@link ResourceDirectory}.
  * 
- * <p>Example:</P
+ * <p>Examples:</P
  * 
- * <code>mountResource("image", new ResourceDirectoryReference(themeDir));</code><br />
- * maps {@code http://host/context/image/foo.png} to {@code themeDir/foo.png} ; that is,
- * all files in the "img" directory are available under the "image" top-level URL path.
- * Multiple levels of subdirectories may exist under img.
+ * <ul>
+ * <li><code>mountResource("img", new ResourceDirectoryReference(themeDir));</code><br />
+ * maps {@code http://host/context/img/foo.png} to {@code themeDir/img/foo.png} ; that is,
+ * all files in the "img" directory are available under the "img" top-level URL path.</li>
+ * 
+ * <li><code>mountResource("static", new ResourceDirectoryReference(themeDir, "static"));</code><br />
+ * maps {@code http://host/context/static/foo.png} to {@code themeDir/foo.png} .
+ * This form is useful if your directory name doesn't match the URL you want to mount it on.</li>
+ * </ul>
  *
  * @see ResourceDirectory
  * 
@@ -44,25 +49,32 @@ public class ResourceDirectoryReference extends ResourceReference {
 	
 	private final File resourceDirectory;
 	
+	private final String removePrefix;
+
 	/**
 	 * Construct for a given directory.
-	 * @param directory the directory to map as static resource files
+	 * @param themeDirectory
 	 */
-	public ResourceDirectoryReference (File directory) {
+	public ResourceDirectoryReference(File themeDirectory) {
+		this(themeDirectory, "");
+	}
+
+	/**
+	 * Convenience constructor where a base directory and subdirectory within it are specified.
+	 * Useful if you are building several ResourceDirectoryReferences that are siblings to each other.
+	 * @param themeDir base directory within which the resources directory is found
+	 * @param subdirectory name of the subdirectory
+	 */
+	public ResourceDirectoryReference (File directory, String removePrefix) {
 		super(directory.getAbsolutePath());  // Use pathname as ResourceReference key
 		resourceDirectory = directory;
+		this.removePrefix = removePrefix;
 	}
 	
 	@Override
 	public IResource getResource() {
-		return new ResourceDirectory(resourceDirectory);
+		return new ResourceDirectory(resourceDirectory, removePrefix);
+
 	}
 
-	@Override
-	public boolean equals(Object other) {
-		if (!(other instanceof ResourceDirectoryReference))
-			return false;
-		ResourceDirectoryReference rdr = (ResourceDirectoryReference)other;
-		return (resourceDirectory.equals(rdr.resourceDirectory));
-	}
 }

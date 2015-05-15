@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -105,7 +105,7 @@ public class TaggingsListPanel extends Panel {
 					@Override
 					public void onClick(AjaxRequestTarget target) {
 						TagService.get().removeTagging(ting);
-						target.add(TaggingsListPanel.this);
+						target.addComponent(TaggingsListPanel.this);
 						target.addChildren(findParent(TagPanel.class), TagList.class);
 					}
 				});

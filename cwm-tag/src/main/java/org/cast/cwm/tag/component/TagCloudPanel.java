@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014 CAST, Inc.
+ * Copyright 2011-2015 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -134,7 +134,7 @@ public class TagCloudPanel extends Panel {
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				listView = false;
-				target.add(TagCloudPanel.this);
+				target.addComponent(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
@@ -146,7 +146,7 @@ public class TagCloudPanel extends Panel {
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				listView = true;
-				target.add(TagCloudPanel.this);
+				target.addComponent(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
@@ -160,7 +160,7 @@ public class TagCloudPanel extends Panel {
 			public void onClick(AjaxRequestTarget target) {
 				sortFreq = false;
 				sortTagList();
-				target.add(TagCloudPanel.this);
+				target.addComponent(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
@@ -173,7 +173,7 @@ public class TagCloudPanel extends Panel {
 			public void onClick(AjaxRequestTarget target) {
 				sortFreq = true;
 				sortTagList();
-				target.add(TagCloudPanel.this);
+				target.addComponent(TagCloudPanel.this);
 			}
 			@Override
 			public boolean isVisible() {
