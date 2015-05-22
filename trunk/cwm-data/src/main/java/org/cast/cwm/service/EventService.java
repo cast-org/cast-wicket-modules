@@ -88,7 +88,7 @@ public class EventService implements IEventService {
 	 * @param triggeringComponent the Component where the event was initiated (eg, a button)
 	 * @return the persisted Event wrapped in an IModel
 	 */
-	public IModel<? extends Event> storeEvent (Event event, Component triggeringComponent) {
+	public <T extends Event> IModel<T> storeEvent (T event, Component triggeringComponent) {
 		gatherEventDataContributions(event, triggeringComponent);
 		event.setComponentPath(triggeringComponent.getPageRelativePath());
 		event.setDefaultValues();
@@ -119,12 +119,12 @@ public class EventService implements IEventService {
 	 * @param e the Event to be saved
 	 * @return model wrapping the event that was saved
 	 */
-	protected IModel<? extends Event> saveEvent (Event e) {
+	protected <T extends Event> IModel<T> saveEvent (T e) {
 		e.setDefaultValues();
 		Databinder.getHibernateSession().save(e);
 		cwmService.flushChanges();
 		log.debug("Event: {}: {}", e.getType(), e.getDetail());
-		return new HibernateObjectModel<Event>(e);
+		return modelProvider.modelOf(e);
 	}
 	
 	/* (non-Javadoc)
