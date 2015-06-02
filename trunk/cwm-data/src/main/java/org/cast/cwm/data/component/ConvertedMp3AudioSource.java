@@ -24,15 +24,15 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.data.resource.UploadedFileResourceReference;
+import org.cast.cwm.data.resource.ConvertedMP3DataResourceReference;
 
 /**
- * Component to use on an HTML5 "source" element to send mp3 response data.
+ * Component to use on an HTML5 "source" element to send mp3 converted response data.
  *
  */
-public class Mp3AudioSource extends WebMarkupContainer {
+public class ConvertedMp3AudioSource extends WebMarkupContainer {
 
-    public Mp3AudioSource(String id, IModel<BinaryFileData> model) {
+    public ConvertedMp3AudioSource(String id, IModel<BinaryFileData> model) {
         super(id, model);
     }
 
@@ -47,7 +47,7 @@ public class Mp3AudioSource extends WebMarkupContainer {
         PageParameters pp = new PageParameters();
         if (getModel() != null && getModel().getObject() != null)
             pp.add("id", getModel().getObject().getId());
-        CharSequence url = getRequestCycle().urlFor(new UploadedFileResourceReference(), pp);
+        CharSequence url = getRequestCycle().urlFor(new ConvertedMP3DataResourceReference(), pp);
         tag.put("src", url);
     }
 

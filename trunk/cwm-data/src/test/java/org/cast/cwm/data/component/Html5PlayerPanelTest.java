@@ -69,7 +69,7 @@ public class Html5PlayerPanelTest extends CwmDataBaseTestCase {
     public void showsSourceLink() {
         tester.startComponentInPage(new Html5PlayerPanel("panel", Model.of(bfd)));
         tester.assertComponent("panel", Html5PlayerPanel.class);
-        tester.assertComponent("panel:audio:source", Mp3AudioSource.class);
+        tester.assertComponent("panel:audio:source", ConvertedMp3AudioSource.class);
         Component source = tester.getComponentFromLastRenderedPage("panel:audio:source");
         tester.assertAttribute("Incorrect mime type", "audio/mpeg", source, "type");
         tester.assertAttribute("Unexpected source/@src attribute",

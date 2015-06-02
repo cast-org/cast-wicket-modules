@@ -19,26 +19,31 @@
  */
 package org.cast.cwm.data.resource;
 
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
 
-import com.google.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * A simple resource that accepts an "id" parameter and serves up
  * the file with the matching ID in the database.  If the file is
  * not found, this will throw a 404 Not Found Error.
- * 
- * TODO: reconcile this with the almost-identical BinaryFileDataResource
+ *
+ * Note: in Wicket 1.4 this could not be cacheable, since WicketFilter would cause database access
+ * outside of a proper session context when it checked the last-modified time; this database session
+ * would remain unclosed.  I believe this is no longer a problem in Wicket 6.
  * 
  * @author jbrookover
+ * @author bgoldowsky
  *
  */
 public class UploadedFileResource extends AbstractResource {
@@ -51,11 +56,6 @@ public class UploadedFileResource extends AbstractResource {
 	public UploadedFileResource() {
 		super();
 		Injector.get().inject(this);
-
-		// TODO is this still true in Wicket 1.5?
-		// Cannot be cacheable, otherwise WicketFilter will cause database access when it checks the last-modified
-		// date, before the session context has been set up, and this database session can remain unclosed.
-		// setCacheable(true);
 	}
 
 	@Override
@@ -63,36 +63,33 @@ public class UploadedFileResource extends AbstractResource {
 		final ResourceResponse response = new ResourceResponse();
 
 		long id = attributes.getParameters().get("id").toLong();
+
 		IModel<BinaryFileData> mBfd = cwmService.getById(BinaryFileData.class, id);
-		if (mBfd == null || mBfd.getObject() == null) {
-			response.setError(HttpServletResponse.SC_NOT_FOUND);
-			return response;
-		}
+		if (mBfd == null || mBfd.getObject() == null)
+			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Data not found [id=" + id + "]");
 		BinaryFileData bfd = mBfd.getObject();
+
 		response.setLastModified(Time.valueOf(bfd.getLastModified()));
-		
+
 		if (response.dataNeedsToBeWritten(attributes)) {
+
+			final byte[] data = bfd.getData();
+			if (data == null)
+				throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Data not found [id=" + id + "]");
+
 			response.setContentType(bfd.getMimeType());
+			response.setContentLength(data.length);
 			response.setContentDisposition(ContentDisposition.INLINE);
-			final byte[] imageData = bfd.getData();			
-			if (imageData == null) {
-				response.setError(HttpServletResponse.SC_NOT_FOUND);
-			} else {
-				response.setWriteCallback(new WriteCallback() {
-					@Override
-					public void writeData(final Attributes attributes) {
-						attributes.getResponse().write(imageData);
-					}
-				});
-			}
+			response.setCacheDuration(Duration.days(1));
+			response.setCacheScope(WebResponse.CacheScope.PUBLIC);
+			response.setWriteCallback(new WriteCallback() {
+				@Override
+				public void writeData(final Attributes attributes) {
+					attributes.getResponse().write(data);
+				}
+			});
 		}
 		return response;
-	}
-
-	// FIXME this can't be right
-	@Override
-	public boolean equals(Object that) {
-		return that instanceof SvgImageResource;
 	}
 
 }
