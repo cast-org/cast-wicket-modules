@@ -34,7 +34,7 @@ import org.cast.cwm.data.UserContent;
 import org.cast.cwm.service.ICwmService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Base64;
+import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 
 /**
@@ -71,7 +71,7 @@ public class AudioUploadBehavior<T extends UserContent> extends AbstractAjaxBeha
                     String base64data = item.getString();
                     String expectedPrefix = "data:audio/mp3;base64,";
                     if (base64data.startsWith(expectedPrefix)) {
-                        byte[] data = Base64.getDecoder().decode(base64data.substring(expectedPrefix.length()));
+                        byte[] data = DatatypeConverter.parseBase64Binary(base64data.substring(expectedPrefix.length()));
                         log.debug("Saving audio data: {}", item);
                         // Note, recorder reports audio/mp3 mime type, but audio/mpeg is more standard
                         BinaryFileData bfd = new BinaryFileData("audio data", "audio/mpeg", data);
