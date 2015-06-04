@@ -19,28 +19,16 @@
  */
 package org.cast.cwm.admin;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.auth.valid.EqualPasswordConvertedInputValidator;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
-import org.apache.wicket.markup.html.form.ChoiceRenderer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.SubmitLink;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -59,7 +47,10 @@ import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
 
-import com.google.inject.Inject;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A panel for editing a user.  
@@ -237,9 +228,10 @@ public class EditUserPanel extends Panel {
 	/**
 	 * Actions to take after creation of a new user.
 	 * This might be overridden, for example, to redirect to a different page.
-	 * @param mUser
+	 * @param mUser The user just created
+	 * @param trigger the component that triggered the creation
 	 */
-	protected void onUserCreated(IModel<User> mUser) {
+	protected void onUserCreated(IModel<User> mUser, Component trigger) {
 		if (autoConfirmNewUser)
 			userService.confirmUser(mUser.getObject());
 	}
@@ -248,10 +240,11 @@ public class EditUserPanel extends Panel {
 	 * Actions to take after updating a user.
 	 * By default does nothing.  You could override it to redirect to a new page 
 	 * or display a confirmation message.
-	 * @param mUser
+	 * @param mUser the user just updated
+	 * @param trigger the component that triggered the update
 	 */
-	protected void onUserUpdated(IModel<User> mUser) {
-		userService.onUserUpdated(mUser);
+	protected void onUserUpdated(IModel<User> mUser, Component trigger) {
+		userService.onUserUpdated(mUser, trigger);
 	}
 	
 	/**
@@ -435,9 +428,9 @@ public class EditUserPanel extends Panel {
 			info("User '" + getModelObject().getUsername() + "' " + (isNewUser ? "Saved." : "Updated."));
 
 			if (isNewUser)
-				EditUserPanel.this.onUserCreated(getModel());
+				EditUserPanel.this.onUserCreated(getModel(), this);
 			else
-				EditUserPanel.this.onUserUpdated(getModel());
+				EditUserPanel.this.onUserUpdated(getModel(), this);
 		}
 	}
 }

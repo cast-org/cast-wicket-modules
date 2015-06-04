@@ -113,14 +113,14 @@ h5 { font-size: 110%; }
 h6 { font-size: 105%; }
 
 table {
-	border: 1px solid black;
+	border: 1px solid #93b5b6;
 	border-collapse: collapse;
 }
 
 td,th {
-	border: 1px solid black;
+	border: 1px solid #93b5b6;
 	border-collapse: collapse;
-	padding: .1em .3em;
+	padding: .3em .4em .2em .4em;
 }
 
 .unem {

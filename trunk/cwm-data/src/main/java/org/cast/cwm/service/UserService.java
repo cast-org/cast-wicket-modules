@@ -19,17 +19,14 @@
  */
 package org.cast.cwm.service;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.QueryBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
-
+import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
@@ -46,7 +43,9 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Database operations on Users and related classes.
@@ -103,10 +102,10 @@ public class UserService implements IUserService {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IUserService#onUserUpdated(org.apache.wicket.model.IModel)
+	 * @see org.cast.cwm.service.IUserService#onUserUpdated(IModel)
 	 */
 	@Override
-	public void onUserUpdated(IModel<User> mUser) {
+	public void onUserUpdated(IModel<User> mUser, Component trigger) {
 		// Does nothing by default.
 	}
 
