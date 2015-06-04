@@ -19,8 +19,7 @@
  */
 package org.cast.cwm.service;
 
-import java.util.List;
-
+import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.admin.EditUserPanel;
@@ -30,6 +29,8 @@ import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.models.UserListModel;
 import org.cast.cwm.service.UserService.LoginData;
+
+import java.util.List;
 
 public interface IUserService {
 	
@@ -62,8 +63,9 @@ public interface IUserService {
 	 * Override to take action after a User is updated by some administrative action.
 	 * Does nothing by default.
 	 * @param mUser Model of the User that was changed.
+	 * @param trigger component that triggered the update
 	 */
-	public void onUserUpdated(IModel<User> mUser);
+	public void onUserUpdated(IModel<User> mUser, Component trigger);
 
 	public void generateSecurityToken(IModel<User> mUser);
 
@@ -104,7 +106,7 @@ public interface IUserService {
 	/**
 	 * Return any open LoginSession for this user.
 	 * (That is, where the end time is null). 
-	 * @param user
+	 * @param mUser model of the user to look for
 	 * @return Model of a List of LoginSessions.
 	 */
 	public IModel<List<LoginSession>> getOpenLoginSessions(IModel<User> mUser);

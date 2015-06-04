@@ -19,44 +19,26 @@
  */
 package org.cast.cwm.data;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.util.string.Strings;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
+
+import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A UserContent object represents a single chunk of user input.
@@ -193,7 +175,7 @@ public class UserContent extends PersistedObject {
 	/**
 	 * Sets the title value, as well as the lastUpdated field if the title has changed.
 	 * This enforces that lastUpdated will track any changes to the title.
-	 * @param text
+	 * @param title text to set
 	 */
 	public void setTitle(String title) {
 		if (!Strings.isEqual(this.title, title))
@@ -204,7 +186,7 @@ public class UserContent extends PersistedObject {
 	/**
 	 * Sets the primaryFile value, as well as the lastUpdated field if the file has changed.
 	 * This enforces that lastUpdated will track any changes to the primaryFile.
-	 * @param text
+	 * @param primaryFile value to set
 	 */
 	public void setPrimaryFile(BinaryFileData primaryFile) {
 		if (!ObjectUtils.equals(this.primaryFile, primaryFile))
