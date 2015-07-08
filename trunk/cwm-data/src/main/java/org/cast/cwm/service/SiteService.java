@@ -19,13 +19,11 @@
  */
 package org.cast.cwm.service;
 
-import java.util.List;
-
+import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.HibernateProvider;
-
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -38,7 +36,7 @@ import org.cast.cwm.data.component.HibernateEditPeriodForm;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
-import com.google.inject.Inject;
+import java.util.List;
 
 /**
  * General Service Class for both Sites and Periods  
@@ -161,22 +159,23 @@ public class SiteService implements ISiteService {
 	 * @see org.cast.cwm.service.ISiteService#getPeriodEditForm(java.lang.String, org.apache.wicket.model.IModel, org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public Form<Period> getPeriodEditForm(String id, IModel<Site> site, IModel<Period> period) {
+	public <T extends Period> Form<T> getPeriodEditForm(String id, Class<T> periodType,
+														IModel<Site> site, IModel<Period> mPeriod) {
 		// New Period
-		if (period == null || period.getObject() == null)
-			return new HibernateEditPeriodForm<Period>(id, site, Period.class);
+		if (mPeriod == null || mPeriod.getObject() == null)
+			return new HibernateEditPeriodForm<T>(id, site, periodType);
 		// Existing Period
-		if (!(period instanceof HibernateObjectModel))
-			throw new IllegalArgumentException("This Service class expects a UserModel (which extends Hibernate)");
-		return new HibernateEditPeriodForm<Period>(id, (HibernateObjectModel<Period>) period);
+		if (!(mPeriod instanceof HibernateObjectModel))
+			throw new IllegalArgumentException("This Service class expects HibernateObjectModel)");
+		return new HibernateEditPeriodForm<T>(id, (HibernateObjectModel<T>) mPeriod);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ISiteService#getPeriodEditForm(java.lang.String, org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public Form<Period> getPeriodEditForm(String id, IModel<Site> site) {
-		return getPeriodEditForm(id, site, null);
+	public <T extends Period> Form<T> getPeriodEditForm(String id, Class<T> periodType, IModel<Site> site) {
+		return getPeriodEditForm(id, periodType, site, null);
 	}
 	
 	/* (non-Javadoc)

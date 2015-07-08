@@ -19,12 +19,8 @@
  */
 package org.cast.cwm.service;
 
-import java.util.Date;
-import java.util.List;
-
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.wicket.model.IChainingModel;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Initialization;
@@ -36,6 +32,9 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.List;
 
 public class CwmService implements ICwmService {
 
@@ -113,6 +112,10 @@ public class CwmService implements ICwmService {
 			} else {
 				throw ex;
 			}
+		} catch (Exception ex) {
+			session.getTransaction().rollback();
+			log.error("Can't ignore exception: {}", ex);
+			ex.printStackTrace(System.err);
 		} finally {
 			session.beginTransaction();
 		}

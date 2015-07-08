@@ -19,10 +19,12 @@
  */
 package org.cast.cwm.admin;
 
+import com.google.inject.Inject;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -30,15 +32,17 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
+import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
-
-import com.google.inject.Inject;
 
 @AuthorizeInstantiation("ADMIN")
 public class PeriodInfoPage extends AdminPage {
 	
 	@Inject
-	protected ISiteService siteService;
+	private ISiteService siteService;
+
+	@Inject
+	private IAdminPageService adminPageService;
 
 	private IModel<Period> period = new Model<Period>(null);
 	private IModel<Site> site = new Model<Site>(null);
@@ -55,21 +59,21 @@ public class PeriodInfoPage extends AdminPage {
 		} else if (!parameters.get("siteId").isEmpty()) {
 			site = siteService.getSiteById(parameters.get("siteId").toLongObject());
 		} else {
-			setResponsePage(SiteListPage.class);
+			setResponsePage(adminPageService.getSiteListPage());
 			return;
 		}
-		
-		BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("siteLink", SiteInfoPage.class);
-		link.getPageParameters().set("siteId", site.getObject().getId());
-		add(link);
-		link.add(new Label("name", site.getObject().getName()));		
+
+		Link siteLink = adminPageService.getSiteEditPageLink("siteLink", site);
+		add(siteLink);
+		siteLink.add(new Label("name", site.getObject().getName()));
 
 		if (period.getObject() == null) {
 			add(new Label("instructions", "Create New Period"));
-			add(siteService.getPeriodEditForm("form", site));
-			// TODO: Cleaner way to do this?
-			add(new WebMarkupContainer("newStudentLink").setVisible(false));
-			add(new WebMarkupContainer("newTeacherLink").setVisible(false));
+			add(siteService.getPeriodEditForm("form", siteService.getPeriodClass(), site));
+			add(new EmptyPanel("newStudentLink"));
+			add(new EmptyPanel("newTeacherLink"));
+			add(new EmptyPanel("userList"));
+
 		} else {
 			add(new Label("instructions", new AbstractReadOnlyModel<String>() {
 
@@ -81,21 +85,21 @@ public class PeriodInfoPage extends AdminPage {
 				}
 				
 			}));
-			add(siteService.getPeriodEditForm("form", site, period));
-			
-			link = new BookmarkablePageLink<Void>("newStudentLink", UserFormPage.class);
+			add(siteService.getPeriodEditForm("form", siteService.getPeriodClass(), site, period));
+
+			BookmarkablePageLink link = new BookmarkablePageLink<Void>("newStudentLink", UserFormPage.class);
 			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.STUDENT_ROLENAME);
 			add(link);
 
 			link = new BookmarkablePageLink<Void>("newTeacherLink", UserFormPage.class);
 			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.TEACHER_ROLENAME);
 			add(link);
+
+			UserListPanel list = new UserListPanel("userList");
+			list.filterByPeriod(period);
+			add(list);
 		}
 		
-		UserListPanel list = new UserListPanel("userList");
-		list.filterByPeriod(period);
-				
-		add(list);
 	}
 	
 	@Override

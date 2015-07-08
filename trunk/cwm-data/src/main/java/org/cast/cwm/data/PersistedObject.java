@@ -19,9 +19,9 @@
  */
 package org.cast.cwm.data;
 
-import java.io.Serializable;
-
 import org.hibernate.proxy.HibernateProxy;
+
+import java.io.Serializable;
 
 /**
  * A base class that persisted objects can extend.  
@@ -59,36 +59,38 @@ public abstract class PersistedObject implements Serializable {
    * The class comparison handles the case where one or both of the objects may be Hibernate proxies.
    * Note that any two distinct transient objects will not be considered equal.
    * 
-   * @param obj - the object to compare against
+   * @param other - the object to compare against
    * @return true if equal
    */
   @Override
-  public boolean equals(Object obj) {
-	  if(this == obj) 
+  public boolean equals(Object other) {
+	  if(this == other)
 		  return true;
-	  if(obj == null) 
-		  return false;
-	  
-	  Class<?> otherClass;
-	  Class<?> thisClass;
-	  
-	  if (obj instanceof HibernateProxy)
-		  otherClass = ((HibernateProxy) obj).getHibernateLazyInitializer().getPersistentClass();
-	  else
-		  otherClass = obj.getClass();
-	  if (this instanceof HibernateProxy)
-		  thisClass = ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass();
-	  else
-		  thisClass = getClass();
-	  if (!thisClass.equals(otherClass))
-		  return false;
-	  
-	  PersistedObject other = (PersistedObject) obj;
-	 
-	  if (isTransient() || other.isTransient())
+	  if(other == null)
 		  return false;
 
-	  return getId().equals(other.getId());
+	  if (!(other instanceof PersistedObject))
+		return false;
+
+	  PersistedObject thisInit = this;
+	  if (this instanceof HibernateProxy) {
+		  thisInit = (PersistedObject) ((HibernateProxy) this).getHibernateLazyInitializer()
+				  .getImplementation();
+	  }
+
+	  PersistedObject otherInit = (PersistedObject) other;
+	  if (other instanceof HibernateProxy) {
+		  otherInit = (PersistedObject) ((HibernateProxy) otherInit).getHibernateLazyInitializer()
+				  .getImplementation();
+	  }
+
+	  if (!thisInit.getClass().equals(otherInit.getClass()))
+		  return false;
+	  
+	  if (thisInit.isTransient() || otherInit.isTransient())
+		  return false;
+
+	  return thisInit.getId().equals(otherInit.getId());
   }
   
   /**

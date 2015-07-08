@@ -19,43 +19,29 @@
  */
 package org.cast.cwm.admin;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.Role;
-import org.cast.cwm.data.User;
-import org.cast.cwm.service.ICwmSessionService;
-import org.cast.cwm.test.GuiceInjectedTestApplication;
-import org.junit.Before;
+import org.cast.cwm.service.AdminPageService;
+import org.cast.cwm.service.IAdminPageService;
+import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.junit.Test;
 
-public class AdminHomeTest {
+public class AdminHomeTest extends CwmDataBaseTestCase {
 
-	private WicketTester tester;
+	@Override
+	public void populateInjection() throws Exception {
+		getHelper().injectAndStubCwmSessionService(this);
+		getHelper().injectMock(IAppConfiguration.class);
 
-	@SuppressWarnings("unchecked")
-	@Before
-	public void setUp() {
-        Map<Class<? extends Object>, Object> injectionMap = new HashMap<Class<? extends Object>, Object>();
-        
-        IAppConfiguration configuration = mock(IAppConfiguration.class);
-		// when(configuration.getById(BinaryFileData.class, 1L)).thenReturn(mSampleBFD);
-        injectionMap.put(IAppConfiguration.class, configuration);
-        
-        ICwmSessionService cwmSessionService = mock(ICwmSessionService.class);
-        when(cwmSessionService.getUser()).thenReturn(new User(Role.ADMIN));
-        injectionMap.put(ICwmSessionService.class, cwmSessionService);
-        
-		@SuppressWarnings("rawtypes")
-		GuiceInjectedTestApplication application = new GuiceInjectedTestApplication(injectionMap);
+		// We use the real service class here, it is safe for testing
+		IAdminPageService adminPageService = getHelper().injectObject(IAdminPageService.class, new AdminPageService());
+	}
 
-		tester = new WicketTester(application);
+	@Override
+	public void setUpData() {
+		super.setUpData();
+		loggedInUser.setRole(Role.ADMIN);
 	}
 	
 	@Test

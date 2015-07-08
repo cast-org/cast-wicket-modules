@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.admin;
 
+import com.google.inject.Inject;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.markup.repeater.data.DataView;
@@ -31,10 +31,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
+import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ISiteService;
-
-import com.google.inject.Inject;
+import org.cwm.db.service.IModelProvider;
 
 /**
  * Page for viewing sites and their associated periods.  Links generated for edit site, edit
@@ -52,6 +52,12 @@ public class SiteListPage extends AdminPage {
 	@Inject
 	private ISiteService siteService;
 
+	@Inject
+	private IAdminPageService adminPageService;
+
+	@Inject
+	private IModelProvider modelProvider;
+
 	private static final long serialVersionUID = 1L;
 
 	public SiteListPage(PageParameters parameters) {
@@ -61,7 +67,7 @@ public class SiteListPage extends AdminPage {
 		
 		// If no sites in datastore, jump directly to creating a site
 		if (siteProvider.size() == 0) {
-			setResponsePage(SiteInfoPage.class);
+			setResponsePage(adminPageService.getSiteEditPage());
 			return;
 		}
 		
@@ -74,9 +80,8 @@ public class SiteListPage extends AdminPage {
 			protected void populateItem(Item<Site> item) {
 				
 				// Link to edit site directly
-				item.add(new BookmarkablePageLink<Void>("siteLink", SiteInfoPage.class,
-						new PageParameters().set("siteId", item.getModelObject().getId()))
-						 	.add(new Label("name", item.getModelObject().getName())));
+				item.add(adminPageService.getSiteEditPageLink("siteLink", item.getModel())
+						.add(new Label("name", item.getModelObject().getName())));
 				
 				DeletePersistedObjectDialog<Site> dialog = new DeletePersistedObjectDialog<Site>("deleteSiteModal", item.getModel()) {
 					
@@ -97,14 +102,12 @@ public class SiteListPage extends AdminPage {
 					WebMarkupContainer c = new WebMarkupContainer(rv.newChildId());
 					rv.add(c);
 					
-					c.add(new BookmarkablePageLink<Void>("periodLink", PeriodInfoPage.class,
-							new PageParameters().set("periodId", p.getId()))
-								.add(new Label("name", p.getName())));
+					c.add(adminPageService.getPeriodEditPageLink("periodLink", modelProvider.modelOf(p))
+							.add(new Label("name", p.getName())));
 				}
 				
 				// Link to add a new period to the site directly
-				item.add(new BookmarkablePageLink<Void>("newPeriodLink", PeriodInfoPage.class,
-						new PageParameters().set("siteId", item.getModelObject().getId())));
+				item.add(adminPageService.getNewPeriodEditPageLink("newPeriodLink", item.getModel()));
 			}
 		};
 		
@@ -112,6 +115,6 @@ public class SiteListPage extends AdminPage {
 		add(siteList);
 		
 		// Link to add a new site
-		add(new BookmarkablePageLink<Void>("newSiteLink", SiteInfoPage.class));
+		add(adminPageService.getNewSiteEditPageLink("newSiteLink"));
 	}
 }

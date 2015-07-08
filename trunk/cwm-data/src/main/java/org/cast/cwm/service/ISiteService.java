@@ -19,8 +19,6 @@
  */
 package org.cast.cwm.service;
 
-import java.util.List;
-
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -28,40 +26,43 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 
+import java.util.List;
+
 public interface ISiteService {
 
-	public Class<? extends Site> getSiteClass();
+	Class<? extends Site> getSiteClass();
 
 	/**
 	 * Create a new instance of the specified Site class.
 	 * @return
 	 */
-	public Site newSite();
+	Site newSite();
 
-	public IModel<List<Site>> listSites();
+	IModel<List<Site>> listSites();
 
-	public IDataProvider<Site> listSitesPageable();
+	IDataProvider<Site> listSitesPageable();
 
-	public IModel<Site> getSiteById(Long id);
+	IModel<Site> getSiteById(Long id);
 
-	public IModel<Site> getSiteByName(String name);
+	IModel<Site> getSiteByName(String name);
 
-	public Class<? extends Period> getPeriodClass();
+	Class<? extends Period> getPeriodClass();
 
 	/**
 	 * Create a new instance of the specified Period class.
 	 * @return
 	 */
-	public Period newPeriod();
+	 Period newPeriod();
 
-	public IModel<List<Period>> listPeriods();
+	IModel<List<Period>> listPeriods();
 
-	public IModel<Period> getPeriodById(long id);
+	IModel<Period> getPeriodById(long id);
 
-	public Form<Period> getPeriodEditForm(String id, IModel<Site> site,
-			IModel<Period> period);
+	<T extends Period> Form<T> getPeriodEditForm(String id, Class<T> periodClass,
+												 IModel<Site> site, IModel<Period> period);
 
-	public Form<Period> getPeriodEditForm(String id, IModel<Site> site);
+	<T extends Period> Form<T> getPeriodEditForm(String id, Class<T> periodClass,
+													  IModel<Site> site);
 
 	/**
 	 * Deletes a period from the datastore, removing all associations
@@ -69,13 +70,13 @@ public interface ISiteService {
 	 * 
 	 * @param period
 	 */
-	public void deletePeriod(IModel<Period> period);
+	void deletePeriod(IModel<Period> period);
 
 	/**
 	 * Get the period by name - this assumes the name is unique
 	 */
-	public IModel<Period> getPeriodByName(String name);
+	IModel<Period> getPeriodByName(String name);
 
-	public IModel<Period> newPeriod(String defaultName);
+	IModel<Period> newPeriod(String defaultName);
 
 }

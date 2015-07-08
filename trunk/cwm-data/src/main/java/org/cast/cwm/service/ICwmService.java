@@ -19,11 +19,11 @@
  */
 package org.cast.cwm.service;
 
-import java.util.List;
-
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.init.IDatabaseInitializer;
+
+import java.util.List;
 
 public interface ICwmService {
 
@@ -31,15 +31,16 @@ public interface ICwmService {
 	 * Checks the model wrapping a {@link PersistedObject} to confirm that
 	 * it has properly been implemented to work with the underlying datastore.
 	 * 
-	 * Override this method to provide your own custom implementation.
-	 * @param objectModel
+	 * @param objectModel model to check
 	 */
 	void confirmDatastoreModel(IModel<? extends PersistedObject> objectModel);
 
 	/**
 	 * Look up a datastore object by its ID.  This method is implemented using
 	 * the underlying datastore system.
-	 * 
+	 *
+	 * @param clazz type of the object (subclass of PersistedObject)
+	 * @param id database ID of the object
 	 */
 	<T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id);
 
@@ -47,21 +48,21 @@ public interface ICwmService {
 	 * Add a {@link PersistedObject} to the datastore.
 	 * Does not take a model as parameter because you usually won't have one for a
 	 * brand new object.
-	 * @param object
+	 * @param object object to make persistent
 	 */
 	void save(PersistedObject object);
 
 	/**
 	 * Delete a {@link PersistedObject} from the datastore.
 	 * 
-	 * @param objectModel
+	 * @param objectModel model of object to delete
 	 */
 	void delete(IModel<? extends PersistedObject> objectModel);
 	
 	/**
 	 * Delete a {@link PersistedObject} from the datastore.
 	 * 
-	 * @param object
+	 * @param object to delete
 	 */
 	void delete(PersistedObject object);
 
@@ -84,7 +85,7 @@ public interface ICwmService {
 	 * and any exceptions will be ignored.
 	 * </p>
 	 * 
-	 * @param catchErrors
+	 * @param catchErrors true to ignore exceptions
 	 */
 	void flushChanges(boolean catchErrors);
 
@@ -98,6 +99,6 @@ public interface ICwmService {
 	 * Record an initialization record in the database.
 	 * @param initializer the database initializer that was run.
 	 */
-	void saveInitialization(IDatabaseInitializer izer);
+	void saveInitialization(IDatabaseInitializer initializer);
 
 }

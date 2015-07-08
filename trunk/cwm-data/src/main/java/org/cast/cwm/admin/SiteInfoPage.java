@@ -34,7 +34,7 @@ import org.apache.wicket.markup.html.form.FormComponentLabel;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -55,6 +55,7 @@ import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
+import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.UserSpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
@@ -78,7 +79,10 @@ public class SiteInfoPage extends AdminPage {
 	private IModel<Site> mSite = null;
 	
 	@Inject
-	protected ISiteService siteService;
+	private ISiteService siteService;
+
+	@Inject
+	private IAdminPageService adminPageService;
 
 	private static final long serialVersionUID = 1L;
 
@@ -89,10 +93,10 @@ public class SiteInfoPage extends AdminPage {
 		Long siteId = param.get("siteId").toOptionalLong();
 		mSite = siteService.getSiteById(siteId); // May create a Transient Instance
 		if (siteId != null && mSite.getObject() == null)
-			throw new RestartResponseAtInterceptPageException(SiteListPage.class);
+			throw new RestartResponseAtInterceptPageException(adminPageService.getSiteListPage());
 
 		// Breadcrumb link
-		add(new BookmarkablePageLink<Void>("siteList", SiteListPage.class));
+		add(adminPageService.getSiteListPageLink("siteList"));
 
 		// Directions (Create New vs Existing)
 		add(new Label("instructions", new AbstractReadOnlyModel<String>() {
@@ -110,14 +114,13 @@ public class SiteInfoPage extends AdminPage {
 		add(new SiteForm("form", mSite));
 
 		// List Existing Periods
-		ListView<Period> list = new ListView<Period>("periodList", new PropertyModel<List<Period>>(mSite, "sitesAsSortedReadOnlyList")) {
+		ListView<Period> list = new ListView<Period>("periodList", new PropertyModel<List<Period>>(mSite, "periodsAsSortedReadOnlyList")) {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			protected void populateItem(ListItem<Period> item) {
-				BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("periodLink", PeriodInfoPage.class);
-				link.getPageParameters().add("periodId", item.getModelObject().getId());
+				Link link = adminPageService.getPeriodEditPageLink("periodLink", item.getModel());
 				item.add(link);
 				link.add(new Label("name", item.getModelObject().getName()));
 
@@ -137,9 +140,7 @@ public class SiteInfoPage extends AdminPage {
 		add(list);
 
 		// Link to create a new Period
-		BookmarkablePageLink<Void> createNewPeriod = new BookmarkablePageLink<Void>("createNewPeriod", PeriodInfoPage.class);
-		if (siteId != null)
-			createNewPeriod.getPageParameters().add("siteId", siteId);
+		Link createNewPeriod = adminPageService.getNewPeriodEditPageLink("createNewPeriod", mSite);
 		createNewPeriod.setVisible(!mSite.getObject().isTransient()); // For Enclosure Visibility
 		add(createNewPeriod);
 

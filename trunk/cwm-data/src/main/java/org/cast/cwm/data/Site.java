@@ -19,32 +19,19 @@
  */
 package org.cast.cwm.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.OneToMany;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.apache.wicket.markup.html.list.ListView;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
+
+import javax.persistence.*;
+import javax.persistence.Entity;
+import java.util.*;
 
 /**
  * A named location and group of {@link Period} objects.  Conceptually, this should
@@ -94,7 +81,7 @@ public class Site extends PersistedObject {
 	 * 
 	 * @return
 	 */
-	public List<Period> getSitesAsSortedReadOnlyList() {
+	public List<Period> getPeriodsAsSortedReadOnlyList() {
 		List<Period> list = new ArrayList<Period>(periods);
 		Collections.sort(list);
 		return Collections.unmodifiableList(list);
