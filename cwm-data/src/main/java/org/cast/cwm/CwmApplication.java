@@ -19,18 +19,18 @@
  */
 package org.cast.cwm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
+import com.google.inject.Binder;
+import com.google.inject.Inject;
+import com.google.inject.Module;
+import com.google.inject.Scopes;
 import lombok.Getter;
 import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
-
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
@@ -41,49 +41,25 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.util.file.File;
-import org.cast.cwm.admin.AdminHome;
-import org.cast.cwm.admin.CacheManagementPage;
-import org.cast.cwm.admin.DatabaseStatisticsPage;
-import org.cast.cwm.admin.EventLog;
-import org.cast.cwm.admin.PeriodInfoPage;
-import org.cast.cwm.admin.SessionListPage;
-import org.cast.cwm.admin.SiteInfoPage;
-import org.cast.cwm.admin.SiteListPage;
-import org.cast.cwm.admin.UserContentLogPage;
-import org.cast.cwm.admin.UserContentViewPage;
-import org.cast.cwm.admin.UserFormPage;
-import org.cast.cwm.admin.UserListPage;
-import org.cast.cwm.data.IResponseType;
-import org.cast.cwm.data.LoginSession;
-import org.cast.cwm.data.ResponseType;
-import org.cast.cwm.data.Role;
-import org.cast.cwm.data.User;
+import org.cast.cwm.admin.*;
+import org.cast.cwm.data.*;
 import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
-import org.cast.cwm.service.CwmService;
-import org.cast.cwm.service.CwmSessionService;
-import org.cast.cwm.service.ICwmService;
-import org.cast.cwm.service.ICwmSessionService;
-import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.SiteService;
+import org.cast.cwm.service.*;
 import org.cwm.db.service.HibernateObjectModelProvider;
 import org.cwm.db.service.IModelProvider;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
-
-import com.google.inject.Binder;
-import com.google.inject.Inject;
-import com.google.inject.Module;
-import com.google.inject.Scopes;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /** 
  * An abstract Application class that CWM-based apps can extend.
@@ -92,11 +68,11 @@ import com.google.inject.Scopes;
  * at start time.
  * 
  * This class expects there to be a java initialization parameter named
- * propertiesFile, containing the absolute path to a file of application
- * properties (which can then be accessed from the application object
- * via {@link #getAppProperties()}).
+ * "appConfig" (or, for back-compatibility, "propertiesFile"),
+ * containing the absolute path to a file of application properties
+ * (which can then be accessed from the application object via {@link #getConfiguration()}).
  * 
- * Application properties that should be provided include:
+ * Application configuration dproperties that should be provided include:
  *  * cwm.hibernateConfig: path to a configuration file for Hibernate
  *  * cwm.logConfig: path to a configuration file for Logback logging system.
  *  * cwm.instanceId: identifier for the particular server instance
@@ -131,6 +107,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Inject 
 	private IResponseTypeRegistry responseTypeRegistry;
+
+	@Inject
+	private IAdminPageService adminPageService;
 	
 	private LoginSessionCloser loginSessionCloser;
 	
@@ -227,6 +206,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 				binder.bind(ISiteService.class).to(SiteService.class).in(Scopes.SINGLETON);
 				binder.bind(IAppConfiguration.class).toInstance(configuration);
 				binder.bind(IModelProvider.class).to(HibernateObjectModelProvider.class);
+				binder.bind(IAdminPageService.class).to(AdminPageService.class);
 			}
 		});
 		return modules;
@@ -256,20 +236,20 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	protected void configureMountPaths() {
 		
-		mountPage("admin", AdminHome.class);
+		mountPage("admin", adminPageService.getAdminHomePage());
+		mountPage("sitelist", adminPageService.getSiteListPage());
+		mountPage("site", adminPageService.getSiteEditPage());
+		mountPage("period", adminPageService.getPeriodEditPage());
+		mountPage("userlist", adminPageService.getUserListPage());
+		mountPage("edituser", adminPageService.getUserEditPage());
+
 		mountPage("stats", DatabaseStatisticsPage.class);
 		mountPage("cache", CacheManagementPage.class);
-		mountPage("sitelist", SiteListPage.class);
-		mountPage("userlist", UserListPage.class);
 		mountPage("eventlog", EventLog.class);
 		mountPage("uclog", UserContentLogPage.class);
 		mountPage("ucview", UserContentViewPage.class);
 		
-		// The following have query parameters
-		mountPage("period", PeriodInfoPage.class);
 		mountPage("sessions", SessionListPage.class);
-		mountPage("site", SiteInfoPage.class);
-		mountPage("edituser", UserFormPage.class);
 	}
 	
 	/** 
@@ -303,7 +283,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 */
 	public Class<? extends Page> getHomePage(Role role) {
 		if (role == Role.ADMIN)
-			return AdminHome.class;
+			return adminPageService.getAdminHomePage();
 		return getHomePage();
 	}
 	
@@ -446,7 +426,8 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	@Override
 	protected void onDestroy() {
 		log.debug("Running shutdown steps");
-		loginSessionCloser.interrupt();
+		if (loginSessionCloser != null)
+			loginSessionCloser.interrupt();
 		this.getHibernateSessionFactory(null).close();
 		super.onDestroy();
 	}

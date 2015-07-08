@@ -19,10 +19,7 @@
  */
 package org.cast.cwm.admin;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.inject.Inject;
 import org.apache.wicket.Page;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.devutils.inspector.InspectorPage;
@@ -32,9 +29,12 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ICwmSessionService;
 
-import com.google.inject.Inject;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This is the home page for the ADMIN users.
@@ -44,7 +44,10 @@ import com.google.inject.Inject;
 public class AdminHome extends AdminPage {
 	
 	@Inject
-	ICwmSessionService cwmSessionService;
+	private ICwmSessionService cwmSessionService;
+
+	@Inject
+	private IAdminPageService adminPageService;
 
 	private static final long serialVersionUID = 1L;
 
@@ -82,8 +85,8 @@ public class AdminHome extends AdminPage {
 			
 		// Links for users with full admin rights
 		if (cwmSessionService.getUser().hasRole(Role.ADMIN)) {
-			map.put("Create/Edit Users", UserListPage.class);
-			map.put("Create/Edit Sites", SiteListPage.class);
+			map.put("Create/Edit Users", adminPageService.getUserListPage());
+			map.put("Create/Edit Sites", adminPageService.getSiteListPage());
 			map.put("Database Statistics", DatabaseStatisticsPage.class);
 			map.put("Cache Management", CacheManagementPage.class);
 			map.put("Open login sessions", SessionListPage.class);

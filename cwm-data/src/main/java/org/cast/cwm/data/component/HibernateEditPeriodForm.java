@@ -21,7 +21,6 @@ package org.cast.cwm.data.component;
 
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
@@ -35,30 +34,28 @@ import org.cast.cwm.data.validator.UniqueDataFieldValidator;
 public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 
 	private static final long serialVersionUID = 1L;
-	private IModel<Site> site;
-	
+	private IModel<Site> mSite;
+
 	public HibernateEditPeriodForm(String id, HibernateObjectModel<T> model) {
 		super(id, model);
-		site = new PropertyModel<Site>(model, "site");
+		mSite = new PropertyModel<Site>(model, "site");
 		addFields();
 	}
 	
 	public HibernateEditPeriodForm(String id, IModel<Site> siteModel, Class<T> periodClass) {
 		super(id, periodClass);
-		getModelObject().setSite(siteModel.getObject());
-		site = siteModel;
+		mSite = siteModel;
 		addFields();
 	}
 
 	private void addFields() {
-
 		add(new FeedbackPanel("feedback"));
 		UniqueDataFieldValidator<String> validator;
 		if (getModelObject().isTransient())
 			validator = new UniqueDataFieldValidator<String>(Period.class, "name");
 		else
 			validator = new UniqueDataFieldValidator<String>(getModel(), "name");
-		validator.limitScope("site", site);
+		validator.limitScope("site", mSite);
 		
 		add(new FeedbackBorder("nameBorder").add(
 				new RequiredTextField<String>("name")
@@ -70,14 +67,15 @@ public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 	@Override
 	protected void onSubmit() {
 		String message = getModelObject().isTransient() ? "Saved." : "Updated.";
+		getModelObject().setSite(mSite.getObject());
 		super.onSubmit();
 		info("Period '" + getModelObject().getName() + "' " + message);
 	}
 	
 	@Override 
 	protected void onDetach() {
-		site.detach();
 		super.onDetach();
+		mSite.detach();
 	}
 }
 

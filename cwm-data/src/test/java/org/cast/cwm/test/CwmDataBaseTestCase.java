@@ -19,12 +19,12 @@
  */
 package org.cast.cwm.test;
 
-import java.util.Arrays;
-import java.util.TreeSet;
-
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
+
+import java.util.Arrays;
+import java.util.TreeSet;
 
 public class CwmDataBaseTestCase extends CwmBaseTestCase {
 
@@ -36,7 +36,7 @@ public class CwmDataBaseTestCase extends CwmBaseTestCase {
 	}
 
 	@Override
-	protected InjectionTestHelper getInjectionTestHelper() {
+	protected CwmDataInjectionTestHelper getInjectionTestHelper() {
 		return new CwmDataInjectionTestHelper();
 	}
 	
