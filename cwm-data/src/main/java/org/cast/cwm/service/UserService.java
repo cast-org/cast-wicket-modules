@@ -71,7 +71,7 @@ public class UserService implements IUserService {
 	/** 
 	 * Instantiate an instance of the application's User class.
 	 * 
-	 * @return
+	 * @return an object of type User or the appropriate subtype.
 	 */
 	@Override
 	public User newUser() {
@@ -173,16 +173,15 @@ public class UserService implements IUserService {
 		c.setGetAllUsers(true);
 		c.setSortState(sort);
 		UserListModel userListModel = new UserListModel(c);
-		HibernateObjectModel<User> mUser = new HibernateObjectModel<User>(userListModel.getObject().get(0));
-		
-		return mUser;
+
+		return new HibernateObjectModel<User>(userListModel.getObject().get(0));
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getByFullnameFromPeriod(java.lang.String, java.lang.String, org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public IModel<User> getByFullnameFromPeriod(String firstName, String lastName, IModel<Period> period) {
+	public IModel<User> getByFullnameFromPeriod(String firstName, String lastName, IModel<? extends Period> period) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setFirstName(firstName);
 		c.setLastName(lastName);
@@ -213,12 +212,12 @@ public class UserService implements IUserService {
 	 * @see org.cast.cwm.service.IUserService#getUserListProvider(org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod) {
+	public ISortableDataProvider<User,String> getUserListProvider(IModel<? extends Period> mPeriod) {
 		return getUserListProvider(mPeriod, null);
 	}
 
 	@Override
-	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role) {
+	public ISortableDataProvider<User,String> getUserListProvider(IModel<? extends Period> mPeriod, Role role) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
 		c.setRole(role);
@@ -229,7 +228,7 @@ public class UserService implements IUserService {
 	 * @see org.cast.cwm.service.IUserService#getUncachedStudentListProvider(org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<Period> mPeriod) {
+	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<? extends Period> mPeriod) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
 		c.setPeriod(mPeriod);
 		c.setCacheResults(false);

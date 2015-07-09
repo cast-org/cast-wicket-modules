@@ -19,13 +19,10 @@
  */
 package org.cast.cwm.data.builders;
 
-import java.util.Collection;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.models.hib.CriteriaBuilder;
 import net.databinder.models.hib.OrderingCriteriaBuilder;
-
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
@@ -39,6 +36,8 @@ import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.Collection;
 /**
  * <p>
  * An object used to query for {@link User} object(s).
@@ -64,7 +63,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private String lastName;
 	private String email;
 	private String subjectId;
-	private IModel<Period> period;
+	private IModel<? extends Period> period;
 	private IModel<? extends Collection<Site>> sites;
 	private ISortState<String> sortState = new SingleSortState<String>();
 	private boolean cacheResults = true;

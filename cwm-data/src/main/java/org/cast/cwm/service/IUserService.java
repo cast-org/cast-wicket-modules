@@ -83,14 +83,14 @@ public interface IUserService {
 	public IModel<User> getAllByEmail(String email);
 
 	public IModel<User> getByFullnameFromPeriod(String firstName,
-			String lastName, IModel<Period> period);
+			String lastName, IModel<? extends Period> period);
 
 	public UserListModel getByRole(Role role);
 
 	public ISortableDataProvider<User,String> getUserListProvider();
 
 	public ISortableDataProvider<User,String> getUserListProvider(
-			IModel<Period> mPeriod);
+			IModel<? extends Period> mPeriod);
 
 	/**
 	 * Find Users with a given Role in a given Period.
@@ -99,9 +99,9 @@ public interface IUserService {
 	 * @param role
 	 * @return a sortable DataProvider with the list.
 	 */
-	public ISortableDataProvider<User,String> getUserListProvider(IModel<Period> mPeriod, Role role);
+	public ISortableDataProvider<User,String> getUserListProvider(IModel<? extends Period> mPeriod, Role role);
 
-	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<Period> mPeriod);
+	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<? extends Period> mPeriod);
 
 	/**
 	 * Return any open LoginSession for this user.
