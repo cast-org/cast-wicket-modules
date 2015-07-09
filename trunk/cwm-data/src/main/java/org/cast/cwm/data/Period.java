@@ -19,26 +19,18 @@
  */
 package org.cast.cwm.data;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.SortNatural;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
+
+import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * <p>
