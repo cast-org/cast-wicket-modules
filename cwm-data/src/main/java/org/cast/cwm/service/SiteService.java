@@ -206,4 +206,13 @@ public class SiteService implements ISiteService {
 		return new HibernateObjectModel<Period>(Period.class, pcb);
 	}
 
+	@Override
+	public void onPeriodCreated(IModel<? extends Period> mPeriod) {
+		// Does nothing by default
+	}
+
+	@Override
+	public void onPeriodEdited(IModel<? extends Period> mPeriod) {
+		// Does nothing by default
+	}
 }

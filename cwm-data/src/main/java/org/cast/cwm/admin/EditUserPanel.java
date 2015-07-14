@@ -232,6 +232,7 @@ public class EditUserPanel extends Panel {
 	 * @param trigger the component that triggered the creation
 	 */
 	protected void onUserCreated(IModel<User> mUser, Component trigger) {
+		userService.onUserCreated(mUser, trigger);
 		if (autoConfirmNewUser)
 			userService.confirmUser(mUser.getObject());
 	}

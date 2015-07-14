@@ -100,10 +100,18 @@ public class UserService implements IUserService {
 		mUser.getObject().generateSecurityToken();
 		cwmService.flushChanges();
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IUserService#onUserUpdated(IModel)
-	 */
+	* @see org.cast.cwm.service.IUserService#onUserCreated(IModel, Component)
+	*/
+	@Override
+	public void onUserCreated(IModel<User> mUser, Component trigger) {
+		// Does nothing by default
+	}
+
+	/* (non-Javadoc)
+	* @see org.cast.cwm.service.IUserService#onUserUpdated(IModel, Component)
+	*/
 	@Override
 	public void onUserUpdated(IModel<User> mUser, Component trigger) {
 		// Does nothing by default.

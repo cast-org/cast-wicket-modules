@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data.component;
 
+import com.google.inject.Inject;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.markup.html.form.RequiredTextField;
@@ -30,10 +31,13 @@ import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
+import org.cast.cwm.service.ISiteService;
 
 public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 
-	private static final long serialVersionUID = 1L;
+	@Inject
+	private ISiteService siteService;
+
 	private IModel<Site> mSite;
 
 	public HibernateEditPeriodForm(String id, HibernateObjectModel<T> model) {
@@ -59,20 +63,35 @@ public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 		
 		add(new FeedbackBorder("nameBorder").add(
 				new RequiredTextField<String>("name")
-				.add(StringValidator.lengthBetween(1, 32))
-				.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")) // NO comma since spreadsheet upload uses comma-sep list.
-				.add(validator)));
+						.add(StringValidator.lengthBetween(1, 32))
+						.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")) // NO comma since spreadsheet upload uses comma-sep list.
+						.add(validator)));
 	}
 	
 	@Override
 	protected void onSubmit() {
-		String message = getModelObject().isTransient() ? "Saved." : "Updated.";
+		boolean periodIsNew = getModelObject().isTransient();
+		String message = periodIsNew ? "Saved." : "Updated.";
 		getModelObject().setSite(mSite.getObject());
 		super.onSubmit();
 		info("Period '" + getModelObject().getName() + "' " + message);
+
+		if (periodIsNew)
+			onPeriodCreated(getModel());
+		else
+			onPeriodEdited(getModel());
 	}
-	
-	@Override 
+
+	protected void onPeriodCreated(IModel<T> mPeriod) {
+		siteService.onPeriodCreated(mPeriod);
+
+	}
+
+	private void onPeriodEdited(IModel<T> mPeriod) {
+		siteService.onPeriodEdited(mPeriod);
+	}
+
+	@Override
 	protected void onDetach() {
 		super.onDetach();
 		mSite.detach();
