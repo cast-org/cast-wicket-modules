@@ -34,7 +34,7 @@ public interface ISiteService {
 
 	/**
 	 * Create a new instance of the specified Site class.
-	 * @return
+	 * @return the new Site
 	 */
 	Site newSite();
 
@@ -50,9 +50,9 @@ public interface ISiteService {
 
 	/**
 	 * Create a new instance of the specified Period class.
-	 * @return
+	 * @return the new Period
 	 */
-	 Period newPeriod();
+	Period newPeriod();
 
 	IModel<List<Period>> listPeriods();
 
@@ -68,7 +68,7 @@ public interface ISiteService {
 	 * Deletes a period from the datastore, removing all associations
 	 * with related objects (e.g. {@link User}s and {@link Site}).
 	 * 
-	 * @param period
+	 * @param period model of the Period to delete
 	 */
 	void deletePeriod(IModel<Period> period);
 
@@ -78,5 +78,21 @@ public interface ISiteService {
 	IModel<Period> getPeriodByName(String name);
 
 	IModel<Period> newPeriod(String defaultName);
+
+	/**
+	 * Override to take action whenever a new Period is created by administrative action.
+	 * Does nothing by default.
+	 *
+	 * @param mPeriod model of the new Period.
+	 */
+	void onPeriodCreated(IModel<? extends Period> mPeriod);
+
+	/**
+	 * Override to take action whenever a Period is edited by administrative action.
+	 * Does nothing by default.
+	 *
+	 * @param mPeriod model of the edited Period.
+	 */
+	void onPeriodEdited(IModel<? extends Period> mPeriod);
 
 }

@@ -39,13 +39,13 @@ public interface IUserService {
 	 * Normally @User, but subclassses may override it with a customized subclass.
 	 * @return class of User
 	 */
-	public Class<? extends User> getUserClass();
+	Class<? extends User> getUserClass();
 
 	/**
 	 * Create a new transient User object of the correct class.
 	 * (Applications may override this in a subclass to use a customized User class).
 	 */
-	public User newUser();
+	User newUser();
 
 	/**
 	 * Mark a user as valid in the database.  Commits changes
@@ -55,64 +55,75 @@ public interface IUserService {
 	 * 
 	 * see: {@link EditUserPanel#setAutoConfirmNewUser(boolean)}
 	 *
-	 * @param user
+	 * @param user User to mark as confirmed.
 	 */
-	public void confirmUser(User user);
-	
+	void confirmUser(User user);
+
+	/**
+	 * Override to take action after a User is created by some administrative action.
+	 *
+	 * @param mUser Model of the User that was just added.
+	 * @param trigger component that triggered the add.
+	 */
+	void onUserCreated(IModel<User> mUser, Component trigger);
+
 	/**
 	 * Override to take action after a User is updated by some administrative action.
 	 * Does nothing by default.
 	 * @param mUser Model of the User that was changed.
 	 * @param trigger component that triggered the update
 	 */
-	public void onUserUpdated(IModel<User> mUser, Component trigger);
+	void onUserUpdated(IModel<User> mUser, Component trigger);
 
-	public void generateSecurityToken(IModel<User> mUser);
+	void generateSecurityToken(IModel<User> mUser);
 
-	public IModel<List<User>> getAllUsers();
+	IModel<List<User>> getAllUsers();
 
-	public IModel<User> getById(long userId);
+	IModel<User> getById(long userId);
 
-	public IModel<User> getByUsername(String username);
+	IModel<User> getByUsername(String username);
 
-	public IModel<User> getBySubjectId(String subjectId);
+	IModel<User> getBySubjectId(String subjectId);
 
-	public IModel<User> getByEmail(String email);
+	IModel<User> getByEmail(String email);
 
 	// gets both valid and invalid users
-	public IModel<User> getAllByEmail(String email);
+	IModel<User> getAllByEmail(String email);
 
-	public IModel<User> getByFullnameFromPeriod(String firstName,
-			String lastName, IModel<? extends Period> period);
+	IModel<User> getByFullnameFromPeriod(String firstName,
+										 String lastName, IModel<? extends Period> period);
 
-	public UserListModel getByRole(Role role);
+	UserListModel getByRole(Role role);
 
-	public ISortableDataProvider<User,String> getUserListProvider();
+	ISortableDataProvider<User,String> getUserListProvider();
 
-	public ISortableDataProvider<User,String> getUserListProvider(
+	ISortableDataProvider<User,String> getUserListProvider(
 			IModel<? extends Period> mPeriod);
 
 	/**
 	 * Find Users with a given Role in a given Period.
 	 * For instance, this can find all the students in a classroom.
-	 * @param mPeriod
-	 * @param role
+	 *
+	 * @param mPeriod model of period to query
+	 * @param role Role of users to return
 	 * @return a sortable DataProvider with the list.
 	 */
-	public ISortableDataProvider<User,String> getUserListProvider(IModel<? extends Period> mPeriod, Role role);
+	ISortableDataProvider<User,String> getUserListProvider(IModel<? extends Period> mPeriod, Role role);
 
-	public ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<? extends Period> mPeriod);
+	ISortableDataProvider<User,String> getUncachedStudentListProvider(IModel<? extends Period> mPeriod);
 
 	/**
 	 * Return any open LoginSession for this user.
-	 * (That is, where the end time is null). 
+	 * (That is, where the end time is null).
+	 *
 	 * @param mUser model of the user to look for
 	 * @return Model of a List of LoginSessions.
 	 */
-	public IModel<List<LoginSession>> getOpenLoginSessions(IModel<User> mUser);
+	IModel<List<LoginSession>> getOpenLoginSessions(IModel<User> mUser);
 
 	/**
 	 * Return a list of all LoginSessions for the given User.
+	 *
 	 * @param mUser Model of a User
 	 * @return Model of the list of LoginSessions.
 	 */
@@ -123,10 +134,9 @@ public interface IUserService {
 	 * and the latest login date for a particular user.  This is a
 	 * (somewhat) efficient query.
 	 * 
-	 * @param user
-	 * @return
+	 * @param user User to query
+	 * @return LoginData object containing the requested information
 	 */
-	public LoginData getLoginSessions(IModel<User> user);
-
+	LoginData getLoginSessions(IModel<User> user);
 
 }
