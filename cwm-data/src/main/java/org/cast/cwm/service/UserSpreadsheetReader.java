@@ -19,38 +19,34 @@
  */
 package org.cast.cwm.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.CharacterCodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateObjectModel;
-
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
+import org.cwm.db.service.IModelProvider;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.generationjava.io.CsvReader;
-import com.google.inject.Inject;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.nio.charset.CharacterCodingException;
+import java.util.*;
 
 /**
  * Object to read a spreadsheet defining users and create those users in the database.
@@ -61,13 +57,16 @@ import com.google.inject.Inject;
 public class UserSpreadsheetReader implements Serializable {
 	
 	@Inject
-	protected ICwmService cwmService;
+	private ICwmService cwmService;
 	
 	@Inject
-	protected ISiteService siteService;
+	private ISiteService siteService;
 	
 	@Inject
-	protected IUserService userService;
+	private IUserService userService;
+
+	@Inject
+	private IModelProvider modelProvider;
 
 	@Getter @Setter
 	protected IModel<Site> defaultSite;
@@ -88,12 +87,13 @@ public class UserSpreadsheetReader implements Serializable {
 	protected List<PotentialUserSave> potentialUsers;
 	
 	protected Map<String,Site> potentialSites;
-	
+
 	protected Map<Site,Map<String,Period>> potentialPeriods;
 	
 	private static final Logger log = LoggerFactory.getLogger(UserSpreadsheetReader.class);
 	
 	private static final long serialVersionUID = 1L;
+	private Map<String, Integer> headerMap;
 
 
 	public UserSpreadsheetReader() {
@@ -111,148 +111,131 @@ public class UserSpreadsheetReader implements Serializable {
 	 */
 	public boolean readInput (InputStream stream) {
 		potentialUsers = new ArrayList<PotentialUserSave>();
-		potentialSites = new HashMap<String,Site>();
-		potentialPeriods = new HashMap<Site,Map<String,Period>>();
-  		String[] values = null; // The values of each User row in the CSV file
-  		String[] header = null; // The header column row in the CSV file
-  		int line = 1;           // Line counter for error reporting.
-  		
-  		CsvReader reader;
-  		try {
-			reader = new CsvReader(new InputStreamReader(stream, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
+		potentialSites = new HashMap<String, Site>();
+		potentialPeriods = new HashMap<Site, Map<String, Period>>();
+
+		CSVParser parser;
+		try {
+			parser = CSVFormat.EXCEL
+					.withHeader()
+					.withIgnoreEmptyLines()
+					.withIgnoreSurroundingSpaces()
+					.parse(new InputStreamReader(new BOMInputStream(stream), "UTF-8"));
+		} catch (IOException e) {
 			log.error(e.getMessage());
 			globalError = e.getMessage();
 			return false;
 		}
-  		
-  		// Get Headers from CSV file
-  		try {
-			header = reader.readLine();
-		} catch (IOException e) {
-			globalError = e.getMessage();
+
+		// Make our own secondary mapping of header names to fields, by
+		// lowercasing and removing spaces from all header names
+		headerMap = parser.getHeaderMap();
+		for (String hdr : new HashSet<String>(headerMap.keySet())) {
+			String normalized = hdr.toLowerCase().replaceAll("\\s", "");
+			if (!normalized.equals(hdr)) {
+				headerMap.put(normalized, headerMap.get(hdr));
+			}
+		}
+
+		if (!headerMap.containsKey("username")) {
+			globalError = "Must specify a 'username' column";
+			return false;
+		} else if (!headerMap.containsKey("password")) {
+			globalError = "Must specify a 'password' column.";
+			return false;
+		} else if (!headerMap.containsKey("type")) {
+			globalError = "Must specify a 'type' column.";
+			return false;
+		} else if (!headerMap.containsKey("firstname")) {
+			globalError = "Must specify a 'firstname' column.";
+			return false;
+		} else if (!headerMap.containsKey("lastname")) {
+			globalError = "Must specify a 'lastname' column.";
+			return false;
+		} else if (!headerMap.containsKey("period")) {
+			globalError = "Must specify a 'period' column.";
+			return false;
+		} else if (defaultSite == null && !headerMap.containsKey("site")) {
+			globalError = "Must specify a 'site' column or a default site.";
 			return false;
 		}
-		for (int i = 0; i < header.length; i++) {
-  			if (header[i].trim().equalsIgnoreCase("first name"))
-  				header[i] = "firstname";
-  			if (header[i].trim().equalsIgnoreCase("last name"))
-  				header[i] = "lastname";
-  			header[i] = header[i].trim().toLowerCase();
-  		}
-		
-  		// Check headers for required fields; return single element List on error
-  		List<String> headerTest = Arrays.asList(header);
-  		if(!headerTest.contains("username")) {
-  			globalError = "Must specify a 'username' column";
-  			return false;
-  		} else if (!headerTest.contains("password")) {
-  			globalError = "Must specify a 'password' column.";
- 			return false;
-  		} else if (!headerTest.contains("type")) {
-  			globalError = "Must specify a 'type' column.";
- 			return false;
-  		} else if (!headerTest.contains("firstname")) {
-  			globalError = "Must specify a 'firstname' column.";
-  			return false;	
-  		} else if (!headerTest.contains("lastname")) {
-  			globalError = "Must specify a 'lastname' column.";
-  			return false;
-  		} else if (!headerTest.contains("period")) {
-  			globalError = "Must specify a 'period' column.";
-  			return false;
-  		} else if (defaultSite==null && !headerTest.contains("site")) {
-  			globalError = "Must specify a 'site' column or a default site.";
-  			return false;
-  		}
 
-  		// Read the CSV file, create Person objects, record error messages, add to PotentialUserSave List
-  		boolean errors = false; // have errors been encountered?
-  		try {
-  			while((values = reader.readLine()) != null) {
-  				
-  				line++; // Line that the error occurs on
-  				String messages = ""; // Error Messages for this user
-  				  				
-  				// Read the User Data fields from this line in the CSV file
-  				Map<String, String> map = new HashMap<String, String>();
-  				for(int i = 0; i < header.length; i++) {
-  					if (!values[i].equals("")) {
-  						map.put(header[i], values[i].trim());
-  					}
-  				}
-  				
-  				// Create a transient User Object from imported data
-  				IModel<User> user = new HibernateObjectModel<User>(userService.getUserClass());
-  				messages += populateUserObject(user, map);
-  				
-  				// Check database for duplicate username
-  				if (userService.getByUsername(user.getObject().getUsername()).getObject() != null) {
-  					messages += "Username " + user.getObject().getUsername() + " already exists in database. \n";
-  				}
-  				
-  				// Check database for duplicate subjectId
-  				if (userService.getBySubjectId(user.getObject().getSubjectId()).getObject() != null) {
-  					messages += "SubjectId " + user.getObject().getSubjectId() + " already exists in database. \n";
-  				}
+		// Read the CSV file, create Person objects, record error messages, add to PotentialUserSave List
+		boolean errors = false; // have errors been encountered?
+		try {
+			for (CSVRecord record : parser) {
 
-  				// Check database for duplicate email addresses when an email address exists 				
-  				if (user.getObject().getEmail() != null && userService.getByEmail(user.getObject().getEmail()).getObject() != null) {
-  					messages += "Email " + user.getObject().getEmail() + " already exists in database. \n";
-  				}
-  				
-  				// Check uploaded user list for duplicate username, subjectId, "Full Name"
-  				for (PotentialUserSave pe : potentialUsers) {
-  					if (user.getObject().getUsername().matches(pe.getUser().getObject().getUsername())) {
-  						messages += "Username " + user.getObject().getUsername() + " is a duplicate in this list. \n";
-  					}
-  					if (user.getObject().getSubjectId().matches(pe.getUser().getObject().getSubjectId())) {
-  						messages += "SubjectId " + user.getObject().getSubjectId() + " is a duplicate in this list. \n";
-  					}
-  					if (user.getObject().getFullName().matches(pe.getUser().getObject().getFullName()) 
-  							&& user.getObject().getPeriods().iterator().next().getName().matches(pe.getUser().getObject().getPeriods().iterator().next().getName())) {
-  						messages += user.getObject().getFullName() + " already exists in " + user.getObject().getPeriods().iterator().next().getName() + " in this list. \n";
-  					}
-  				}
-  				
-  				// Add a PotentialUserSave to the list.
-  				PotentialUserSave pe = new PotentialUserSave(user, messages, line);
-  				potentialUsers.add(pe);
-  				if (!"".equals(messages))
-  					errors = true;
-  			}
-  			
-  			// If CSV file has only one line, it is either empty or has unrecognized LF/CR values.
-  			if (line == 1) {
-//  			potentialUsers.add(new PotentialUserSave(null, "Empty or Corrupted File.  Note: Save as Windows CSV.", 0));
-  	  			globalError = "Empty or Corrupted File - LF/CR values may be invalid!";	  			
-  				throw new CharacterCodingException();
-  			}
-  		
-  		} catch (ArrayIndexOutOfBoundsException e) {
-  			// This can happen if the last row is missing values; Excel doesn't fill them out to the last column
-  			log.error("Caught exception importing line {}: {}", line, e.getClass());
-  			potentialUsers = new ArrayList<PotentialUserSave>();
-  			potentialUsers.add(new PotentialUserSave(null, "Data missing/misaligned. Fatal error. \n", line));
-  			return false;
+				String messages = ""; // Error Messages for this user
+
+				// Create a transient User Object from imported data
+				IModel<User> user = new HibernateObjectModel<User>(userService.getUserClass());
+				messages += populateUserObject(user, record);
+
+				// Check database for duplicate username
+				if (userService.getByUsername(user.getObject().getUsername()).getObject() != null) {
+					messages += "Username " + user.getObject().getUsername() + " already exists in database. \n";
+				}
+
+				// Check database for duplicate subjectId
+				if (userService.getBySubjectId(user.getObject().getSubjectId()).getObject() != null) {
+					messages += "SubjectId " + user.getObject().getSubjectId() + " already exists in database. \n";
+				}
+
+				// Check database for duplicate email addresses when an email address exists
+				if (user.getObject().getEmail() != null && userService.getByEmail(user.getObject().getEmail()).getObject() != null) {
+					messages += "Email " + user.getObject().getEmail() + " already exists in database. \n";
+				}
+
+				// Check uploaded user list for duplicate username, subjectId, "Full Name"
+				for (PotentialUserSave pe : potentialUsers) {
+					if (user.getObject().getUsername().matches(pe.getUser().getObject().getUsername())) {
+						messages += "Username " + user.getObject().getUsername() + " is a duplicate in this list. \n";
+					}
+					if (user.getObject().getSubjectId().matches(pe.getUser().getObject().getSubjectId())) {
+						messages += "SubjectId " + user.getObject().getSubjectId() + " is a duplicate in this list. \n";
+					}
+					if (user.getObject().getFullName().matches(pe.getUser().getObject().getFullName())
+							&& user.getObject().getPeriods().iterator().next().getName().matches(pe.getUser().getObject().getPeriods().iterator().next().getName())) {
+						messages += user.getObject().getFullName() + " already exists in " + user.getObject().getPeriods().iterator().next().getName() + " in this list. \n";
+					}
+				}
+
+				// Add a PotentialUserSave to the list.
+				PotentialUserSave pe = new PotentialUserSave(user, messages, parser.getCurrentLineNumber());
+				potentialUsers.add(pe);
+				if (!"".equals(messages))
+					errors = true;
+			}
+
+			// If CSV file has only one line, it is either empty or has unrecognized LF/CR values.
+			if (parser.getCurrentLineNumber() == 1) {
+	  			potentialUsers.add(new PotentialUserSave(null, "Empty or Corrupted File.  Note: Save as Windows CSV.", 0));
+				globalError = "Empty or Corrupted File - LF/CR values may be invalid!";
+				throw new CharacterCodingException();
+			}
+
+//  		} catch (ArrayIndexOutOfBoundsException e) {
+//  			// This can happen if the last row is missing values; Excel doesn't fill them out to the last column
+//  			log.error("Caught exception importing line {}: {}", line, e.getClass());
+//  			potentialUsers = new ArrayList<PotentialUserSave>();
+//  			potentialUsers.add(new PotentialUserSave(null, "Data missing/misaligned. Fatal error. \n", line));
+//  			return false;
   		} catch (CharacterCodingException e) {
   			log.error("Empty or Corrupted File - only 1 line found - CR/LF issue?. {}", e.getClass());
   			return false;
   		} catch (Exception e) {
   			e.printStackTrace();
-  			log.error("Caught exception importing line {}: {}", line, e.getClass());
+  			log.error("Caught exception importing line {}: {}", parser.getCurrentLineNumber(), e.getClass());
   			potentialUsers = new ArrayList<PotentialUserSave>();
-  			potentialUsers.add(new PotentialUserSave(null, "Fatal Error" + e, line));
+  			potentialUsers.add(new PotentialUserSave(null, "Fatal Error" + e, parser.getCurrentLineNumber()));
   			return false;
-  		}
-  	
+		}
+
   		return (!errors);
 	}
 	
 	/** 
 	 * Saves the potential users, periods, and sites.
-	 * 
-	 * @param users
 	 */
 	public void save() {
 		Session session = Databinder.getHibernateSession();
@@ -264,43 +247,43 @@ public class UserSpreadsheetReader implements Serializable {
 		
 		for (Map<String, Period> map : potentialPeriods.values())
 			for (Period period : map.values()) {
-				if (period.isTransient())
+				if (period.isTransient()) {
 					session.save(period);
+					siteService.onPeriodCreated(modelProvider.modelOf(period));
+				}
 			}
-	
+
 		for(PotentialUserSave potentialUser : potentialUsers) {
 			IModel<User> mUser = potentialUser.getUser();
 			User u = mUser.getObject();
 			u.setValid(true);
 			u.setCreateDate(new Date());
 			session.save(u);
+			userService.onUserCreated(mUser, null);
 		}
 
 		cwmService.flushChanges();
 	}
-	
 
 	/**
-	 * Adds a map of values to a User object.
+	 * Adds a record of values to a User object.
 	 * 
-	 * @param user a model of an empty, transient User object
-	 * @param map a map of fields that will populate the User object
-	 * @param tempPeriods a list of transient {@link Period} objects that this user can pick from or add to
-	 * @param site the site where these Period objects should reside
+	 * @param mUser a model of an empty, transient User object
+	 * @param record a record of fields that will populate the User object
 	 * @return a string of errors (empty string if none)
 	 * @throws IOException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-  	private String populateUserObject(IModel<User> user, Map<String, String> map) 
+  	private String populateUserObject(IModel<User> mUser, CSVRecord record)
   		throws IOException, InstantiationException, IllegalAccessException {
   		
   		String errors = "";
   		Site site =  null;
   		
   		// Determine site
-  		if (map.containsKey("site")) {
-  			site = getSite(map.get("site"));
+		if (notEmpty(record, "site")) {
+			site = getSite(get(record, "site"));
   		} else if (defaultSite != null && defaultSite.getObject() != null) {
   			site = defaultSite.getObject();
   		} else {
@@ -308,79 +291,95 @@ public class UserSpreadsheetReader implements Serializable {
   		}
   		
   		// Determine period(s)
-  		if (map.containsKey("period")) {
-  			for (String periodName : map.get("period").split(","))
-  				user.getObject().getPeriods().add(getPeriod(site, periodName.trim()));
+		User u = mUser.getObject();
+		if (notEmpty(record, "period")) {
+  			for (String periodName : get(record, "period").split(","))
+  				u.getPeriods().add(getPeriod(site, periodName.trim()));
   		} else if (defaultPeriod != null && defaultPeriod.getObject() != null) {
-  			user.getObject().getPeriods().add(defaultPeriod.getObject());
+  			u.getPeriods().add(defaultPeriod.getObject());
   		} else {
   			errors += "Must specify period. \n";
   		}
   		
   		// Set Names
-  		if (map.containsKey("firstname") && !map.get("firstname").isEmpty())
-  			user.getObject().setFirstName(map.get("firstname"));
+		if (notEmpty(record, "firstname"))
+  			u.setFirstName(get(record, "firstname"));
   		else
-  			errors += "Must specify \"firstname.\" \n";  		
-  		if (map.containsKey("lastname") && !map.get("lastname").isEmpty())
-  			user.getObject().setLastName(map.get("lastname"));
+  			errors += "Must specify \"firstname.\" \n";
+		if (notEmpty(record, "lastname"))
+  			u.setLastName(get(record, "lastname"));
   		else
   			errors += "Must specify \"lastname.\" \n";
 
   		// Set Permission
   		boolean permission = false;
-		if (map.containsKey("permission") && !map.get("permission").isEmpty()) {
-			if (map.get("permission").trim().toLowerCase().equals("true") || map.get("permission").trim().equals("1") ) {
+		if (notEmpty(record, "permission")) {
+			String value = get(record, "permission").trim().toLowerCase();
+			if (value.equals("true") || value.equals("1") ) {
 				permission = true;
 			}
   		}
-		user.getObject().setPermission(permission);
+		u.setPermission(permission);
 
   		
   		// Set Type
-  		if(map.containsKey("type")) {
-  			String type = map.get("type");
+  		if(notEmpty(record, "type")) {
+  			String type = get(record, "type").toLowerCase();
   			if (Role.forRoleString(type) != null)
-  				user.getObject().setRole(Role.forRoleString(type));
+  				u.setRole(Role.forRoleString(type));
   			else if (type.startsWith("t"))
-  				user.getObject().setRole(Role.TEACHER);
+  				u.setRole(Role.TEACHER);
   			else
-  				user.getObject().setRole(Role.STUDENT);
+  				u.setRole(Role.STUDENT);
   		} else {
-  			errors += "Must specify user type. \n";
-  			user.getObject().setRole(null);
+  			errors += "Must specify mUser type. \n";
+  			u.setRole(null);
   		}
   		
   		// Set Password
-  		if(map.containsKey("password") && !map.get("password").isEmpty()) {
-  			user.getObject().setPassword(map.get("password"));
+		if(notEmpty(record, "password")) {
+  			u.setPassword(get(record, "password"));
   		} else {
   			errors += "Must specify password. \n";
-  			user.getObject().setPassword("");
+  			u.setPassword("");
   		}
  
   		// Set Username
-  		if(map.containsKey("username")  && !map.get("username").isEmpty()) {
-  			user.getObject().setUsername(map.get("username"));
+		if(notEmpty(record, "username")) {
+  			u.setUsername(get(record, "username"));
   		} else {
   			errors += "Must specify username. \n";
-  			user.getObject().setUsername("");
+  			u.setUsername("");
   		}
   		
   		// Set SubjectId (Default to Username)
-  		if(map.containsKey("subjectid")) {
-  			user.getObject().setSubjectId(map.get("subjectid"));
+		if(notEmpty(record, "subjectid")) {
+  			u.setSubjectId(get(record, "subjectid"));
   		} else {
-  			user.getObject().setSubjectId(map.get("username"));
+  			u.setSubjectId(get(record, "username"));
   		}
 
   		// Set email
-  		if(map.containsKey("email")) {
-  			user.getObject().setEmail(map.get("email"));
+		if(notEmpty(record, "email")) {
+  			u.setEmail(get(record, "email"));
   		}
 
   	  	return errors;
   	}
+
+	// Determine whether the named field has a real, non-empty value.
+	private boolean notEmpty(CSVRecord record, String fieldname) {
+		Integer position = headerMap.get(fieldname);
+		if (position == null)
+			return false;
+		String value = record.get(position);
+		return (value != null && ! value.isEmpty());
+	}
+
+	// Get the value for the named field.
+	private String get(CSVRecord record, String fieldname) {
+		return record.get(headerMap.get(fieldname));
+	}
 
   	protected Site getSite (String siteName) {
   		Site site = potentialSites.get(siteName);
@@ -442,9 +441,9 @@ public class UserSpreadsheetReader implements Serializable {
 
 		private IModel<User> user;
 		private String error;
-		private int line;
+		private long line;
 		
-		public PotentialUserSave(IModel<User> user, String error, int line) {
+		public PotentialUserSave(IModel<User> user, String error, long line) {
 			this.user = user;
 			this.error = error;
 			this.line = line;
