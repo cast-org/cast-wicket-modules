@@ -242,7 +242,12 @@
                 <artifactId>commons-lang</artifactId>
                 <version>2.4</version>
             </dependency>
-          
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>1.1</version>
+            </dependency>
+
             <!-- OTHER -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -268,11 +273,6 @@
                 <groupId>com.xmlmind</groupId>
                 <artifactId>davclient_util</artifactId>
                 <version>1.0.3</version>
-            </dependency>
-            <dependency>
-                <groupId>genjava</groupId>
-                <artifactId>gj-csv</artifactId>
-                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>HTTPClient</groupId>

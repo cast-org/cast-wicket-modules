@@ -19,13 +19,8 @@
  */
 package org.cast.cwm.admin;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.List;
-
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.Model;
@@ -37,7 +32,12 @@ import org.cast.cwm.data.provider.IteratorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.generationjava.io.CsvWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A CSV-formatted downloadable dump of data.
@@ -53,8 +53,8 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 
 	/**
 	 * Configure a download with a given iterator provider and set of columns
-	 * @param columns
-	 * @param interatorProvider
+	 * @param columns list of data columns
+	 * @param iteratorProvider class that will supply the iterator
 	 */
 	public CSVDownload (final List<IDataColumn<E>> columns, final IteratorProvider<E> iteratorProvider) {
 		super();
@@ -64,8 +64,8 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 
 	/**
 	 * Configure a download with a given data provider and set of columns
-	 * @param columns
-	 * @param dataProvider
+	 * @param columns list of data columns
+	 * @param dataProvider data provider holding the query
 	 */
 	public CSVDownload (final List<IDataColumn<E>> columns, final IDataProvider<E> dataProvider) {
 		this(columns, new IteratorProvider<E>(){
@@ -102,30 +102,29 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 					Response response = attributes.getResponse();
 
 					try {
-						CsvWriter writer = new CsvWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
+						CSVPrinter writer = new CSVPrinter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"),
+								CSVFormat.EXCEL);
 						
 						// Write header row
 						for (IDataColumn<E> col : columns) {
-							writer.writeField(col.getHeaderString());
+							writer.print(col.getHeaderString());
 						}
-						writer.endBlock();
+						writer.println();
 						
 						// Write Data
-						// DataProvider doesn't have a concept of "unlimited".  Hopefully 
-						// a million event records is enough
-						Iterator<? extends E> it = iteratorProvider.getIterator(); 
+						Iterator<? extends E> it = iteratorProvider.getIterator();
 						while (it.hasNext()) {
 							E e = it.next();
 							for (IDataColumn<E> col : columns) {
-								String columnValue = col.getItemString(new Model<E>(e)); // does this need to be a HibernateObjectModel?  That makes it hard to test.
+								String columnValue = col.getItemString(new Model<E>(e));
 								if (columnValue==null) {
 									log.warn("Got a null value for {} of item {}", col.getHeaderString(), e);
 									columnValue="null";
 								}
 								// Clean up text -- CSV file cannot have newlines in it
-								writer.writeField(columnValue.replaceAll("[\r\n]", " "));
+								writer.print(columnValue.replaceAll("[\r\n]", " "));
 							}
-							writer.endBlock();
+							writer.println();
 						}
 						writer.close();
 						

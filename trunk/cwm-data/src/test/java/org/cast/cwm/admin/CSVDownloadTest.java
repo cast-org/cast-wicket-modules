@@ -19,9 +19,6 @@
  */
 package org.cast.cwm.admin;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.IModel;
@@ -29,6 +26,9 @@ import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.data.Event;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CSVDownloadTest {
 
@@ -42,19 +42,19 @@ public class CSVDownloadTest {
 	@Test
 	public void oneCellTable() {
 		tester.startResource(new CSVDownload<Event>(getDataColumns(1), getDataProvider(1)));
-		tester.assertContains("^Column0\ndata\n$");
+		tester.assertContains("^Column0\r\ndata\r\n$");
 	}
 	
 	@Test
 	public void twoCellTable() {
 		tester.startResource(new CSVDownload<Event>(getDataColumns(1), getDataProvider(2)));
-		tester.assertContains("^Column0\ndata\ndata\n$");
+		tester.assertContains("^Column0\r\ndata\r\ndata\r\n$");
 	}
 	
 	@Test
 	public void fourCellTable() {
 		tester.startResource(new CSVDownload<Event>(getDataColumns(2), getDataProvider(2)));
-		tester.assertContains("^Column0,Column1\ndata,data\ndata,data\n$");
+		tester.assertContains("^Column0,Column1\r\ndata,data\r\ndata,data\r\n$");
 	}
 
 	

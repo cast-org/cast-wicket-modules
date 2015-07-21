@@ -48,10 +48,6 @@
             <artifactId>jta</artifactId>
         </dependency>
         <dependency>
-            <groupId>genjava</groupId>
-            <artifactId>gj-csv</artifactId>
-        </dependency>
-        <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
@@ -79,6 +75,10 @@
  	  		<groupId>commons-lang</groupId>
  	  		<artifactId>commons-lang</artifactId>
  	  	</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+		</dependency>
  	  	<dependency>
  	  		<groupId>org.apache.sanselan</groupId>
  	  		<artifactId>sanselan</artifactId>
