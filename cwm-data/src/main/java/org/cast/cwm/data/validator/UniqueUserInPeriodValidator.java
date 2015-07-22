@@ -19,9 +19,7 @@
  */
 package org.cast.cwm.data.validator;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -30,17 +28,13 @@ import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
-import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IUserService;
 
-import com.google.inject.Inject;
-
 /**
- * A hacked together validator to ensure that no two users exist in the same period
- * with the same name.  Assumes ISISession.get().getCurrentPeriodModel() since there
- * is no detaching of Form Validators.
- * 
+ * A validator to make sure the first and last name in a form are unique within the current Period.
+ *
  * @author jbrookover
  *
  */
@@ -48,6 +42,9 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 	
 	@Inject
 	protected IUserService userService;
+
+	@Inject
+	protected ICwmSessionService cwmSessionService;
 
 	private static final long serialVersionUID = 1L;
 	
@@ -60,11 +57,14 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 		
 		// Ensure that no other users exist in this period with the same full name
 		User student = (User) form.getModelObject();
-		
-		IModel<User> otherUser = userService.getByFullnameFromPeriod(getFirstNameComponent().getConvertedInput(), getLastNameComponent().getConvertedInput(), CwmSession.get().getCurrentPeriodModel());
-		if (otherUser.getObject() != null && !student.equals(otherUser.getObject())) {
+
+		String firstName = getFirstNameComponent().getConvertedInput();
+		String lastName = getLastNameComponent().getConvertedInput();
+		IModel<User> otherUser = userService.getByFullnameFromPeriod(firstName, lastName,
+				cwmSessionService.getCurrentPeriodModel());
+		if ((otherUser != null) && (otherUser.getObject() != null)
+				&& !student.equals(otherUser.getObject())) {
 			error(getFirstNameComponent(), "UniqueUserInPeriodValidator");
-			return;
 		}
 	}
 
@@ -80,23 +80,18 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 	 * A helper function that uses an IVisitor to find a TextField<String> in a provided
 	 * form with the given wicketId.  Someday, findChild will exist.
 	 * 
-	 * @param form
-	 * @param wicketId
-	 * @return
+	 * @param form the Form to search within
+	 * @param wicketId wicket ID to search for
+	 * @return the field, or null if not found
 	 */
 	public static TextField<String> findFieldInForm(Form<?> form, final String wicketId) {
-		final List<TextField<String>> list = new ArrayList<TextField<String>>();
-		form.visitChildren(TextField.class, new IVisitor<TextField<String>,Void>() {
-
+		return form.visitChildren(TextField.class, new IVisitor<TextField<String>, TextField<String>>() {
 			@Override
-			public void component(TextField<String> component, IVisit<Void> visit) {
+			public void component(TextField<String> component, IVisit<TextField<String>> visit) {
 				if (component.getId().equals(wicketId)) {
-					list.add(component);
-					visit.stop();
+					visit.stop(component);
 				}
 			}
-			
 		});
-		return list.get(0);
 	}
 }
