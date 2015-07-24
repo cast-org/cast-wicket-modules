@@ -8,7 +8,7 @@
     <version>3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     
-    <url>http://code.google.com/p/cast-wicket-modules</url>
+    <url>http://github.com/cast-org/cast-wicket-modules</url>
     <description>Parent project for the CAST Wicket Modules.
     This POM contains basic metadata and dependencies so they are always
     consistent across the various modules.</description>
@@ -29,13 +29,13 @@
     
     <issueManagement>
         <system>Google Code</system>
-        <url>http://code.google.com/p/cast-wicket-modules/issues</url>
+        <url>http://github.com/cast-org/cast-wicket-modules/issues</url>
     </issueManagement>
     
     <scm>
-        <url>http://code.google.com/p/cast-wicket-modules/source</url>
-        <connection>scm:svn:http://cast-wicket-modules.googlecode.com/svn/trunk</connection>
-        <developerConnection>scm:svn:https://cast-wicket-modules.googlecode.com/svn/trunk</developerConnection>
+        <url>http://github.com/cast-org/cast-wicket-modules/source</url>
+        <connection>scm:git:git://cast-org/cast-wicket-modules.git</connection>
+        <developerConnection>scm:git:git@github.com:cast-org/cast-wicket-modules.git</developerConnection>
     </scm>
     
     <distributionManagement>
