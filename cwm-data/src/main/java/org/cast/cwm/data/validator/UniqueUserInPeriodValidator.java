@@ -58,8 +58,8 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 		// Ensure that no other users exist in this period with the same full name
 		User student = (User) form.getModelObject();
 
-		String firstName = getFirstNameComponent().getConvertedInput();
-		String lastName = getLastNameComponent().getConvertedInput();
+		String firstName = getFirstNameComponent().getValue();
+		String lastName = getLastNameComponent().getValue();
 		IModel<User> otherUser = userService.getByFullnameFromPeriod(firstName, lastName,
 				cwmSessionService.getCurrentPeriodModel());
 		if ((otherUser != null) && (otherUser.getObject() != null)
