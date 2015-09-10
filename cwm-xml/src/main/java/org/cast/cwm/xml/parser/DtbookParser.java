@@ -160,7 +160,6 @@ public class DtbookParser extends XmlParser implements Serializable {
 	 * 
 	 * @param section the section being processed, start with the root 
 	 * @param elt the element that belongs to the section, start with the {@link Document#getDocumentElement()}
-	 * @param idMap direct access idMap that each section is registered with
 	 */
 	private void fillIn(XmlSection section, Element elt) {
 		

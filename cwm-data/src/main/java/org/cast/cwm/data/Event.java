@@ -46,14 +46,14 @@ import org.hibernate.annotations.GenericGenerator;
 /**
  * <p>
  * A logged event of a {@link User}'s action in the program.  Events are
- * generated and stored by an {@link AbstractEventService} implementation.
+ * generated and stored by an {@link org.cast.cwm.service.IEventService} implementation.
  * </p>
  * <p>
  * In general, unless specifically viewing the event log, the event table
  * should not be queried, particularly for application operation.
  * </p>
  * @author jbrookover
- * @see {@link org.cast.cwm.service.EventService}
+ * @see {@link org.cast.cwm.service.IEventService}
  *
  */
 @Entity
@@ -62,7 +62,7 @@ import org.hibernate.annotations.GenericGenerator;
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
 @Getter 
 @Setter
-@ToString(of={"id","insertTime"})
+@ToString(of={"id","type","insertTime"})
 public class Event extends PersistedObject {
 
 	private static final long serialVersionUID = 1L;

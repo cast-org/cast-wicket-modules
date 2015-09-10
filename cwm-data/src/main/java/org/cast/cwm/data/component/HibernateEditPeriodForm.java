@@ -54,18 +54,20 @@ public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 
 	private void addFields() {
 		add(new FeedbackPanel("feedback"));
+
+		RequiredTextField<String> name = new RequiredTextField<String>("name");
+		name.add(StringValidator.lengthBetween(1, 32));
+		name.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")); // NO comma since spreadsheet upload uses comma-sep list.
+
 		UniqueDataFieldValidator<String> validator;
 		if (getModelObject().isTransient())
 			validator = new UniqueDataFieldValidator<String>(Period.class, "name");
 		else
 			validator = new UniqueDataFieldValidator<String>(getModel(), "name");
 		validator.limitScope("site", mSite);
-		
-		add(new FeedbackBorder("nameBorder").add(
-				new RequiredTextField<String>("name")
-						.add(StringValidator.lengthBetween(1, 32))
-						.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")) // NO comma since spreadsheet upload uses comma-sep list.
-						.add(validator)));
+		name.add(validator);
+
+		add(new FeedbackBorder("nameBorder").add(name));
 	}
 	
 	@Override

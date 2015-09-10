@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.markup.html.list.ListView;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
@@ -48,7 +49,7 @@ import java.util.*;
 @Getter
 @Setter
 @ToString(of={"id", "name"})
-public class Site extends PersistedObject {
+public class Site extends PersistedObject implements Comparable<Site> {
   
 	private static final long serialVersionUID = 1L;
 	
@@ -86,6 +87,18 @@ public class Site extends PersistedObject {
 		Collections.sort(list);
 		return Collections.unmodifiableList(list);
 	}
-	
+
+	// Sort order for sites is based on their name, or ID if names are equal
+	@Override
+	public int compareTo(Site other) {
+		if (this.equals(other))
+			return 0;
+
+		int nameDiff = ObjectUtils.compare(this.name, other.name);
+		if (nameDiff != 0)
+			return nameDiff;
+
+		return ObjectUtils.compare(this.id, other.id);
+	}
 
 }

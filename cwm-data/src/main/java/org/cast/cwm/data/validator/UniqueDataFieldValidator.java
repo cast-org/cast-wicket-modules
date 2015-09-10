@@ -19,21 +19,22 @@
  */
 package org.cast.cwm.data.validator;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.databinder.models.hib.CriteriaBuilder;
 import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.util.lang.Classes;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A validator for confirming field uniqueness for objects in the datastore.  For example:
@@ -52,7 +53,7 @@ import org.hibernate.criterion.Restrictions;
  *
  * @param <T>
  */
-public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
+public class UniqueDataFieldValidator<T> implements IValidator<T> {
 
 	private static final long serialVersionUID = 1L;
 	private Class<? extends PersistedObject> clazz;
@@ -62,7 +63,7 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 
 	/**
 	 * Constructor used when editing a persistent object.
-	 * 
+	 *
 	 * @param current the object being edited
 	 * @param fieldName the field to confirm for uniqueness among objects of this type
 	 */
@@ -74,7 +75,7 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 	
 	/**
 	 * Constructor used when creating a new persistent object.
-	 * 
+	 *
 	 * @param clazz the type of object to check
 	 * @param fieldName the field to confirm for uniqueness among objects of this type
 	 */
@@ -84,10 +85,8 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 	}
 
 	@Override
-	protected void onValidate(final IValidatable<T> validatable) {
+	public void validate(final IValidatable<T> validatable) {
 		HibernateObjectModel<PersistedObject> other = new HibernateObjectModel<PersistedObject>(clazz, new CriteriaBuilder() {
-
-			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void build(Criteria criteria) {
@@ -99,10 +98,12 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 		});	
 		
 		if (other.getObject() != null && !other.getObject().equals(current.getObject())) {
-			error(validatable);
+			ValidationError err = new ValidationError(this).addKey(getResourceKey());
+			err.setVariables(variablesMap());
+			validatable.error(err);
 		}
 	}
-	
+
 	/**
 	 * Limit the scope of this validation.  Allows you to ensure that a
 	 * data field is unique only within a certain group.  For example,
@@ -123,10 +124,13 @@ public class UniqueDataFieldValidator<T> extends AbstractValidator<T>{
 		scope.put(field, value);
 		return this;
 	}
-	
-	@Override 
-	protected Map<String, Object> variablesMap(IValidatable<T> validatable) {
-		Map<String, Object> map = super.variablesMap(validatable);
+
+	private String getResourceKey() {
+		return Classes.simpleName(getClass());
+	}
+
+	protected Map<String, Object> variablesMap() {
+		Map<String, Object> map = new HashMap<String, Object>(2);
 		map.put("field", field);
 		map.put("object", clazz.getSimpleName());
 		return map;

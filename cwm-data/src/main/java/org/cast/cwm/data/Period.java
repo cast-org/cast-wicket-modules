@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
@@ -50,7 +51,7 @@ import java.util.TreeSet;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Getter
 @Setter
-@ToString(of={"id", "name"})
+@ToString(of={"id", "name", "site"})
 public class Period extends PersistedObject implements Comparable<Period> {
   
 	private static final long serialVersionUID = 1L;
@@ -94,20 +95,25 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	}
 
 	/**
-	 * Periods are sorted alphabetically by name.
+	 * Periods are sorted alphabetically by name within a site.
 	 * This function is careful to avoid NPEs and avoids returning 0 for two 
 	 * Periods that have different IDs.
 	 */
 	@Override
 	public int compareTo(Period other) {
-		if (other == null)
-			return 1;
-		int idDiff = (getId()==null) ? 0 : getId().compareTo(other.getId());
-		if (name == null || other.name == null)
-			return idDiff;
-		int nameDiff = name.compareTo(other.name);
+		if (this.equals(other))
+			return 0;
+
+		// .getSite() not .site so that we correctly work through Hibernate proxies
+		int siteDiff = ObjectUtils.compare(this.getSite(), other.getSite());
+		if (siteDiff != 0)
+			return siteDiff;
+
+		int nameDiff = ObjectUtils.compare(this.getName(), other.getName());
 		if (nameDiff != 0)
 			return nameDiff;
-		return idDiff;
+
+		return ObjectUtils.compare(this.getId(), other.getId());
 	}
+
 }
