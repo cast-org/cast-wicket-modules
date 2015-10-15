@@ -58,6 +58,7 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private static final long serialVersionUID = 1L;
 	private Role role = null;
 	private boolean getAllUsers = true; // should users with valid=false be included?
+	private boolean permissionedOnly = false; // should users with no research permissions be excluded?
 	private String username;
 	private String firstName;
 	private String lastName;
@@ -98,6 +99,8 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 			criteria.add(Restrictions.eq("role", role));
 		if (!getAllUsers)
 			criteria.add(Restrictions.eq("valid", true));
+		if (permissionedOnly)
+			criteria.add(Restrictions.eq("permission", true));
 		if (username != null)
 			criteria.add(Restrictions.eq("username", username).ignoreCase());
 		if (email != null)
