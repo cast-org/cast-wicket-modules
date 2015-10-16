@@ -40,9 +40,6 @@ import com.google.inject.Inject;
 public class AdminHeaderPanel extends Panel {
 	
 	@Inject
-	IAppConfiguration configuration;
-	
-	@Inject
 	ICwmSessionService cwmSessionService;
 
 	private static final long serialVersionUID = 1L;
@@ -52,10 +49,9 @@ public class AdminHeaderPanel extends Panel {
 	
 		String appNameHeader = "";
 		if (Application.get() instanceof CwmApplication) {
-			appNameHeader = CwmApplication.get().getAppId() + "/"; 
+			appNameHeader = CwmApplication.get().getAppAndInstanceId();
 		}
-		appNameHeader += configuration.getString("instanceId", "?");
-		
+
 		add(new Label("appName", appNameHeader));
 		add(new BookmarkablePageLink<WebPage>("homeLink", Application.get().getHomePage()));
 		add(new Label("name", cwmSessionService.getUser().getFullName()));
