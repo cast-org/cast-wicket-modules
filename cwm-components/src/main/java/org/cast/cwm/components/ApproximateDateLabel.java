@@ -31,10 +31,25 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * A Label that displays its model-object Date with varying precision depending on how recent it is.
+ * This will be a string like one of the following:
+ * <ul>
+ *     <li><strong>9:43AM Today</strong> (if today)</li>
+ *     <li><strong>9:43AM Yesterday</strong> (if yesterday)</li>
+ *     <li><strong>March 3</strong> (if this year)</li>
+ *     <li><strong>March 3, 2014</strong> (otherwise)</li>
+ * </ul>
+ *
+ */
 public class ApproximateDateLabel extends DateLabel {
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Logger log = LoggerFactory.getLogger(ApproximateDateLabel.class);
 
 	public ApproximateDateLabel(String id, IModel<Date> mDate) {
 		super(id, mDate, new ApproximateDateConverter());
@@ -62,6 +77,7 @@ public class ApproximateDateLabel extends DateLabel {
 		public String convertToString(Date value, Locale locale) {
             TimeZone zone = getClientTimeZone();
             if (getApplyTimeZoneDifference() && zone != null) {
+				log.trace("Converting {} to time zone {}", value, zone);
                 // Determine format to use, based on the what day the given date
                 // falls on in the client's time zone.
                 DateTimeZone ctz = DateTimeZone.forTimeZone(getClientTimeZone());
@@ -72,6 +88,7 @@ public class ApproximateDateLabel extends DateLabel {
             } else {
                 // Client time zone is unknown or turned off.
                 // Same as above but using default time zone.
+				log.trace("No client time zone info (or applyTimeZoneDifference is off), displaying date as is: {}", value);
                 DateTime dt = new DateTime(value);
                 DateTimeFormatter format = getFormat(dt);
                 return format.print(dt);

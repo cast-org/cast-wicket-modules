@@ -49,7 +49,7 @@ public abstract class AbstractDataColumn<E> extends AbstractColumn<E,String> imp
 
 	@Override
 	public String getHeaderString() {
-		return getDisplayModel().getObject().toString();
+		return getDisplayModel().getObject();
 	}
 	
 	// Default implementation
@@ -57,4 +57,5 @@ public abstract class AbstractDataColumn<E> extends AbstractColumn<E,String> imp
 	public void populateItem(Item<ICellPopulator<E>> cellItem, String componentId, IModel<E> rowModel) {
 		cellItem.add(new Label(componentId, getItemString(rowModel)));
 	}
+
 }

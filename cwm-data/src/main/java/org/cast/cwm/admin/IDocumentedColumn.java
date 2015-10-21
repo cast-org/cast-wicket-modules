@@ -19,25 +19,18 @@
  */
 package org.cast.cwm.admin;
 
-import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.model.IModel;
 
-/** 
- * An IColumn that can also be used for static data table download.
- * This requires that header and data item content can be retrieved as simple strings
- * in addition to retrieval as Wicket components.
- * 
- * @see org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn
- * 
+/**
  * @author bgoldowsky
- * 
- * TODO: allow parameterization of sort field type
- *
  */
-public interface IDataColumn<E> extends IColumn<E,String> {
+public interface IDocumentedColumn {
 
-	String getHeaderString();
-	
-	String getItemString(IModel<E> rowModel);
+	/**
+	 * Return a model holding the documentation string for this column.
+	 *
+	 * @return a string model; may be null if no documentation.
+	 */
+	IModel<String> getDocumentationModel();
 
 }

@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.admin;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.wicket.WicketRuntimeException;
@@ -42,21 +44,30 @@ import java.util.List;
 /**
  * A CSV-formatted downloadable dump of data.
  *
+ * Contains a row for the column headers followed by the data rows.
+ * If "includeDocumentationRow" is set to true, then an additional row
+ * will be generated with documentation strings for any columns that implement IDocumentedColumn.
+ *
  */
 public class CSVDownload<E extends Serializable> extends AbstractResource {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(CSVDownload.class);
 
+	@Getter
+	@Setter
+	protected boolean includeDocumentationRow = false;
+
 	protected List<IDataColumn<E>> columns;
 	private IteratorProvider<? extends E> iteratorProvider;
 
 	/**
 	 * Configure a download with a given iterator provider and set of columns
-	 * @param columns list of data columns
+	 *
+	 * @param columns          list of data columns
 	 * @param iteratorProvider class that will supply the iterator
 	 */
-	public CSVDownload (final List<IDataColumn<E>> columns, final IteratorProvider<E> iteratorProvider) {
+	public CSVDownload(final List<IDataColumn<E>> columns, final IteratorProvider<E> iteratorProvider) {
 		super();
 		this.columns = columns;
 		this.iteratorProvider = iteratorProvider;
@@ -64,27 +75,26 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 
 	/**
 	 * Configure a download with a given data provider and set of columns
-	 * @param columns list of data columns
+	 *
+	 * @param columns      list of data columns
 	 * @param dataProvider data provider holding the query
 	 */
-	public CSVDownload (final List<IDataColumn<E>> columns, final IDataProvider<E> dataProvider) {
-		this(columns, new IteratorProvider<E>(){
+	public CSVDownload(final List<IDataColumn<E>> columns, final IDataProvider<E> dataProvider) {
+		this(columns, new IteratorProvider<E>() {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Iterator<? extends E> getIterator() {
-				// DataProvider doesn't have a concept of "unlimited".  Hopefully 
-				// a million event records is enough
-				return dataProvider.iterator(0, 1000000);
-			}});
+				return dataProvider.iterator(0, Long.MAX_VALUE);
+			}
+		});
 	}
 
 	/**
 	 * creates a new resource response based on the request attributes
-	 * 
-	 * @param attributes
-	 *            current request attributes from client
+	 *
+	 * @param attributes current request attributes from client
 	 * @return resource response for answering request
 	 */
 	@Override
@@ -94,7 +104,7 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 		rr.setFileName("log.csv");
 		rr.setContentDisposition(ContentDisposition.ATTACHMENT);
 		rr.setContentType("text/csv");
-		
+
 		if (rr.dataNeedsToBeWritten(attributes)) {
 			rr.setWriteCallback(new WriteCallback() {
 				@Override
@@ -104,22 +114,34 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 					try {
 						CSVPrinter writer = new CSVPrinter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"),
 								CSVFormat.EXCEL);
-						
+
 						// Write header row
 						for (IDataColumn<E> col : columns) {
 							writer.print(col.getHeaderString());
 						}
 						writer.println();
-						
+
+						// Write documentation row, if requested
+						if (includeDocumentationRow) {
+							for (IDataColumn<E> col : columns) {
+								if (col instanceof IDocumentedColumn) {
+									writer.print(((IDocumentedColumn) col).getDocumentationModel().getObject());
+								} else {
+									writer.print("");
+								}
+							}
+							writer.println();
+						}
+
 						// Write Data
 						Iterator<? extends E> it = iteratorProvider.getIterator();
 						while (it.hasNext()) {
 							E e = it.next();
 							for (IDataColumn<E> col : columns) {
 								String columnValue = col.getItemString(new Model<E>(e));
-								if (columnValue==null) {
+								if (columnValue == null) {
 									log.warn("Got a null value for {} of item {}", col.getHeaderString(), e);
-									columnValue="null";
+									columnValue = "null";
 								}
 								// Clean up text -- CSV file cannot have newlines in it
 								writer.print(columnValue.replaceAll("[\r\n]", " "));
@@ -127,7 +149,7 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 							writer.println();
 						}
 						writer.close();
-						
+
 					} catch (UnsupportedEncodingException e) {
 						throw new StringValueConversionException("UTF-8 translation not supported?!", e);
 					} catch (IOException e) {
@@ -136,8 +158,8 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 				}
 			});
 		}
-		
+
 		return rr;
 	}
-	
+
 }

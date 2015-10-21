@@ -19,6 +19,8 @@
  */
 package org.cast.cwm.admin;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -27,13 +29,20 @@ import org.apache.wicket.model.Model;
  * Extension of PropertyColumn that can also function as an IDataColumn for static download.
  * The header should be specified as a simple string.  The cell values will be extracted
  * based on the property expression, and converted to a string.
+ *
+ * A documentation model, or literal string, can also be set for use with
+ * {@link org.cast.cwm.admin.DocumentationToolbar}.
  * 
  * @author bgoldowsky
  *
  */
-public class PropertyDataColumn<E> extends PropertyColumn<E,String> implements IDataColumn<E> {
+public class PropertyDataColumn<E> extends PropertyColumn<E,String>
+		implements IDataColumn<E>, IDocumentedColumn {
 
 	private static final long serialVersionUID = 1L;
+
+	@Getter @Setter
+	private IModel<String> documentationModel = null;
 
 	public PropertyDataColumn(String headerString, String propertyExpression) {
 		super(new Model<String>(headerString), propertyExpression);
@@ -46,13 +55,29 @@ public class PropertyDataColumn<E> extends PropertyColumn<E,String> implements I
 
 	@Override
 	public String getHeaderString() {
-		return getDisplayModel().getObject().toString();
+		return getDisplayModel().getObject();
 	}
 
 	@Override
 	public String getItemString(IModel<E> rowModel) {
 		Object rowObj = getDataModel(rowModel).getObject();
 		return rowObj==null ? "" : rowObj.toString();
+	}
+
+	public String getDocumentation() {
+		if (documentationModel != null)
+			return documentationModel.getObject();
+		return null;
+	}
+
+	public void setDocumentation(String documentation) {
+		documentationModel = Model.of(documentation);
+	}
+
+	@Override
+	public void detach() {
+		super.detach();
+		documentationModel.detach();
 	}
 
 }
