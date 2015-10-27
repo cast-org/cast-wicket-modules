@@ -77,7 +77,8 @@ public class PropertyDataColumn<E> extends PropertyColumn<E,String>
 	@Override
 	public void detach() {
 		super.detach();
-		documentationModel.detach();
+		if (documentationModel != null)
+			documentationModel.detach();
 	}
 
 }
