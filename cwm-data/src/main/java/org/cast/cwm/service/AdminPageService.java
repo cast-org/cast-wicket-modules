@@ -26,6 +26,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.admin.*;
 import org.cast.cwm.data.Period;
+import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 
@@ -101,8 +102,16 @@ public class AdminPageService implements IAdminPageService {
 
 	@Override
 	public Link getUserEditPageLink(String wicketId, IModel<? extends User> mUser) {
-		return new BookmarkablePageLink(wicketId, getUserEditPage(),
+		return new BookmarkablePageLink<Void>(wicketId, getUserEditPage(),
 				new PageParameters().set("userId", mUser.getObject().getId()));
+	}
+
+	@Override
+	public Link getNewUserEditPageLink(String wicketId, Role role, IModel<? extends Period> mPeriod) {
+		PageParameters pp = new PageParameters().set("role", role.name());
+		if (mPeriod != null && mPeriod.getObject() != null)
+			pp.set("periodId", mPeriod.getObject().getId());
+		return new BookmarkablePageLink<Void>(wicketId, getUserEditPage(), pp);
 	}
 
 }

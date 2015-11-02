@@ -62,17 +62,18 @@ import java.util.Map;
  * @author jbrookover
  *
  */
+@SuppressWarnings("WicketForgeJavaIdInspection")
 public class EditUserPanel extends Panel {
 
-	private static final long serialVersionUID = 1L;
-	
 	@Inject
-	protected ISiteService siteService;
+	private ISiteService siteService;
 	
 	@Inject 
-	IUserService userService;
-	
-	private Form<User> userForm;
+	private IUserService userService;
+
+	@Getter
+	private UserForm userForm;
+
 	private Map<String, FormComponentContainer> components = new HashMap<String, FormComponentContainer>();
 	
 	@Getter @Setter
@@ -87,7 +88,7 @@ public class EditUserPanel extends Panel {
 	
 	/**
 	 * Construct a panel for creating a new user.
-	 * @param id
+	 * @param id wicket ID
 	 */
 	public EditUserPanel(String id) {
 		super(id);
@@ -100,8 +101,8 @@ public class EditUserPanel extends Panel {
 	 * TODO: Should allow general IModel<User> instead of HibernateObjectModel,
 	 * but this will require some cascading changes.
 	 * 
-	 * @param id
-	 * @param model
+	 * @param id wicket ID
+	 * @param model model of User to edit
 	 */
 	public EditUserPanel(String id, HibernateObjectModel<User> model) {
 		super(id, model);
@@ -119,15 +120,15 @@ public class EditUserPanel extends Panel {
 	
 	/**
 	 * Get the Form component for the editing panel.
-	 * @param id
-	 * @return
+	 * @param id wicket id
+	 * @return the newly-constructed Form
 	 */
-	protected Form<User> getUserForm(String id, HibernateObjectModel<User> model) {
+	protected UserForm getUserForm(String id, HibernateObjectModel<User> model) {
 		UserForm form;
 		if (model!=null)
-			form = new UserForm("form", model);
+			form = new UserForm(id, model);
 		else
-			form = new UserForm("form");
+			form = new UserForm(id);
 
 		Component submitComponent = getSubmitComponent("submit");
 		if (submitComponent != null)
@@ -165,8 +166,8 @@ public class EditUserPanel extends Panel {
 	/**
 	 * Can be used to return a link or other component that will cancel the form.
 	 * By default, there is no such component, so null is returned.
-	 * @param id
-	 * @return
+	 * @param id wicket id
+	 * @return newly constructed cancel button
 	 */
 	protected Component getCancelComponent(String id) {
 		return new WebMarkupContainer(id).setVisible(false);
@@ -177,7 +178,7 @@ public class EditUserPanel extends Panel {
 	 * is useful if you need to set certain fields programmatically
 	 * before the form is displayed (e.g. role).
 	 * 
-	 * @return
+	 * @return model of the User
 	 */
 	public IModel<User> getUserModel() {
 		return userForm.getModel();
@@ -186,8 +187,8 @@ public class EditUserPanel extends Panel {
 	/**
 	 * Set the visibility of a field.
 	 * 
-	 * @param field
-	 * @return
+	 * @param field wicket id of the field to modify
+	 * @return this, for chaining
 	 */
 	public EditUserPanel setVisible(String field, boolean visible) {
 		FormComponentContainer component = components.get(field);
@@ -199,9 +200,9 @@ public class EditUserPanel extends Panel {
 	/**
 	 * Set whether a field is enabled.  This does 
 	 * not affect visibility.
-	 * 
-	 * @param field
-	 * @return
+	 *
+	 * @param field wicket id of the field to modify
+	 * @return this, for chaining
 	 */
 	public EditUserPanel setEnabled(String field, boolean enabled) {
 		FormComponentContainer component = components.get(field);
@@ -214,9 +215,9 @@ public class EditUserPanel extends Panel {
 	 * Set whether a field is required.  This does not check
 	 * for any database requirements.  Therefore, setting a field
 	 * to NOT be required should be done with caution.
-	 * 
-	 * @param field
-	 * @return
+	 *
+	 * @param field wicket id of the field to modify
+	 * @return this, for chaining
 	 */
 	public EditUserPanel setRequired(String field, boolean required) {
 		FormComponentContainer component = components.get(field);
@@ -247,14 +248,14 @@ public class EditUserPanel extends Panel {
 	protected void onUserUpdated(IModel<User> mUser, Component trigger) {
 		userService.onUserUpdated(mUser, trigger);
 	}
-	
+
 	/**
 	 * A Hibernate DataForm for modifying or creating a user account.
 	 * 
 	 * @author jbrookover
 	 *
 	 */
-	private class UserForm extends DataForm<User>{
+	public class UserForm extends DataForm<User>{
 
 		private static final long serialVersionUID = 1L;
 		
@@ -276,8 +277,8 @@ public class EditUserPanel extends Panel {
 		/**
 		 * Constructor.  Used for editing an existing user.
 		 * 
-		 * @param id
-		 * @param model
+		 * @param id wicket id
+		 * @param model model of the User to edit
 		 */
 		public UserForm(String id, HibernateObjectModel<User> model) {
 			super(id, model);

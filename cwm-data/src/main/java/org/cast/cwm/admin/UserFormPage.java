@@ -39,8 +39,6 @@ import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
 import org.cast.cwm.service.UserService.LoginData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Page for adding a new or editing existing user.
@@ -58,13 +56,8 @@ public class UserFormPage extends AdminPage {
 	@Inject
 	private IAdminPageService adminPageService;
 	
-	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(UserFormPage.class);
-	private HibernateObjectModel<User> userModel;
-	private IModel<Period> periodModel = new Model<Period>(null);
-	private Role role = null;
-
-	private static final long serialVersionUID = 1L;
+	protected HibernateObjectModel<User> userModel;
+	protected IModel<Period> periodModel = new Model<Period>(null);
 
 	public UserFormPage(final PageParameters parameters) {
 		super(parameters);
@@ -73,6 +66,7 @@ public class UserFormPage extends AdminPage {
 		if (!parameters.get("userId").isEmpty())
 			userModel = (HibernateObjectModel<User>) userService.getById(parameters.get("userId").toLongObject());
 		// The role of the user to create, if any
+		Role role = null;
 		if (!parameters.get("role").isEmpty())
 			role = Role.forRoleString(parameters.get("role").toString());
 		// The period to link back to, if any
@@ -81,27 +75,36 @@ public class UserFormPage extends AdminPage {
 		
 		addBreadcrumbLinks();
 		
-		// Edit an existing user
+		addEditUserPanel(role);
+		
+		addLoginHistory();
+	}
+
+	protected void addEditUserPanel (Role role) {
 		if (userModel!= null && userModel.getObject() != null) {
-			add(new EditUserPanel("editUserPanel", userModel));
-			
-		// Edit a new user, setting the Role and Default Period, if necessary
+			// Edit an existing user
+			add(instantiateEditUserPanel("editUserPanel", userModel));
+
 		} else if (role != null) {
-			EditUserPanel p = new EditUserPanel("editUserPanel");
+			// Edit a new user, setting the Role and Default Period, if necessary
+			EditUserPanel p = instantiateEditUserPanel("editUserPanel", null);
 			p.getUserModel().getObject().setRole(role);
 			p.setEnabled("role", false);
 			p.setAutoConfirmNewUser(true);  // Creating via admin shouldn't require confirmation
 			if (periodModel.getObject() != null)
 				p.getUserModel().getObject().getPeriods().add(periodModel.getObject());
 			add(p);
-			
-		// For now, we only create new users if we know their role.
+
+			// For now, we only create new users if we know their role.
 		} else {
 			throw new IllegalStateException("Cannot Edit User without existing user or default role.");
 		}
-		
-		addLoginHistory();
 	}
+
+	protected EditUserPanel instantiateEditUserPanel(String id, HibernateObjectModel<User> mUser) {
+		return new EditUserPanel(id, mUser);
+	}
+
 
 	// TODO: This is a bit overkill
 	protected void addBreadcrumbLinks() {
@@ -149,7 +152,11 @@ public class UserFormPage extends AdminPage {
 			add(new Label("logindate", "never"));		
 		}
 	}
-	
+
+	protected EditUserPanel getEditUserPanel() {
+		return (EditUserPanel) get("editUserPanel");
+	}
+
 	@Override
 	protected void onDetach() {
 		periodModel.detach();

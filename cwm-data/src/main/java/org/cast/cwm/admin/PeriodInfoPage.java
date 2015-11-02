@@ -87,13 +87,9 @@ public class PeriodInfoPage extends AdminPage {
 			}));
 			add(siteService.getPeriodEditForm("form", siteService.getPeriodClass(), site, period));
 
-			BookmarkablePageLink link = new BookmarkablePageLink<Void>("newStudentLink", UserFormPage.class);
-			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.STUDENT_ROLENAME);
-			add(link);
+			add(adminPageService.getNewUserEditPageLink("newStudentLink", Role.STUDENT, period));
 
-			link = new BookmarkablePageLink<Void>("newTeacherLink", UserFormPage.class);
-			link.getPageParameters().set("periodId", period.getObject().getId()).set("role", Role.TEACHER_ROLENAME);
-			add(link);
+			add(adminPageService.getNewUserEditPageLink("newTeacherLink", Role.TEACHER, period));
 
 			UserListPanel list = new UserListPanel("userList");
 			list.filterByPeriod(period);

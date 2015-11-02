@@ -22,6 +22,7 @@ package org.cast.cwm.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import net.databinder.models.hib.SortableHibernateProvider;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -42,6 +43,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
+import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.UserService;
 
 /**
@@ -51,7 +53,9 @@ import org.cast.cwm.service.UserService;
  */
 public class UserListPanel extends Panel {
 
-	private static final long serialVersionUID = 1L;
+	@Inject
+	private IAdminPageService adminPageService;
+
 	private UserCriteriaBuilder builder;
 
 	public UserListPanel(String id) {
@@ -115,13 +119,9 @@ public class UserListPanel extends Panel {
 	 */
 	public class EditLinkFragment extends Fragment {
 
-		private static final long serialVersionUID = 1L;
-
 		public EditLinkFragment(String id, IModel<User> model) {
 			super(id, "editLinkFragment", UserListPanel.this, model);
-			PageParameters pp = new PageParameters();
-			pp.set("userId", model.getObject().getId());
-			add(new BookmarkablePageLink<Void>("link", UserFormPage.class, pp));
+			add(adminPageService.getUserEditPageLink("link", model));
 		}
 	}
 	
@@ -130,4 +130,5 @@ public class UserListPanel extends Panel {
 		builder.detach();
 		super.onDetach();
 	}
+
 }

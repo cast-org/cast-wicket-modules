@@ -34,16 +34,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * <p>
- * A named group of {@link User} objects.  Conceptually, this should be
- * used to organize users into classrooms of students and teachers.
- * </p>
- * <p>
+ * A named group of {@link User} objects, part of a {@link Site}.
+ * Normally, this is used to organize users into classrooms of students and teachers.
+ *
  * Users can belong to many Periods.  Any given Period can only
  * belong to one {@link Site}.
- * </p>  
- * @author jbrookover
  *
+ * @author jbrookover
  */
 @Entity
 @Audited
@@ -66,6 +63,12 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	
 	@NaturalId(mutable=true)
 	private String name;
+
+	/**
+	 * Anonymous identifier for research purposes.
+	 */
+	@Column(unique = true, nullable = false)
+	private String classId;
 	
 	@ManyToMany(mappedBy="periods")
 	@SortNatural
@@ -74,15 +77,13 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	public Period() { /* No Arg Constructor for the datastore */ }
 	
 	/**
-	 * <p>
-	 * Get a set of users in this period, filtered by 
+	 * Get a set of users in this period, filtered by
 	 * a specific role.
-	 * </p>
-	 * <p>
-	 * Deprecated in favor of using models.
-	 * </p>
-	 * @param role
-	 * @return
+	 *
+	 * @deprecated {@link org.cast.cwm.data.builders.UserCriteriaBuilder is more efficient and flexible}
+	 *
+	 * @param role return only users with at least this level of permission
+	 * @return a set of users, sorted in natural order
 	 */
 	@Deprecated
 	public SortedSet<User> getByRole (Role role) {
@@ -98,6 +99,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 * Periods are sorted alphabetically by name within a site.
 	 * This function is careful to avoid NPEs and avoids returning 0 for two 
 	 * Periods that have different IDs.
+	 * @param other Period to compare to
 	 */
 	@Override
 	public int compareTo(Period other) {

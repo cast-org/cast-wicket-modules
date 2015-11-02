@@ -23,6 +23,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
+import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 
@@ -105,5 +106,14 @@ public interface IAdminPageService {
 	 * @return link component
 	 */
 	Link getUserEditPageLink(String wicketId, IModel<? extends User> mUser);
+
+	/**
+	 * Return a link to the page for creating a new {@link User}.
+	 * @param wicketId wicket id of the component
+	 * @param role type of User to create
+	 * @param mPeriod optional, period that new user should be in.
+	 * @return link component
+	 */
+	Link getNewUserEditPageLink(String wicketId, Role role, IModel<? extends Period> mPeriod);
 
 }

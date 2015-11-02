@@ -19,29 +19,29 @@
  */
 package org.cast.cwm.data.models;
 
+import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.AbstractPropertyModel;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
 
-import com.google.inject.Inject;
-
 /**
- * Model that displays an appropriate designator for a User depending on the role of the logged-in User.
+ * Model that displays an appropriate designator for a Site depending on the role of the logged-in User.
  *
- * Researchers and administrators should get anonymized views without subjects' real names displayed,
- * while the teachers and students should see real names or usernames.
+ * Researchers and administrators should get anonymized views without actual site names displayed,
+ * while the teachers and students should see the real name.
  */
-public class UserDisplayNameModel extends AbstractPropertyModel<String> {
+public class SiteDisplayNameModel extends AbstractPropertyModel<String> {
 
 	@Inject
 	protected ICwmSessionService cwmSessionService;
-	
+
 	private static final long serialVersionUID = 1L;
-	
-	public UserDisplayNameModel (IModel<User> mUser) {
-		super(mUser);
+
+	public SiteDisplayNameModel(IModel<Site> mSite) {
+		super(mSite);
 		Injector.get().inject(this);
 	}
 
@@ -49,16 +49,15 @@ public class UserDisplayNameModel extends AbstractPropertyModel<String> {
 	protected String propertyExpression() {
 		User user = cwmSessionService.getUser();
 		if (user == null)
-			return "username";
+			return "siteId";
 		switch (user.getRole()) {
 		case ADMIN:
 		case RESEARCHER:
-			return "subjectId";
+			return "siteId";
 		case TEACHER:
-			return "fullName";
 		case STUDENT:
 		case GUEST:
-			return "username";
+			return "name";
 		default:
 			throw new IllegalArgumentException("Unknown role: " + user);
 		}

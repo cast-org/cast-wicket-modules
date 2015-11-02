@@ -21,6 +21,7 @@ package org.cast.cwm.admin;
 
 import java.util.Arrays;
 
+import com.google.inject.Inject;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
@@ -30,6 +31,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Role;
+import org.cast.cwm.service.IAdminPageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +43,8 @@ import org.slf4j.LoggerFactory;
 @AuthorizeInstantiation("ADMIN")
 public class UserListPage extends AdminPage {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(UserListPage.class);
-
-	private static final long serialVersionUID = 1L;
+	@Inject
+	private IAdminPageService adminPageService;
 
 	public UserListPage(final PageParameters parameters) {
 		super(parameters);
@@ -62,7 +62,7 @@ public class UserListPage extends AdminPage {
 			protected void populateItem(ListItem<Role> item) {
 				PageParameters pp = new PageParameters();
 				pp.set("role", item.getModelObject().getRoleString());
-				item.add(new BookmarkablePageLink<Page>("addLink", UserFormPage.class, pp)
+				item.add(adminPageService.getNewUserEditPageLink("addLink", item.getModelObject(), null)
 						.add(new Label("role", item.getModelObject().toString())));
 				if (item.getIndex() != 0)
 					item.add(AttributeModifier.replace("class", "addSeparator"));

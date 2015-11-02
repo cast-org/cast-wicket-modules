@@ -56,8 +56,17 @@ public class Site extends PersistedObject implements Comparable<Site> {
 	@Id @GeneratedValue(generator = "my_generator")
 	@Setter(AccessLevel.NONE) 
 	private Long id;
-	
+
+	/**
+	 * User-visible name
+	 */
 	private String name;
+
+	/**
+	 * Anonymous identifier for research purposes.
+	 */
+	@Column(unique = true, nullable = false)
+	private String siteId;
 	
 	private String location;
 	
@@ -80,7 +89,7 @@ public class Site extends PersistedObject implements Comparable<Site> {
 	 * is a convenience method to be used with {@link ListView}
 	 * components in Wicket.
 	 * 
-	 * @return
+	 * @return read-only list of periods in natural order.
 	 */
 	public List<Period> getPeriodsAsSortedReadOnlyList() {
 		List<Period> list = new ArrayList<Period>(periods);

@@ -55,19 +55,34 @@ public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 	private void addFields() {
 		add(new FeedbackPanel("feedback"));
 
+		// Period name
 		RequiredTextField<String> name = new RequiredTextField<String>("name");
 		name.add(StringValidator.lengthBetween(1, 32));
 		name.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")); // NO comma since spreadsheet upload uses comma-sep list.
 
-		UniqueDataFieldValidator<String> validator;
+		UniqueDataFieldValidator<String> nameValidator;
 		if (getModelObject().isTransient())
-			validator = new UniqueDataFieldValidator<String>(Period.class, "name");
+			nameValidator = new UniqueDataFieldValidator<String>(Period.class, "name");
 		else
-			validator = new UniqueDataFieldValidator<String>(getModel(), "name");
-		validator.limitScope("site", mSite);
-		name.add(validator);
+			nameValidator = new UniqueDataFieldValidator<String>(getModel(), "name");
+		nameValidator.limitScope("site", mSite);
+		name.add(nameValidator);
 
 		add(new FeedbackBorder("nameBorder").add(name));
+
+		// Anonymous ClassId
+		RequiredTextField<String> classId = new RequiredTextField<String>("classId");
+		name.add(StringValidator.lengthBetween(1, 32));
+		name.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")); // NO comma since spreadsheet upload uses comma-sep list.
+
+		UniqueDataFieldValidator<String> idValidator;
+		if (getModelObject().isTransient())
+			idValidator = new UniqueDataFieldValidator<String>(Period.class, "classId");
+		else
+			idValidator = new UniqueDataFieldValidator<String>(getModel(), "classId");
+		name.add(idValidator);
+
+		add(new FeedbackBorder("classIdBorder").add(classId));
 	}
 	
 	@Override

@@ -185,6 +185,17 @@ public class SiteInfoPage extends AdminPage {
 			FormComponentContainer nameContainer = new FormComponentContainer("nameEnclosure", name).setLabel("Site Name:");
 			add(nameContainer);
 
+			// Site Anonymous ID
+			TextField<String> siteId = new TextField<String>("siteId");
+			siteId.setRequired(true);
+			siteId.add(StringValidator.lengthBetween(1, 32));
+			siteId.add(new MaxLengthAttribute(32));
+			siteId.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+"));
+			siteId.add(new UniqueDataFieldValidator<String>(getModel(), "siteId"));
+
+			FormComponentContainer siteIdContainer = new FormComponentContainer("siteIdEnclosure", siteId).setLabel("Anonymous Site ID:");
+			add(siteIdContainer);
+
 			// Location
 			TextField<String> location = new TextField<String>("location");
 			location.add(StringValidator.lengthBetween(0, 32));
