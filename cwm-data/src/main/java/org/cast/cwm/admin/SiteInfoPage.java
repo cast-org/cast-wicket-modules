@@ -39,13 +39,11 @@ import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.*;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.lang.Bytes;
+import org.apache.wicket.util.string.AppendingStringBuffer;
 import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.cwm.data.Period;
@@ -57,6 +55,7 @@ import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
+import org.cast.cwm.service.ISpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
 import org.slf4j.Logger;
@@ -64,6 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -157,6 +157,7 @@ public class SiteInfoPage extends AdminPage {
 	 * @author jbrookover
 	 *
 	 */
+	@SuppressWarnings("WicketForgeJavaIdInspection")
 	private class SiteForm extends DataForm<Site> {
 
 		private static final long serialVersionUID = 1L;
@@ -256,10 +257,9 @@ public class SiteInfoPage extends AdminPage {
 		private Button commitButton;
 		private Button cancelButton;
 
-		private UserSpreadsheetReader reader;
+		private ISpreadsheetReader reader;
 		private WebMarkupContainer resultsContainer = new WebMarkupContainer("results-container");
 		private Label uploadResults = new Label("upload-results", "UploadedData");
-
 
 		public UserFileUploadForm(String id, IModel<Site> site) {
 			super(id, site);
@@ -328,7 +328,7 @@ public class SiteInfoPage extends AdminPage {
 			clearResults();
 			final FileUpload upload = getFileUpload();
 			if (upload != null) {
-				reader = new UserSpreadsheetReader();
+				reader = adminPageService.getUserSpreadsheetReader();
 				reader.setDefaultSite(getModel());
 				boolean success;
 				try {
@@ -374,51 +374,25 @@ public class SiteInfoPage extends AdminPage {
 
 			uploadResults.setVisible(true);
 
-			List<String> headers = new ArrayList<String>();
-			headers.add("Line");  headers.add("SubjectID"); headers.add("Type"); 
-			headers.add("Period"); headers.add("Username"); headers.add("Password"); 
-			headers.add("Full Name"); headers.add("Email"); headers.add("Permission");
-
-			resultsContainer.add(new ListView<String>("headers", headers) {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected void populateItem(ListItem<String> item) {
-					String value = item.getModelObject();
-					item.add(new Label("value", value));
-				}
-			});
-
 			resultsContainer.add(new ListView<PotentialUserSave>("data-rows", reader.getPotentialUsers()) {
-
-				private static final long serialVersionUID = 1L;
 
 				@Override
 				protected void populateItem(ListItem<PotentialUserSave> item) {
+					IModel<PotentialUserSave> mp = item.getModel();
+					IModel<User> mu = item.getModelObject().getUser();
 
-					PotentialUserSave pe = item.getModelObject();
-					User p = pe.getUser().getObject();
-					List<String> values = new ArrayList<String>();
-					values.add(String.valueOf(pe.getLine())); values.add(p.getSubjectId());
-					values.add(p.getRole().toString()); 
-					values.add(p.getPeriods().iterator().next().getName()); 
-					values.add(p.getUsername()); values.add("********");
-					values.add(p.getFullName());
-					values.add(p.getEmail());
-					values.add(String.valueOf(p.isPermission()));
-					item.add(new ListView<String>("data-columns", values) {
+					item.add(new Label("line", new PropertyModel<Integer>(mp, "line")));
+					item.add(new Label("subjectId", new PropertyModel<Integer>(mu, "subjectId")));
+					item.add(new Label("role", new PropertyModel<Integer>(mu, "role")));
+					item.add(new Label("periods", new PeriodNameListModel(mu)));
+					item.add(new Label("username", new PropertyModel<Integer>(mu, "username")));
+					item.add(new Label("fullname", new PropertyModel<Integer>(mu, "fullName")));
+					item.add(new Label("email", new PropertyModel<Integer>(mu, "email")));
+					item.add(new Label("permission", new PropertyModel<Integer>(mu, "permission")));
+					item.add(new Label("error", new PropertyModel<String>(mp, "error")));
 
-						private static final long serialVersionUID = 1L;
 
-						@Override
-						protected void populateItem(ListItem<String> item) {
-							String value = item.getModelObject();
-							item.add(new Label("value", value));
-						}
-
-					});
-					if (!pe.getError().matches("")) {
+					if (!mp.getObject().getError().matches("")) {
 						item.add(new AttributeAppender("style", new Model<String>("color:red"), ";"));
 					}
 				}
@@ -437,4 +411,27 @@ public class SiteInfoPage extends AdminPage {
 		if (mSite != null)
 			mSite.detach();
 	}
+
+
+	private class PeriodNameListModel extends ChainingModel<String> {
+
+		public PeriodNameListModel(IModel<User> mUser) {
+			super(mUser);
+		}
+
+		@Override
+		public String getObject() {
+			AppendingStringBuffer output = new AppendingStringBuffer();
+			List<Period> list = ((IModel<User>) getTarget()).getObject().getPeriodsAsList();
+			Iterator<Period> listIt = list.listIterator();
+			while (listIt.hasNext()) {
+				Period p = listIt.next();
+				output.append(p.getName());
+				if (listIt.hasNext())
+					output.append(", ");
+			}
+			return output.toString();
+		}
+	}
+
 }

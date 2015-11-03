@@ -47,6 +47,8 @@ public interface IAdminPageService {
 
 	Class<? extends WebPage> getUserEditPage();
 
+	ISpreadsheetReader getUserSpreadsheetReader();
+
 	/**
 	 * Return a link to the page listing all sites and periods.
 	 *

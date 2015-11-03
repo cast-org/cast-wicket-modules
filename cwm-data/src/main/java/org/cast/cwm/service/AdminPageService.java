@@ -63,13 +63,13 @@ public class AdminPageService implements IAdminPageService {
 	}
 
 	@Override
-	public Link getUserListPageLink(String wicketId) {
-		return new BookmarkablePageLink<Void>("link", getUserListPage());
+	public Class<? extends WebPage> getUserEditPage() {
+		return UserFormPage.class;
 	}
 
 	@Override
-	public Class<? extends WebPage> getUserEditPage() {
-		return UserFormPage.class;
+	public ISpreadsheetReader getUserSpreadsheetReader() {
+		return new UserSpreadsheetReader();
 	}
 
 	@Override
@@ -98,6 +98,11 @@ public class AdminPageService implements IAdminPageService {
 	public Link getNewPeriodEditPageLink(String wicketId, IModel<? extends Site> mSite) {
 		return new BookmarkablePageLink<Void>(wicketId, getPeriodEditPage(),
 				new PageParameters().set("siteId", mSite.getObject().getId()));
+	}
+
+	@Override
+	public Link getUserListPageLink(String wicketId) {
+		return new BookmarkablePageLink<Void>("link", getUserListPage());
 	}
 
 	@Override

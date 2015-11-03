@@ -20,8 +20,6 @@
 package org.cast.cwm.service;
 
 import com.google.inject.Inject;
-import lombok.Getter;
-import lombok.Setter;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.QueryBuilder;
@@ -59,16 +57,19 @@ import java.util.List;
  */
 public class UserService implements IUserService {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
 	@Inject
 	private ICwmService cwmService;
 
-	@Getter @Setter
-	private Class<? extends User> userClass = User.class;
+	/**
+	 * Return the class to be used for Users.
+	 * Override if your application has it own User subclass.
+	 * @return the application's User class
+	 */
+	public Class<? extends User> getUserClass() {
+		return User.class;
+	}
 
-	/** 
+	/**
 	 * Instantiate an instance of the application's User class.
 	 * 
 	 * @return an object of type User or the appropriate subtype.
@@ -76,7 +77,7 @@ public class UserService implements IUserService {
 	@Override
 	public User newUser() {
 		try {
-			return userClass.newInstance();
+			return getUserClass().newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -98,24 +98,38 @@
 	     </p>
 	     </wicket:enclosure>
 	    </fieldset>
+
 	    <div wicket:id="upload-feedback"></div>
+
 	    <wicket:enclosure child="upload-results">
 	      <fieldset>
 	       <legend><span wicket:id="upload-results"></span></legend>
-	        <span wicket:id="results-container">
+	        <div wicket:id="results-container">
 	        <table>
-	          <tr> 
-	            <th wicket:id="headers">
-	              <span wicket:id="value"></span>
-	            </th>
+	          <tr>
+				  <th>line</th>
+				  <th>subjectId</th>
+				  <th>role</th>
+				  <th>periods</th>
+				  <th>username</th>
+				  <th>fullname</th>
+				  <th>email</th>
+				  <th>permission</th>
+				  <th>error</th>
 	          </tr>
 	          <tr wicket:id="data-rows">
-	            <td wicket:id="data-columns">
-	              <span wicket:id="value"></span>
-	            </td>
+				  <td wicket:id="line"></td>
+				  <td wicket:id="subjectId"></td>
+				  <td wicket:id="role"></td>
+				  <td wicket:id="periods"></td>
+				  <td wicket:id="username"></td>
+				  <td wicket:id="fullname"></td>
+				  <td wicket:id="email"></td>
+				  <td wicket:id="permission"></td>
+				  <td wicket:id="error"></td>
 	          </tr>
 	        </table>
-	        </span>
+	        </div>
 	      </fieldset>
 	    </wicket:enclosure>
 	  </form>

@@ -19,10 +19,15 @@
  */
 package org.cast.cwm.test;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.apache.wicket.model.Model;
+import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
+import org.cast.cwm.service.IUserService;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 
@@ -37,6 +42,20 @@ public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 	    when(cwmSessionService.getUser()).thenReturn(baseInjectedTestCase.loggedInUser);
 	    when(cwmSessionService.getCurrentPeriodModel()).thenReturn(Model.of(baseInjectedTestCase.period));
 		return cwmSessionService;
+	}
+
+	public IUserService injectAndStubUserService (CwmDataBaseTestCase testCase) {
+		IUserService userService = injectMock(IUserService.class);
+		when(userService.newUser()).thenAnswer(new Answer<User>() {
+			@Override
+			public User answer(InvocationOnMock invocation) throws Throwable {
+				return new User();
+			}
+		});
+		when(userService.getByEmail(anyString())).thenReturn(Model.of((User)null));
+		when(userService.getByUsername(anyString())).thenReturn(Model.of((User) null));
+		when(userService.getBySubjectId(anyString())).thenReturn(Model.of((User) null));
+		return userService;
 	}
 
 }

@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.test;
 
+import org.apache.wicket.mock.MockApplication;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
@@ -49,6 +50,10 @@ public class CwmDataBaseTestCase extends CwmBaseTestCase {
 		TestIdSetter.setId(Period.class, period, 1L);
 		loggedInUser = makeUser(Role.STUDENT, period, "Mickey", "Mouse");
 		TestIdSetter.setId(User.class, loggedInUser, 2L);
+	}
+
+	protected MockApplication getTestApplication() {
+		return new CwmDataTestApplication(injectionHelper.getMap());
 	}
 
 	public User makeUser(Role role, Period period, String firstName, String lastName) {
