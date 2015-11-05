@@ -45,7 +45,7 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 	public static enum Field {USERNAME, EMAIL, SUBJECTID };
 
 	private static final long serialVersionUID = 1L;
-	private IModel<User> currentUser;
+	private IModel<? extends User> currentUser;
 	private Field field;
 	
 	@Inject 
@@ -55,7 +55,7 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 		this(new Model<User>(null), field);
 	}
 	
-	public UniqueUserFieldValidator(IModel<User> currentUser, Field field) {
+	public UniqueUserFieldValidator(IModel<? extends User> currentUser, Field field) {
 		this.currentUser = currentUser;
 		this.field = field;
 		Injector.get().inject(this);
@@ -64,7 +64,7 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 	@Override
 	protected void onValidate(IValidatable<String> validatable) {
 
-		IModel<User> other;
+		IModel<? extends User> other;
 		
 		switch(field) {
 		case USERNAME:

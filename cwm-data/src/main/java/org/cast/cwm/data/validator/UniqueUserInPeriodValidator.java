@@ -33,7 +33,9 @@ import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IUserService;
 
 /**
- * A validator to make sure the first and last name in a form are unique within the current Period.
+ * A form-level validator to make sure the combination of first and last name in a form are unique within the current Period.
+ * Implementor must define methods to return the form components for the first and last names.
+ * The User object is expected to be the model of the form; if not, override the getUser() method.
  *
  * @author jbrookover
  *
@@ -56,7 +58,7 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 	public void validate(Form<?> form) {
 		
 		// Ensure that no other users exist in this period with the same full name
-		User student = (User) form.getModelObject();
+		User student = getUser(form);
 
 		String firstName = getFirstNameComponent().getValue();
 		String lastName = getLastNameComponent().getValue();
@@ -66,6 +68,10 @@ public abstract class UniqueUserInPeriodValidator extends AbstractFormValidator 
 				&& !student.equals(otherUser.getObject())) {
 			error(getFirstNameComponent(), "UniqueUserInPeriodValidator");
 		}
+	}
+
+	protected User getUser(Form<?> form) {
+		return (User) form.getModelObject();
 	}
 
 	@Override
