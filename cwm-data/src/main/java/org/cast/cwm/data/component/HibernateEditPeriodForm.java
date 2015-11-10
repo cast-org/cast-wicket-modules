@@ -72,15 +72,15 @@ public class HibernateEditPeriodForm<T extends Period> extends DataForm<T>{
 
 		// Anonymous ClassId
 		RequiredTextField<String> classId = new RequiredTextField<String>("classId");
-		name.add(StringValidator.lengthBetween(1, 32));
-		name.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+")); // NO comma since spreadsheet upload uses comma-sep list.
+		classId.add(StringValidator.lengthBetween(1, 32));
+		classId.add(new PatternValidator("[\\w!@#$%^&*()=_+;:/ -]+"));
 
 		UniqueDataFieldValidator<String> idValidator;
 		if (getModelObject().isTransient())
 			idValidator = new UniqueDataFieldValidator<String>(Period.class, "classId");
 		else
 			idValidator = new UniqueDataFieldValidator<String>(getModel(), "classId");
-		name.add(idValidator);
+		classId.add(idValidator);
 
 		add(new FeedbackBorder("classIdBorder").add(classId));
 	}

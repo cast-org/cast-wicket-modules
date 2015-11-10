@@ -77,6 +77,11 @@ public interface ISiteService {
 	 */
 	IModel<Period> getPeriodByName(String name);
 
+	/**
+	 * Create a new Site and Period within that site with a given name.
+	 * @param defaultName
+	 * @return
+	 */
 	IModel<Period> newPeriod(String defaultName);
 
 	/**

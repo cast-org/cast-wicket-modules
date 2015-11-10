@@ -126,15 +126,19 @@ public class SiteService implements ISiteService {
 		}	
 	}
 
-	/* create a new default period and associated site */
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#newPeriod(String)
+	 */
 	public IModel<Period> newPeriod(String defaultName) {
 		Site newSite = newSite();
 		newSite.setName(defaultName);
+		newSite.setSiteId(defaultName);
 		Period newPeriod = newPeriod();
 		newPeriod.setName(defaultName);
+		newPeriod.setClassId(defaultName);
 		newPeriod.setSite(newSite);
-		Databinder.getHibernateSession().save(newSite);
-		Databinder.getHibernateSession().save(newPeriod);
+		cwmService.save(newSite);
+		cwmService.save(newPeriod);
 		cwmService.flushChanges();
 		return new HibernateObjectModel<Period>(newPeriod);
 	}
