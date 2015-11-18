@@ -43,7 +43,6 @@ import org.apache.wicket.model.*;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.lang.Bytes;
-import org.apache.wicket.util.string.AppendingStringBuffer;
 import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.cwm.data.Period;
@@ -52,18 +51,16 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
 import org.cast.cwm.data.component.DeletePersistedObjectDialog;
 import org.cast.cwm.data.component.FormComponentContainer;
+import org.cast.cwm.data.models.UserPeriodNamesModel;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.ISpreadsheetReader;
-import org.cast.cwm.service.UserSpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -283,7 +280,7 @@ public class SiteInfoPage extends AdminPage {
 
 				@Override
 				public void onSubmit() {				
-					reader.save();
+					reader.save(this);
 					info("Users Submitted!");
 					log.info("User list saved to database");
 					commitButton.setVisible(false);
@@ -341,14 +338,8 @@ public class SiteInfoPage extends AdminPage {
 				if (!success) {
 					if (reader.getGlobalError() != null)
 						error(reader.getGlobalError());
-					for (PotentialUserSave pus : reader.getPotentialUsers()) {
-						if (!pus.getError().equals("")) {
-							String[] errors = pus.getError().split("\n");
-                            for (String error : errors) {
-                                error("Error on line " + pus.getLine() + ": " + error);
-                            }
-						}
-					}
+					else
+						error("One or more errors in file, see below");
 				}
 				displayResults();
 
@@ -381,10 +372,10 @@ public class SiteInfoPage extends AdminPage {
 					IModel<PotentialUserSave> mp = item.getModel();
 					IModel<User> mu = item.getModelObject().getUser();
 
-					item.add(new Label("line", new PropertyModel<Integer>(mp, "line")));
+					item.add(new Label("line", new PropertyModel<Integer>(mp, "csvRecord.recordNumber")));
 					item.add(new Label("subjectId", new PropertyModel<Integer>(mu, "subjectId")));
 					item.add(new Label("role", new PropertyModel<Integer>(mu, "role")));
-					item.add(new Label("periods", new PeriodNameListModel(mu)));
+					item.add(new Label("periods", new UserPeriodNamesModel(mu)));
 					item.add(new Label("username", new PropertyModel<Integer>(mu, "username")));
 					item.add(new Label("fullname", new PropertyModel<Integer>(mu, "fullName")));
 					item.add(new Label("email", new PropertyModel<Integer>(mu, "email")));
@@ -412,26 +403,5 @@ public class SiteInfoPage extends AdminPage {
 			mSite.detach();
 	}
 
-
-	private class PeriodNameListModel extends ChainingModel<String> {
-
-		public PeriodNameListModel(IModel<User> mUser) {
-			super(mUser);
-		}
-
-		@Override
-		public String getObject() {
-			AppendingStringBuffer output = new AppendingStringBuffer();
-			List<Period> list = ((IModel<User>) getTarget()).getObject().getPeriodsAsList();
-			Iterator<Period> listIt = list.listIterator();
-			while (listIt.hasNext()) {
-				Period p = listIt.next();
-				output.append(p.getName());
-				if (listIt.hasNext())
-					output.append(", ");
-			}
-			return output.toString();
-		}
-	}
 
 }

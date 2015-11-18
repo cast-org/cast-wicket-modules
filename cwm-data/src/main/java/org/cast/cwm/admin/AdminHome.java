@@ -87,6 +87,7 @@ public class AdminHome extends AdminPage {
 		if (cwmSessionService.getUser().hasRole(Role.ADMIN)) {
 			map.put("Create/Edit Users", adminPageService.getUserListPage());
 			map.put("Create/Edit Sites", adminPageService.getSiteListPage());
+			map.put("Bulk Update Users", adminPageService.getBulkUpdatePage());
 			map.put("Database Statistics", DatabaseStatisticsPage.class);
 			map.put("Cache Management", CacheManagementPage.class);
 			map.put("Open login sessions", SessionListPage.class);

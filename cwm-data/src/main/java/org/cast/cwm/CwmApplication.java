@@ -242,6 +242,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		mountPage("period", adminPageService.getPeriodEditPage());
 		mountPage("userlist", adminPageService.getUserListPage());
 		mountPage("edituser", adminPageService.getUserEditPage());
+		mountPage("bulkupdate", adminPageService.getBulkUpdatePage());
 
 		mountPage("stats", DatabaseStatisticsPage.class);
 		mountPage("cache", CacheManagementPage.class);

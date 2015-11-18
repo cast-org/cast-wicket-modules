@@ -62,14 +62,14 @@ public class CreateDefaultUsers implements IDatabaseInitializer {
 				FileInputStream file = new FileInputStream(userSpreadsheet);
 				UserSpreadsheetReader usr = new UserSpreadsheetReader();
 				if (usr.readInput(file)) {
-					usr.save();
+					usr.save(null);
 					file.close();
 					return true;
 				} else {
 					log.error("User spreadsheet contained errors: {}", usr.getGlobalError());
 					for (org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave u : usr.getPotentialUsers()) {
 						if (u.getUser()==null || !Strings.isEmpty(u.getError())) {
-							log.error("Error line {}: {}", u.getLine(), u.getError());
+							log.error("Error line {}: {}", u.getCsvRecord().getRecordNumber(), u.getError());
 						}
 					}
 				}

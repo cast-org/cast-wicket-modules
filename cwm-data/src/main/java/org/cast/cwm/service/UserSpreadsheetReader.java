@@ -22,12 +22,13 @@ package org.cast.cwm.service;
 import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.databinder.hib.Databinder;
-import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.wicket.Component;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.Strings;
@@ -38,10 +39,7 @@ import org.cast.cwm.data.User;
 import org.cwm.db.service.IDBService;
 import org.cwm.db.service.IModelProvider;
 import org.hibernate.Criteria;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +54,7 @@ import java.util.*;
  * @author bgoldowsky
  *
  */
+@Slf4j
 public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 	
 	@Inject
@@ -73,7 +72,7 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 	@Inject
 	private IDBService dbService;
 
-	@Getter @Setter
+	@Getter
 	protected IModel<Site> defaultSite;
 	
 	@Getter @Setter
@@ -94,10 +93,7 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 	protected Map<String,Site> potentialSites;
 
 	protected Map<Site,Map<String,Period>> potentialPeriods;
-	
-	private static final Logger log = LoggerFactory.getLogger(UserSpreadsheetReader.class);
-	
-	private static final long serialVersionUID = 1L;
+
 	private Map<String, Integer> headerMap;
 
 
@@ -147,40 +143,38 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 		if (!Strings.isEmpty(globalError))
 			return false;
 
-		// Read the CSV file, create Person objects, record error messages, add to PotentialUserSave List
+		// Read the CSV file, create PotentialUserSave objects, record error messages, add to potentialUsers List
 		try {
 			boolean errors = false; // have errors been encountered?
 			for (CSVRecord record : parser) {
 
 				try {
-					User user = userService.newUser();
+					User user = createUserObject(record);
 					String messages = populateUserObject(user, record);
 					if (Strings.isEmpty(messages))
 						messages = validateUser(user);
 
 					// Add a PotentialUserSave to the list.
-					potentialUsers.add(new PotentialUserSave(modelProvider.modelOf(user), messages,
-							parser.getCurrentLineNumber()));
+					potentialUsers.add(new PotentialUserSave(modelProvider.modelOf(user), messages, record));
 					if (!Strings.isEmpty(messages))
 						errors = true;
 
 				} catch (ArrayIndexOutOfBoundsException e) {
 					// This can happen if the last row is missing values; Excel doesn't fill them out to the last column
 					log.error("Caught exception importing line {}: {}", parser.getCurrentLineNumber(), e.getClass());
-					potentialUsers.add(new PotentialUserSave(null, "Data missing from CSV.\n",
-							parser.getCurrentLineNumber()));
+					potentialUsers.add(new PotentialUserSave(null, "Data missing from CSV.\n", record));
 					errors = true;
 				} catch (Exception e) {
 					e.printStackTrace();
 					log.error("Caught exception importing line {}: {}", parser.getCurrentLineNumber(), e.getClass());
-					potentialUsers.add(new PotentialUserSave(null, "Error: " + e, parser.getCurrentLineNumber()));
+					potentialUsers.add(new PotentialUserSave(null, "Error: " + e, record));
 					errors = true;
 				}
 			}
 
 			// If CSV file has only one line, it is either empty or has unrecognized LF/CR values.
 			if (parser.getCurrentLineNumber() == 1) {
-	  			potentialUsers.add(new PotentialUserSave(null, "Empty or Corrupted File.  Note: Save as Windows CSV.", 0));
+	  			potentialUsers.add(new PotentialUserSave(null, "Empty or Corrupted File.  Note: Save as Windows CSV.", null));
 				globalError = "Empty or Corrupted File - LF/CR values may be invalid!";
 				throw new CharacterCodingException();
 			}
@@ -199,21 +193,21 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 	 */
 	protected String checkRequiredHeaders(Map<String, Integer> map) {
 		String message = "";
-		if (!map.containsKey("username"))
-			message += "Must include a 'username' column.\n";
-		if (!map.containsKey("password"))
-			message += "Must include a 'password' column.\n";
-		if (!map.containsKey("type"))
-			message += "Must include a 'type' column.\n";
-		if (!map.containsKey("firstname"))
-			message += "Must include a 'firstname' column.\n";
-		if (!map.containsKey("lastname"))
-			message += "Must include a 'lastname' column.\n";
-		if (!map.containsKey("period"))
-			message += "Must include a 'period' column.\n";
+		for (String field : getRequiredFields()) {
+			if (!map.containsKey(field))
+				message += String.format("Must include a '%s' column.\n", field);
+		}
 		if (defaultSite == null && !map.containsKey("site"))
 			message += "Must include a 'site' column or a default site.\n";
 		return message;
+	}
+
+	/**
+	 * Return a list of field headers that are always required.
+	 * @return list of strings.
+	 */
+	protected List<String> getRequiredFields() {
+		return Arrays.asList("username", "password", "type", "firstname", "lastname", "period");
 	}
 
 	/**
@@ -240,21 +234,27 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 		if (user.getEmail() != null && userService.getByEmail(user.getEmail()).getObject() != null) {
 			messages += "Email " + user.getEmail() + " already exists in database. \n";
 		}
+		messages += checkForListDuplicates(user);
 
-		// Check uploaded user list for duplicate username, subjectId, "Full Name"
+		return messages;
+	}
+
+	// Check uploaded user list for duplicate username, subjectId, "Full Name"
+	protected String checkForListDuplicates(User user) {
+		String messages = "";
 		for (PotentialUserSave pe : potentialUsers) {
 			// Don't attempt to compare to null records (which may be included to mark lines with syntax errors).
 			if (pe.getUser() != null && pe.getUser().getObject() != null) {
 				User existing = pe.getUser().getObject();
 				if (user.getUsername().matches(existing.getUsername())) {
-					messages += "Username " + user.getUsername() + " is a duplicate in this list. \n";
+					messages += "Username " + user.getUsername() + " is a duplicate in this list.\n";
 				}
 				if (user.getSubjectId().matches(existing.getSubjectId())) {
-					messages += "SubjectId " + user.getSubjectId() + " is a duplicate in this list. \n";
+					messages += "SubjectId " + user.getSubjectId() + " is a duplicate in this list.\n";
 				}
 				if (user.getFullName().matches(existing.getFullName())
 						&& user.hasPeriodInCommonWith(existing)) {
-					messages += "Full name \'" + user.getFullName() + "\' is duplicated in this list. \n";
+					messages += "Full name \'" + user.getFullName() + "\' is duplicated in this list.\n";
 				}
 			}
 		}
@@ -263,9 +263,10 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 
 	/** 
 	 * Saves the potential users, periods, and sites.
+	 * @param triggerComponent the component that triggered the save (for logging).
 	 */
 	@Override
-	public void save() {
+	public void save(Component triggerComponent) {
 		for (Site site : potentialSites.values()) {
 			if (site.isTransient())
 				dbService.save(site);
@@ -291,18 +292,18 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 		cwmService.flushChanges();
 	}
 
+	protected User createUserObject(CSVRecord record) {
+		return userService.newUser();
+	}
+
 	/**
 	 * Adds a record of values to a User object.
 	 * 
 	 * @param user User object to be filled in
 	 * @param record a record of fields that will populate the User object
-	 * @return a string of errors (empty string if none)
-	 * @throws IOException
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
+	 * @return error message as a string if there are errors, empty string if successful
 	 */
-  	protected String populateUserObject(User user, CSVRecord record)
-  		throws IOException, InstantiationException, IllegalAccessException {
+  	protected String populateUserObject(User user, CSVRecord record) {
   		
   		String errors = "";
   		Site site =  null;
@@ -392,7 +393,7 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
   	}
 
 	// Determine whether the named field has a real, non-empty value.
-	private boolean notEmpty(CSVRecord record, String fieldname) {
+	protected boolean notEmpty(CSVRecord record, String fieldname) {
 		Integer position = headerMap.get(fieldname);
 		if (position == null)
 			return false;
@@ -401,7 +402,7 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 	}
 
 	// Get the value for the named field.
-	private String get(CSVRecord record, String fieldname) {
+	protected String get(CSVRecord record, String fieldname) {
 		return record.get(headerMap.get(fieldname));
 	}
 
@@ -451,7 +452,11 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 		criteria.add(Restrictions.eq("site", site));
 		return (Period) criteria.uniqueResult();
 	}
-	
+
+	public ISpreadsheetReader setDefaultSite(IModel<Site> mDefaultSite) {
+		this.defaultSite = mDefaultSite;
+		return this;
+	}
 
 	/**
 	 * A simple object used for creating a set of Person objects from an uploaded CSV file.
@@ -468,12 +473,12 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 
 		private IModel<User> user;
 		private String error;
-		private long line;
+		private CSVRecord csvRecord;
 		
-		public PotentialUserSave(IModel<User> user, String error, long line) {
+		public PotentialUserSave(IModel<User> user, String error, CSVRecord csvRecord) {
 			this.user = user;
 			this.error = error;
-			this.line = line;
+			this.csvRecord = csvRecord;
 		}
 	}
 }

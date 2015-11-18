@@ -61,7 +61,7 @@ public class Mp3CacheTest {
         assertNull("Should be null if not previously stored", cache.getCachedDate(2L));
     }
 
-    @Test
+    @Test // FIXME this fails occasionally
     public void blocksForSecondRead() throws Exception {
         // These will accept the values from the secondary thread.
         final Exchanger<Exception> exceptionExchanger = new Exchanger<Exception>();
@@ -93,7 +93,7 @@ public class Mp3CacheTest {
             }
         }.start();
 
-        // Wait a moment for second thread to attempt to read value
+        // Wait a second for second thread to attempt to read value
         // This simulates time taken for mp3 conversion
         Thread.sleep(1000);
 

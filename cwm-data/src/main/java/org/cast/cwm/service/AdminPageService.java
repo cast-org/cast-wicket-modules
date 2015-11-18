@@ -68,8 +68,18 @@ public class AdminPageService implements IAdminPageService {
 	}
 
 	@Override
+	public Class<? extends WebPage> getBulkUpdatePage() {
+		return BulkUpdatePage.class;
+	}
+
+	@Override
 	public ISpreadsheetReader getUserSpreadsheetReader() {
 		return new UserSpreadsheetReader();
+	}
+
+	@Override
+	public ISpreadsheetReader getUserUpdateSpreadsheetReader() {
+		return new UserUpdateSpreadsheetReader();
 	}
 
 	@Override

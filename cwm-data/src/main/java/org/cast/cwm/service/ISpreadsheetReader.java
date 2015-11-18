@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Site;
 
@@ -54,8 +55,10 @@ public interface ISpreadsheetReader {
 	/**
 	 * Save remembered "potential users" to the datastore.
 	 * This method should only be called after readInput has been called and completed successfully.
+	 *
+	 * @param triggerComponent the component that triggered the save (for logging)
 	 */
-	void save();
+	void save(Component triggerComponent);
 
 	IModel<Site> getDefaultSite();
 
