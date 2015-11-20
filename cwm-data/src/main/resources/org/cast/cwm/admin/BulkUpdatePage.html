@@ -4,29 +4,8 @@
 <body>
 
 <wicket:extend>
-	<h3>Upload Spreadsheet of Updates</h3>
-	<p>
-	  	Use this to change fields for multiple user accounts at once by uploading a Comma Separated Values (CSV) file.
-		Such a file can be created in any spreadsheet program.
-	</p>
-	<p>
-		Each line must correspond to an existing user account, based on its username or subject ID.
-		Thus, either a <em>username</em> or <em>subjectid</em> column is required.
-		If both colums exist, then the username will be used to find accounts, and their subject IDs will be updated.
-		Other columns are optional; any values in them will be used to update the database information.
-		Any cell may be left blank, in which case the existing data will be unchanged.
-	</p>
-	<p>Columns recognized:
-		<ul>
-			<li>username - the user that will be modified</li>
-			<li>subjectId - the new anonymous identifier for this user (or, can be used to identify user to change)</li>
-			<li>firstname - the new first name for your user.</li>
-			<li>lastname - the new last name for your user.</li>
-			<li>password - the new password for the user.</li>
-			<li>email - the new email address of the user</li>
-			<li>permission - change whether this user's data will be included in research reports (true/false or 1/0)</li>
-		</ul>
-	</p>
+	<h3><wicket:message key="heading">Upload Spreadsheet of Updates</wicket:message></h3>
+	<wicket:message key="instructions">Documentation here</wicket:message>
 
 	<form wicket:id="upload-form">
 		<fieldset style="margin-bottom:1em;">
