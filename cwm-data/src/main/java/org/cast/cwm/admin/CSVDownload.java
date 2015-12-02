@@ -124,7 +124,8 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 						// Write documentation row, if requested
 						if (includeDocumentationRow) {
 							for (IDataColumn<E> col : columns) {
-								if (col instanceof IDocumentedColumn) {
+								if (col instanceof IDocumentedColumn
+										&& ((IDocumentedColumn) col).getDocumentationModel() != null) {
 									writer.print(((IDocumentedColumn) col).getDocumentationModel().getObject());
 								} else {
 									writer.print("");
