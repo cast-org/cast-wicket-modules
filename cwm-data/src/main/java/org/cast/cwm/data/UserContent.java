@@ -198,7 +198,7 @@ public class UserContent extends PersistedObject {
 	 * Check whether this object has content that is considered empty based on its data type.
 	 * This incorporates rules and esoteric knowledge about a few commonly-used data types.
 	 * Probably needs rethinking to make this more general somehow.
-	 * @return
+	 * @return true if the object contains no significant content.
 	 */
 	public boolean isEmpty() {
 		if (dataType == null)

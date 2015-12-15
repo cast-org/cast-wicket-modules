@@ -21,13 +21,7 @@ package org.cast.cwm.data;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,6 +45,10 @@ import org.hibernate.annotations.GenericGenerator;
 @Getter 
 @Setter
 @ToString(of={"user","startTime"})
+@Table(indexes={
+		@Index(columnList="user_id", name="loginsession_user_idx"),
+		@Index(columnList="sessionId", name="loginsession_session_idx", unique = true)
+})
 public class LoginSession extends PersistedObject {
   
 	private static final long serialVersionUID = 1L;

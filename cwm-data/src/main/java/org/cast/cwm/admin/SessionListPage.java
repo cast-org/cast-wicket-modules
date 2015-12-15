@@ -37,8 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This page enables the viewing of users in a table using {link @UserListPanel}.
- * Links are created to add users for each {link @Role}.
+ * This page shows information about each currently-open login session.
  *
  */
 @AuthorizeInstantiation("ADMIN")
@@ -71,6 +70,8 @@ public class SessionListPage extends AdminPage {
 		// columns.add(new PropertyColumn<LoginSession>(new Model<String>("Time since last event"), "secondsSinceLastEvent")); // cannot sort since it's not a field Hibernate knows about
 		columns.add(new PropertyColumn<LoginSession,String>(new Model<String>("Browser"), "userAgent"));
 		columns.add(new PropertyColumn<LoginSession,String>(new Model<String>("IP Address"), "ipAddress"));
+
+
 	
 		return columns;
 	}

@@ -38,6 +38,7 @@ import org.apache.wicket.ThreadContext;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.util.file.File;
@@ -319,9 +320,14 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		sessionTimeout = configuration.getInteger("cwm.sessionTimeout", DEFAULT_SESSION_TIMEOUT);
 	}
 	
-	// Called to create a session
+	// Called to create a Wicket session
+	// Also sets the timeout at the servlet level to the requested value
 	@Override
 	public Session newSession(Request request, Response response) {
+		if (request instanceof ServletWebRequest) {
+			((ServletWebRequest) request).getContainerRequest()
+					.getSession().setMaxInactiveInterval(sessionTimeout);
+		}
 		return new CwmSession(request);
 	}
 	
@@ -463,7 +469,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 							LoginSession loginSession = eventService.getLoginSessionBySessionId(loginSessionId).getObject();
 							if (loginSession != null) {
 								 if (loginSession.getEndTime() == null) {
-									 log.debug("Closer thread closing login session {}", loginSessionId);
+									 log.debug("Closing login session {}", loginSessionId);
 									 eventService.forceCloseLoginSession(loginSession, "[timed out]");
 								 } else {
 									 // If user logged out normally, login session would already be closed.
@@ -471,7 +477,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 								 }
 							} else {
 								// This is probably a web session where the user never logged in.
-								log.debug("No LoginSession corresponds to session ID {}", loginSessionId, loginSession);
+								log.debug("No LoginSession corresponds to session ID {}", loginSessionId);
 							}
 							dbSession.getTransaction().commit();
 							return null;
@@ -480,6 +486,10 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 				} catch (InterruptedException e) {
 					log.debug("LoginSessionCloser exiting due to interrupt");
 					break;
+				} catch (Exception e) {
+					// Catch all other exceptions so that they don't terminate the thread
+					log.error("Unexpected exception during login session closing (ignored):");
+					e.printStackTrace();
 				}
 			}
 
