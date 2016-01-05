@@ -403,7 +403,11 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 
 	// Get the value for the named field.
 	protected String get(CSVRecord record, String fieldname) {
-		return record.get(headerMap.get(fieldname));
+		Integer fieldIndex = headerMap.get(fieldname);
+		if (fieldIndex != null)
+			return record.get(headerMap.get(fieldname));
+		else
+			return null;
 	}
 
 	// Make sure Site exists in our map of Sites, and return it.
