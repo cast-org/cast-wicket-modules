@@ -126,14 +126,7 @@ public class UserContent extends PersistedObject {
 	@ManyToMany
 	@JoinTable(inverseJoinColumns={@JoinColumn(name="file_id")})
 	private Set<BinaryFileData> secondaryFiles = new HashSet<BinaryFileData>();
-	
-	/**
-	 * Evaluations of this content, if any.
-	 */
-	@OneToMany(mappedBy="userContent")
-	@Cascade({CascadeType.ALL})
-	private Set<Evaluation> evaluations;
-	
+
 	/**
 	 * Related event - eg the "post" or "save" that resulted in this contnet getting stored or updated.
 	 */

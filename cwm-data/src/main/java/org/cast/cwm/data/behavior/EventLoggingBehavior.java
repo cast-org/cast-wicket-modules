@@ -100,7 +100,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	 * Constructor
 	 * 
 	 * @param jsEvent the client-side event (e.g. onclick)
-	 * @param eventCode the logging event code
+	 * @param eventType the logging event code
 	 */
 	public EventLoggingBehavior(String jsEvent, String eventType) {
 		super(jsEvent);

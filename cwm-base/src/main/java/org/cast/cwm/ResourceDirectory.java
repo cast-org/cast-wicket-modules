@@ -97,7 +97,7 @@ public class ResourceDirectory extends AbstractResource {
 		}
 		if (relativePath.endsWith("/"))
 			relativePath = relativePath.substring(0, relativePath.length()-1);
-		log.debug("relativePath is {}", relativePath);
+		log.trace("relativePath is {}", relativePath);
 
 		String absolutePath = new File(sourceDirectory, relativePath)
 				.getAbsolutePath();
@@ -194,6 +194,7 @@ public class ResourceDirectory extends AbstractResource {
 	 */
 	public IResourceStream getResourceStream(String absolutePath) {
 		if (!accept(Application.class, absolutePath)) {
+			log.warn("Access denied by IPackageResrouceGuard to resource: {}", absolutePath);
 			throw new PackageResourceBlockedException(
 					"Access denied to (static) package resource "
 							+ absolutePath + ". See IPackageResourceGuard");
