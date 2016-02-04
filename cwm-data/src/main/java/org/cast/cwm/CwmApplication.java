@@ -293,27 +293,32 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	protected void configureHibernate(Configuration c) {
 		// We don't actually want the defaults that Databinder sets.
 		// super.configureHibernate(ac);
-		
+
 		File configFile = configuration.getFile("cwm.hibernateConfig");
 		if (configFile == null)
-			throw new RuntimeException ("Hibernate config file must be specified with cwm.hibernateConfig property.");
-		
+			throw new RuntimeException("Hibernate config file must be specified with cwm.hibernateConfig property.");
+
 		c.configure(configFile);
 
-		c.addAnnotatedClass(org.cast.cwm.data.Event.class);
+		addCwmHibernateClasses(c);
+	}
+
+	public static void addCwmHibernateClasses(Configuration c) {
 		c.addAnnotatedClass(org.cast.cwm.data.BinaryFileData.class);
+		c.addAnnotatedClass(org.cast.cwm.data.Event.class);
+		c.addAnnotatedClass(org.cast.cwm.data.Initialization.class);
 		c.addAnnotatedClass(org.cast.cwm.data.LoginSession.class);
-		c.addAnnotatedClass(org.cast.cwm.data.User.class);
+		c.addAnnotatedClass(org.cast.cwm.data.Period.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Prompt.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Response.class);
-		c.addAnnotatedClass(org.cast.cwm.data.ResponseData.class);		
+		c.addAnnotatedClass(org.cast.cwm.data.ResponseData.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Site.class);
-		c.addAnnotatedClass(org.cast.cwm.data.Period.class);
-		c.addAnnotatedClass(org.cast.cwm.data.Initialization.class);
+		c.addAnnotatedClass(org.cast.cwm.data.User.class);
+		c.addAnnotatedClass(org.cast.cwm.data.UserContent.class);
 		c.addAnnotatedClass(org.cast.cwm.data.UserPreferenceBoolean.class);
 		c.addAnnotatedClass(org.cast.cwm.data.UserPreferenceString.class);
 	}
-	
+
 	public void loadAppProperties() {
 		configuration = AppConfiguration.loadFor(this);
 		appInstanceId = configuration.getString("cwm.instanceId", "unknown");
