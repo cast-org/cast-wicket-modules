@@ -21,6 +21,7 @@ package org.cast.cwm.test;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.wicket.Application;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.mock.MockApplication;
 
@@ -43,6 +44,7 @@ public class CwmTestApplication<T> extends MockApplication {
 	@Override
 	public void init() {
 		super.init();
+		getDebugSettings().setDevelopmentUtilitiesEnabled(false);
 		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getGuiceInjector()));
 	}
 
