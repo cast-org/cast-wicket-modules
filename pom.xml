@@ -487,7 +487,7 @@
         <hibernate.search.version>4.5.2.Final</hibernate.search.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
-        <copyright.year>2014</copyright.year>
+        <copyright.year>2016</copyright.year>
     </properties>
   
 </project>
