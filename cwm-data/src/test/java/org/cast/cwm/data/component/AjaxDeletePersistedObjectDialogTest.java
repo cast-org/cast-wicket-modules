@@ -32,10 +32,16 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.Response;
+import org.cast.cwm.service.IEventService;
 import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.junit.Test;
 
 public class AjaxDeletePersistedObjectDialogTest extends CwmDataBaseTestCase {
+	@Override
+	public void populateInjection() throws Exception {
+		super.populateInjection();
+		injectionHelper.injectMock(IEventService.class);
+	}
 
 	@Test
 	public void canRender() {

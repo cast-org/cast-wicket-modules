@@ -23,6 +23,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.BinaryFileData;
+import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.cast.cwm.test.TestIdSetter;
 import org.junit.Test;
@@ -40,6 +41,7 @@ public class Html5PlayerPanelTest extends CwmDataBaseTestCase {
 	
 	@Override
 	public void populateInjection() {
+		injectionHelper.injectMock(ICwmService.class);
 	}
 
 	@Test

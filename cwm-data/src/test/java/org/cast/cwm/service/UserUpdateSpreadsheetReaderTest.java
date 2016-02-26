@@ -45,6 +45,7 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataBaseTestCase {
 		IUserService userService = getHelper().injectAndStubUserService(this);
 		getHelper().injectMock(ICwmService.class);
 		getHelper().injectMock(IDBService.class);
+		getHelper().injectMock(ISiteService.class);
 		getHelper().injectObject(IModelProvider.class, new SimpleModelProvider());
 
 		// Our mock SiteService will acknowledge one existing site.
