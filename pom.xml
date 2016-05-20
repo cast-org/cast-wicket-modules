@@ -5,7 +5,7 @@
     <groupId>org.cast.cwm</groupId>
     <artifactId>cwm-parent</artifactId>
     <name>CWM parent project</name>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.2</version>
     <packaging>pom</packaging>
     
     <url>http://github.com/cast-org/cast-wicket-modules</url>
@@ -36,7 +36,8 @@
         <url>http://github.com/cast-org/cast-wicket-modules/source</url>
         <connection>scm:git:git://cast-org/cast-wicket-modules.git</connection>
         <developerConnection>scm:git:git@github.com:cast-org/cast-wicket-modules.git</developerConnection>
-    </scm>
+      <tag>cwm-parent-3.2</tag>
+  </scm>
     
     <distributionManagement>
         <repository>
