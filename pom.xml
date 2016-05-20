@@ -28,7 +28,7 @@
     </licenses>
     
     <issueManagement>
-        <system>Google Code</system>
+        <system>Github</system>
         <url>http://github.com/cast-org/cast-wicket-modules/issues</url>
     </issueManagement>
     
