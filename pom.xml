@@ -481,8 +481,8 @@
     </build>
   
     <properties>
-        <wicket.version>6.21.0</wicket.version>
-        <wicketstuff.version>6.21.0</wicketstuff.version>
+        <wicket.version>6.23.0</wicket.version>
+        <wicketstuff.version>6.23.0</wicketstuff.version>
         <hibernate.version>4.3.11.Final</hibernate.version>
         <hibernate.search.version>4.5.2.Final</hibernate.search.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
