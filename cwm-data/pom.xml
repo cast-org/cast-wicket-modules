@@ -31,10 +31,6 @@
  	  			</exclusion>
  	  		</exclusions>
  	  	</dependency>
- 	  	<dependency>
- 	  		<groupId>org.cast.cwm</groupId>
- 	  		<artifactId>cwm-audioapplet</artifactId>
- 	  	</dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -109,6 +105,7 @@
  	  		<groupId>net.sf.ehcache</groupId>
  	  		<artifactId>ehcache-core</artifactId>
  	  	</dependency>
+<!--
  	  	<dependency>
  	  		<groupId>org.wicketstuff</groupId>
  	  		<artifactId>wicketstuff-tinymce</artifactId>
@@ -119,7 +116,7 @@
  	  			</exclusion>
  	  		</exclusions>
  	  	</dependency>
-
+-->
  	  	<dependency>
  	  		<groupId>org.apache.wicket</groupId>
  	  		<artifactId>wicket-devutils</artifactId>
