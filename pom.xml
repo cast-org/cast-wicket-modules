@@ -48,7 +48,6 @@
     </distributionManagement>
     
     <modules>
-        <module>cwm-audioapplet</module>
         <module>cwm-base</module>
         <module>cwm-components</module>
         <module>cwm-data</module>
@@ -58,7 +57,6 @@
         <module>cwm-mediaplayer</module>
         <module>cwm-search</module>
         <module>cwm-tag</module>
-    	<module>cwm-wami</module>
         <module>cwm-xml</module>
     </modules>
 

@@ -50,7 +50,7 @@ public class FileDownloadLinkTest {
 		tester.clickLink("link");
 		assertEquals("Content length header is wrong", fakeFile.length, tester.getContentLengthFromResponseHeader());
 		assertEquals("Content type header is wrong", "text/plain", tester.getContentTypeFromResponseHeader());
-		assertEquals("Content disposition header is wrong", "attachment; filename=\"fakefile\"", tester.getContentDispositionFromResponseHeader());
+		assertEquals("Content disposition header is wrong", "attachment; filename=\"fakefile\"; filename*=UTF-8''fakefile", tester.getContentDispositionFromResponseHeader());
 		tester.assertContains("testdata");
 	}
 
