@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.components;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +29,8 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,19 +52,7 @@ public class RssFeedPanel extends Panel {
 	public RssFeedPanel (String wicketId, String url, int maxItems) {
 		super(wicketId);
 		
-		List<? extends SyndEntry> entryList;
-		try {
-			 entryList = new SyndEntryListModel(url).getObject();
-			 entryList = entryList.subList(0, Math.min(entryList.size(), maxItems));
-		} catch (RuntimeException e) {
-			// SyndEntryListModel throws a RuntimeException if it can't connect to the given URL.
-			log.error("Failed to get RSS feed from {}: {}", url, e.getMessage());
-			entryList = Collections.emptyList();
-		}
-		
-		add(new ListView<SyndEntry> ("item", entryList) {
-
-			private static final long serialVersionUID = 1L;
+		add(new ListView<SyndEntry> ("item", new LimitedSyndEntryListModel(url, maxItems)) {
 
 			@Override
 			protected void populateItem(ListItem<SyndEntry> item) {
@@ -74,4 +65,42 @@ public class RssFeedPanel extends Panel {
 			
 		});
 	}
+
+	/**
+	 * Model that will return just N of the syndicated items.
+	 * Wraps a SyndEntryListModel and peels off the initial items.
+	 */
+	protected class LimitedSyndEntryListModel extends AbstractReadOnlyModel<List<SyndEntry>> {
+
+		private int maxItems;
+		private SyndEntryListModel delegate;
+
+		public LimitedSyndEntryListModel (String url, int maxItems) {
+			this.maxItems = maxItems;
+			this.delegate = new SyndEntryListModel(url);
+		}
+		@Override
+		public List<SyndEntry> getObject() {
+			List<SyndEntry> list = new ArrayList<>(maxItems);
+			try {
+				List<? extends SyndEntry> fullList = delegate.getObject();
+				if (fullList.size() <= maxItems)
+					list.addAll(fullList);
+				else
+					list.addAll(fullList.subList(0, maxItems));
+			} catch (RuntimeException e) {
+				// SyndEntryListModel throws a RuntimeException if it can't connect to the given URL.
+				log.error("Failed to get RSS feed: {}", e.getMessage());
+			}
+			return list;
+		}
+
+		@Override
+		public void detach() {
+			delegate.detach();
+		}
+
+	}
+
+
 }

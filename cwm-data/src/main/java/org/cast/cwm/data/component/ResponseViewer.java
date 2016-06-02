@@ -39,12 +39,10 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.cast.audioapplet.component.AudioPlayer;
 import org.cast.cwm.UserResponseDataMapper;
 import org.cast.cwm.components.FileDownloadLink;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Response;
-import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.data.resource.ThumbnailUploadedImageResourceReference;
 import org.cast.cwm.data.resource.UploadedFileResourceReference;
 
@@ -127,8 +125,8 @@ public class ResponseViewer extends Panel {
 			return (new TextFragment(id, model));
 		if (typeName.equals("HTML"))
 			return (new TextFragment(id, model));
-		if (typeName.equals("AUDIO"))
-			return (new AudioFragment(id, model));
+//		if (typeName.equals("AUDIO"))
+//			return (new AudioFragment(id, model));
 		if (typeName.equals("UPLOAD"))
 			return (new UploadFragment(id, model));
 		if (typeName.equals("SVG"))
@@ -203,20 +201,20 @@ public class ResponseViewer extends Panel {
 		
 	}
 	
-	public class AudioFragment extends Fragment {
-
-		private static final long serialVersionUID = 1L;
-		
-		public AudioFragment(String id, IModel<? extends Response> model) {
-			super(id, "audioFragment", ResponseViewer.this, model);
-
-			LoadableDetachableAudioAppletModel audioModel = new LoadableDetachableAudioAppletModel(model);
-			audioModel.setReadOnly(true);
-						
-			AudioPlayer audioApplet = new AudioPlayer("applet", audioModel);
-			add(audioApplet);
-		}	
-	}
+//	public class AudioFragment extends Fragment {
+//
+//		private static final long serialVersionUID = 1L;
+//
+//		public AudioFragment(String id, IModel<? extends Response> model) {
+//			super(id, "audioFragment", ResponseViewer.this, model);
+//
+//			LoadableDetachableAudioAppletModel audioModel = new LoadableDetachableAudioAppletModel(model);
+//			audioModel.setReadOnly(true);
+//
+//			AudioPlayer audioApplet = new AudioPlayer("applet", audioModel);
+//			add(audioApplet);
+//		}
+//	}
 	
 	public class UploadFragment extends Fragment {
 

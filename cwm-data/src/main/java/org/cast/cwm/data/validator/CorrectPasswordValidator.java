@@ -22,7 +22,8 @@ package org.cast.cwm.data.validator;
 import net.databinder.auth.AuthDataSessionBase;
 
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 
 /**
  * Validate that the password given actually belongs to the logged-in user.
@@ -31,15 +32,12 @@ import org.apache.wicket.validation.validator.AbstractValidator;
  * 
  * @author bgoldowsky
  */
-public class CorrectPasswordValidator extends AbstractValidator<String> {
-
-	private static final long serialVersionUID = 1L;
+public class CorrectPasswordValidator implements IValidator<String> {
 
 	@Override
-	protected void onValidate(IValidatable<String> validatable) {		
+	public void validate(IValidatable<String> validatable) {
 		if (!AuthDataSessionBase.get().getUser().getPassword().matches(validatable.getValue())) {
-			error(validatable);
+			validatable.error(new ValidationError(this));
 		}
 	}
-
 }

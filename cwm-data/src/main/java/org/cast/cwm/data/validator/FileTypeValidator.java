@@ -19,14 +19,14 @@
  */
 package org.cast.cwm.data.validator;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Validate for file type.
@@ -37,9 +37,8 @@ import org.apache.wicket.validation.validator.AbstractValidator;
  * @author jbrookover
  *
  */
-public class FileTypeValidator extends AbstractValidator<FileUpload>{
+public class FileTypeValidator implements IValidator<FileUpload> {
 
-	private static final long serialVersionUID = 1L;
 	private List<String> mimeTypes;
 	
 	public FileTypeValidator (String... mimeTypes) {
@@ -48,19 +47,15 @@ public class FileTypeValidator extends AbstractValidator<FileUpload>{
 	}
 
 	@Override
-	protected void onValidate(IValidatable<FileUpload> validatable) {
+	public void validate(IValidatable<FileUpload> validatable) {
 		String uploadType = validatable.getValue().getContentType();
-		if (uploadType == null || !mimeTypes.contains(uploadType))
-			error(validatable);
-	}
-	
-	@Override
-	protected Map<String, Object> variablesMap(IValidatable<FileUpload> validatable) {
-		final Map<String, Object> map = super.variablesMap(validatable);
-		map.put("type", validatable.getValue().getContentType());
-		String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[0])) + "'";
-		map.put("allowed", types);
-		return map;
+		if (uploadType == null || !mimeTypes.contains(uploadType)) {
+			ValidationError error = new ValidationError(this);
+			error.setVariable("type", validatable.getValue().getContentType());
+			String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[mimeTypes.size()])) + "'";
+			error.setVariable("allowed", types);
+			validatable.error(error);
+		}
 	}
 
 }

@@ -21,6 +21,11 @@ package org.cast.cwm.data.behavior;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.AbstractAjaxBehavior;
@@ -28,7 +33,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.TextRequestHandler;
-import org.apache.wicket.util.upload.*;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.UserContent;
 import org.cast.cwm.service.ICwmService;
@@ -60,9 +64,7 @@ public class AudioUploadBehavior<T extends UserContent> extends AbstractAjaxBeha
     @Override
     public void onRequest() {
         HttpServletRequest req = ((ServletWebRequest)getComponent().getRequest()).getContainerRequest();
-        FileUpload upload = new FileUpload(new DiskFileItemFactory(Application.get()
-                .getResourceSettings()
-                .getFileCleaner()));
+        FileUpload upload = new FileUpload(new DiskFileItemFactory());
         try {
             boolean saved = false;
             List<FileItem> fileItems = upload.parseRequest(new ServletRequestContext(req));

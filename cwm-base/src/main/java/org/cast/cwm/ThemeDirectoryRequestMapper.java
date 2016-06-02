@@ -29,7 +29,6 @@ import org.apache.wicket.request.Url;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.mapper.AbstractMapper;
 import org.apache.wicket.request.resource.PackageResource.PackageResourceBlockedException;
-import org.apache.wicket.settings.IResourceSettings;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.time.Duration;
@@ -44,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *   getRootRequestMapperAsCompound().add(new ThemeDirectoryRequestMapper(themeDir, "js", "css"));
  * </pre></code>
  * 
- * Cache duration for files can be set, will default to {@link IResourceSettings#getDefaultCacheDuration()}.
+ * Cache duration for files can be set, or left to its default.
  * Files are checked against the PackageResourceGuard before being delivered.
  *  
  * @author bgoldowsky
@@ -146,7 +145,7 @@ public class ThemeDirectoryRequestMapper extends AbstractMapper {
 	private boolean accessCheck (String path) {
 		IPackageResourceGuard guard = Application.get().getResourceSettings()
 				.getPackageResourceGuard();
-		return guard.accept(Application.class, path);
+		return guard.accept(path);
 	}
 
 	public Duration getCacheDuration () {

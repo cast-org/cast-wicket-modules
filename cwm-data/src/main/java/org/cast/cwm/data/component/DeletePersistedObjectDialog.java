@@ -21,7 +21,6 @@ package org.cast.cwm.data.component;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -34,7 +33,7 @@ import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.PersistedObject;
 
 /**
- * A dialog for deleting a {@link Persisted Object} from the datastore.
+ * A dialog for deleting a {@link PersistedObject} from the datastore.
  * 
  * TODO: Is this too specific for a separate panel?  Shouldn't we break these down into a few types of Dialogs:
  *  - Alert Dialog (takes a message and shows Okay)
@@ -69,13 +68,15 @@ public abstract class DeletePersistedObjectDialog<T extends PersistedObject> ext
 				new PropertyModel<String>(DeletePersistedObjectDialog.this, "objectName"),
 				new PropertyModel<String>(DeletePersistedObjectDialog.this, "objectNameCapitalized")
 		};
-		
-		StringResourceModel titleModel = new StringResourceModel("deleteDialogTitle", this, null, modelParameters);
+
+		StringResourceModel titleModel = new StringResourceModel("deleteDialogTitle", this)
+				.setParameters(modelParameters);
 		add(dialogBorder = new DialogBorder ("dialogBorder", titleModel));
 		dialogBorder.setMoveContainer(this);
 		
 		// Set up a model that allows property value to interpolate the type of object being deleted with {0}
-		StringResourceModel messageModel = new StringResourceModel("deleteQuestion", this, null, modelParameters);
+		StringResourceModel messageModel = new StringResourceModel("deleteQuestion", this)
+				.setParameters(modelParameters);
 		dialogBorder.getBodyContainer().add(new Label("deleteQuestion", messageModel));
 		
 		dialogBorder.getBodyContainer().add(new WebMarkupContainer("cancelLink").add(dialogBorder.getClickToCloseBehavior()));

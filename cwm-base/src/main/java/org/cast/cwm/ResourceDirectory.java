@@ -62,8 +62,6 @@ public class ResourceDirectory extends AbstractResource {
 
 	private static final Duration DEFAULT_CACHE_DURATION = Duration.hours(1);
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * The path to the directory of resources
 	 */
@@ -193,7 +191,7 @@ public class ResourceDirectory extends AbstractResource {
 	 * @return resource stream or <code>null</code> if not found
 	 */
 	public IResourceStream getResourceStream(String absolutePath) {
-		if (!accept(Application.class, absolutePath)) {
+		if (!accept(absolutePath)) {
 			log.warn("Access denied by IPackageResrouceGuard to resource: {}", absolutePath);
 			throw new PackageResourceBlockedException(
 					"Access denied to (static) package resource "
@@ -203,17 +201,16 @@ public class ResourceDirectory extends AbstractResource {
 	}
 
 	/**
-	 * @param scope
-	 *            resource scope
+	 * Check whether resource at path is legal to send to client.
 	 * @param path
 	 *            resource path
 	 * @return <code>true<code> if resource access is granted
 	 */
-	private boolean accept(Class<?> scope, String path) {
+	private boolean accept(String path) {
 		IPackageResourceGuard guard = Application.get().getResourceSettings()
 				.getPackageResourceGuard();
 
-		return guard.accept(scope, path);
+		return guard.accept(path);
 	}
 
 	@Override

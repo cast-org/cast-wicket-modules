@@ -19,13 +19,7 @@
  */
 package org.cast.cwm.data.component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import org.apache.commons.fileupload.FileItem;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
@@ -44,7 +38,9 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.string.Strings;
-import org.apache.wicket.util.upload.FileItem;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This is a re-creation of {@link MultiFileUploadField}.  It references a similar javascript
@@ -200,9 +196,6 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 		return true;
 	}
 
-	/**
-	 * @see org.apache.wicket.markup.html.IHeaderContributor#renderHead(org.apache.wicket.markup.html.IHeaderResponse)
-	 */
 	@Override
 	public void renderHead(IHeaderResponse response)
 	{

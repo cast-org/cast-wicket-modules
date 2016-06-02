@@ -19,15 +19,15 @@
  */
 package org.cast.cwm.data.validator;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Validate for file type.  Identical to {@link FileTypeValidator}, but this
@@ -39,9 +39,8 @@ import org.apache.wicket.validation.validator.AbstractValidator;
  * @author jbrookover
  *
  */
-public class MultipleFileTypeValidator extends AbstractValidator<Collection<FileUpload>>{
+public class MultipleFileTypeValidator implements IValidator<Collection<FileUpload>> {
 
-	private static final long serialVersionUID = 1L;
 	private List<String> mimeTypes;
 	
 	public MultipleFileTypeValidator (String... mimeTypes) {
@@ -50,20 +49,17 @@ public class MultipleFileTypeValidator extends AbstractValidator<Collection<File
 	}
 
 	@Override
-	protected void onValidate(IValidatable<Collection<FileUpload>> validatable) {
+	public void validate(IValidatable<Collection<FileUpload>> validatable) {
 		for (FileUpload f : validatable.getValue()) {
 			String uploadType = f.getContentType();
-			if (uploadType == null || !mimeTypes.contains(uploadType))
-				error(validatable);
+			if (uploadType == null || !mimeTypes.contains(uploadType)) {
+				ValidationError error = new ValidationError(this);
+				error.setVariable("type", uploadType);
+				String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[mimeTypes.size()])) + "'";
+				error.setVariable("allowed", types);
+				validatable.error(error);
+			}
 		}
-	}
-
-	@Override
-	protected Map<String, Object> variablesMap(IValidatable<Collection<FileUpload>> validatable) {
-		final Map<String, Object> map = super.variablesMap(validatable);
-		String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[0])) + "'";
-		map.put("allowed", types);
-		return map;
 	}
 
 }

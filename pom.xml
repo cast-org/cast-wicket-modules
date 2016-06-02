@@ -216,7 +216,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wicketstuff</groupId>
-                <artifactId>wicketstuff-tinymce</artifactId>
+                <artifactId>wicketstuff-tinymce3</artifactId>
                 <version>${wicketstuff.version}</version>
             </dependency>
 

@@ -19,16 +19,18 @@
  */
 package org.cast.cwm.components;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.wicket.core.request.ClientInfo;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.StatelessForm;
-import org.apache.wicket.markup.html.pages.BrowserInfoForm.ClientPropertiesBean;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.util.io.IClusterable;
 
 /**
  * A stateless form component that will, as a side effect, gather extended browser information.
@@ -78,7 +80,7 @@ public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
 	@Override
 	protected void onSubmit() {
 		RequestCycle requestCycle = getRequestCycle();
-		WebSession session = (WebSession)getSession();
+		WebSession session = (WebSession) getSession();
 		ClientInfo ci = session.getClientInfo();
 
 		if (ci == null) {
@@ -86,7 +88,7 @@ public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
 			getSession().setClientInfo(ci);
 		} else {
 			if (!(ci instanceof WebClientInfo))
-				throw new RuntimeException ("ClientInfo is not of expected type");
+				throw new RuntimeException("ClientInfo is not of expected type");
 		}
 		WebClientInfo clientInfo = (WebClientInfo) ci;
 
@@ -98,5 +100,55 @@ public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
 		return bean;
 	}
 
+	@Getter
+	@Setter
+	protected static class ClientPropertiesBean {
+
+		private String navigatorAppName;
+		private String navigatorAppVersion;
+		private String navigatorAppCodeName;
+		private Boolean navigatorCookieEnabled = Boolean.FALSE;
+		private Boolean navigatorJavaEnabled = Boolean.FALSE;
+		private String navigatorLanguage;
+		private String navigatorPlatform;
+		private String navigatorUserAgent;
+		private String screenHeight;
+		private String screenWidth;
+		private String screenColorDepth;
+		private String utcOffset;
+		private String utcDSTOffset;
+		private String browserWidth;
+		private String browserHeight;
+		private String hostname;
+
+		public void merge(ClientProperties properties) {
+			properties.setNavigatorAppName(navigatorAppName);
+			properties.setNavigatorAppVersion(navigatorAppVersion);
+			properties.setNavigatorAppCodeName(navigatorAppCodeName);
+			properties.setNavigatorCookieEnabled(navigatorCookieEnabled);
+			properties.setNavigatorLanguage(navigatorLanguage);
+			properties.setNavigatorPlatform(navigatorPlatform);
+			properties.setNavigatorUserAgent(navigatorUserAgent);
+			properties.setScreenWidth(getInt(screenWidth));
+			properties.setScreenHeight(getInt(screenHeight));
+			properties.setBrowserWidth(getInt(browserWidth));
+			properties.setBrowserHeight(getInt(browserHeight));
+			properties.setScreenColorDepth(getInt(screenColorDepth));
+			properties.setUtcOffset(utcOffset);
+			properties.setUtcDSTOffset(utcDSTOffset);
+			properties.setHostname(hostname);
+		}
+
+		private int getInt(String value) {
+			int intValue = -1;
+			try {
+				intValue = Integer.parseInt(value);
+			} catch (NumberFormatException e) {
+				// Do nothing
+			}
+			return intValue;
+		}
+
+	}
 
 }

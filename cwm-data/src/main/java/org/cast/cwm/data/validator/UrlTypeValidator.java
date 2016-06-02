@@ -19,15 +19,15 @@
  */
 package org.cast.cwm.data.validator;
 
+import org.apache.wicket.util.string.Strings;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
+
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.wicket.util.string.Strings;
-import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
 
 /**
  * Validate for file type on a URL.
@@ -35,9 +35,8 @@ import org.apache.wicket.validation.validator.AbstractValidator;
  * @author jbrookover
  *
  */
-public class UrlTypeValidator extends AbstractValidator<String>{
+public class UrlTypeValidator implements IValidator<String> {
 
-	private static final long serialVersionUID = 1L;
 	private List<String> mimeTypes;
 	
 	public UrlTypeValidator (String... mimeTypes) {
@@ -46,47 +45,30 @@ public class UrlTypeValidator extends AbstractValidator<String>{
 	}
 
 	@Override
-	protected void onValidate(IValidatable<String> validatable) {
+	public void validate(IValidatable<String> validatable) {
 
 		try {
 			URL url = new URL(validatable.getValue());
 			URLConnection c = url.openConnection();
-			
+			c.connect();
+
 			// Get Content Type
 			// TODO: This just checks headers.  Better way?
 			String contentType = c.getContentType();
-			if (contentType == null || !mimeTypes.contains(contentType))
-				error(validatable);
-			
+			if (contentType == null || !mimeTypes.contains(contentType)) {
+				ValidationError error = new ValidationError(this);
+
+				error.setVariable("type", (contentType == null) ? "unknown" : contentType);
+
+				String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[0])) + "'";
+				error.setVariable("allowed", types);
+
+				validatable.error(error);
+			}
 		} catch (Exception ex) {
-			error(validatable); // Malformed URL or cannot connect
+			// URL is malformed, or connection cannot be made
+			validatable.error(new ValidationError(this));
 		}
-	}
-	
-	@Override
-	protected Map<String, Object> variablesMap(IValidatable<String> validatable) {
-		final Map<String, Object> map = super.variablesMap(validatable);
-	
-		String type;
-		try {
-			URL url = new URL(validatable.getValue());
-			
-			// Ensure a connection can be made
-			URLConnection c = url.openConnection();
-			c.connect();
-			
-			type = c.getContentType();
-			if (type == null)
-				type = "unknown";
-		
-		} catch (Exception ex) {
-			type = "unknown";
-		}
-		
-		map.put("type", type);
-		String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[0])) + "'";
-		map.put("allowed", types);
-		return map;
 	}
 
 }

@@ -71,9 +71,7 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Bytes;
-import org.apache.wicket.util.time.Time;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.cast.audioapplet.component.AbstractAudioRecorder;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.UserResponseDataMapper;
 import org.cast.cwm.components.UrlStreamedToString;
@@ -82,7 +80,6 @@ import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;
 import org.cast.cwm.data.behavior.AjaxAutoSavingBehavior;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
-import org.cast.cwm.data.models.LoadableDetachableAudioAppletModel;
 import org.cast.cwm.drawtool.SvgEditor;
 import org.cast.cwm.service.IResponseService;
 import org.slf4j.Logger;
@@ -107,6 +104,7 @@ import com.google.inject.Inject;
  * @author jbrookover
  *
  */
+@SuppressWarnings("ALL")
 public abstract class ResponseEditor extends Panel {
 
 	private static final long serialVersionUID = 1L;
@@ -279,8 +277,8 @@ public abstract class ResponseEditor extends Panel {
 			return (new TextFragment(id, model, false));
 		if (typeName.equals("HTML"))
 			return (new TextFragment(id, model, true));
-		if (typeName.equals("AUDIO"))
-			return (new AudioFragment(id, model));
+//		if (typeName.equals("AUDIO"))
+//			return (new AudioFragment(id, model));
 		if (typeName.equals("UPLOAD"))
 			return (new UploadFragment(id, model));
 		if (typeName.equals("SVG"))
@@ -417,7 +415,10 @@ public abstract class ResponseEditor extends Panel {
 			 * Sentence Starter Dropdown List
 			 * @see onBeforeRender for choice modifications and visibility.
 			 */
-			add(choiceList = new DropDownChoice<String>("sentenceStarters", new Model<String>("default"), new PropertyModel<List<String>>(ResponseEditor.this, "starters"), new SentenceStarterRenderer()));
+			add(choiceList = new DropDownChoice<String>("sentenceStarters",
+					new Model<String>("default"),
+					new PropertyModel<List<String>>(ResponseEditor.this, "starters"),
+					new SentenceStarterRenderer()));
 			choiceList.setOutputMarkupId(true);
 			choiceList.setNullValid(true);
 
@@ -469,13 +470,19 @@ public abstract class ResponseEditor extends Panel {
 			super.onBeforeRender();
 		}
 
+		/**
+		 * The dropdown choices for sentence starters are rendered with the value
+		 * (the text that will be inserted) equal to the displayed text, except that the
+		 * default choice should not insert any text.
+		 */
 		private class SentenceStarterRenderer implements IChoiceRenderer<String> {
-			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String getDisplayValue(String object) {
 				if ("default".equals(object))
-					return new StringResourceModel("sentenceStarters.null", null, "Choose a Sentence Starter").getString();
+					return new StringResourceModel("sentenceStarters.null")
+							.setDefaultValue("Choose a Sentence Starter")
+							.getString();
 				else
 					return object;
 			}
@@ -486,6 +493,14 @@ public abstract class ResponseEditor extends Panel {
 					return " ";
 				else
 					return object;
+			}
+
+			@Override
+			public String getObject(String id, IModel<? extends List<? extends String>> choices) {
+				if (" ".equals(id))
+					return "default";
+				else
+					return id;
 			}
 		}		
 	}
@@ -730,39 +745,39 @@ public abstract class ResponseEditor extends Panel {
 
 		
 	
-	protected class AudioFragment extends Fragment {
-
-		private static final long serialVersionUID = 1L;
-
-		public AudioFragment(String id, IModel<Response> model) {
-			super(id, "audioFragment", ResponseEditor.this, model);
-
-			LoadableDetachableAudioAppletModel audioModel = new LoadableDetachableAudioAppletModel(model);
-			audioModel.setMaxLength(300);
-			
-			AbstractAudioRecorder audioApplet = new AbstractAudioRecorder("applet", audioModel) {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onReceiveAudio() {
-					String filename = ResponseEditor.this.getModel().getObject().getUser().getId() + "_" + Time.now().getMilliseconds() + ".au";
-					responseService.saveBinaryResponse(ResponseEditor.this.getModel(), getModelObject(), "audio/au", filename, pageName);
-				}
-
-				@Override
-				public void onSave(AjaxRequestTarget target) {
-					ResponseEditor.this.onSave(target);
-				}
-				
-			};
-			audioApplet.setDebug(debug);
-			add(audioApplet);
-
-			WebMarkupContainer saveLink = audioApplet.generateStandardSaveLink("save");
-			add(saveLink);
-		}
-	}
+//	protected class AudioFragment extends Fragment {
+//
+//		private static final long serialVersionUID = 1L;
+//
+//		public AudioFragment(String id, IModel<Response> model) {
+//			super(id, "audioFragment", ResponseEditor.this, model);
+//
+//			LoadableDetachableAudioAppletModel audioModel = new LoadableDetachableAudioAppletModel(model);
+//			audioModel.setMaxLength(300);
+//
+//			AbstractAudioRecorder audioApplet = new AbstractAudioRecorder("applet", audioModel) {
+//
+//				private static final long serialVersionUID = 1L;
+//
+//				@Override
+//				public void onReceiveAudio() {
+//					String filename = ResponseEditor.this.getModel().getObject().getUser().getId() + "_" + Time.now().getMilliseconds() + ".au";
+//					responseService.saveBinaryResponse(ResponseEditor.this.getModel(), getModelObject(), "audio/au", filename, pageName);
+//				}
+//
+//				@Override
+//				public void onSave(AjaxRequestTarget target) {
+//					ResponseEditor.this.onSave(target);
+//				}
+//
+//			};
+//			audioApplet.setDebug(debug);
+//			add(audioApplet);
+//
+//			WebMarkupContainer saveLink = audioApplet.generateStandardSaveLink("save");
+//			add(saveLink);
+//		}
+//	}
 	
 	protected class UploadFragment extends Fragment {
 

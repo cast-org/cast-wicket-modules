@@ -19,17 +19,15 @@
  */
 package org.cast.cwm.data.validator;
 
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.IUserService;
-
-import com.google.inject.Inject;
 
 /**
  * Validate that the username is not already in use in the database by a different
@@ -40,11 +38,10 @@ import com.google.inject.Inject;
  * 
  * @author bgoldowsky
  */
-public class UniqueUserFieldValidator extends AbstractValidator<String> {
+public class UniqueUserFieldValidator implements IValidator<String> {
 	
-	public static enum Field {USERNAME, EMAIL, SUBJECTID };
+	public enum Field {USERNAME, EMAIL, SUBJECTID }
 
-	private static final long serialVersionUID = 1L;
 	private IModel<? extends User> currentUser;
 	private Field field;
 	
@@ -62,7 +59,7 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 	}
 
 	@Override
-	protected void onValidate(IValidatable<String> validatable) {
+	public void validate(IValidatable<String> validatable) {
 
 		IModel<? extends User> other;
 		
@@ -81,15 +78,10 @@ public class UniqueUserFieldValidator extends AbstractValidator<String> {
 		}
 
 		if (other.getObject() != null && !other.getObject().equals(currentUser.getObject())) {
-			error(validatable);
+			ValidationError error = new ValidationError(this);
+			error.setVariable("field", field.toString().toLowerCase());
+			validatable.error(error);
 		}
-	}
-	
-	@Override 
-	protected Map<String, Object> variablesMap(IValidatable<String> validatable) {
-		Map<String, Object> map = super.variablesMap(validatable);
-		map.put("field", field.toString().toLowerCase());
-		return map;
 	}
 
 }
