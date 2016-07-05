@@ -54,7 +54,6 @@
         <module>cwm-dav</module>
 	    <module>cwm-db</module>
         <module>cwm-glossary</module>
-        <module>cwm-mediaplayer</module>
         <module>cwm-search</module>
         <module>cwm-tag</module>
         <module>cwm-xml</module>
@@ -107,11 +106,6 @@
             <dependency>
                 <groupId>org.cast.cwm</groupId>
                 <artifactId>cwm-glossary</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.cast.mediaplayer</groupId>
-                <artifactId>cwm-components</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

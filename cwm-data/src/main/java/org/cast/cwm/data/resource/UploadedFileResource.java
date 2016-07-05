@@ -26,6 +26,7 @@ import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
@@ -48,8 +49,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class UploadedFileResource extends AbstractResource {
 
-	private static final long serialVersionUID = 1L;
-
 	@Inject
 	private ICwmService cwmService;
 	
@@ -60,13 +59,20 @@ public class UploadedFileResource extends AbstractResource {
 
 	@Override
 	protected ResourceResponse newResourceResponse(final Attributes attributes) {
-		final ResourceResponse response = new ResourceResponse();
+		ResourceResponse response = new ResourceResponse();
 
-		long id = attributes.getParameters().get("id").toLong();
+		long id;
+		try {
+			id = attributes.getParameters().get("id").toLong();
+		} catch (StringValueConversionException e) {
+			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
+					"Invalid id in request [id=" + attributes.getParameters().get("id")+ "]");
+		}
 
 		IModel<BinaryFileData> mBfd = cwmService.getById(BinaryFileData.class, id);
 		if (mBfd == null || mBfd.getObject() == null)
-			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Data not found [id=" + id + "]");
+			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
+					"Data not found [id=" + id + "]");
 		BinaryFileData bfd = mBfd.getObject();
 
 		response.setLastModified(Time.valueOf(bfd.getLastModified()));
@@ -75,7 +81,8 @@ public class UploadedFileResource extends AbstractResource {
 
 			final byte[] data = bfd.getData();
 			if (data == null)
-				throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Data not found [id=" + id + "]");
+				throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
+						"Data not found [id=" + id + "]");
 
 			response.setContentType(bfd.getMimeType());
 			response.setContentLength(data.length);

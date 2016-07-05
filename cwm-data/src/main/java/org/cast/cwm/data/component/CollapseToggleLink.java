@@ -22,12 +22,12 @@ package org.cast.cwm.data.component;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.components.ClassAttributeModifier;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
@@ -43,7 +43,9 @@ import com.google.inject.Inject;
  *  
  * @author lynnmccormack
  *
+ * @deprecated Use CAST Framework toggle instead of this old version
  */
+@Deprecated
 public class CollapseToggleLink extends AjaxLink<Void> {
 
 	private static final long serialVersionUID = 1L;
@@ -102,10 +104,11 @@ public class CollapseToggleLink extends AjaxLink<Void> {
 	protected void onInitialize() {
 		super.onInitialize();
 		// set the toggle state from the saved state otherwise use the toggleState
-		if (togglePreferenceId != null || !togglePreferenceId.isEmpty()) {
+		if (togglePreferenceId != null && !togglePreferenceId.isEmpty()) {
 			initToggleState();
 		}
-		add(new ClassAttributeModifier("open", !toggleState));
+		if (toggleState)
+			add(AttributeModifier.append("class", "open"));
 	}
 	
 
