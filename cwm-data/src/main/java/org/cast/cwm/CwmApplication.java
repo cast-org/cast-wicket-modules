@@ -49,7 +49,9 @@ import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.service.*;
+import org.cwm.db.service.DBService;
 import org.cwm.db.service.HibernateObjectModelProvider;
+import org.cwm.db.service.IDBService;
 import org.cwm.db.service.IModelProvider;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -188,7 +190,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	}
 	
 	/**
-	 * Returns a list of Guice Modules to be injected.
+	 * Returns a list of default implementations of Guice Modules to be injected.
 	 * Applications should override this method to inject services.
 	 * 
 	 * A typical usage should be to call super.getInjectionModules() to get the list, and then add to that list.
@@ -208,6 +210,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 				binder.bind(IAppConfiguration.class).toInstance(configuration);
 				binder.bind(IModelProvider.class).to(HibernateObjectModelProvider.class);
 				binder.bind(IAdminPageService.class).to(AdminPageService.class);
+				binder.bind(IEventService.class).to(EventService.class);
+				binder.bind(IUserService.class).to(UserService.class);
+				binder.bind(IDBService.class).to(DBService.class);
 			}
 		});
 		return modules;
