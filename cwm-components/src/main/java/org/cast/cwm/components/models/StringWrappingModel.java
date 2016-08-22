@@ -30,7 +30,7 @@ import org.apache.wicket.util.lang.Args;
  * 
  * Example: put an object's name in brackets:
  * <code><pre>
- *   new AppendingModel(new PropertyModel<String>(object, "name"), "[", "]");
+ *   new StringWrappingModel(new PropertyModel<String>(object, "name"), "[", "]");
  * </pre></code>
  * 
  * @author bgoldowsky

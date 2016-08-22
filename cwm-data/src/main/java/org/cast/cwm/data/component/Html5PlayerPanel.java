@@ -61,8 +61,6 @@ public class Html5PlayerPanel extends GenericPanel<BinaryFileData> {
             log.debug("Mime type for player: {}", mimeType);
             if (mimeType.equals("audio/mpeg")) {
                 audio.add(new Mp3AudioSource("source", model));
-            } else if (mimeType.equals("audio/wav")) {
-                audio.add(new ConvertedMp3AudioSource("source", model));
             } else {
                 log.error("Unexpected MIME type of audio BinaryFileData: {}", mimeType);
                 audio.add(new WebMarkupContainer("source"));

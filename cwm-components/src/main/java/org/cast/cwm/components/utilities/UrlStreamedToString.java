@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.components;
+package org.cast.cwm.components.utilities;
 
 import java.io.BufferedReader;
 import java.io.IOException;

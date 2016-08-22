@@ -53,6 +53,7 @@
         <module>cwm-data</module>
         <module>cwm-dav</module>
 	    <module>cwm-db</module>
+        <module>cwm-figuration</module>
         <module>cwm-glossary</module>
         <module>cwm-search</module>
         <module>cwm-tag</module>
@@ -102,6 +103,11 @@
             	<groupId>org.cast.cwm</groupId>
             	<artifactId>cwm-db</artifactId>
             	<version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.cast.cwm</groupId>
+                <artifactId>cwm-figuration</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.cast.cwm</groupId>

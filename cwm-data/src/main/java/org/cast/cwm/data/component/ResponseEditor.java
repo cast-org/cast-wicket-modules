@@ -74,7 +74,7 @@ import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.UserResponseDataMapper;
-import org.cast.cwm.components.UrlStreamedToString;
+import org.cast.cwm.components.utilities.UrlStreamedToString;
 import org.cast.cwm.data.IResponseType;
 import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.Response;

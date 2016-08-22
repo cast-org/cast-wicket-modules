@@ -128,18 +128,6 @@
  	  		<artifactId>cwm-db</artifactId>
  	  	</dependency>
 
-        <!-- lamejb for mp3 conversion -->
-        <dependency>
-            <groupId>lamejb</groupId>
-            <artifactId>lamejb</artifactId>
-        </dependency>
-
-        <!-- jna is required by lamejb -->
-        <dependency>
-            <groupId>com.sun.jna</groupId>
-            <artifactId>jna</artifactId>
-        </dependency>
-
         <!-- required for non-parallelizable tests -->
         <dependency>
             <groupId>net.jcip</groupId>

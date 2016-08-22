@@ -21,6 +21,7 @@ package org.cast.cwm.data.component;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
@@ -35,7 +36,7 @@ public class Html5PlayerPanelTest extends CwmDataBaseTestCase {
 	@Override
 	public void setUpData() {
 		super.setUpData();
-        bfd = new BinaryFileData("test", "audio/wav", new byte[] { 1, 2, 3});
+        bfd = new BinaryFileData("test", "audio/mpeg", new byte[] { 1, 2, 3});
         TestIdSetter.setId(BinaryFileData.class, bfd, 1L);
 	}
 	
@@ -71,11 +72,11 @@ public class Html5PlayerPanelTest extends CwmDataBaseTestCase {
     public void showsSourceLink() {
         tester.startComponentInPage(new Html5PlayerPanel("panel", Model.of(bfd)));
         tester.assertComponent("panel", Html5PlayerPanel.class);
-        tester.assertComponent("panel:audio:source", ConvertedMp3AudioSource.class);
+        tester.assertComponent("panel:audio:source", Mp3AudioSource.class);
         Component source = tester.getComponentFromLastRenderedPage("panel:audio:source");
         tester.assertAttribute("Incorrect mime type", "audio/mpeg", source, "type");
         tester.assertAttribute("Unexpected source/@src attribute",
-                "./resource/org.cast.cwm.data.resource.ConvertedMP3DataResourceReference/mp3?id=1",
+                "./resource/org.cast.cwm.data.resource.UploadedFileResourceReference/file?id=1",
                 source, "src");
     }
 
