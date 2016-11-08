@@ -19,7 +19,10 @@
  */
 package org.cast.cwm.admin;
 
-import net.databinder.models.hib.HibernateObjectModel;
+import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.wicket.Application;
+import org.apache.wicket.Page;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentLabel;
@@ -27,24 +30,18 @@ import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.CwmApplication;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Period;
-import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FeedbackBorder;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.service.IUserService;
+import org.cwm.db.service.IModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
-
-import java.util.List;
 
 /**
  * A simple Sign-In form for authenticating users.
@@ -52,19 +49,17 @@ import java.util.List;
  * @author jbrookover
  *
  */
+@Slf4j
 public class SignInFormPanel extends Panel {
 
-	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(SignInForm.class);
-	
 	private RequiredTextField<String> username;
 	private PasswordTextField password;
 	
 	@Inject
-	protected IEventService eventService;
+	private IEventService eventService;
 
-	@Inject 
-	protected ISiteService siteService;
+	@Inject
+	private IModelProvider modelProvider;
 	
 	public SignInFormPanel(String id) {
 		super(id);
@@ -72,15 +67,13 @@ public class SignInFormPanel extends Panel {
 	}
 
 	public class SignInForm extends Form<User> {
-		
-		private static final long serialVersionUID = 1L;
-		
+
 		public SignInForm(String id) {
 			super(id);
 			
 			add(new FeedbackPanel("feedback", new ContainerFeedbackMessageFilter(this)));
 			
-			add((new FeedbackBorder("usernameBorder")).add(username = new RequiredTextField<String>("username", new Model<String>())));
+			add((new FeedbackBorder("usernameBorder")).add(username = new RequiredTextField<>("username", new Model<String>())));
 			add((new FeedbackBorder("passwordBorder")).add(password = new PasswordTextField("password", new Model<String>())));
 			
 			add(new FormComponentLabel("usernameLabel", username));
@@ -124,32 +117,37 @@ public class SignInFormPanel extends Panel {
 				eventService.saveLoginEvent(this);
 			}
 
-			List<Period> plist = user.getPeriodsAsList();
-			if (plist != null && !plist.isEmpty()) {
-				session.setCurrentPeriodModel(new HibernateObjectModel<Period>(plist.get(0)));
-				session.setCurrentSiteModel(new HibernateObjectModel<Site>(plist.get(0).getSite()));
-			} else {
-				IModel<Period> mPeriod = siteService.getPeriodByName("test");
-				if (user.hasRole(Role.RESEARCHER) && mPeriod.getObject() != null) {
-					session.setCurrentPeriodModel(mPeriod);
-					session.setCurrentSiteModel(new HibernateObjectModel<Site>(mPeriod.getObject().getSite()));
-				} else {
-					log.error("There must be a period named 'test' to use as the admin user's default period.");
-					error(getLocalizer().getString("signInFailed", this, "User has no classroom to log in to"));
-					return;
-				}
-			}
+			// Set current Period and Site in the session
+			Period period = user.getDefaultPeriod();
+			session.setCurrentPeriodModel(modelProvider.modelOf(period));
+			if (period != null)
+				session.setCurrentSiteModel(modelProvider.modelOf(period.getSite()));
+			else
+				session.setCurrentSiteModel(modelProvider.modelOf((Site)null));
 
 			initialUserSetup(user);
 
+			continueToOriginalDestination();
+			// Normally continueToOriginalDestination doesn't return.  If it does, go to default page.
+			setResponsePage(getDefaultPage(), new PageParameters().set("source", "login"));
 		}
 	}
 
 	/**
 	 * Do any needed housekeeping on the user at login time.
 	 */
-	private void initialUserSetup(User user) {
+	protected void initialUserSetup(User user) {
 		// nothing currently
+	}
+
+	/**
+	 * Return the default page to load after login.
+	 *
+	 * Normally this is the application's home page.
+	 * @return page class
+	 */
+	protected Class<? extends Page> getDefaultPage() {
+		return Application.get().getHomePage();
 	}
 
 }

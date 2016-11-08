@@ -176,6 +176,22 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	public List<Period> getPeriodsAsList() {
 		return new ArrayList<Period>(getPeriods());
 	}
+
+	/**
+	 * Returns whichever Period is considered the main or default one for this User.
+	 *
+	 * By default this is just the alphabetically first in their set of periods, but applications
+	 * can override this behavior.
+	 *
+	 * @return a Period, or null if User has no Periods.
+	 */
+	public Period getDefaultPeriod() {
+		SortedSet<Period> periods = getPeriods();
+		if (!periods.isEmpty())
+			return periods.first();
+		else
+			return null;
+	}
 	
 	@Override
 	public String toString() {
