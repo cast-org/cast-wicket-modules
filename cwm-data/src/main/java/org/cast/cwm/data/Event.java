@@ -19,29 +19,17 @@
  */
 package org.cast.cwm.data;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.cast.cwm.CwmSession;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * <p>
@@ -77,12 +65,7 @@ public class Event extends PersistedObject {
 	@ManyToOne(optional=false)
 	protected LoginSession loginSession;
 	
-	protected boolean hasResponses = false;
-	
 	protected boolean hasUserContent = false;
-	
-	@OneToMany(mappedBy="event", fetch=FetchType.LAZY)
-	protected Set<ResponseData> responseData = new HashSet<ResponseData>();
 	
 	@Column(nullable=false)
 	protected Date insertTime;
@@ -110,11 +93,6 @@ public class Event extends PersistedObject {
 			loginSession = CwmSession.get().getLoginSession();
 		if ((user == null) && (loginSession != null))
 			user = loginSession.getUser();
-	}
-	
-	// Not auto-generated in Lombok 0.10.0
-	public boolean hasResponses() {
-		return hasResponses;
 	}
 	
 }

@@ -54,16 +54,14 @@ public class EventService implements IEventService {
 	public static final String LOGIN_TYPE_NAME = "login";
 	public static final String LOGOUT_TYPE_NAME = "logout";
 	public static final String TIMEOUT_TYPE_NAME = "logout:forced";
-	public static final String PAGEVIEW_TYPE_NAME = "pageview";
-	public static final String DIALOGVIEW_TYPE_NAME = "dialogview";
-	public static final String POST_TYPE_NAME = "post";
-	public static final String AUTOSAVE_POST_TYPE_NAME = "post:autosave";
-	public static final String AGENTVIEW_TYPE_NAME = "agent:animate";
-	
+
 	private final static Logger log = LoggerFactory.getLogger(EventService.class);
 	
 	@Inject
 	private ICwmService cwmService;
+
+	@Inject
+	private ICwmSessionService cwmSessionService;
 
 	@Inject
 	private IModelProvider modelProvider;
@@ -113,12 +111,23 @@ public class EventService implements IEventService {
 		}
 	}
 
+	@Override
+	public IModel<? extends Event> saveLoginEvent(Component triggerComponent) {
+		Event event = newEvent()
+				.setType(LOGIN_TYPE_NAME)
+				.setDetail("role=" + cwmSessionService.getUser().getRole());
+		return storeEvent(event, triggerComponent);
+	}
+
 	/**
-	 * Save an actual event object.  
-	 * 
+	 * Save an actual event object.
+	 *
 	 * @param e the Event to be saved
 	 * @return model wrapping the event that was saved
+	 *
+	 * @deprecated use storeEvent instead
 	 */
+	@Deprecated
 	protected <T extends Event> IModel<T> saveEvent (T e) {
 		e.setDefaultValues();
 		Databinder.getHibernateSession().save(e);
@@ -126,10 +135,11 @@ public class EventService implements IEventService {
 		log.debug("Event: {}: {}", e.getType(), e.getDetail());
 		return modelProvider.modelOf(e);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
+	@Deprecated
 	@Override
 	public IModel<? extends Event> saveEvent(String type, String detail, String pageName, String componentPath) {
 		Event e = newEvent();
@@ -144,38 +154,11 @@ public class EventService implements IEventService {
 	 * @see org.cast.cwm.service.IEventService#saveEvent(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
+	@Deprecated
 	public IModel<? extends Event> saveEvent(String type, String detail, String pageName) {
 		return saveEvent(type, detail, pageName, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#saveLoginEvent()
-	 */
-	@Override
-	public IModel<? extends Event> saveLoginEvent() {
-		return saveEvent(LOGIN_TYPE_NAME, CwmSession.get().getUser().getRole().toString(), null, null);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#savePageViewEvent(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public IModel<? extends Event> savePageViewEvent (String detail, String pageName) {
-		return saveEvent(PAGEVIEW_TYPE_NAME, detail, pageName);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#savePostEvent(boolean, java.lang.String)
-	 */
-	@Override
-	public IModel<? extends Event> savePostEvent(boolean hasResponses, String pageName) {
-		Event e = newEvent();
-		e.setType(RequestCycle.get().getRequest().getRequestParameters().getParameterValue("autosave").toBoolean() ? AUTOSAVE_POST_TYPE_NAME : POST_TYPE_NAME);
-		e.setHasResponses(hasResponses);
-		e.setPage(pageName);
-		return saveEvent(e);
-	}
-	
 	////// Login Session methods
 	
 	/* (non-Javadoc)

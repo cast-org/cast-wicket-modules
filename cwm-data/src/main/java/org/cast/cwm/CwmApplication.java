@@ -29,6 +29,7 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 import lombok.Getter;
 import net.databinder.auth.hib.AuthDataApplication;
+import net.databinder.components.hib.DataForm;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 import org.apache.wicket.Application;
@@ -241,7 +242,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	}
 	
 	protected void configureMountPaths() {
-		
+
 		mountPage("admin", adminPageService.getAdminHomePage());
 		mountPage("sitelist", adminPageService.getSiteListPage());
 		mountPage("site", adminPageService.getSiteEditPage());
@@ -315,8 +316,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		c.addAnnotatedClass(org.cast.cwm.data.LoginSession.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Period.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Prompt.class);
-		c.addAnnotatedClass(org.cast.cwm.data.Response.class);
-		c.addAnnotatedClass(org.cast.cwm.data.ResponseData.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Site.class);
 		c.addAnnotatedClass(org.cast.cwm.data.User.class);
 		c.addAnnotatedClass(org.cast.cwm.data.UserContent.class);

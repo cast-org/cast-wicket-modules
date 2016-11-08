@@ -57,7 +57,6 @@ import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.Event;
-import org.cast.cwm.data.ResponseData;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
@@ -211,44 +210,6 @@ public class EventLog extends AdminPage {
 		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type"));
 		columns.add(new PropertyDataColumn<Event>("Details", "detail"));
 		columns.add(new PropertyDataColumn<Event>("Page", "page"));
-		columns.add(new AbstractDataColumn<Event>("Response") {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void populateItem(Item<ICellPopulator<Event>> cellItem, String componentId, IModel<Event> rowModel) {
-				cellItem.add(new Label(componentId, getItemString(rowModel)));				
-			}
-			
-			// TODO: this should do something more useful for audio, drawing, upload, and table responses.
-			// The raw data display is not very usable inside a spreadsheet; and for audio and upload we don't display anything at all.
-			// Perhaps we could include a link to display the item?  Or some metadata about it?
-			@Override
-			public String getItemString(IModel<Event> rowModel) {
-				if (!rowModel.getObject().hasResponses()) {
-					return "";
-				} else {
-					Set<ResponseData> responseData = rowModel.getObject().getResponseData();
-					if ((responseData == null) || (responseData.isEmpty())) {
-						log.warn("Event {} claims to have responses, but none found", rowModel.getObject().getId());
-						return "Missing Response Data";
-					}
-					StringBuffer result = new StringBuffer(256);
-					if (responseData.size() > 1)
-						result.append (String.format("[%d responses] ", responseData.size()));
-					for (ResponseData r : responseData) {
-						result.append(r.getResponse().getType().getName());
-						result.append(" ");
-						String text = r.getText();
-						if (!Strings.isEmpty(text)) {
-							result.append(text);
-						}
-					}
-					return (result.toString());
-				}
-			}
-			
-		});
 
 		return columns;
 	}

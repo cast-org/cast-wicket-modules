@@ -33,7 +33,7 @@ import java.util.List;
 public class FigurationUtil {
 
 	public static final JavaScriptReferenceHeaderItem figurationJsHeaderItem = JavaScriptHeaderItem.forReference(
-			new UrlResourceReference(Url.parse("https://cdn.jsdelivr.net/figuration/1.0.0/js/figuration.min.js")) {
+			new UrlResourceReference(Url.parse("https://cdn.jsdelivr.net/figuration/1.3.1/js/figuration.min.js")) {
 				@Override
 				public List<HeaderItem> getDependencies() {
 					List<HeaderItem> dependencies = new LinkedList<>();
@@ -46,7 +46,7 @@ public class FigurationUtil {
 
 
 	private static final CssReferenceHeaderItem figurationCSSHeaderItem = CssHeaderItem.forReference(
-			new UrlResourceReference(Url.parse("https://cdn.jsdelivr.net/figuration/1.0.0/css/figuration.min.css")));
+			new UrlResourceReference(Url.parse("https://cdn.jsdelivr.net/figuration/1.3.1/css/figuration.min.css")));
 
 	/**
 	 * Add the header items needed to use the CAST Figuration framework.
