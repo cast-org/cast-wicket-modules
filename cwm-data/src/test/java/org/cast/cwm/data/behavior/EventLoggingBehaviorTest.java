@@ -33,35 +33,26 @@ import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
+import org.cast.cwm.test.CwmBaseTestCase;
 import org.cast.cwm.test.CwmWicketTester;
 import org.cast.cwm.test.GuiceInjectedTestApplication;
+import org.cast.cwm.test.InjectionTestHelper;
 import org.junit.Before;
 import org.junit.Test;
 
 
-public class EventLoggingBehaviorTest {
+public class EventLoggingBehaviorTest extends CwmBaseTestCase {
 
-	private WicketTester tester;
 	private IEventService eventService;
 
-	@Before
-	public void setUp() {
-        Map<Class<? extends Object>, Object> injectionMap = new HashMap<Class<? extends Object>, Object>();
+	public void populateInjection() throws Exception {
+		eventService = injectionHelper.injectMock(IEventService.class);
 
-        ICwmSessionService cwmSessionService = mock(ICwmSessionService.class);
-        when(cwmSessionService.getUser()).thenReturn(new User(Role.STUDENT));
-        when(cwmSessionService.isSignedIn()).thenReturn(true);
-        injectionMap.put(ICwmSessionService.class, cwmSessionService);
-        
-        eventService = mock(IEventService.class);
-        injectionMap.put(IEventService.class, eventService);
-        
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-		GuiceInjectedTestApplication application = new GuiceInjectedTestApplication(injectionMap);
-
-		tester = new CwmWicketTester(application);
+		ICwmSessionService cwmSessionService = injectionHelper.injectMock(ICwmSessionService.class);
+		when(cwmSessionService.getUser()).thenReturn(new User(Role.STUDENT));
+		when(cwmSessionService.isSignedIn()).thenReturn(true);
 	}
-	
+
 	@Test
 	public void canAttach() {
 		Label p = new Label("test", "test");
@@ -85,6 +76,14 @@ public class EventLoggingBehaviorTest {
 		tester.executeBehavior(behavior);
 		verify(eventService).saveEvent(eq("testEvent"), eq("testDetail"), eq("testPageName"));
 	}
-	
 
+	@Override
+	protected InjectionTestHelper getInjectionTestHelper() {
+		return new InjectionTestHelper();
+	}
+
+	@Override
+	protected boolean isApplicationThemed() {
+		return false;
+	}
 }

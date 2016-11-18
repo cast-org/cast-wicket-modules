@@ -22,6 +22,14 @@ package org.cast.cwm.test;
 import org.apache.wicket.mock.MockApplication;
 import org.junit.Before;
 
+/**
+ * Base class for testing CWM-based application components.
+ *
+ * Allows for Guice injection and a "theme" directory of HTML files separate from
+ * the java files.
+ *
+ * If you use cwm-data as well, see org.cast.cwm.test.CwmDataBaseTestCase in that package.
+ */
 public abstract class CwmBaseTestCase {
 
 	protected CwmWicketTester tester;
@@ -45,10 +53,9 @@ public abstract class CwmBaseTestCase {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected MockApplication getTestApplication() {
-		if (isApplicationThemed())
-			return new CwmTestThemedApplication(injectionHelper.getMap());
-		else
-			return new CwmTestApplication(injectionHelper.getMap());
+		CwmTestApplication app = new CwmTestApplication(injectionHelper.getMap());
+		app.setApplicationUsesThemeDir(isApplicationThemed());
+		return app;
 	}
 	
 	public void setUpData() throws Exception {

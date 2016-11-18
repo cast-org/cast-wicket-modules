@@ -28,8 +28,11 @@ import org.apache.wicket.mock.MockApplication;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.apache.wicket.util.file.Path;
 
 public class CwmTestApplication<T> extends MockApplication {
+
+	private boolean applicationUsesThemeDir = false;
 
 	protected Map<Class<T>, T> injectionMap;
 
@@ -46,6 +49,10 @@ public class CwmTestApplication<T> extends MockApplication {
 		super.init();
 		getDebugSettings().setDevelopmentUtilitiesEnabled(false);
 		getComponentInstantiationListeners().add(new GuiceComponentInjector(this, getGuiceInjector()));
+
+		// If requested, set up separate "theme" folder for markup files.
+		if (applicationUsesThemeDir)
+			getResourceSettings().getResourceFinders().add(new Path(getThemeDir()));
 	}
 
 	protected Injector getGuiceInjector() {
@@ -57,6 +64,24 @@ public class CwmTestApplication<T> extends MockApplication {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Set to true if application should look in "theme" directory for markup files
+	 * @param applicationUsesThemeDir boolean setting
+	 */
+	public void setApplicationUsesThemeDir(boolean applicationUsesThemeDir) {
+		this.applicationUsesThemeDir = applicationUsesThemeDir;
+	}
+
+	/**
+	 * Path, relative to the application root, where markup files are stored.
+	 * To use this, set applicationUsesThemeDir to true.
+
+	 * @return the theme directory path
+	 */
+	protected String getThemeDir() {
+		return "theme";
 	}
 
 }

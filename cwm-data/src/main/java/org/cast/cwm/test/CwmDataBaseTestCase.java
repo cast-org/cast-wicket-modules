@@ -27,6 +27,14 @@ import org.cast.cwm.data.User;
 import java.util.Arrays;
 import java.util.TreeSet;
 
+/**
+ * Base class for testing cwm-data application components.
+ *
+ * Sets up injection and a logged-in User with a Period.
+ * If your application keeps its HTML in a separate theme directory, override
+ * isApplicationThemed() to return true.
+ *
+ */
 public class CwmDataBaseTestCase extends CwmBaseTestCase {
 
 	public Period period;
@@ -53,7 +61,9 @@ public class CwmDataBaseTestCase extends CwmBaseTestCase {
 	}
 
 	protected MockApplication getTestApplication() {
-		return new CwmDataTestApplication(injectionHelper.getMap());
+		CwmDataTestApplication app = new CwmDataTestApplication(injectionHelper.getMap());
+		app.setApplicationUsesThemeDir(isApplicationThemed());
+		return app;
 	}
 
 	public User makeUser(Role role, Period period, String firstName, String lastName) {
