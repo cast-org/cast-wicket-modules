@@ -128,7 +128,7 @@ public class UserContent extends PersistedObject {
 	private Set<BinaryFileData> secondaryFiles = new HashSet<BinaryFileData>();
 
 	/**
-	 * Related event - eg the "post" or "save" that resulted in this contnet getting stored or updated.
+	 * Related event - eg the "post" or "save" that resulted in this content getting stored or updated.
 	 */
 	@ManyToOne(optional=true, fetch=FetchType.LAZY)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
