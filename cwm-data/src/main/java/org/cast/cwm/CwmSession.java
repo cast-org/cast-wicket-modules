@@ -85,7 +85,9 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	public void signOut() {
 		synchronized(this) {
 			if (loginSessionModel != null) {
-				eventService.recordLogout();
+				// Normally shouldn't be null, but can happen with database changes & restarts.
+				if (getUser() != null)
+					eventService.recordLogout();
 				loginSessionModel = null;
 			}
 		}

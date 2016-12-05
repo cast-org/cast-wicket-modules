@@ -87,7 +87,10 @@ public class SignInFormPanel extends Panel {
 			boolean loginSessionExists = false;
 
 			if (session.isSignedIn()) {
-				if (session.getUser().getUsername().equals(username.getModelObject())) {
+				if (session.getUser() == null) {
+					log.error("Session logged in as null user");
+					session.signOut();
+				} else if (session.getUser().getUsername().equals(username.getModelObject())) {
 					log.warn("Already logged in as same user; ignoring login attempt!");
 					loginSessionExists = true;
 				} else {
