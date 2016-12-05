@@ -23,11 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.OrderingCriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
 
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
@@ -43,7 +42,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToo
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
@@ -55,7 +53,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
@@ -109,7 +106,7 @@ public class EventLog extends AdminPage {
 
 		addFilterForm();
 		
-		OrderingCriteriaBuilder builder = makeCriteriaBuilder();
+		ICriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
 		DataTable<Event,String> table = new DataTable<Event,String>("eventtable", columns, eventsprovider, 30);
@@ -123,7 +120,7 @@ public class EventLog extends AdminPage {
 		add(new ResourceLink<Object>("downloadLink", download));
 	}
 
-	protected OrderingCriteriaBuilder makeCriteriaBuilder() {
+	protected ICriteriaBuilder makeCriteriaBuilder() {
 		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
 		SingleSortState<String> defaultSort = new SingleSortState<String>();
 		defaultSort.setSort(new SortParam<String>("insertTime", false)); // Sort by Insert Time by default
@@ -131,7 +128,7 @@ public class EventLog extends AdminPage {
 		return eventCriteriaBuilder;
 	}
 
-	protected SortableHibernateProvider<Event> makeHibernateProvider(OrderingCriteriaBuilder builder) {
+	protected SortableHibernateProvider<Event> makeHibernateProvider(ICriteriaBuilder builder) {
 		SortableHibernateProvider<Event> provider = new SortableHibernateProvider<Event>(Event.class, builder);
 		provider.setWrapWithPropertyModel(false);
 		return provider;
@@ -231,13 +228,11 @@ public class EventLog extends AdminPage {
 		return adjustedDateTime.toDate();
 	}
 
-	public class EventCriteriaBuilder implements OrderingCriteriaBuilder, ISortStateLocator<String> {
+	public class EventCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<String> {
 
 		@Getter @Setter 
 		private ISortState<String> sortState;
 		
-		private static final long serialVersionUID = 1L;
-
 		@Override
 		public void buildUnordered(Criteria criteria) {
 			

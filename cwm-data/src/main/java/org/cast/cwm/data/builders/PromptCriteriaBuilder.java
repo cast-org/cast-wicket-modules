@@ -21,24 +21,22 @@ package org.cast.cwm.data.builders;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.CriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 
 import org.apache.wicket.model.IDetachable;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * A simple CriteriaBuilder that locates a Prompt by its identifier.
+ * A simple ICriteriaBuilder that locates a Prompt by its identifier.
  * 
  * @author bgoldowsky
  *
  */
 @Getter
 @Setter
-public class PromptCriteriaBuilder implements CriteriaBuilder, IDetachable {
+public class PromptCriteriaBuilder implements ICriteriaBuilder, IDetachable {
 
-	private static final long serialVersionUID = 1L;
-	
 	private String identifier;
 	
 	public PromptCriteriaBuilder(String identifier) {
@@ -46,12 +44,17 @@ public class PromptCriteriaBuilder implements CriteriaBuilder, IDetachable {
 	}
 
 	@Override
-	public void build(Criteria criteria) {
+	public void buildUnordered(Criteria criteria) {
 		if (identifier != null) {
 			criteria.add(Restrictions.eq("identifier", identifier));
 			criteria.setMaxResults(1); // identifier is unique
 		}
 		criteria.setCacheable(true);
+	}
+
+	@Override
+	public void buildOrdered(Criteria criteria) {
+		buildUnordered(criteria);
 	}
 
 	@Override

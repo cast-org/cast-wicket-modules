@@ -21,8 +21,7 @@ package org.cast.cwm.data.builders;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.CriteriaBuilder;
-import net.databinder.models.hib.OrderingCriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
@@ -53,9 +52,8 @@ import java.util.Collection;
  */
 @Getter
 @Setter
-public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String>, IDetachable {
+public class UserCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<String>, IDetachable {
 
-	private static final long serialVersionUID = 1L;
 	private Role role = null;
 	private boolean getAllUsers = true; // should users with valid=false be included?
 	private boolean permissionedOnly = false; // should users with no research permissions be excluded?
@@ -70,11 +68,6 @@ public class UserCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBui
 	private boolean cacheResults = true;
 	
 	public UserCriteriaBuilder() {
-	}
-	
-	@Override
-	public void build(Criteria criteria) {
-		buildOrdered(criteria);
 	}
 	
 	@Override

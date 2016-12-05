@@ -35,7 +35,7 @@ public class LoggingHibernateObjectModel<T> extends HibernateObjectModel<T> {
 	}
 
 	public LoggingHibernateObjectModel(Class objectClass,
-			CriteriaBuilder criteriaBuilder) {
+			ICriteriaBuilder criteriaBuilder) {
 		super(objectClass, criteriaBuilder);
 	}
 

@@ -16,6 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 package net.databinder.models.hib;
 
 import java.io.Serializable;
@@ -23,12 +24,17 @@ import java.io.Serializable;
 import org.hibernate.Criteria;
 
 /**
- * Builds criteria objects with or without order. Only one of the build methods
- * should be called in building a criteria object.
+ * Interface for callback that sets parameters for a Hibernate Creteria object and 
+ * any necessary sub-criteria.
+ *
+ * @author Nathan Hamblen
  */
-public interface OrderingCriteriaBuilder extends Serializable {
+public interface ICriteriaBuilder extends Serializable {
+
 	/** Build the criteria without setting an order */
 	public void buildUnordered(Criteria criteria);
+
 	/** Build the (entire) criteria, including an order */
 	public void buildOrdered(Criteria criteria);
+
 }

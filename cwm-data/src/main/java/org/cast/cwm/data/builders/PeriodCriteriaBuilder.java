@@ -21,23 +21,23 @@ package org.cast.cwm.data.builders;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.CriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 
 import org.cast.cwm.data.Site;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * A simple CriteriaBuilder that locates a Period.
+ * A simple ICriteriaBuilder that locates a Period.
  * 
  * @author lmccormack
  *
  */
 @Getter
 @Setter
-public class PeriodCriteriaBuilder implements CriteriaBuilder {
+public class PeriodCriteriaBuilder implements ICriteriaBuilder {
 	
-	private static final long serialVersionUID = 1L;
 	private String name = null;
 	private Site site = null;
 	private Integer maxResults = null;	
@@ -47,7 +47,7 @@ public class PeriodCriteriaBuilder implements CriteriaBuilder {
 	}
 	
 	@Override
-	public void build(Criteria criteria) {
+	public void buildUnordered(Criteria criteria) {
 		if (name != null)
 			criteria.add(Restrictions.eq("name", name));
 		if (site != null)
@@ -55,6 +55,12 @@ public class PeriodCriteriaBuilder implements CriteriaBuilder {
 		if (maxResults != null)
 			criteria.setMaxResults(maxResults);
 		criteria.setCacheable(true);
-	}	
+	}
+
+	@Override
+	public void buildOrdered(Criteria criteria) {
+		buildUnordered(criteria);
+		criteria.addOrder(Order.asc("name"));
+	}
 
 }

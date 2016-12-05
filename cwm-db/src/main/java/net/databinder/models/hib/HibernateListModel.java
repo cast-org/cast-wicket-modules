@@ -34,10 +34,10 @@ import org.hibernate.Session;
  * @author Nathan Hamblen
  */
 public class HibernateListModel<T> extends LoadableDetachableModel<List<T>> {
-	private static final long serialVersionUID = 1L;
+
 	private QueryBuilder queryBuilder;
 	private Class objectClass;
-	private CriteriaBuilder criteriaBuilder;
+	private ICriteriaBuilder criteriaBuilder;
 	
 	private Object factoryKey;
 	
@@ -88,7 +88,7 @@ public class HibernateListModel<T> extends LoadableDetachableModel<List<T>> {
 	 * @param objectClass class for root criteria
 	 * @param criteriaBuilder builder to apply criteria restrictions
 	 */
-	public HibernateListModel(Class objectClass, CriteriaBuilder criteriaBuilder) {
+	public HibernateListModel(Class objectClass, ICriteriaBuilder criteriaBuilder) {
 		this.objectClass = objectClass;
 		this.criteriaBuilder = criteriaBuilder;
 	}
@@ -128,7 +128,7 @@ public class HibernateListModel<T> extends LoadableDetachableModel<List<T>> {
 		}
 		Criteria criteria = session.createCriteria(objectClass);
 		if (criteriaBuilder != null)
-			criteriaBuilder.build(criteria);
+			criteriaBuilder.buildOrdered(criteria);
 		return criteria.list();
 	}
 }

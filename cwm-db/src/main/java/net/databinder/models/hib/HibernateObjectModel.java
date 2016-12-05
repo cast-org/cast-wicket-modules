@@ -47,7 +47,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	private Class objectClass;
 	private Serializable objectId;
 	private QueryBuilder queryBuilder;
-	private CriteriaBuilder criteriaBuilder;
+	private ICriteriaBuilder criteriaBuilder;
 	/** May store unsaved objects between requests. */
 	private T retainedObject;
 	/** Enable retaining unsaved objects between requests. */
@@ -105,7 +105,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 	 * @param objectClass class of object for root criteria
 	 * @param criteriaBuilder builder to apply criteria restrictions
 	 */
-	public HibernateObjectModel(Class objectClass, CriteriaBuilder criteriaBuilder) {
+	public HibernateObjectModel(Class objectClass, ICriteriaBuilder criteriaBuilder) {
 		this.objectClass = objectClass;
 		this.criteriaBuilder = criteriaBuilder;
 	}
@@ -202,7 +202,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 
 		if(criteriaBuilder != null) {
 			Criteria criteria = sess.createCriteria(objectClass);
-			criteriaBuilder.build(criteria);
+			criteriaBuilder.buildUnordered(criteria);
 			return (T) criteria.uniqueResult();
 		}
 
@@ -274,7 +274,7 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
     @Override
     protected void onDetach() {
         super.onDetach();
-        // The CriteriaBuilder might have underlying connections to models
+        // The ICriteriaBuilder might have underlying connections to models
         if (criteriaBuilder != null && criteriaBuilder instanceof IDetachable)
             ((IDetachable)criteriaBuilder).detach();
     }

@@ -23,8 +23,7 @@ import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.CriteriaBuilder;
-import net.databinder.models.hib.OrderingCriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
@@ -44,10 +43,8 @@ import org.hibernate.criterion.Restrictions;
 @Setter
 
 // TODO: ResponseType should be a set
-public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String>, IDetachable {
+public class ResponseCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<String>, IDetachable {
 
-	private static final long serialVersionUID = 1L;
-	
 	private ISortState<String> sortState = new SingleSortState<String>();
 	
 	private IModel<? extends Prompt> promptModel;
@@ -95,12 +92,6 @@ public class ResponseCriteriaBuilder implements CriteriaBuilder, OrderingCriteri
 		criteria.setCacheable(true);
 	}
 
-	
-	@Override
-	public void build(Criteria criteria) {
-		buildOrdered(criteria);
-	}	
-	
 	@Override
 	public void detach() {
 		if (promptModel != null)

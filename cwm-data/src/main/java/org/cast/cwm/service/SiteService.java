@@ -21,6 +21,7 @@ package org.cast.cwm.service;
 
 import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
+import net.databinder.models.hib.BasicCacheableCriteriaBuilder;
 import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import net.databinder.models.hib.HibernateProvider;
@@ -30,10 +31,9 @@ import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
-import org.cast.cwm.data.builders.CachingCriteriaBuilder;
 import org.cast.cwm.data.builders.PeriodCriteriaBuilder;
 import org.cast.cwm.data.component.HibernateEditPeriodForm;
-import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
@@ -73,7 +73,7 @@ public class SiteService implements ISiteService {
 	 */
 	@Override
 	public IModel<List<Site>> listSites() {
-		return new HibernateListModel<Site>(Site.class, new CachingCriteriaBuilder());
+		return new HibernateListModel<Site>(Site.class, new BasicCacheableCriteriaBuilder(Order.asc("name")));
 	}
 	
 	/* (non-Javadoc)
@@ -81,7 +81,7 @@ public class SiteService implements ISiteService {
 	 */
 	@Override
 	public IDataProvider<Site> listSitesPageable() {
-		return new HibernateProvider<Site>(Site.class, new CachingCriteriaBuilder());
+		return new HibernateProvider<Site>(Site.class, new BasicCacheableCriteriaBuilder(Order.asc("name")));
 	}
 
 	/* (non-Javadoc)
@@ -97,10 +97,8 @@ public class SiteService implements ISiteService {
 	 */
 	@Override
 	public IModel<Site> getSiteByName (String name) {
-		Criteria criteria = Databinder.getHibernateSession().createCriteria(Site.class);
-		criteria.add(Restrictions.eq("name", name));
-		criteria.setCacheable(true);
-		return new HibernateObjectModel<Site>((Site)criteria.uniqueResult());
+		return new HibernateObjectModel<Site>(Site.class,
+				new BasicCacheableCriteriaBuilder(Restrictions.eq("name", name)));
 	}
 	
 

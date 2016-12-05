@@ -24,9 +24,7 @@ package org.cast.cwm.data.builders;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.CriteriaBuilder;
-import net.databinder.models.hib.OrderingCriteriaBuilder;
-
+import net.databinder.models.hib.ICriteriaBuilder;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
@@ -35,7 +33,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, ISortStateLocator<String> {
+public class LoginSessionCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<String> {
 
 	@Getter @Setter
 	private ISortState<String> sortState;
@@ -46,17 +44,10 @@ public class LoginSessionCriteriaBuilder implements CriteriaBuilder, OrderingCri
 	@Getter @Setter
 	private Long userId = null;
 	
-	private static final long serialVersionUID = 1L;
-
 	public LoginSessionCriteriaBuilder() {
 		SingleSortState<String> sort = new SingleSortState<String>();
 		sort.setSort(new SortParam<String>("startTime", true));
 		sortState = sort;
-	}
-
-	@Override
-	public void build(Criteria criteria) {
-		buildOrdered(criteria);
 	}
 
 	@Override

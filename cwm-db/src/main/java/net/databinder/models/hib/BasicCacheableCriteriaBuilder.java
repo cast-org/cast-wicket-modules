@@ -24,7 +24,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 
 /**
- * Simple CriteriaBuilder implementation that sets the cacheable flag.
+ * Simple ICriteriaBuilder implementation that sets the cacheable flag.
  * Other than caching, identical to {@link BasicCriteriaBuilder}.
  * 
  * @author bgoldowsky

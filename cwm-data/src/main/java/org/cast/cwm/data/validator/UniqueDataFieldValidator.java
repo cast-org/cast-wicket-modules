@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.validator;
 
-import net.databinder.models.hib.CriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -86,14 +86,17 @@ public class UniqueDataFieldValidator<T> implements IValidator<T> {
 
 	@Override
 	public void validate(final IValidatable<T> validatable) {
-		HibernateObjectModel<PersistedObject> other = new HibernateObjectModel<PersistedObject>(clazz, new CriteriaBuilder() {
-
+		HibernateObjectModel<PersistedObject> other = new HibernateObjectModel<PersistedObject>(clazz, new ICriteriaBuilder() {
 			@Override
-			public void build(Criteria criteria) {
+			public void buildUnordered(Criteria criteria) {
 				criteria.add(Restrictions.eq(field, validatable.getValue()));
 				for (String field : scope.keySet()) {
 					criteria.add(Restrictions.eq(field, scope.get(field).getObject()));
 				}
+			}
+			@Override
+			public void buildOrdered(Criteria criteria) {
+				buildUnordered(criteria);
 			}
 		});	
 		

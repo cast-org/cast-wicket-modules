@@ -13,7 +13,7 @@ net.databinder.models.PropertyDataProvider
 
 interfaces we use:
 
-net.databinder.models.hib.CriteriaBuilder
+net.databinder.models.hib.ICriteriaBuilder
 net.databinder.models.hib.OrderingCriteriaBuilder
 net.databinder.models.hib.QueryBuilder
 net.databinder.hib.SessionUnit

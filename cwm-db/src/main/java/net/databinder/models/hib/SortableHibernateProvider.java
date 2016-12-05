@@ -26,7 +26,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
  * <h1>SortableHibernateProvider</h1>
  * <i>Copyright (C) 2008 The Scripps Research Institute</i>
  * <p>A HibernateProvider extension that implements ISortableDataProvider so it can be used with a DefaultDataTable or an AjaxFallbackDefaultDataTable
- * The CriteriaBuilder that handles the sorting should also implement ISortStateLocator (such as CriteriaSorter).</p>
+ * The ICriteriaBuilder that handles the sorting should also implement ISortStateLocator (such as CriteriaSorter).</p>
  * 
  * @author Mark Southern (southern at scripps dot edu)
  * 
@@ -36,19 +36,11 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 
 public class SortableHibernateProvider<T> extends HibernateProvider<T> implements ISortableDataProvider<T,String> {
 
-    private static final long serialVersionUID = 1L;
-
 	private ISortStateLocator sortStateLocator = null;
 
     private ISortState sortState = null;
 
-	public SortableHibernateProvider(Class<T> objectClass, CriteriaBuilder criteriaBuilder, CriteriaBuilder orderingCriteriaBuilder) {
-        super(objectClass, criteriaBuilder, orderingCriteriaBuilder);
-        if (orderingCriteriaBuilder instanceof ISortStateLocator)
-            sortStateLocator = (ISortStateLocator) orderingCriteriaBuilder;
-    }
-
-    public SortableHibernateProvider(Class<T> objectClass, OrderingCriteriaBuilder criteriaBuilder) {
+    public SortableHibernateProvider(Class<T> objectClass, ICriteriaBuilder criteriaBuilder) {
         super(objectClass, criteriaBuilder);
         if (criteriaBuilder instanceof ISortStateLocator)
             sortStateLocator = (ISortStateLocator) criteriaBuilder;

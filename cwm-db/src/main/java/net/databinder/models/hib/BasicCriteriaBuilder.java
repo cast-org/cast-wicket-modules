@@ -25,7 +25,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 
 /**
- * A simple implementation of a CriteriaBuilder that applies some given Restrictions
+ * A simple implementation of a ICriteriaBuilder that applies some given Restrictions
  * and, optionally, an Order.
  *
  * When detached, this class will detach any detachable criteria
@@ -40,24 +40,24 @@ import org.hibernate.criterion.Order;
  * @author bgoldowsky
  *
  */
-public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBuilder, IDetachable {
+public class BasicCriteriaBuilder implements ICriteriaBuilder, IDetachable {
 
-	private static final long serialVersionUID = 1L;
-	
 	private Criterion[] requestedCriteria;
 	
 	private Order requestedOrder = null;
 	
 	/**
 	 * Construct a simple CriteriaBuidler from a list of criteria
-	 * @param criteria
+	 * @param criteria the restrictions that should be applied
 	 */
 	public BasicCriteriaBuilder(Criterion... criteria) {
 		this.requestedCriteria = criteria;
 	}
 	
 	/**
-	 * Construct from a list of criteria and an ordering instruction. 
+	 * Construct from a list of criteria and an ordering instruction.
+	 * @param order the ordering directive that should be used
+	 * @param criteria the restrictions that should be applied
 	 */
 	public BasicCriteriaBuilder(Order order, Criterion... criteria) {
 		this.requestedOrder = order;
@@ -75,11 +75,6 @@ public class BasicCriteriaBuilder implements CriteriaBuilder, OrderingCriteriaBu
 		buildUnordered(criteria);
 		if (requestedOrder != null)
 			criteria.addOrder(requestedOrder);
-	}
-
-	@Override
-	public void build(Criteria criteria) {
-		buildOrdered(criteria);
 	}
 
     @Override

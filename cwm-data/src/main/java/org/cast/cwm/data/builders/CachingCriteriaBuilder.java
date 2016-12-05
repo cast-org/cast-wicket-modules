@@ -19,7 +19,7 @@
  */
 package org.cast.cwm.data.builders;
 
-import net.databinder.models.hib.CriteriaBuilder;
+import net.databinder.models.hib.ICriteriaBuilder;
 
 import org.hibernate.Criteria;
 
@@ -29,12 +29,16 @@ import org.hibernate.Criteria;
  * @author jbrookover
  *
  */
-public class CachingCriteriaBuilder implements CriteriaBuilder {
-
-	private static final long serialVersionUID = 1L;
+public class CachingCriteriaBuilder implements ICriteriaBuilder {
 
 	@Override
-	public void build(Criteria criteria) {
+	public void buildUnordered(Criteria criteria) {
 		criteria.setCacheable(true);		
 	}
+
+	@Override
+	public void buildOrdered(Criteria criteria) {
+		buildUnordered(criteria);
+	}
+
 }

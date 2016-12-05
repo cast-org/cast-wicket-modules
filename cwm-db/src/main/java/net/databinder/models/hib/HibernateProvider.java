@@ -42,7 +42,7 @@ import org.hibernate.criterion.Projections;
 public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	private static final long serialVersionUID = 1L;
 	private Class objectClass;
-	private OrderingCriteriaBuilder criteriaBuilder;
+	private ICriteriaBuilder criteriaBuilder;
 	private QueryBuilder queryBuilder, countQueryBuilder;
 	
 	private Object factoryKey;
@@ -53,63 +53,17 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 	public HibernateProvider(Class objectClass) {
 		this.objectClass = objectClass;
 	}
-	
-	/**
-	 * Provides all entities of the given class using a distinct criteria builder for the order query.
-	 * @param objectClass
-	 * @param criteriaBuilder base criteria builder
-	 * @param criteriaOrderer add ordering information ONLY, base criteria will be called first
-	 */
-	public HibernateProvider(Class objectClass, final CriteriaBuilder criteriaBuilder, final CriteriaBuilder criteriaOrderer) {
-		this(objectClass);
-		this.criteriaBuilder = new OrderingCriteriaBuilder() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void buildOrdered(Criteria criteria) {
-				criteriaBuilder.build(criteria);
-				criteriaOrderer.build(criteria);
-			}
-			@Override
-			public void buildUnordered(Criteria criteria) {
-				criteriaBuilder.build(criteria);
-			}
-		};
-	}
-	
+
 	/**
 	 * Provides all entities of the given class.
 	 * @param objectClass
 	 * @param criteriaBuider builds different criteria objects for iterator() and size()
 	 */
-	public HibernateProvider(Class objectClass, OrderingCriteriaBuilder criteriaBuider) {
+	public HibernateProvider(Class objectClass, ICriteriaBuilder criteriaBuider) {
 		this(objectClass);
 		this.criteriaBuilder = criteriaBuider;
 	}
 
-	/** Provides entities of the given class meeting the supplied criteria. */
-	public HibernateProvider(Class objectClass, final CriteriaBuilder criteriaBuilder) {
-		this(objectClass, new OrderingCriteriaBuilder() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void buildOrdered(Criteria criteria) {
-				criteriaBuilder.build(criteria);
-			}
-			@Override
-			public void buildUnordered(Criteria criteria) {
-				criteriaBuilder.build(criteria);
-			}
-		});
-	}
-
-	/**
-	 * Provides entities matching the given query. The count query
-	 * is derived by prefixing "select count(*)" to the given query; this will fail if 
-	 * the supplied query has a select clause.
-	 */
-	public HibernateProvider(String query) {
-		this(query, makeCount(query));
-	}
-	
 	/**
 	 * Provides entities matching the given queries.
 	 */
@@ -117,42 +71,11 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 		this(new QueryBinderBuilder(query), new QueryBinderBuilder(countQuery));
 	}
 	
-	/**
-	 * Provides entities matching the given query with bound parameters.  The count query
-	 * is derived by prefixing "select count(*)" to the given query; this will fail if 
-	 * the supplied query has a select clause.
-	 * @deprecated because the derived count query is often non-standard, even if it works. Use the longer constructor.
-	 */
-	@Deprecated
-	public HibernateProvider(String query, QueryBinder queryBinder) {
-		this(query, queryBinder, makeCount(query), queryBinder);
-	}
-
-	/**
-	 * Provides entities matching the given queries with bound parameters.
-	 * @param query query to return entities
-	 * @param queryBinder binder for the standard query
-	 * @param countQuery query to return count of entities
-	 * @param countQueryBinder binder for the count query (may be same as queryBinder)
-	 */
-	public HibernateProvider(final String query, final QueryBinder queryBinder, final String countQuery, final QueryBinder countQueryBinder) {
-		this(new QueryBinderBuilder(query, queryBinder), new QueryBinderBuilder(countQuery, countQueryBinder));
-	}
-	
 	public HibernateProvider(QueryBuilder queryBuilder, QueryBuilder countQueryBuilder) {
 		this.queryBuilder = queryBuilder;
 		this.countQueryBuilder = countQueryBuilder;
 	}
 
-	/**
-	 * @deprecated
-	 * @return query with select count(*) prepended 
-	 */
-	@Deprecated
-	static protected String makeCount(String query) {
-		return "select count(*) " + query;
-	}
-	
 	/** @return session factory key, or null for the default factory */
 	public Object getFactoryKey() {
 		return factoryKey;
@@ -221,7 +144,7 @@ public class HibernateProvider<T> extends PropertyDataProvider<T> {
 		return new HibernateObjectModel<T>(object);
 	}
 	
-	/** Detach the QueryBuilder or CriteriaBuilder if needed. */
+	/** Detach the QueryBuilder or ICriteriaBuilder if needed. */
 	@Override
 	public void detach() {
 		if (queryBuilder != null && queryBuilder instanceof IDetachable)
