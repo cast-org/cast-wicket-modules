@@ -26,6 +26,7 @@ import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.request.cycle.IRequestCycleListener;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.internal.ManagedSessionContext;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 /**
  * Provides access to application-bound Hibernate session factories and current sessions.
@@ -153,7 +154,7 @@ public class Databinder {
 			return unit.run(sess);
 		} finally {
 			try {
-				if (sess.getTransaction().isActive())
+				if (sess.getTransaction().getStatus().equals(TransactionStatus.ACTIVE))
 					sess.getTransaction().rollback();
 			} finally {
 				sess.close();

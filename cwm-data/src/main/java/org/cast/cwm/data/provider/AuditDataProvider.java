@@ -19,11 +19,7 @@
  */
 package org.cast.cwm.data.provider;
 
-import java.io.Serializable;
-import java.util.Iterator;
-
 import net.databinder.hib.Databinder;
-
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.model.IDetachable;
@@ -34,6 +30,9 @@ import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditQuery;
 import org.hibernate.envers.query.criteria.AuditProperty;
 import org.hibernate.envers.query.internal.property.RevisionNumberPropertyName;
+
+import java.io.Serializable;
+import java.util.Iterator;
 
 /**
  * A sortable DataProvider for views of audit data.
@@ -56,6 +55,7 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 		this.builder = builder;
 	}
 
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<? extends AuditTriple<E, R>> iterator(long first, long count) {
@@ -68,7 +68,7 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 	@Override
 	public long size() {
 		AuditQuery query = builder.build(Databinder.getHibernateSession());
-		query.addProjection(new AuditProperty<Long>(new RevisionNumberPropertyName()).count());
+		query.addProjection(new AuditProperty<Long>("auditAlias", new RevisionNumberPropertyName()).count());
 		Number size = (Number) query.getSingleResult();
 		return size == null ? 0 : size.longValue();
 	}

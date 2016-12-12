@@ -19,12 +19,12 @@
  */
 package org.cast.cwm;
 
-import java.util.Properties;
-
 import org.hibernate.MappingException;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
+
+import java.util.Properties;
 
 /**
  * Used by Hibernate Annotations to generate pooled IDs for 
@@ -37,10 +37,10 @@ import org.hibernate.type.Type;
 public class CwmIdGenerator extends SequenceStyleGenerator {
 	
 	@Override
-	public void configure(Type type, Properties params, Dialect dialect) throws MappingException {
+	public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
 		params.put("optimizer", "pooled");
 		params.put("increment_size", "10");
 		params.put("sequence_name", "cwm_id_sequence");
-		super.configure(type, params, dialect);
+		super.configure(type, params, serviceRegistry);
 	}
 }

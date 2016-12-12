@@ -19,10 +19,7 @@
  */
 package net.databinder;
 
-import java.util.HashSet;
-
 import net.databinder.hib.Databinder;
-
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.IRequestCycleListener;
@@ -30,8 +27,11 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.context.internal.ManagedSessionContext;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
 
 /**
  * <p>Opens Hibernate sessions and transactions as required and closes them at a request's
@@ -56,7 +56,7 @@ public class DBRequestCycleListener implements IRequestCycleListener {
 		
 		if (sess.isOpen())
 			try {
-				if (sess.getTransaction().isActive()) {
+				if (sess.getTransaction().getStatus().equals(TransactionStatus.ACTIVE)) {
 					log.debug("Rolling back uncomitted transaction.");
 					sess.getTransaction().rollback();
 				}

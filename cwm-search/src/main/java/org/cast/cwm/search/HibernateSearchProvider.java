@@ -19,25 +19,23 @@
  */
 package org.cast.cwm.search;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import net.databinder.hib.Databinder;
 import net.databinder.models.PropertyDataProvider;
 import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.lucene.search.Query;
 import org.apache.wicket.model.IModel;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.engine.spi.FacetManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A result provider for a DataView of full-text search results.
@@ -123,7 +121,7 @@ public class HibernateSearchProvider<T> extends PropertyDataProvider<T> {
 			Query luceneQuery;
 			try {
 				luceneQuery = builder.build (queryBuilder);
-			} catch (SearchException e) {
+			} catch (Exception e) {
 				// query building can fail e.g. if search string contains only stopwords.
 				log.warn("Search query construction failed: {}", e);
 				return null;
