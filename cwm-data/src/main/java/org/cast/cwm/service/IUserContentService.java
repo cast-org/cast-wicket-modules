@@ -19,11 +19,7 @@
  */
 package org.cast.cwm.service;
 
-import java.util.List;
-
-import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.IResponseType;
-import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserContent;
 
@@ -36,25 +32,5 @@ public interface IUserContentService {
 	 * @return an instance of UserContent
 	 */
 	public UserContent newUserContent (User author, IResponseType dataType);
-
-	/**
-	 * Get a single UserContent by a given user for a given prompt.  This assumes that only
-	 * one such response should exist.  If multiple responses are returned, an exception
-	 * will be thrown.  In such cases, use {@link #getUserContentListForPrompt(IModel, IModel)}.
-	 * 
-	 * @param mPrompt model of the Prompt
-	 * @param mUser model of the User
-	 * @return model of the single UserContent; won't be null but may return null from getObject.
-	 */
-	IModel<UserContent> getUserContentForPrompt(IModel<? extends Prompt> mPrompt, IModel<User> mUser);
-	
-	/**
-	 * Get the list of UserContent objects for a given user and prompt.
-	 * 
-	 * @param mPrompt model of the Prompt
-	 * @param mUser model of the User
-	 * @return model of the list of UserContent; won't be null but may return an empty list from getObject.
-	 */
-	IModel<List<UserContent>> getUserContentListForPrompt(IModel<? extends Prompt> mPrompt, IModel<User> mUser);
 
 }

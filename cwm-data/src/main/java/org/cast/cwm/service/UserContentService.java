@@ -19,19 +19,9 @@
  */
 package org.cast.cwm.service;
 
-import java.util.List;
-
-import net.databinder.models.hib.BasicCriteriaBuilder;
-import net.databinder.models.hib.HibernateListModel;
-import net.databinder.models.hib.HibernateObjectModel;
-
-import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.IResponseType;
-import org.cast.cwm.data.Prompt;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserContent;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 public class UserContentService implements IUserContentService {
 	
@@ -39,27 +29,5 @@ public class UserContentService implements IUserContentService {
 	public UserContent newUserContent (User author, IResponseType dataType) {
 		return new UserContent(author, dataType);
 	}
-
-
-	@Override
-	public IModel<UserContent> getUserContentForPrompt(IModel<? extends Prompt> mPrompt, IModel<User> mUser) {
-		return new HibernateObjectModel<UserContent>(UserContent.class, 
-				new BasicCriteriaBuilder(
-						Restrictions.eq("prompt", mPrompt.getObject()),
-						Restrictions.eq("user", mUser.getObject())));
-	}
-
-
-	@Override
-	public IModel<List<UserContent>> getUserContentListForPrompt(
-			IModel<? extends Prompt> mPrompt, IModel<User> mUser) {
-		return new HibernateListModel<UserContent>(UserContent.class,
-				new BasicCriteriaBuilder(
-						Order.asc("sortOrder"),
-						Restrictions.eq("prompt", mPrompt.getObject()),
-						Restrictions.eq("user", mUser.getObject())));
-	}
-
-	
 	
 }
