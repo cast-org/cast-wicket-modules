@@ -89,7 +89,15 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author bgoldowsky
  */
 public abstract class CwmApplication extends AuthDataApplication<User> {
-	
+
+	public static final String RESPTYPE_TEXT = "TEXT";
+	public static final String RESPTYPE_HTML = "HTML";
+	public static final String RESPTYPE_AUDIO = "AUDIO";
+	public static final String RESPTYPE_SVG = "SVG";
+	public static final String RESPTYPE_UPLOAD = "UPLOAD";
+	public static final String RESPTYPE_TABLE = "TABLE";
+	public static final String RESPTYPE_SINGLE_SELECT = "SINGLE_SELECT";
+	public static final String RESPTYPE_SCORE = "SCORE";
 	@Getter
 	protected IAppConfiguration configuration;
 	
@@ -347,70 +355,50 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		loginSessionCloser.closeQueue.add(sessionId);
 	}
 
+	/**
+	 * Set up some default response types used by many applications.
+	 */
 	protected void initResponseTypes() {
-		/**
-		 * Plain text is stored using {@link ResponseData#ResponseData.setText(String)}.
+		/*
+		 * Plain text is stored using {@link UserContent#setText(String)}.
 		 */
-		responseTypeRegistry.registerResponseType("TEXT", new ResponseType("TEXT", "Write")); 
+		responseTypeRegistry.registerResponseType(RESPTYPE_TEXT, new ResponseType(RESPTYPE_TEXT, "Write"));
 
-		/**
-		 * Styled HTML text is stored using {@link ResponseData#setText(String)}.
+		/*
+		 * Styled HTML text is stored using {@link UserContent#setText(String)}.
 		 */
-		responseTypeRegistry.registerResponseType("HTML", new ResponseType("HTML", "Write")); 
+		responseTypeRegistry.registerResponseType(RESPTYPE_HTML, new ResponseType(RESPTYPE_HTML, "Write"));
 		
-		/**
-		 * Binary audio data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
+		/*
+		 * Binary audio data is stored using {@link UserContent#setPrimaryFile(BinaryFileData)}.
 		 */
-		responseTypeRegistry.registerResponseType("AUDIO", new ResponseType("AUDIO", "Record")); 
+		responseTypeRegistry.registerResponseType(RESPTYPE_AUDIO, new ResponseType(RESPTYPE_AUDIO, "Record"));
 		
-		/**
-		 * SVG markup is stored using {@link ResponseData#setText(String)}
+		/*
+		 * SVG markup is stored using {@link UserContent#setText(String)}
 		 */
-		responseTypeRegistry.registerResponseType("SVG", new ResponseType("SVG", "Draw"));
+		responseTypeRegistry.registerResponseType(RESPTYPE_SVG, new ResponseType(RESPTYPE_SVG, "Draw"));
 		
-		/**
-		 * Binary data is stored using {@link ResponseData#setBinaryFileData(BinaryFileData)}.
+		/*
+		 * Uploaded files are stored using {@link UserContent#setPrimaryFile(BinaryFileData)}.
 		 */
-		responseTypeRegistry.registerResponseType("UPLOAD", new ResponseType("UPLOAD", "Upload"));
+		responseTypeRegistry.registerResponseType(RESPTYPE_UPLOAD, new ResponseType(RESPTYPE_UPLOAD, "Upload"));
 		
-		/**
-		 * Highlight colors and word indexes are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.  
-		 * For example: "R:1,2,3,5,6,7#Y:22,23,25,26"
-		 */
-		responseTypeRegistry.registerResponseType("HIGHLIGHT", new ResponseType("HIGHLIGHT", "Highlight"));
-		
-		/**
-		 * A response to a cloze-type passage (fill in the missing words).  The actual answers
-		 * are stored as CSV using {@link ResponseData#ResponseData.setText(String)}.
-		 */
-		responseTypeRegistry.registerResponseType("CLOZE", new ResponseType("CLOZE", "Cloze Passage")); 
-		
-		/**
-		 * A response to a single-select, multiple choice prompt.  Actual answer stored using {@link ResponseData#setText(String)}.
-		 */
-		responseTypeRegistry.registerResponseType("SINGLE_SELECT", new ResponseType("SINGLE_SELECT", "Multiple Choice"));
-		
-		/**
-		 * A rating (e.g. 1-5).  The value is stored using {@link ResponseData#setScore(int)}
-		 */
-		responseTypeRegistry.registerResponseType("STAR_RATING", new ResponseType("STAR_RATING", "Rate"));
-		
-		/**
-		 * A generic score.  
-		 * 
-		 * TODO: Perhaps this can be used to replace Star Rating and combine Cloze/SingleSelect?
-		 */
-		responseTypeRegistry.registerResponseType("SCORE", new ResponseType("SCORE", "Score"));
-		
-		/**
-		 * Applet markup is stored using {@link ResponseData#setText(String)}
-		 */
-		responseTypeRegistry.registerResponseType("APPLET", new ResponseType("APPLET", "Applet"));
-
-		/**
+		/*
 		 * Table markup is stored using {@link ResponseData#setText(String)}
 		 */
-		responseTypeRegistry.registerResponseType("TABLE", new ResponseType("TABLE", "Table"));
+		responseTypeRegistry.registerResponseType(RESPTYPE_TABLE, new ResponseType(RESPTYPE_TABLE, "Table"));
+
+		/*
+		 * A response to a single-select, multiple choice prompt.  Actual answer stored using {@link UserContent#setText(String)}.
+		 */
+		responseTypeRegistry.registerResponseType(RESPTYPE_SINGLE_SELECT, new ResponseType(RESPTYPE_SINGLE_SELECT, "Multiple Choice"));
+		
+		/*
+		 * A score of some type -- star rating, rubric value, etc.
+		 */
+		responseTypeRegistry.registerResponseType(RESPTYPE_SCORE, new ResponseType(RESPTYPE_SCORE, "Score"));
+		
 	}
 	
 	public IResponseType getResponseType(String name) {
