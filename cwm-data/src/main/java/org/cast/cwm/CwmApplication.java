@@ -315,7 +315,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		c.addAnnotatedClass(org.cast.cwm.data.Initialization.class);
 		c.addAnnotatedClass(org.cast.cwm.data.LoginSession.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Period.class);
-		c.addAnnotatedClass(org.cast.cwm.data.Prompt.class);
 		c.addAnnotatedClass(org.cast.cwm.data.Site.class);
 		c.addAnnotatedClass(org.cast.cwm.data.User.class);
 		c.addAnnotatedClass(org.cast.cwm.data.UserContent.class);

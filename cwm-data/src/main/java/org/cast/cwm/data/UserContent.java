@@ -42,10 +42,13 @@ import java.util.Set;
 
 /**
  * A UserContent object represents a single chunk of user input.
- * Most often it is a response to a {@link Prompt} object.
  * 
  * It is an audited object, so it can be modified at will and the 
  * history of revisions will be available in the audit table.
+ *
+ * Most applications will need to extend this in order to connect user content
+ * to application-specific contexts; eg, the content is responding to something
+ * or placed somewhere.
  */
 @Entity
 @Audited
@@ -62,8 +65,6 @@ import java.util.Set;
 @ToString(of={"id","dataType","lastUpdated"})
 public class UserContent extends PersistedObject {
 
-	private static final long serialVersionUID = 1L;
-	
 	@Id @GeneratedValue(generator = "my_generator")
 	@Setter(AccessLevel.NONE) 
 	private Long id;
