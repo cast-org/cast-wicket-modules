@@ -28,14 +28,16 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 /**
- * Base class for testing cwm-data application components.
+ * Base class for testing components that use cwm-data.
  *
- * Sets up injection and a logged-in User with a Period.
- * If your application keeps its HTML in a separate theme directory, override
+ * This abstract class is intended to be extended into a base test case for your application.
+ * You will need to override getInjectionHelper, with your own extended version of CwmDataInjectionTestHelper.
+ * If your application keeps its HTML in a separate theme directory, also override
  * isApplicationThemed() to return true.
  *
+ * This test case sets up injection and creates a pretend logged-in User with a Period.
  */
-public class CwmDataBaseTestCase extends CwmBaseTestCase {
+public abstract class CwmDataBaseTestCase<T extends CwmDataInjectionTestHelper> extends CwmBaseTestCase<T> {
 
 	public Period period;
 	public User loggedInUser;
@@ -44,15 +46,6 @@ public class CwmDataBaseTestCase extends CwmBaseTestCase {
 		super();
 	}
 
-	@Override
-	protected CwmDataInjectionTestHelper getInjectionTestHelper() {
-		return new CwmDataInjectionTestHelper();
-	}
-	
-	protected CwmDataInjectionTestHelper getHelper() {
-		return (CwmDataInjectionTestHelper) injectionHelper;
-	}
-	
 	public void setUpData() {
 		period = new Period();
 		TestIdSetter.setId(Period.class, period, 1L);

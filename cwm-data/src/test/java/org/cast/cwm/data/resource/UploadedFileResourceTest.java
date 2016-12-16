@@ -37,7 +37,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
-import org.cast.cwm.test.GuiceInjectedTestApplication;
+import org.cast.cwm.test.CwmTestApplication;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,8 +59,8 @@ public class UploadedFileResourceTest {
 		cwmService = mock(ICwmService.class);
 		when(cwmService.getById(BinaryFileData.class, 1L)).thenReturn(mSampleBFD);
 		injectionMap.put(ICwmService.class, cwmService);
-		
-		GuiceInjectedTestApplication application = new GuiceInjectedTestApplication(injectionMap);
+
+		CwmTestApplication application = new CwmTestApplication(injectionMap);
 		tester = new WicketTester(application);
 	}
 	

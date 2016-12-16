@@ -28,10 +28,12 @@ import org.apache.wicket.util.tester.FormTester;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.test.CwmDataBaseTestCase;
+import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.cast.cwm.test.TestDataUtil;
 import org.junit.Test;
 
-public class PeriodChoicePanelTest extends CwmDataBaseTestCase {
+public class PeriodChoicePanelTest extends CwmDataTestCase {
 
 	private Period period2;
 	private SortedSet<Period> periods;
@@ -53,8 +55,8 @@ public class PeriodChoicePanelTest extends CwmDataBaseTestCase {
 	}
 	
 	@Override
-	public void populateInjection() {
-		cwmSessionService = getHelper().injectAndStubCwmSessionService(this);
+	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		cwmSessionService = helper.injectAndStubCwmSessionService(this);
 	}
 
 	@Test

@@ -19,17 +19,24 @@
  */
 package org.cast.cwm.test;
 
-import java.util.Map;
+import org.apache.wicket.mock.MockApplication;
+import org.cast.cwm.data.Period;
+import org.cast.cwm.data.Role;
+import org.cast.cwm.data.User;
+
+import java.util.Arrays;
+import java.util.TreeSet;
 
 /**
- * @deprecated  Use  {@link #CwmTestApplication} for a fake application with injection (which may be empty)
- *  or {@link #CwmTestThemedApplication} for a fake application injection that also uses the usual CAST theme directory.
+ * Base class for the tests of cwm-data module components.
+ * This is a concrete instance of CwmDataBaseTestCase.
+ *
  */
-@Deprecated
-public class GuiceInjectedTestApplication<T> extends CwmTestApplication<T> {
+public class CwmDataTestCase extends CwmDataBaseTestCase<CwmDataInjectionTestHelper> {
 
-	public GuiceInjectedTestApplication(Map<Class<T>, T> injectionMap) {
-		super(injectionMap);
+	@Override
+	protected CwmDataInjectionTestHelper getInjectionTestHelper() {
+		return new CwmDataInjectionTestHelper();
 	}
 
 }

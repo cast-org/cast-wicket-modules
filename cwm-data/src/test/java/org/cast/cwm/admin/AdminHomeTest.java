@@ -25,17 +25,19 @@ import org.cast.cwm.data.Role;
 import org.cast.cwm.service.AdminPageService;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.test.CwmDataBaseTestCase;
+import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.junit.Test;
 
-public class AdminHomeTest extends CwmDataBaseTestCase {
+public class AdminHomeTest extends CwmDataTestCase {
 
 	@Override
-	public void populateInjection() throws Exception {
-		getHelper().injectAndStubCwmSessionService(this);
-		getHelper().injectMock(IAppConfiguration.class);
+	public void populateInjection(CwmDataInjectionTestHelper helper) throws Exception {
+		helper.injectAndStubCwmSessionService(this);
+		helper.injectMock(IAppConfiguration.class);
 
 		// We use the real service class here, it is safe for testing
-		IAdminPageService adminPageService = getHelper().injectObject(IAdminPageService.class, new AdminPageService());
+		IAdminPageService adminPageService = helper.injectObject(IAdminPageService.class, new AdminPageService());
 	}
 
 	@Override

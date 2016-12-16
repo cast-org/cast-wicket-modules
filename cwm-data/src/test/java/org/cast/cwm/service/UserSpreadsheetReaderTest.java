@@ -25,7 +25,8 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
-import org.cast.cwm.test.CwmDataBaseTestCase;
+import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.cwm.db.service.IDBService;
 import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
@@ -38,20 +39,20 @@ import static org.mockito.Mockito.when;
 /**
  * @author bgoldowsky
  */
-public class UserSpreadsheetReaderTest extends CwmDataBaseTestCase {
+public class UserSpreadsheetReaderTest extends CwmDataTestCase {
 
 	UserSpreadsheetReader reader;
 	Site site = new Site();
 
 	@Override
-	public void populateInjection() throws Exception {
-		getHelper().injectAndStubUserService(this);
-		getHelper().injectMock(ICwmService.class);
-		getHelper().injectMock(IDBService.class);
-		getHelper().injectObject(IModelProvider.class, new SimpleModelProvider());
+	public void populateInjection(CwmDataInjectionTestHelper helper) throws Exception {
+		helper.injectAndStubUserService(this);
+		helper.injectMock(ICwmService.class);
+		helper.injectMock(IDBService.class);
+		helper.injectObject(IModelProvider.class, new SimpleModelProvider());
 
 		// Our mock SiteService will acknowledge one existing site.
-		ISiteService siteService = getHelper().injectMock(ISiteService.class);
+		ISiteService siteService = helper.injectMock(ISiteService.class);
 		when(siteService.getSiteByName(eq("existing_site"))).thenReturn(Model.of(site));
 		when(siteService.newSite()).thenReturn(new Site());
 		when(siteService.newPeriod()).thenReturn(new Period());

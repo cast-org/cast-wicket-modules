@@ -24,6 +24,8 @@ import org.apache.wicket.model.Model;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.test.CwmDataBaseTestCase;
+import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.cwm.db.service.IDBService;
 import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
@@ -36,17 +38,17 @@ import static org.mockito.Mockito.when;
 /**
  * @author bgoldowsky
  */
-public class UserUpdateSpreadsheetReaderTest extends CwmDataBaseTestCase {
+public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 
 	UserSpreadsheetReader reader;
 
 	@Override
-	public void populateInjection() throws Exception {
-		IUserService userService = getHelper().injectAndStubUserService(this);
-		getHelper().injectMock(ICwmService.class);
-		getHelper().injectMock(IDBService.class);
-		getHelper().injectMock(ISiteService.class);
-		getHelper().injectObject(IModelProvider.class, new SimpleModelProvider());
+	public void populateInjection(CwmDataInjectionTestHelper helper) throws Exception {
+		IUserService userService = helper.injectAndStubUserService(this);
+		helper.injectMock(ICwmService.class);
+		helper.injectMock(IDBService.class);
+		helper.injectMock(ISiteService.class);
+		helper.injectObject(IModelProvider.class, new SimpleModelProvider());
 
 		// Our mock SiteService will acknowledge one existing site.
 //		ISiteService siteService = getHelper().injectMock(ISiteService.class);

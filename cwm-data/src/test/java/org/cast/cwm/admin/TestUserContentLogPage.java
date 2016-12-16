@@ -50,7 +50,7 @@ import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.ISiteService;
-import org.cast.cwm.test.GuiceInjectedTestApplication;
+import org.cast.cwm.test.CwmTestApplication;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
 import org.junit.Before;
@@ -76,7 +76,7 @@ public class TestUserContentLogPage {
 		injectionMap.put(ISiteService.class,  siteService);
 
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		GuiceInjectedTestApplication application = new GuiceInjectedTestApplication(injectionMap);
+		CwmTestApplication application = new CwmTestApplication(injectionMap);
 
 		tester = new WicketTester(application);
 	}

@@ -30,10 +30,10 @@ import org.junit.Before;
  *
  * If you use cwm-data as well, see org.cast.cwm.test.CwmDataBaseTestCase in that package.
  */
-public abstract class CwmBaseTestCase {
+public abstract class CwmBaseTestCase<T extends InjectionTestHelper>  {
 
 	protected CwmWicketTester tester;
-	protected InjectionTestHelper injectionHelper;
+	protected T injectionHelper;
 
 	public CwmBaseTestCase() {
 		super();
@@ -43,7 +43,7 @@ public abstract class CwmBaseTestCase {
 	public void setup() throws Exception {
 		injectionHelper = getInjectionTestHelper();
 		setUpData();
-		populateInjection();
+		populateInjection(injectionHelper);
 		setUpTester();
 	}
 
@@ -61,10 +61,10 @@ public abstract class CwmBaseTestCase {
 	public void setUpData() throws Exception {
 	}
 
-	public void populateInjection() throws Exception {
+	public void populateInjection(T helper) throws Exception {
 	}
 
 	protected abstract boolean isApplicationThemed();
 	
-	protected abstract InjectionTestHelper getInjectionTestHelper();
+	protected abstract T getInjectionTestHelper();
 }

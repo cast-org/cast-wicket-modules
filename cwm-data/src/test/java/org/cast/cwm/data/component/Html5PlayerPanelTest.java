@@ -26,10 +26,12 @@ import org.apache.wicket.model.Model;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.test.CwmDataBaseTestCase;
+import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.cast.cwm.test.TestIdSetter;
 import org.junit.Test;
 
-public class Html5PlayerPanelTest extends CwmDataBaseTestCase {
+public class Html5PlayerPanelTest extends CwmDataTestCase {
 
     private BinaryFileData bfd;
 
@@ -41,8 +43,8 @@ public class Html5PlayerPanelTest extends CwmDataBaseTestCase {
 	}
 	
 	@Override
-	public void populateInjection() {
-		injectionHelper.injectMock(ICwmService.class);
+	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		helper.injectMock(ICwmService.class);
 	}
 
 	@Test

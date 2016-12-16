@@ -22,14 +22,13 @@ package org.cast.cwm.data.component;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.junit.Test;
 
-public class RoleVisibilityContainerTest extends CwmDataBaseTestCase {
+public class RoleVisibilityContainerTest extends CwmDataTestCase {
 
 	@Override
-	public void populateInjection() throws Exception {
-		super.populateInjection();
-		CwmDataInjectionTestHelper helper = getHelper();
+	public void populateInjection(CwmDataInjectionTestHelper helper) throws Exception {
 		helper.injectAndStubCwmSessionService(this);
 	}
 

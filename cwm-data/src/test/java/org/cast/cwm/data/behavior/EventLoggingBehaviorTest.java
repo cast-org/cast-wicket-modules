@@ -24,31 +24,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.test.CwmBaseTestCase;
-import org.cast.cwm.test.CwmWicketTester;
-import org.cast.cwm.test.GuiceInjectedTestApplication;
 import org.cast.cwm.test.InjectionTestHelper;
-import org.junit.Before;
 import org.junit.Test;
 
 
-public class EventLoggingBehaviorTest extends CwmBaseTestCase {
+public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelper> {
 
 	private IEventService eventService;
 
-	public void populateInjection() throws Exception {
-		eventService = injectionHelper.injectMock(IEventService.class);
+	@Override
+	public void populateInjection(InjectionTestHelper helper) throws Exception {
+		eventService = helper.injectMock(IEventService.class);
 
-		ICwmSessionService cwmSessionService = injectionHelper.injectMock(ICwmSessionService.class);
+		ICwmSessionService cwmSessionService = helper.injectMock(ICwmSessionService.class);
 		when(cwmSessionService.getUser()).thenReturn(new User(Role.STUDENT));
 		when(cwmSessionService.isSignedIn()).thenReturn(true);
 	}

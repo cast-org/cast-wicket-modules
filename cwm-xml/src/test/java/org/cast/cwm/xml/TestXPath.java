@@ -43,7 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class TestXPath extends CwmBaseTestCase {
+public class TestXPath extends CwmBaseTestCase<InjectionTestHelper> {
 	
 	private static final XPathFactory factory = XPathFactory.newInstance();
 	
@@ -81,7 +81,7 @@ public class TestXPath extends CwmBaseTestCase {
 	}
 	
 	@Override
-	public void populateInjection() throws Exception {
+	public void populateInjection(InjectionTestHelper injectionHelper) throws Exception {
 		IXmlService xmlService = mock(IXmlService.class);
 		when(xmlService.getNamespaceContext()).thenReturn(new XmlService.CwmNamespaceContext());
 		injectionHelper.injectObject(IXmlService.class, xmlService);
