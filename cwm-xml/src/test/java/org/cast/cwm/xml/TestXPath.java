@@ -19,19 +19,6 @@
  */
 package org.cast.cwm.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayInputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import org.cast.cwm.test.CwmBaseTestCase;
 import org.cast.cwm.test.InjectionTestHelper;
 import org.cast.cwm.xml.service.IXmlService;
@@ -42,6 +29,20 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestXPath extends CwmBaseTestCase<InjectionTestHelper> {
 	
@@ -68,20 +69,25 @@ public class TestXPath extends CwmBaseTestCase<InjectionTestHelper> {
 	}
 
 	@Override
-	public void setUpData() throws Exception {
+	public void setUpData() {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		Document document;
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		document = db.parse(new ByteArrayInputStream(doc));
-		dom = document.getDocumentElement();
+		DocumentBuilder db;
+		try {
+			db = dbf.newDocumentBuilder();
+			document = db.parse(new ByteArrayInputStream(doc));
+			dom = document.getDocumentElement();
+		} catch (ParserConfigurationException|SAXException|IOException e) {
+			throw new RuntimeException(e);
+		}
 
 		xPath = factory.newXPath();
 		xPath.setNamespaceContext(new XmlService().getNamespaceContext());
 	}
 	
 	@Override
-	public void populateInjection(InjectionTestHelper injectionHelper) throws Exception {
+	public void populateInjection(InjectionTestHelper injectionHelper) {
 		IXmlService xmlService = mock(IXmlService.class);
 		when(xmlService.getNamespaceContext()).thenReturn(new XmlService.CwmNamespaceContext());
 		injectionHelper.injectObject(IXmlService.class, xmlService);

@@ -20,6 +20,9 @@
 package org.cast.cwm.test;
 
 import org.apache.wicket.mock.MockApplication;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.util.tester.WicketTestCase;
+import org.apache.wicket.util.tester.WicketTester;
 import org.junit.Before;
 
 /**
@@ -30,38 +33,46 @@ import org.junit.Before;
  *
  * If you use cwm-data as well, see org.cast.cwm.test.CwmDataBaseTestCase in that package.
  */
-public abstract class CwmBaseTestCase<T extends InjectionTestHelper>  {
+public abstract class CwmBaseTestCase<T extends InjectionTestHelper> extends WicketTestCase {
 
-	protected CwmWicketTester tester;
 	protected T injectionHelper;
 
 	public CwmBaseTestCase() {
 		super();
 	}
 
-	@Before
-	public void setup() throws Exception {
+	@Override
+	public void commonBefore() {
 		injectionHelper = getInjectionTestHelper();
 		setUpData();
 		populateInjection(injectionHelper);
-		setUpTester();
+		super.commonBefore();
 	}
 
-	public void setUpTester() throws Exception {
-		tester = new CwmWicketTester(getTestApplication());		
+	@Override
+	public WicketTester newWicketTester(final WebApplication app) {
+		return new CwmWicketTester(app);
 	}
 
+	protected CwmWicketTester getWicketTester() {
+		if (tester instanceof CwmWicketTester)
+			return (CwmWicketTester) tester;
+		System.err.println("Tester not of CwmWicketTester class: " + tester);
+		return null;
+	}
+
+	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected MockApplication getTestApplication() {
+	protected MockApplication newApplication() {
 		CwmTestApplication app = new CwmTestApplication(injectionHelper.getMap());
 		app.setApplicationUsesThemeDir(isApplicationThemed());
 		return app;
 	}
 	
-	public void setUpData() throws Exception {
+	public void setUpData() {
 	}
 
-	public void populateInjection(T helper) throws Exception {
+	public void populateInjection(T helper) {
 	}
 
 	protected abstract boolean isApplicationThemed();

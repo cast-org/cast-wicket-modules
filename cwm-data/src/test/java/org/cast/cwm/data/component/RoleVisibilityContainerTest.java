@@ -28,7 +28,7 @@ import org.junit.Test;
 public class RoleVisibilityContainerTest extends CwmDataTestCase {
 
 	@Override
-	public void populateInjection(CwmDataInjectionTestHelper helper) throws Exception {
+	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		helper.injectAndStubCwmSessionService(this);
 	}
 

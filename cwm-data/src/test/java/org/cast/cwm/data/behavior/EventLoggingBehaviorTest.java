@@ -39,7 +39,7 @@ public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelpe
 	private IEventService eventService;
 
 	@Override
-	public void populateInjection(InjectionTestHelper helper) throws Exception {
+	public void populateInjection(InjectionTestHelper helper) {
 		eventService = helper.injectMock(IEventService.class);
 
 		ICwmSessionService cwmSessionService = helper.injectMock(ICwmSessionService.class);

@@ -76,8 +76,8 @@ public class Html5PlayerPanelTest extends CwmDataTestCase {
         tester.assertComponent("panel", Html5PlayerPanel.class);
         tester.assertComponent("panel:audio:source", Mp3AudioSource.class);
         Component source = tester.getComponentFromLastRenderedPage("panel:audio:source");
-        tester.assertAttribute("Incorrect mime type", "audio/mpeg", source, "type");
-        tester.assertAttribute("Unexpected source/@src attribute",
+        getWicketTester().assertAttribute("Incorrect mime type", "audio/mpeg", source, "type");
+        getWicketTester().assertAttribute("Unexpected source/@src attribute",
                 "./resource/org.cast.cwm.data.resource.UploadedFileResourceReference/file?id=1",
                 source, "src");
     }

@@ -25,6 +25,7 @@ import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.TreeSet;
 
 /**
@@ -53,7 +54,7 @@ public abstract class CwmDataBaseTestCase<T extends CwmDataInjectionTestHelper> 
 		TestIdSetter.setId(User.class, loggedInUser, 2L);
 	}
 
-	protected MockApplication getTestApplication() {
+	protected MockApplication newApplication() {
 		CwmDataTestApplication app = new CwmDataTestApplication(injectionHelper.getMap());
 		app.setApplicationUsesThemeDir(isApplicationThemed());
 		return app;
@@ -62,7 +63,7 @@ public abstract class CwmDataBaseTestCase<T extends CwmDataInjectionTestHelper> 
 	public User makeUser(Role role, Period period, String firstName, String lastName) {
 		User user = new User();
 		user.setRole(role);
-		user.setPeriods(new TreeSet<Period>(Arrays.asList(period)));
+		user.setPeriods(new TreeSet<Period>(Collections.singletonList(period)));
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		return user;
