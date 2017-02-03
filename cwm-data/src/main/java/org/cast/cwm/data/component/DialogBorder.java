@@ -176,7 +176,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * @param target
 	 */
 	protected void logOpenEvent(AjaxRequestTarget target) {
-		eventService.saveEvent(eventCode, eventDetail, pageName);
+		eventService.storeEvent(this, eventCode, eventDetail);
 	}
 	
 	
@@ -376,7 +376,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
      * dialog).  If you do not adjust focus here, you should adjust focus elsewhere
      * to maintain accessibility.
      * 
-     * @param adjustFocus
+     * @param returnFocus
      * @return
      */
     public String getCloseString(boolean returnFocus) {
@@ -471,9 +471,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * 
 	 * @param object
 	 */
-	public final void setModelObject(String title)
+	public final void setModelObject(String object)
 	{
-		setDefaultModelObject(title);
+		setDefaultModelObject(object);
 	}
 
 }

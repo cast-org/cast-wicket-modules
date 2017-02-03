@@ -35,16 +35,4 @@ public class LoggingEventService implements IEventLogger {
 
 	private final static Logger log = LoggerFactory.getLogger(LoggingEventService.class);
 
-	@Override
-	public Object saveEvent(String type, String detail, String location) {
-		log.debug("Event: {}, {}, {}", Arrays.asList(type, detail, location));
-		return null;
-	}
-
-	@Override
-	public Object saveEvent(String type, String detail, String location, String componentPath) {
-		log.debug("Event: {}, {}, {}, {}", Arrays.asList(type, detail, location, componentPath));
-		return null;
-	}
-
 }

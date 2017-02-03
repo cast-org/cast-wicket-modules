@@ -34,7 +34,6 @@ import com.google.inject.Inject;
  * A generic behavior that allows JS events to be logged
  */
 public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
-	private static final long serialVersionUID = 1L;
 
 	@Inject
 	private IEventService eventService;
@@ -47,8 +46,7 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 	protected void respond(AjaxRequestTarget target) {
 		String eventDetail = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("eventDetail").toString();
 		String eventType = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("eventType").toString();
-		String eventPage = RequestCycle.get().getRequest().getRequestParameters().getParameterValue("eventPage").toString();
-		logJsEvent(eventDetail, eventType, eventPage);		
+		logJsEvent(eventDetail, eventType);
 	}
 	
 	/**
@@ -56,20 +54,9 @@ public class JsEventLoggingBehavior extends AbstractDefaultAjaxBehavior {
 	 * 
 	 * @param eventDetail
 	 * @param eventType
-	 * @param eventPage
 	 */
-	protected void logJsEvent(String eventDetail, String eventType, String eventPage) {
-		if (eventPage == null || eventPage.equals(""))
-			eventPage = getEventPage();
-		eventService.saveEvent(eventType, eventDetail, eventPage);
-	}
-
-	/**
-	 * Override this to setup default page information
-	 * @return
-	 */
-	protected String getEventPage() {
-		return null;
+	protected void logJsEvent(String eventDetail, String eventType) {
+		eventService.storeEvent(this.getComponent(), eventType, eventDetail);
 	}
 
 	@Override

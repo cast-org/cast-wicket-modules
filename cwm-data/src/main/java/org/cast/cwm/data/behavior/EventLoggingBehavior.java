@@ -19,9 +19,10 @@
  */
 package org.cast.cwm.data.behavior;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
@@ -30,10 +31,6 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 /**
  * An Ajax Behavior for logging events.  Supports executing
@@ -44,10 +41,9 @@ import com.google.inject.Inject;
  * @author jbrookover
  *
  */
+@Slf4j
 public class EventLoggingBehavior extends AjaxEventBehavior {
 
-	private static final long serialVersionUID = 1L;
-	private static final Logger log = LoggerFactory.getLogger(EventLoggingBehavior.class);
 	private static final String queryVar = "EventDetail";
 	
 	/**
@@ -60,12 +56,6 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	 */
 	@Getter @Setter
 	private String detail;
-	
-	/**
-	 * The name of the page, for the event log.
-	 */
-	@Getter @Setter
-	private String pageName;
 	
 //	/**
 //	 * Javascript to be executed on the client side before
@@ -122,7 +112,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	@Override
 	protected void onEvent(AjaxRequestTarget target) {
 		// Construct Detail
-		StringBuffer finalDetail = new StringBuffer();
+		StringBuilder finalDetail = new StringBuilder();
 		if (!Strings.isEmpty(detail))
 			finalDetail.append(detail);
 
@@ -136,9 +126,9 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 		
 		// Log Event
 		if (cwmSessionService.isSignedIn())
-			eventService.saveEvent(eventType, finalDetail.toString(), pageName);
+			eventService.storeEvent(this.getComponent(), eventType, finalDetail.toString());
 		else
-			log.info("Event triggered for non-logged in user: {}, {}, {}", new Object[] {eventType, finalDetail, pageName});
+			log.info("Event triggered for non-logged in user: {}, {}", new Object[] {eventType, finalDetail});
 	}
 	
 }

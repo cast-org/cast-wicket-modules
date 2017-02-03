@@ -43,12 +43,16 @@ public interface IEventService extends IEventLogger {
 	 */
 	LoginSession newLoginSession();
 
+	<T extends Event> IModel<T> storeEvent(T event, Component triggeringComponent);
+
+	IModel<? extends Event> storeEvent(Component triggerComponent, String type, String detail);
+
 	/**
 	 * Store a login event with data contributions from ancestors of the given triggering component.
 	 * @param triggerComponent login-causing component
 	 * @return model of the new event
 	 */
-	IModel<? extends Event> saveLoginEvent(Component triggerComponent);
+	IModel<? extends Event> storeLoginEvent(Component triggerComponent);
 
 	/** 
 	 * Create a LoginSession object in the database based on the current Session and the given Request.
