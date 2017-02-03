@@ -56,7 +56,6 @@
         <module>cwm-figuration</module>
         <module>cwm-glossary</module>
         <module>cwm-search</module>
-        <module>cwm-tag</module>
         <module>cwm-xml</module>
     </modules>
 
