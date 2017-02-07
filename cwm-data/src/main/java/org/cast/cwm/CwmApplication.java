@@ -219,7 +219,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 				binder.bind(IAppConfiguration.class).toInstance(configuration);
 				binder.bind(IModelProvider.class).to(HibernateObjectModelProvider.class);
 				binder.bind(IAdminPageService.class).to(AdminPageService.class);
-				binder.bind(IEventService.class).to(EventService.class);
 				binder.bind(IUserService.class).to(UserService.class);
 				binder.bind(IDBService.class).to(DBService.class);
 			}

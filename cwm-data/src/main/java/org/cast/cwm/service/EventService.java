@@ -31,6 +31,7 @@ import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.Request;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.IEventType;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.component.IEventDataContributor;
@@ -44,15 +45,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Methods for working with Events and related information in the database.
+ * Default implementations of various methods for working with Events and related information in the database.
+ *
+ * Applications must override this and implement a few methods that specify details of how they will handle events.
  *
  */
 @Slf4j
-public class EventService implements IEventService {
-	
-	public static final String LOGIN_TYPE_NAME = "login";
-	public static final String LOGOUT_TYPE_NAME = "logout";
-	public static final String TIMEOUT_TYPE_NAME = "logout:forced";
+public abstract class EventService implements IEventService {
 
 	@Inject
 	private ICwmService cwmService;
@@ -63,9 +62,8 @@ public class EventService implements IEventService {
 	@Inject
 	private IModelProvider modelProvider;
 
-	/** 
-	 * Create a new Event instance.
-	 * Applications that use a subclass of Event can override this factory method to create it.
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Event newEvent() {
@@ -73,20 +71,33 @@ public class EventService implements IEventService {
 	}
 
 	/**
-	 * Save event to DB, after allowing all containing Components to embellish it.
-	 * Before committing to database, each Component, starting with the Page
-	 * and working down to the triggeringComponent, can add any relevant contextual
-	 * information to the Event.  Any component that wants to add information should
-	 * implement the {@link IEventDataContributor} interface.
-	 *
-	 * @param event the Event to be filled out and saved
-	 * @param triggeringComponent the Component where the event was initiated (eg, a button)
-	 * @return the persisted Event wrapped in an IModel
+	 * @return event type that should be used for recording user logins
+	 */
+	protected abstract IEventType getLoginEventType();
+
+	/**
+	 * @return event type that should be used for recording intentional user logouts
+	 */
+	protected abstract IEventType getLogoutEventType();
+
+	/**
+	 * @return event type that should be used for recording automatic logouts due to a user's session timing out
+	 */
+	protected abstract IEventType getTimeoutEventType();
+
+	/**
+	 * @return event type for opening a dialog
+	 */
+	protected abstract IEventType getDialogOpenEvent();
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public <T extends Event> IModel<T> storeEvent(T event, Component triggeringComponent) {
 		gatherEventDataContributions(event, triggeringComponent);
-		event.setComponentPath(triggeringComponent.getPageRelativePath());
+		if (triggeringComponent != null)
+			event.setComponentPath(triggeringComponent.getPageRelativePath());
 		event.setDefaultValues();
 		cwmService.save(event);
 		cwmService.flushChanges();
@@ -94,12 +105,16 @@ public class EventService implements IEventService {
 		return modelProvider.modelOf(event);
 	}
 
-	// Recursively collect information in the Event from all ancestors of the given Component.
-	// The top-level Component (page) will contribute its data first, moving down the chain
-	// to the triggering component last, so that more specific components can override values
-	// set by more general ones.
-	// Unchecked cast below - we assume that the Event will be of the correct subtype for each contributor.
-	// Not sure how that could be avoided.
+	/**
+	 *  Recursively collect information in the Event from all ancestors of the given Component.
+	 *  The top-level Component (page) will contribute its data first, moving down the chain
+	 *  to the triggering component last, so that more specific components can override values
+	 *  set by more general ones.
+	 *  Unchecked cast below - we assume that the Event will be of the correct subtype for each contributor.
+	 *  Not sure how that could be avoided.
+	 * @param event the event to be modified
+	 * @param component the component whose ancestors are consulted
+	 */
 	@SuppressWarnings("unchecked")
 	protected void gatherEventDataContributions (Event event, Component component) {
 		if (component == null) {
@@ -113,17 +128,33 @@ public class EventService implements IEventService {
 		}
 	}
 
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public IModel<? extends Event> storeEvent(Component triggerComponent, String type, String detail) {
+	public IModel<? extends Event> storeEvent(Component triggerComponent, IEventType type, String detail) {
 		Event event = newEvent()
 				.setType(type)
 				.setDetail(detail);
 		return storeEvent(event, triggerComponent);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IModel<? extends Event> storeLoginEvent(Component triggerComponent) {
-		return storeEvent(triggerComponent, LOGIN_TYPE_NAME, "role=" + cwmSessionService.getUser().getRole());
+		return storeEvent(triggerComponent, getLoginEventType(),
+				"role=" + cwmSessionService.getUser().getRole());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IModel<? extends Event> storeDialogOpenEvent(Component triggerComponent) {
+		return storeEvent(triggerComponent, getDialogOpenEvent(), null);
 	}
 
 	////// Login Session methods
@@ -182,7 +213,7 @@ public class EventService implements IEventService {
 	 * @see org.cast.cwm.service.IEventService#recordLogout()
 	 */
 	@Override
-	public IModel<? extends Event> recordLogout() {
+	public IModel<? extends Event> recordLogout(Component triggerComponent) {
 		LoginSession ls = CwmSession.get().getLoginSession();
 
 		String sesLength = "";
@@ -198,7 +229,7 @@ public class EventService implements IEventService {
 			log.debug ("recordLogout found no LoginSession");
 		}
 		// storeEvent will commit the transaction
-		return storeEvent(null, LOGOUT_TYPE_NAME, sesLength);
+		return storeEvent(triggerComponent, getLogoutEventType(), sesLength);
 	}
 	
 	/* (non-Javadoc)
@@ -220,20 +251,12 @@ public class EventService implements IEventService {
 
 		// Record Event for the session end
 		Event ev = newEvent();
-		ev.setType(TIMEOUT_TYPE_NAME);
+		ev.setType(getTimeoutEventType());
 		ev.setDetail("Session length=" + (now.getTime()-loginSession.getStartTime().getTime())/1000 + "s " + comment);
 		ev.setInsertTime(now);
 		ev.setLoginSession(loginSession);
 		ev.setUser(loginSession.getUser());
 		storeEvent(ev, null);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.IEventService#getEventTypes()
-	 */
-	@Override
-	public IModel<List<String>> getEventTypes() {
-		return new HibernateListModel<String>("select distinct type from Event", true);
 	}
 	
 	/* (non-Javadoc)

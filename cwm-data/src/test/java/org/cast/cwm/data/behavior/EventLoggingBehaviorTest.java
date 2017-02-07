@@ -20,6 +20,7 @@
 package org.cast.cwm.data.behavior;
 
 import org.apache.wicket.markup.html.basic.Label;
+import org.cast.cwm.TestingEventType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
@@ -49,7 +50,7 @@ public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelpe
 	@Test
 	public void canAttach() {
 		Label p = new Label("test", "test");
-		p.add(new EventLoggingBehavior("click", "testEvent"));
+		p.add(new EventLoggingBehavior("click", TestingEventType.CLICK));
 		tester.startComponentInPage(p);
 	}
 
@@ -60,13 +61,13 @@ public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelpe
 	@Test
 	public void logsAnEvent() {
 		Label p = new Label("test", "test");
-		EventLoggingBehavior behavior = new EventLoggingBehavior("click", "testEvent");
+		EventLoggingBehavior behavior = new EventLoggingBehavior("click", TestingEventType.CLICK);
 		behavior.setDetail("testDetail");
 		p.add(behavior);
 
 		tester.startComponentInPage(p);
 		tester.executeBehavior(behavior);
-		verify(eventService).storeEvent(eq(p), eq("testEvent"), eq("testDetail"));
+		verify(eventService).storeEvent(eq(p), eq(TestingEventType.CLICK), eq("testDetail"));
 	}
 
 	@Override

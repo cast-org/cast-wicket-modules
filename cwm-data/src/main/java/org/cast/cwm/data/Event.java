@@ -24,9 +24,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.IEventType;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -71,7 +73,8 @@ public class Event extends PersistedObject {
 	protected Date insertTime;
 	
 	@Column(nullable=false)
-	protected String type;
+	@Type(type="org.cast.cwm.data.EventTypeHibernateType")
+	protected IEventType type;
 	
 	@Column(columnDefinition="TEXT")
 	protected String detail;

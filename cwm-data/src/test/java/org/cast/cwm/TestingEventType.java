@@ -17,36 +17,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.component;
+package org.cast.cwm;
 
-import com.google.inject.Inject;
-import org.apache.wicket.Application;
-import org.apache.wicket.markup.html.link.StatelessLink;
-import org.cast.cwm.CwmSession;
-import org.cast.cwm.service.ICwmSessionService;
+import jdk.nashorn.internal.objects.annotations.Getter;
+import org.omg.CORBA.TIMEOUT;
 
 /**
- * Link that will terminate the current session and return the user to the login page.
+ * @author bgoldowsky
  */
-public class LogoutLink extends StatelessLink<Void> {
-	
-	@Inject
-	private ICwmSessionService cwmSessionService;
+public enum TestingEventType implements IEventType {
 
-	public LogoutLink(String id) {
-		super(id);
+	LOGIN,
+	LOGOUT,
+	TIMEOUT,
+	CLICK;
+
+	@Override
+	public String getDisplayName() {
+		return name().toLowerCase();
 	}
 
 	@Override
-	protected void onConfigure() {
-		super.onConfigure();
-		setVisible (cwmSessionService.isSignedIn());
-	}
-
-	@Override
-	public void onClick() {
-		CwmSession.get().signOut(this);
-		setResponsePage(Application.get().getHomePage());
+	public String getDocumentation() {
+		return "Documentation for " + name();
 	}
 
 }

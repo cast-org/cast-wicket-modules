@@ -27,7 +27,6 @@ import org.apache.wicket.model.IModel;
  * Interface for an object that can be used to log events.
  * Exists so that CWM modules can record some user activity without depending on
  * any more specific functionality; but currently unused.
- *
  */
 public interface IEventLogger {
 

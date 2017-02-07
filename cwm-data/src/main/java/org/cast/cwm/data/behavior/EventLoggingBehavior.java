@@ -29,6 +29,7 @@ import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.Strings;
+import org.cast.cwm.IEventType;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 
@@ -49,7 +50,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	/**
 	 * The event code.
 	 */
-	private String eventType;
+	private IEventType eventType;
 	
 	/**
 	 * The detail of the event.
@@ -92,7 +93,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	 * @param jsEvent the client-side event (e.g. onclick)
 	 * @param eventType the logging event code
 	 */
-	public EventLoggingBehavior(String jsEvent, String eventType) {
+	public EventLoggingBehavior(String jsEvent, IEventType eventType) {
 		super(jsEvent);
 		this.eventType = eventType;
 		Injector.get().inject(this);
@@ -130,5 +131,6 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 		else
 			log.info("Event triggered for non-logged in user: {}, {}", new Object[] {eventType, finalDetail});
 	}
-	
+
+
 }
