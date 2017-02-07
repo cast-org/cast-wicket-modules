@@ -17,36 +17,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.data.component;
+package org.cast.cwm;
 
-import com.google.inject.Inject;
-import org.apache.wicket.Application;
-import org.apache.wicket.markup.html.link.StatelessLink;
-import org.cast.cwm.CwmSession;
-import org.cast.cwm.service.ICwmSessionService;
+import java.io.Serializable;
 
 /**
- * Link that will terminate the current session and return the user to the login page.
+ * Applications must define an event-type enumerator implementing this interface.
+ * Every stored event will have a type.
+ * Event types have an internal name() for use in the databaes (eg the enum constant),
+ * a display name (what researchers will see in the event log),
+ * and a documentation string describing what it means.
+ *
+ * CWM itself requires that a few basic event types exist so that it can store events;
+ * for example "login" and "logout" events that are reported by code in the cwm-data module.
+ * There are abstract methods in EventService that must be implemented return these event types.
  */
-public class LogoutLink extends StatelessLink<Void> {
-	
-	@Inject
-	private ICwmSessionService cwmSessionService;
+public interface IEventType extends Serializable {
 
-	public LogoutLink(String id) {
-		super(id);
-	}
+	String name();
 
-	@Override
-	protected void onConfigure() {
-		super.onConfigure();
-		setVisible (cwmSessionService.isSignedIn());
-	}
+	String getDisplayName();
 
-	@Override
-	public void onClick() {
-		CwmSession.get().signOut(this);
-		setResponsePage(Application.get().getHomePage());
-	}
+	String getDocumentation();
 
 }

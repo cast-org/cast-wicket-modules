@@ -19,26 +19,31 @@
  */
 package org.cast.cwm.data;
 
-import java.io.Serializable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
-import org.cast.cwm.IResponseTypeRegistry;
+import org.cast.cwm.IEventType;
+import org.cast.cwm.service.IEventService;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.StringType;
 import org.hibernate.usertype.UserType;
 
-import com.google.inject.Inject;
+import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class ResponseTypeHibernateType implements UserType, Serializable {
+/**
+ * Hibernate UserType for the IEventType interface (generally, but not necessarily, implemented as an enum).
+ * Uses the name() method of IEventType as the string value to store in the database,
+ * and IEventService's getEventType(String) method to look up the values when they are read out.
+ */
+public class EventTypeHibernateType implements UserType, Serializable {
 
 	@Inject
-	private IResponseTypeRegistry typeRegistry;
+	private IEventService eventService;
 
-	public ResponseTypeHibernateType() {
+	public EventTypeHibernateType() {
 		super();
 		Injector.get().inject(this);
 	}
@@ -52,7 +57,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	@Override
 	public Class<?> returnedClass() {
-		return IResponseType.class;
+		return IEventType.class;
 	}
 
 	@Override
@@ -72,7 +77,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 		String typeName = rs.getString(names[0]);
 		if (typeName == null)
 			return null;
-		return typeRegistry.getResponseType(typeName);
+		return eventService.getEventType(typeName);
 	}
 
 	@Override
@@ -81,8 +86,8 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 		if (value == null) {
 			StringType.INSTANCE.set(st, null, index, session);
 		} else {
-			IResponseType rt = (IResponseType) value;
-			StringType.INSTANCE.set(st, rt.getName(), index, session);
+			IEventType type = (IEventType) value;
+			StringType.INSTANCE.set(st, type.name(), index, session);
 		}
 	}
 
@@ -98,7 +103,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	@Override
 	public Serializable disassemble(Object value) throws HibernateException {
-		return (IResponseType)value;
+		return (IEventType)value;
 	}
 
 	@Override

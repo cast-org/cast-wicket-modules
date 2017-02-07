@@ -24,6 +24,7 @@ import lombok.Setter;
 import net.databinder.auth.AuthDataSessionBase;
 import net.databinder.models.hib.HibernateObjectModel;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.Session;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
@@ -80,20 +81,24 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	public static CwmSession get() {
 		return (CwmSession) Session.get();
 	}
-	
+
 	@Override
 	public void signOut() {
+		signOut(null);
+	}
+
+	public void signOut(Component triggerComponent) {
 		synchronized(this) {
 			if (loginSessionModel != null) {
 				// Normally shouldn't be null, but can happen with database changes & restarts.
 				if (getUser() != null)
-					eventService.recordLogout();
+					eventService.recordLogout(triggerComponent);
 				loginSessionModel = null;
 			}
 		}
 		super.signOut();
 	}
-	
+
 	public LoginSession getLoginSession() {
 		if (loginSessionModel == null)
 			return null;

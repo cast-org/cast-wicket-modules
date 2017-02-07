@@ -59,7 +59,6 @@ import com.google.inject.Inject;
  * TODO: determine if we should keep styleReferences or use overriding to set styles
  * TODO: somehow make default stylesheet not interfere so much with application stylesheets
  *
- * @param <T>
  */
 public class DialogBorder extends Border implements IHeaderContributor {
 
@@ -70,12 +69,6 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	
 	@Getter @Setter
 	private boolean logEvents = true;
-	
-	@Getter @Setter
-	private String eventCode = "dialog:open";
-	
-	@Getter @Setter
-	private String eventDetail;
 	
 	@Getter @Setter
 	private String pageName;
@@ -176,11 +169,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * @param target
 	 */
 	protected void logOpenEvent(AjaxRequestTarget target) {
-		eventService.saveEvent(eventCode, eventDetail, pageName);
+		eventService.storeDialogOpenEvent(this);
 	}
-	
-	
-	
+
 	/**
 	 * Add the border's body.
 	 * @param container main content container
@@ -376,7 +367,7 @@ public class DialogBorder extends Border implements IHeaderContributor {
      * dialog).  If you do not adjust focus here, you should adjust focus elsewhere
      * to maintain accessibility.
      * 
-     * @param adjustFocus
+     * @param returnFocus
      * @return
      */
     public String getCloseString(boolean returnFocus) {
@@ -471,9 +462,9 @@ public class DialogBorder extends Border implements IHeaderContributor {
 	 * 
 	 * @param object
 	 */
-	public final void setModelObject(String title)
+	public final void setModelObject(String object)
 	{
-		setDefaultModelObject(title);
+		setDefaultModelObject(object);
 	}
 
 }

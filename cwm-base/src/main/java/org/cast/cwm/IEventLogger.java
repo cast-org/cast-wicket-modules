@@ -27,33 +27,8 @@ import org.apache.wicket.model.IModel;
  * Interface for an object that can be used to log events.
  * Exists so that CWM modules can record some user activity without depending on
  * any more specific functionality; but currently unused.
- *
  */
 public interface IEventLogger {
 
-	/**
-	 * Log an event with the appropriate details.
-	 *
-	 * @param type The type of event; should be a manageable finite set of types for each application
-	 * @param detail Any additional details about the event
-	 * @param pageName An indication of the page or area of the application where the event occurred
-	 * @return if an object was created to represent the event, return it.
-	 *
-	 * @deprecated Should be replaced with storeEvent
-	 */
-    public abstract Object saveEvent (String type, String detail, String pageName);
-    
-	/**
-	 * Log a component-related event with the appropriate details.
-	 *
-	 * @param type The type of event; should be a manageable finite set of types for each application
-	 * @param detail Any additional details about the event
-	 * @param pageName An indication of the page or area of the application where the event occurred
-	 * @param componentPath the wicket ID path to the component related to this event.
-	 * @return if an object was created to represent the event, return it.
-	 *
-	 * @deprecated Should be replaced with storeEvent
-	 */
-	public abstract Object saveEvent(String type, String detail, String pageName, String componentPath);
 
 }

@@ -23,8 +23,10 @@ import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.cast.cwm.IEventLogger;
+import org.cast.cwm.IEventType;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
+import org.cast.cwm.data.component.IEventDataContributor;
 
 import java.util.Date;
 import java.util.List;
@@ -44,11 +46,65 @@ public interface IEventService extends IEventLogger {
 	LoginSession newLoginSession();
 
 	/**
-	 * Store a login event with data contributions from ancestors of the given triggering component.
-	 * @param triggerComponent login-causing component
-	 * @return model of the new event
+	 * Return the enumeration used for event types by the application
+	 * @return event type class object
 	 */
-	IModel<? extends Event> saveLoginEvent(Component triggerComponent);
+	Class<? extends IEventType> getEventTypeClass();
+
+	/**
+	 * Look up the IEventType instance with the given name.
+	 * @param typeName the name of an event type
+	 * @return the type object, or null if it does not exist.
+	 */
+	IEventType getEventType(String typeName);
+
+	/**
+	 * Return a list of all defined event types.
+	 * Used for creating filters in the Event Log page.
+	 *
+	 * @return list of type names
+	 */
+	List<? extends IEventType> listEventTypes();
+
+	/**
+	 * Save event to DB, after allowing all containing Components to embellish it.
+	 * Before committing to database, each Component, starting with the Page
+	 * and working down to the triggeringComponent, can add any relevant contextual
+	 * information to the Event.  Any component that wants to add information should
+	 * implement the {@link IEventDataContributor} interface.
+	 *
+	 * @param event the Event to be filled out and saved
+	 * @param triggeringComponent the Component where the event was initiated (eg, a button)
+	 * @return the persisted Event wrapped in a model
+	 */
+	<T extends Event> IModel<T> storeEvent(T event, Component triggeringComponent);
+
+	/**
+	 * Create and store an event.
+	 * Basic information is passed in to this method, and additional information will be collected
+	 * from the trigger component and its ancestors.
+	 * @see #storeEvent(Event, Component)
+	 *
+	 * @param triggerComponent the Component where the event was initiated (eg, a button)
+	 * @param type the type of the event
+	 * @param detail additional information about the event
+	 * @return the persisted Event wrapped in a model
+	 */
+	IModel<? extends Event> storeEvent(Component triggerComponent, IEventType type, String detail);
+
+	/**
+	 * Create and store an event to record a user logging in.
+	 * @param triggerComponent login-causing component
+	 * @return the persisted Event wrapped in a model
+	 */
+	IModel<? extends Event> storeLoginEvent(Component triggerComponent);
+
+	/**
+	 * Store an event representing opening a dialog.
+	 * @param triggerComponent the button clicked to open the dialog
+	 * @return the event logged
+	 */
+	IModel<? extends Event> storeDialogOpenEvent(Component triggerComponent);
 
 	/** 
 	 * Create a LoginSession object in the database based on the current Session and the given Request.
@@ -81,7 +137,7 @@ public interface IEventService extends IEventLogger {
 	 * Close the current {@link LoginSession} and save a Logout Event
 	 * @return the stored event
 	 */
-	IModel<? extends Event> recordLogout();
+	IModel<? extends Event> recordLogout(Component triggerComponent);
 
 	/**
 	 * 
@@ -92,13 +148,6 @@ public interface IEventService extends IEventLogger {
 	 * @param comment added to the event detail field
 	 */
 	void forceCloseLoginSession(LoginSession loginSession, String comment);
-
-	/**
-	 * Return a list of all types of events currently found in the database.
-	 * Used for creating filters in Event Log page.
-	 * @return list of type names
-	 */
-	IModel<List<String>> getEventTypes();
 
 	/**
 	 * Get the date of most recent event in a LoginSession.  

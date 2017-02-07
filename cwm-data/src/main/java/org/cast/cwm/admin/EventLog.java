@@ -26,6 +26,7 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.databinder.models.hib.ICriteriaBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
 
@@ -53,6 +54,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.cast.cwm.IEventType;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
@@ -77,11 +79,12 @@ import com.google.inject.Inject;
  *
  */
 @AuthorizeInstantiation("RESEARCHER")
+@Slf4j
 public class EventLog extends AdminPage {
 
 	protected int numberOfEventTypes;
 	
-	protected IModel<List<String>> showEventTypesM;
+	protected IModel<List<IEventType>> showEventTypesM;
 	protected int numberOfSites;
 	protected IModel<List<Site>> showSitesM;
 
@@ -90,15 +93,12 @@ public class EventLog extends AdminPage {
 	protected IModel<Boolean> showPermissionUsers;
 
 	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
-	private static final Logger log = LoggerFactory.getLogger(EventLog.class);
-	
-	private static final long serialVersionUID = 1L;
 
 	@Inject
-	protected IEventService eventService;
+	private IEventService eventService;
 	
 	@Inject
-	protected ISiteService siteService;
+	private ISiteService siteService;
 
 	public EventLog(final PageParameters params) {
 		super(params);
@@ -109,27 +109,27 @@ public class EventLog extends AdminPage {
 		ICriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
-		DataTable<Event,String> table = new DataTable<Event,String>("eventtable", columns, eventsprovider, 30);
-		table.addTopToolbar(new HeadersToolbar<String>(table, eventsprovider));
+		DataTable<Event,String> table = new DataTable<>("eventtable", columns, eventsprovider, 30);
+		table.addTopToolbar(new HeadersToolbar<>(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
-		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<String>("No events found")));
+		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<>("No events found")));
 		add(table);
 
-		CSVDownload<Event> download = new CSVDownload<Event>(columns, eventsprovider);
-		add(new ResourceLink<Object>("downloadLink", download));
+		CSVDownload<Event> download = new CSVDownload<>(columns, eventsprovider);
+		add(new ResourceLink<>("downloadLink", download));
 	}
 
 	protected ICriteriaBuilder makeCriteriaBuilder() {
 		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
 		SingleSortState<String> defaultSort = new SingleSortState<String>();
-		defaultSort.setSort(new SortParam<String>("insertTime", false)); // Sort by Insert Time by default
+		defaultSort.setSort(new SortParam<>("insertTime", false)); // Sort by Insert Time by default
 		eventCriteriaBuilder.setSortState(defaultSort);
 		return eventCriteriaBuilder;
 	}
 
 	protected SortableHibernateProvider<Event> makeHibernateProvider(ICriteriaBuilder builder) {
-		SortableHibernateProvider<Event> provider = new SortableHibernateProvider<Event>(Event.class, builder);
+		SortableHibernateProvider<Event> provider = new SortableHibernateProvider<>(Event.class, builder);
 		provider.setWrapWithPropertyModel(false);
 		return provider;
 	}
@@ -144,12 +144,13 @@ public class EventLog extends AdminPage {
 	}
 
 	protected void addEventTypeFilter(Form<Object> form) {
-		IModel<List<String>> allEventTypes = eventService.getEventTypes();
-		List<String> eventTypes = new ArrayList<String>();
-		eventTypes.addAll(allEventTypes.getObject());
+		List<? extends IEventType> allEventTypes = eventService.listEventTypes();
+		List<IEventType> eventTypes = new ArrayList<>();
+		eventTypes.addAll(allEventTypes);
 		numberOfEventTypes = eventTypes.size();
-		showEventTypesM = new ListModel<String>(eventTypes);
-		form.add(new CheckBoxMultipleChoice<String>("type", showEventTypesM, allEventTypes));
+		showEventTypesM = new ListModel<IEventType>(eventTypes);
+		form.add(new CheckBoxMultipleChoice<IEventType>("type", showEventTypesM, allEventTypes,
+				new ChoiceRenderer<IEventType>("displayName", "name")));
 	}
 
 	protected void addDateFilter(Form<Object> form) {
@@ -166,9 +167,10 @@ public class EventLog extends AdminPage {
 		List<Site> sites = new ArrayList<Site>();
 		sites.addAll(allSites.getObject());
 		numberOfSites = sites.size();
-		showSitesM = new ListModel<Site>(sites);
+		showSitesM = new ListModel<>(sites);
 		if (!allSites.getObject().isEmpty())
-			form.add(new CheckBoxMultipleChoice<Site>("site", showSitesM, allSites, new ChoiceRenderer<Site>("name", "id")));
+			form.add(new CheckBoxMultipleChoice<>("site", showSitesM, allSites,
+					new ChoiceRenderer<Site>("name", "id")));
 		else
 			form.add(new WebMarkupContainer("site").setVisible(false));
 	}
@@ -188,8 +190,6 @@ public class EventLog extends AdminPage {
 
 		columns.add(new AbstractDataColumn<Event>("Date/Time", "insertTime") {
 
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void populateItem(Item<ICellPopulator<Event>> cellItem, String componentId, IModel<Event> rowModel) {
 				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "insertTime"), eventDateFormat));				
@@ -204,7 +204,7 @@ public class EventLog extends AdminPage {
 		});
 		
 		columns.add(new PropertyDataColumn<Event>("User", "user.subjectId", "user.subjectId"));
-		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type"));
+		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type.displayName"));
 		columns.add(new PropertyDataColumn<Event>("Details", "detail"));
 		columns.add(new PropertyDataColumn<Event>("Page", "page"));
 
@@ -295,4 +295,12 @@ public class EventLog extends AdminPage {
 			}
 		}
 	}
+
+	@Override
+	protected void onDetach() {
+		super.onDetach();
+		if (showSitesM != null)
+			showSitesM.detach();
+	}
+
 }

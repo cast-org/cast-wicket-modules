@@ -19,12 +19,8 @@
  */
 package org.cast.cwm.data.behavior;
 
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.apache.wicket.markup.html.basic.Label;
+import org.cast.cwm.TestingEventType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
@@ -32,6 +28,10 @@ import org.cast.cwm.service.IEventService;
 import org.cast.cwm.test.CwmBaseTestCase;
 import org.cast.cwm.test.InjectionTestHelper;
 import org.junit.Test;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelper> {
@@ -50,25 +50,24 @@ public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelpe
 	@Test
 	public void canAttach() {
 		Label p = new Label("test", "test");
-		p.add(new EventLoggingBehavior("click", "testEvent"));
+		p.add(new EventLoggingBehavior("click", TestingEventType.CLICK));
 		tester.startComponentInPage(p);
 	}
 
-	public void logsOnClick() {
-		// Hm.  We don't seem to have any way to test javascript based behavior.
-	}
+//	public void logsOnClick() {
+//		// Hm.  We don't seem to have any way to test javascript based behavior.
+//	}
 	
 	@Test
 	public void logsAnEvent() {
 		Label p = new Label("test", "test");
-		EventLoggingBehavior behavior = new EventLoggingBehavior("click", "testEvent");
+		EventLoggingBehavior behavior = new EventLoggingBehavior("click", TestingEventType.CLICK);
 		behavior.setDetail("testDetail");
-		behavior.setPageName("testPageName");
 		p.add(behavior);
 
 		tester.startComponentInPage(p);
 		tester.executeBehavior(behavior);
-		verify(eventService).saveEvent(eq("testEvent"), eq("testDetail"), eq("testPageName"));
+		verify(eventService).storeEvent(eq(p), eq(TestingEventType.CLICK), eq("testDetail"));
 	}
 
 	@Override

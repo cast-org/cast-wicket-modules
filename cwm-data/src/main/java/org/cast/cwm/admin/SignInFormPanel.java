@@ -117,7 +117,7 @@ public class SignInFormPanel extends Panel {
 
 			if (!loginSessionExists) {
 				eventService.createLoginSession(getRequest());
-				eventService.saveLoginEvent(this);
+				eventService.storeLoginEvent(this);
 			}
 
 			// Set current Period and Site in the session
