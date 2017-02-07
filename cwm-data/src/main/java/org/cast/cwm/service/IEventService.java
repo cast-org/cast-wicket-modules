@@ -100,6 +100,13 @@ public interface IEventService extends IEventLogger {
 	IModel<? extends Event> storeLoginEvent(Component triggerComponent);
 
 	/**
+	 * Create and store an event to record a page view.
+	 * @param pageName identifies which page was viewed
+	 * @return the persisted Event wrapped in a model
+	 */
+	IModel<? extends Event> storePageViewEvent(String pageName);
+
+	/**
 	 * Store an event representing opening a dialog.
 	 * @param triggerComponent the button clicked to open the dialog
 	 * @return the event logged

@@ -55,8 +55,6 @@ import java.util.Date;
 @ToString(of={"id","type","insertTime"})
 public class Event extends PersistedObject {
 
-	private static final long serialVersionUID = 1L;
-
 	@Id @GeneratedValue(generator = "my_generator")
 	@Setter(AccessLevel.NONE) 
 	private Long id;
@@ -71,14 +69,24 @@ public class Event extends PersistedObject {
 	
 	@Column(nullable=false)
 	protected Date insertTime;
-	
+
+	/**
+	 * A type designation for this event.
+	 * A few types are required by CWM but the application generally is expected to define its own taxonomy.
+	 */
 	@Column(nullable=false)
 	@Type(type="org.cast.cwm.data.EventTypeHibernateType")
 	protected IEventType type;
-	
+
+	/**
+	 * Any additional information about this event.
+	 */
 	@Column(columnDefinition="TEXT")
 	protected String detail;
-	
+
+	/**
+	 * Name of the page on which this event occurred.
+	 */
 	protected String page;
 	
 	/**
@@ -86,7 +94,8 @@ public class Event extends PersistedObject {
 	 */
 	protected String componentPath;
 	
-	/** Called just before saving Event to database to set various fields
+	/**
+	 * Called just before saving Event to database to set various fields
 	 * whose values are predictable.  Override as necessary for you application.
 	 */
 	public void setDefaultValues() {

@@ -86,6 +86,11 @@ public abstract class EventService implements IEventService {
 	protected abstract IEventType getTimeoutEventType();
 
 	/**
+	 * @return event type used for recording a user visiting a page.
+	 */
+	protected abstract IEventType getPageViewEventType();
+
+	/**
 	 * @return event type for opening a dialog
 	 */
 	protected abstract IEventType getDialogOpenEvent();
@@ -147,6 +152,16 @@ public abstract class EventService implements IEventService {
 	public IModel<? extends Event> storeLoginEvent(Component triggerComponent) {
 		return storeEvent(triggerComponent, getLoginEventType(),
 				"role=" + cwmSessionService.getUser().getRole());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public IModel<? extends Event> storePageViewEvent(String pageName) {
+		Event event = newEvent()
+				.setType(getPageViewEventType())
+				.setPage(pageName);
+		return storeEvent(event, null);
 	}
 
 	/**
