@@ -67,8 +67,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -123,7 +121,7 @@ public class EventLog extends AdminPage {
 	protected ICriteriaBuilder makeCriteriaBuilder() {
 		EventCriteriaBuilder eventCriteriaBuilder = new EventCriteriaBuilder();
 		SingleSortState<String> defaultSort = new SingleSortState<String>();
-		defaultSort.setSort(new SortParam<>("insertTime", false)); // Sort by Insert Time by default
+		defaultSort.setSort(new SortParam<>("startTime", false)); // Sort by Insert Time by default
 		eventCriteriaBuilder.setSortState(defaultSort);
 		return eventCriteriaBuilder;
 	}
@@ -188,17 +186,17 @@ public class EventLog extends AdminPage {
 		
 		columns.add(new PropertyDataColumn<Event>("EventID", "id", "id"));
 
-		columns.add(new AbstractDataColumn<Event>("Date/Time", "insertTime") {
+		columns.add(new AbstractDataColumn<Event>("Date/Time", "startTime") {
 
 			@Override
 			public void populateItem(Item<ICellPopulator<Event>> cellItem, String componentId, IModel<Event> rowModel) {
-				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "insertTime"), eventDateFormat));				
+				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "startTime"), eventDateFormat));
 			}
 
 			@Override
 			public String getItemString(IModel<Event> rowModel) {
 				Event event = rowModel.getObject();
-				Date insertTime = event.getInsertTime();
+				Date insertTime = event.getStartTime();
 				return new SimpleDateFormat(eventDateFormat).format(insertTime); 			
 			}
 		});
