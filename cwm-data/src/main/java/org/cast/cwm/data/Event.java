@@ -43,7 +43,7 @@ import java.util.Date;
  * should not be queried, particularly for application operation.
  * </p>
  * @author jbrookover
- * @see {@link org.cast.cwm.service.IEventService}
+ * @see org.cast.cwm.service.IEventService
  *
  */
 @Entity
@@ -52,50 +52,98 @@ import java.util.Date;
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
 @Getter 
 @Setter
-@ToString(of={"id","type","insertTime"})
+@ToString(of={"id","type","startTime"})
 public class Event extends PersistedObject {
-
-	private static final long serialVersionUID = 1L;
 
 	@Id @GeneratedValue(generator = "my_generator")
 	@Setter(AccessLevel.NONE) 
 	private Long id;
 
+	/**
+	 * User whose action created this event.
+	 */
 	@ManyToOne(optional=false)
 	protected User user;
-	
+
+	/**
+	 * Login session that contains this Event.
+	 */
 	@ManyToOne(optional=false)
 	protected LoginSession loginSession;
-	
-	protected boolean hasUserContent = false;
-	
+
+	/**
+	 * Time when the event occurred (or started, for events with duration).
+	 * (In server's time zone).
+	 */
 	@Column(nullable=false)
-	protected Date insertTime;
-	
+	protected Date startTime;
+
+	/**
+	 * Time of the event end, if it is an event with measured duration.
+	 */
+	@Column(nullable=true)
+	protected Date endTime;
+
+	/**
+	 * For page view events, the time in ms that the browser took to load this page.
+	 */
+	@Column(nullable=true)
+	protected Long loadTime;
+
+	/**
+	 * A type designation for this event.
+	 * A few types are required by CWM but the application generally is expected to define its own taxonomy.
+	 */
 	@Column(nullable=false)
 	@Type(type="org.cast.cwm.data.EventTypeHibernateType")
 	protected IEventType type;
-	
+
+	/**
+	 * Any additional information about this event.
+	 */
 	@Column(columnDefinition="TEXT")
 	protected String detail;
-	
+
+	/**
+	 * Name of the page on which this event occurred.
+	 */
 	protected String page;
 	
 	/**
 	 * The wicket ID path of the component that was clicked to generate this event. 
 	 */
 	protected String componentPath;
-	
-	/** Called just before saving Event to database to set various fields
+
+	/**
+	 * Should be set to true if there is a UserContent object connected to this event.
+	 */
+	protected boolean hasUserContent = false;
+
+
+	/**
+	 * Called just before saving Event to database to set various fields
 	 * whose values are predictable.  Override as necessary for you application.
 	 */
 	public void setDefaultValues() {
-		if (insertTime == null)
-			insertTime = new Date();
+		if (startTime == null)
+			startTime = new Date();
 		if (loginSession == null)
 			loginSession = CwmSession.get().getLoginSession();
 		if ((user == null) && (loginSession != null))
 			user = loginSession.getUser();
 	}
-	
+
+	/**
+	 * Return the recorded duration of the event, in milliseconds.
+	 * If the start time or end time is unknown, will return 0.
+	 *
+	 * @return milliseconds between start and end time of event; 0 if unknown.
+	 */
+	public long getDuration() {
+		if (endTime == null || startTime == null)
+			return 0;
+		else
+			return endTime.getTime() - startTime.getTime();
+	}
+
 }

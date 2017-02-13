@@ -23,7 +23,6 @@ import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.BasicCriteriaBuilder;
-import net.databinder.models.hib.HibernateListModel;
 import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
@@ -42,7 +41,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Default implementations of various methods for working with Events and related information in the database.
@@ -84,6 +82,11 @@ public abstract class EventService implements IEventService {
 	 * @return event type that should be used for recording automatic logouts due to a user's session timing out
 	 */
 	protected abstract IEventType getTimeoutEventType();
+
+	/**
+	 * @return event type used for recording a user visiting a page.
+	 */
+	protected abstract IEventType getPageViewEventType();
 
 	/**
 	 * @return event type for opening a dialog
@@ -147,6 +150,16 @@ public abstract class EventService implements IEventService {
 	public IModel<? extends Event> storeLoginEvent(Component triggerComponent) {
 		return storeEvent(triggerComponent, getLoginEventType(),
 				"role=" + cwmSessionService.getUser().getRole());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public IModel<? extends Event> storePageViewEvent(String pageName) {
+		Event event = newEvent()
+				.setType(getPageViewEventType())
+				.setPage(pageName);
+		return storeEvent(event, null);
 	}
 
 	/**
@@ -253,7 +266,7 @@ public abstract class EventService implements IEventService {
 		Event ev = newEvent();
 		ev.setType(getTimeoutEventType());
 		ev.setDetail("Session length=" + (now.getTime()-loginSession.getStartTime().getTime())/1000 + "s " + comment);
-		ev.setInsertTime(now);
+		ev.setStartTime(now);
 		ev.setLoginSession(loginSession);
 		ev.setUser(loginSession.getUser());
 		storeEvent(ev, null);
@@ -267,7 +280,7 @@ public abstract class EventService implements IEventService {
 		Session session = Databinder.getHibernateSession();
 		Criteria criteria = session.createCriteria(Event.class);
 		criteria.add(Restrictions.eq("loginSession", ls));
-		criteria.setProjection(Projections.max("insertTime"));
+		criteria.setProjection(Projections.max("startTime"));
 		return (Date) criteria.uniqueResult();
 	}
 	
