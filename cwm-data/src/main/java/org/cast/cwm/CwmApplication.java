@@ -32,10 +32,7 @@ import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.components.hib.DataForm;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
-import org.apache.wicket.Application;
-import org.apache.wicket.Page;
-import org.apache.wicket.Session;
-import org.apache.wicket.ThreadContext;
+import org.apache.wicket.*;
 import org.apache.wicket.guice.GuiceComponentInjector;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.markup.html.WebPage;
@@ -430,7 +427,11 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		log.debug("Running shutdown steps");
 		if (loginSessionCloser != null)
 			loginSessionCloser.interrupt();
-		this.getHibernateSessionFactory(null).close();
+		try {
+			this.getHibernateSessionFactory(null).close();
+		} catch (WicketRuntimeException e) {
+			log.warn("Ignoring exception when trying to close hibernate session factory: {}", e.getMessage());
+		}
 		super.onDestroy();
 	}
 	
