@@ -27,11 +27,14 @@ import org.apache.wicket.util.file.File;
  * Mountable {@link ResourceReference} for a {@link ResourceDirectory}.
  * 
  * <p>Example:</P
- * 
- * <code>mountResource("image", new ResourceDirectoryReference(themeDir));</code><br />
- * maps {@code http://host/context/image/foo.png} to {@code themeDir/foo.png} ; that is,
- * all files in the "img" directory are available under the "image" top-level URL path.
- * Multiple levels of subdirectories may exist under img.
+ *
+ * <pre>
+ * <code>mountResource("image", new ResourceDirectoryReference(themeDir));</code>
+ * </pre>
+ *
+ * The example maps {@code http://host/context/image/foo.png} to {@code themeDir/foo.png} ; that is,
+ * all files in the "themeDir" directory are available under the "image" top-level URL path.
+ * Multiple levels of subdirectories may exist under the given directory.
  *
  * @see ResourceDirectory
  * 
@@ -40,8 +43,6 @@ import org.apache.wicket.util.file.File;
  */
 public class ResourceDirectoryReference extends ResourceReference {
 
-	private static final long serialVersionUID = 1L;
-	
 	private final File resourceDirectory;
 	
 	/**

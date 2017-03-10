@@ -19,24 +19,21 @@
  */
 package org.cast.cwm;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.wicket.Application;
-import org.apache.wicket.markup.html.IPackageResourceGuard;
 import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.request.resource.AbstractResource;
-import org.apache.wicket.request.resource.PackageResource.PackageResourceBlockedException;
+import org.apache.wicket.resource.FileSystemResource;
 import org.apache.wicket.util.file.File;
-import org.apache.wicket.util.io.IOUtils;
-import org.apache.wicket.util.resource.FileResourceStream;
-import org.apache.wicket.util.resource.IResourceStream;
-import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
 import org.apache.wicket.util.time.Duration;
+import org.apache.wicket.util.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * <p>Represents a directory in which all of the files can be used as resources
@@ -45,19 +42,15 @@ import org.slf4j.LoggerFactory;
  *
  * <p>See {@link ResourceDirectoryReference} for usage examples.</p>
 
- * <p>The installed PackageResourceGuard will be checked to make sure the file is
- * ok to send.</p>
- * 
- * <p>Heavily based on the
- * {@link org.apache.wicket.request.resource.PackageResource} class, but with
- * different logic to locate the file to send.</p>
- * 
+ * <p>Extends FileSystemResource so that we inherit its handling for range requests.
+ * Adds caching, sending of last-modified time, and proper 404 errors.</p>
+ *
  * @see ResourceDirectoryReference
  * 
  * @author bgoldowsky
  * 
  */
-public class ResourceDirectory extends AbstractResource {
+public class ResourceDirectory extends FileSystemResource {
 	private static final Logger log = LoggerFactory.getLogger(ResourceDirectory.class);
 
 	private static final Duration DEFAULT_CACHE_DURATION = Duration.hours(1);
@@ -65,16 +58,25 @@ public class ResourceDirectory extends AbstractResource {
 	/**
 	 * The path to the directory of resources
 	 */
-	private final File sourceDirectory;
+	private final Path sourceDirectory;
 	
 	private Duration cacheDuration = DEFAULT_CACHE_DURATION;
 
 	/**
-	 * Construct a with a given directory of resource files.
+	 * Construct a with a given File pointing to a directory of resource files.
 	 * 
 	 * @param directory the directory containing public files
 	 */
 	public ResourceDirectory(File directory) {
+		this(Paths.get(directory.getAbsolutePath()));
+	}
+
+	/**
+	 * Construct a with the given Path to a directory of resource files.
+	 *
+	 * @param directory the directory containing public files
+	 */
+	public ResourceDirectory(Path directory) {
 		this.sourceDirectory = directory;
 	}
 
@@ -87,130 +89,55 @@ public class ResourceDirectory extends AbstractResource {
 	 */
 	@Override
 	protected ResourceResponse newResourceResponse(Attributes attributes) {
-		String relativePath = "";
+		Path filePath = sourceDirectory;
 		PageParameters parameters = attributes.getParameters();
 		for (int i=0; i< parameters.getIndexedCount(); i++) {
-			relativePath += parameters.get(i);
-			relativePath += '/';
+			filePath = filePath.resolve(parameters.get(i).toString());
 		}
-		if (relativePath.endsWith("/"))
-			relativePath = relativePath.substring(0, relativePath.length()-1);
-		log.trace("relativePath is {}", relativePath);
-
-		String absolutePath = new File(sourceDirectory, relativePath)
-				.getAbsolutePath();
-
-		final ResourceResponse resourceResponse = new ResourceResponse();
-
-		final IResourceStream resourceStream = getResourceStream(absolutePath);
-
-		// bail out if resource stream could not be found
-		if (resourceStream == null) {
-			return sendResourceError(absolutePath, resourceResponse,
-					HttpServletResponse.SC_NOT_FOUND, "Unable to find resource");
+		log.trace("Resource file path is {}", filePath);
+		if (!Files.isReadable(filePath)) {
+			log.warn("Resource request for non-existent file: {}", filePath);
+			throw new AbortWithHttpErrorCodeException(404, "File does not exist or is not readable");
 		}
 
-		// allow caching
-		resourceResponse.setCacheScope(WebResponse.CacheScope.PUBLIC);
-		resourceResponse.setCacheDuration(cacheDuration);
+		ResourceResponse resourceResponse = null;
+		try {
+			resourceResponse = createResourceResponse(filePath);
 
-		// add Last-Modified header (to support HEAD requests and If-Modified-Since)
-		resourceResponse.setLastModified(resourceStream.lastModifiedTime());
+			// allow caching
+			resourceResponse.setCacheScope(WebResponse.CacheScope.PUBLIC);
+			resourceResponse.setCacheDuration(cacheDuration);
 
-		if (resourceResponse.dataNeedsToBeWritten(attributes)) {
-			String contentType = resourceStream.getContentType();
-
-			if (contentType == null && Application.exists())
-				contentType = Application.get().getMimeType(absolutePath);
-
-			// set Content-Type (may be null)
-			resourceResponse.setContentType(contentType);
-
-			try {
-				// read resource data
-				final byte[] bytes;
-
-				bytes = IOUtils.toByteArray(resourceStream.getInputStream());
-
-				// send Content-Length header
-				resourceResponse.setContentLength(bytes.length);
-
-				// send response body with resource data
-				resourceResponse.setWriteCallback(new WriteCallback() {
-					@Override
-					public void writeData(Attributes attributes) {
-						attributes.getResponse().write(bytes);
-					}
-				});
-			} catch (IOException e) {
-				log.debug(e.getMessage(), e);
-				return sendResourceError(absolutePath, resourceResponse, 500,
-						"Unable to read resource stream");
-			} catch (ResourceStreamNotFoundException e) {
-				log.debug(e.getMessage(), e);
-				return sendResourceError(absolutePath, resourceResponse, 500,
-						"Unable to open resource stream");
-			} finally {
-				try {
-					resourceStream.close();
-				} catch (IOException e) {
-					log.warn("Unable to close the resource stream", e);
-				}
-			}
+			// add Last-Modified header (to support HEAD requests and If-Modified-Since)
+			resourceResponse.setLastModified(
+					Time.millis(Files.readAttributes(filePath, BasicFileAttributes.class)
+							.lastModifiedTime().toMillis()));
+		} catch (IOException e) {
+			sendResourceError(filePath, resourceResponse, 404, e.getMessage());
 		}
-
 		return resourceResponse;
 	}
 
 	/**
-	 * send resource specific error message and write log entry
-	 * 
-	 * @param resourceResponse
-	 *            resource response
-	 * @param errorCode
-	 *            error code (=http status)
-	 * @param errorMessage
-	 *            error message (=http error message)
+	 * Send a resource-specific error message and write log entry.
+	 *
+	 * @param filePath path to the file that caused the error
+	 * @param resourceResponse resource response on which to report the error
+	 * @param errorCode http status that will be reported
+	 * @param errorMessage human-readable error message
 	 * @return resource response for method chaining
 	 */
-	private ResourceResponse sendResourceError(String absolutePath,
-			ResourceResponse resourceResponse, int errorCode,
-			String errorMessage) {
+	private ResourceResponse sendResourceError(Path filePath,
+											   ResourceResponse resourceResponse, int errorCode,
+											   String errorMessage) {
 		String msg = String.format("resource [path = %s]: %s (status=%d)",
-				absolutePath, errorMessage, errorCode);
+				filePath, errorMessage, errorCode);
 
 		log.warn(msg);
 
-		resourceResponse.setError(errorCode, errorMessage);
+		if (resourceResponse != null)
+			resourceResponse.setError(errorCode, errorMessage);
 		return resourceResponse;
-	}
-
-	/**
-	 * locate resource stream for current resource
-	 * 
-	 * @return resource stream or <code>null</code> if not found
-	 */
-	public IResourceStream getResourceStream(String absolutePath) {
-		if (!accept(absolutePath)) {
-			log.warn("Access denied by IPackageResrouceGuard to resource: {}", absolutePath);
-			throw new PackageResourceBlockedException(
-					"Access denied to (static) package resource "
-							+ absolutePath + ". See IPackageResourceGuard");
-		}
-		return new FileResourceStream(new File(absolutePath));
-	}
-
-	/**
-	 * Check whether resource at path is legal to send to client.
-	 * @param path
-	 *            resource path
-	 * @return <code>true<code> if resource access is granted
-	 */
-	private boolean accept(String path) {
-		IPackageResourceGuard guard = Application.get().getResourceSettings()
-				.getPackageResourceGuard();
-
-		return guard.accept(path);
 	}
 
 	@Override
