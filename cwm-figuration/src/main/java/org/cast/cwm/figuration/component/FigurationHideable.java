@@ -171,10 +171,21 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * Recognized commands are 'show', 'hide', 'toggle', 'unlink', and 'destroy'.
 	 */
 	protected void sendCommand(AjaxRequestTarget target, String command) {
-		target.appendJavaScript(String.format("$('#%s').%s('%s');", 
-				getMarkupId(), 
+		target.appendJavaScript(getCommandJavascript(command));
+	}
+
+	/**
+	 * Defines the javascript that should be run to send a command to this Figuration object.
+	 * Command string should be one of the defined commands such as 'toggle', 'show', 'hide', etc.
+	 *
+	 * @param command command string, see Figuration documentation for appropriate widget
+	 * @return a javascript statement
+	 */
+	public String getCommandJavascript(String command) {
+		return String.format("$('#%s').%s('%s');",
+				getMarkupId(),
 				getInitializationFunctionName(),
-				command));
+				command);
 	}
 
 	/**

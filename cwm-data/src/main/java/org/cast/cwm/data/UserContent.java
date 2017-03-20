@@ -77,12 +77,16 @@ public class UserContent extends PersistedObject {
 	
 	/**
 	 * Date when content was originally created.
+	 *
+	 * Private in order to force using setter which does sanity checking.
 	 */
 	private Date createDate;
 	
 	/**
 	 * Date of last change to the actual content.
-	 * This field will be updated to the current time when certain other fields are modified. 
+	 * This field will be updated to the current time when certain other fields are modified.
+	 *
+	 * Private in order to force using setter which does sanity checking.
 	 */
 	private Date lastUpdated;
 	
@@ -95,12 +99,16 @@ public class UserContent extends PersistedObject {
 	 * 
 	 * Note: Because of "valid" and "invalid" responses, no guarantee
 	 * is made regarding the sequence of numbers.  Values may be skipped.
+	 *
+	 * Private to force use of setter, which also updates lastUpdated.
 	 */
 	private Integer sortOrder;
 	
 	/**
 	 * Short content, if appropriate for the content type.
 	 * Could be numeric, plain text, HTML, and SVG.
+	 *
+	 * Private to force use of setter, which also updates lastUpdated.
 	 */
 	@Column(columnDefinition="TEXT")
 	private String text;
@@ -108,21 +116,25 @@ public class UserContent extends PersistedObject {
 	/**
 	 * Supplemental title for the content.  This can be used as a 
 	 * caption for an SVG Image, description for an upload, etc.
+	 *
+	 * Private to force use of setter, which also updates lastUpdated.
 	 */
 	@Column(columnDefinition="TEXT")
 	private String title;
 
 	/**
 	 * Point to byte data for file-type content (eg uploaded document or audio)
+	 *
+	 * Private to force use of setter, which also updates lastUpdated.
 	 */
-	// TODO: Is this the proper cascade?  
-	// TODO: Should we avoid deletion to allow for re-use? If so, how do BinaryFileData objects get deleted?
 	@ManyToOne(optional=true, fetch=FetchType.LAZY)
 	@Cascade({CascadeType.ALL})
 	private BinaryFileData primaryFile;
 
 	/**
 	 * Point to supporting files (e.g. uploads to a drawing)
+	 *
+	 * Private to force use of setter, which also updates lastUpdated.
 	 */
 	@ManyToMany
 	@JoinTable(inverseJoinColumns={@JoinColumn(name="file_id")})
@@ -130,6 +142,8 @@ public class UserContent extends PersistedObject {
 
 	/**
 	 * Related event - eg the "post" or "save" that resulted in this content getting stored or updated.
+	 *
+	 * Private to force use of setter, which also updates lastUpdated.
 	 */
 	@ManyToOne(optional=true, fetch=FetchType.LAZY)
 	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
@@ -187,7 +201,18 @@ public class UserContent extends PersistedObject {
 			this.lastUpdated = new Date();
 		this.primaryFile = primaryFile;
 	}
-	
+
+	/**
+	 * Sets the secondaryFiles value, as well as the lastUpdated field if the file has changed.
+	 * This enforces that lastUpdated will track any changes to the primaryFile.
+	 * @param secondaryFiles value to set
+	 */
+	public void setSecondaryFiles(Set<BinaryFileData> secondaryFiles) {
+		if (!ObjectUtils.equals(this.secondaryFiles, secondaryFiles))
+			this.lastUpdated = new Date();
+		this.secondaryFiles = secondaryFiles;
+	}
+
 	/**
 	 * Check whether this object has content that is considered empty based on its data type.
 	 * This incorporates rules and esoteric knowledge about a few commonly-used data types.
