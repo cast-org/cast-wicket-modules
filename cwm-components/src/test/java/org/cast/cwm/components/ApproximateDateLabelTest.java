@@ -33,13 +33,6 @@ import java.util.Date;
 @Slf4j
 public class ApproximateDateLabelTest extends WicketTestCase {
 
-	private WicketTester tester;
-
-	@Before
-	public void setUp() {
-		tester = new WicketTester();
-	}
-
 	@Test
 	public void canRender() {
 		tester.startComponentInPage(new ApproximateDateLabel("id", new Date()));
