@@ -21,6 +21,10 @@
  	  		<groupId>org.cast.cwm</groupId>
  	  		<artifactId>cwm-components</artifactId>
  	  	</dependency>
+		<dependency>
+			<groupId>org.cast.cwm</groupId>
+			<artifactId>cwm-figuration</artifactId>
+		</dependency>
  	  	<dependency>
  	  		<groupId>org.cast.cwm</groupId>
  	  		<artifactId>cwm-drawtool</artifactId>

@@ -4,25 +4,28 @@
  */
 var SessionExpireWarning = {
 
-    DEBUG: false, // If true, will print logging messages in Firebug
-    timeoutLength: 0, // Time until user receives a warning
-	responseTime: 0,  // Time user has to respond to the warning
-    warnEvent: null, // Timer event for warnFunction
-	inactiveEvent: null, // Timer event for inactiveFunction
-	warnFunction: null, // Callback to warn that the session is about to expire
-	inactiveFunction: null, // Callback if user does not respond to warning
-	sessionTimeoutEvent: null, // Timer after timeout has occurred
-	sessionTimeoutTime: 0, // Time until user is forced to home page
-	sessionTimeoutIntervalEvent: null, // Interval Timer to force user to home page
-	sessionTimeoutIntervalTime: 10000, // how often to check if the user is now active after timing out
-    
+	// Parameters that can be adjusted
+    warnDelay: 0,         // Time until user receives a warning
+	logoutDelay: 0,       // Additional time user has to respond to the warning
+    checkPeriod: 10000,   // how often to check (in ms)
+    warnFunction: null,   // Callback to warn that the session is about to expire
+    logoutFunction: null, // Callback if user does not respond to warning
+    DEBUG: false,
+
+    // Internal variables
+    timer: null, // Timer for periodic checks
+    warned: false, // If true, warning has been popped up
+    warnTime: null, // Time when the warning will be displayed
+    logoutTime: null, // Time when the user will be declared inactive and logged out
+
 	/**
 	 * Reset the timer
 	 */
 	reset: function() {		
 		SessionExpireWarning.log("resetting the timers");
-		SessionExpireWarning.clear();
-		SessionExpireWarning.start();
+		SessionExpireWarning.warned = false;
+        SessionExpireWarning.warnTime = new Date().getTime() + SessionExpireWarning.warnDelay;
+        SessionExpireWarning.logoutTime = SessionExpireWarning.warnTime + SessionExpireWarning.logoutDelay;
 	},
 	
 	/**
@@ -39,16 +42,15 @@ var SessionExpireWarning = {
 	init: function(sessionLength, warningTime, warningCallbackFunction, responseTime, inactiveCallbackFunction) {
 		
 		SessionExpireWarning.warnFunction = warningCallbackFunction;
-		SessionExpireWarning.inactiveFunction = inactiveCallbackFunction;
+		SessionExpireWarning.logoutFunction = inactiveCallbackFunction;
 		
 		// Timeout must be at least a minute.
 		if (sessionLength > warningTime && responseTime < warningTime) {
-			SessionExpireWarning.timeoutLength = (sessionLength - warningTime) * 1000; // In milliseconds
-			SessionExpireWarning.log("Time till Warning Message = " + SessionExpireWarning.timeoutLength);
-			SessionExpireWarning.responseTime = responseTime * 1000; // In milliseconds
-			SessionExpireWarning.log("Time to respond to Warning Message = " + SessionExpireWarning.responseTime);
-			SessionExpireWarning.sessionTimeoutTime = SessionExpireWarning.timeoutLength + SessionExpireWarning.responseTime + 2000;
-			SessionExpireWarning.log("Time to close session = " + SessionExpireWarning.sessionTimeoutTime);
+			SessionExpireWarning.warnDelay = (sessionLength - warningTime) * 1000; // In milliseconds
+			SessionExpireWarning.log("Time till Warning Message = " + SessionExpireWarning.warnDelay);
+			SessionExpireWarning.logoutDelay = responseTime * 1000; // In milliseconds
+			SessionExpireWarning.log("Time to respond to Warning Message = " + SessionExpireWarning.logoutDelay);
+			SessionExpireWarning.sessionTimeoutTime = SessionExpireWarning.warnDelay + SessionExpireWarning.logoutDelay + 2000;
 			SessionExpireWarning.start();
 		} else {
 			SessionExpireWarning.log("Invalid Time Parameters");
@@ -62,51 +64,49 @@ var SessionExpireWarning = {
 	 * Start the timer
 	 */
 	start: function() {
-		if (SessionExpireWarning.timeoutLength > 0 ) {
-			// execute the warning function at timeoutLength
-			SessionExpireWarning.warnEvent = setTimeout(SessionExpireWarning.warn, SessionExpireWarning.timeoutLength);
-			SessionExpireWarning.log("Starting Warning Timer = " + SessionExpireWarning.timeoutLength);
-			
-			// if the browser window is closed or asleep during inactive warning/timeout - keep checking after the
-			// timeout has occurred
-			SessionExpireWarning.sessionTimeoutEvent = setTimeout(SessionExpireWarning.sessionTimeout, SessionExpireWarning.sessionTimeoutTime);
-			SessionExpireWarning.log("Starting Timeout Timer = " + SessionExpireWarning.sessionTimeoutTime);
+		if (SessionExpireWarning.warnDelay > 0 ) {
+			// We use an interval timer since one-shot timers might never fire if, say, laptop is closed.
+			SessionExpireWarning.timer = setInterval(SessionExpireWarning.check, SessionExpireWarning.checkPeriod);
+			SessionExpireWarning.log("Starting Timer = " + SessionExpireWarning.timer);
 		}
 	},
 	
 	/**
-	 * Clear all timeout events
+	 * Stop the timer
 	 */
-	clear: function() {
-		if (SessionExpireWarning.warnEvent != null) {
-			clearTimeout(SessionExpireWarning.warnEvent);
+	stop: function() {
+		if (SessionExpireWarning.timer != null) {
+			clearInterval(SessionExpireWarning.timer);
+			SessionExpireWarning.timer = null;
 		}
-		if (SessionExpireWarning.inactiveEvent != null) {
-			clearTimeout(SessionExpireWarning.inactiveEvent);
-		}
-		if (SessionExpireWarning.sessionTimeoutEvent != null) {
-			clearTimeout(SessionExpireWarning.sessionTimeoutEvent);
-		}
-		if (SessionExpireWarning.sessionTimeoutIntervalEvent != null) {
-			clearInterval(SessionExpireWarning.sessionTimeoutIntervalEvent);
-		}
-		SessionExpireWarning.log("Timers Cleared");
-	},		
+		SessionExpireWarning.log("Timer Stopped");
+	},
+
+    check: function() {
+	    var now = new Date().getTime();
+	    if (now > SessionExpireWarning.logoutTime) {
+            SessionExpireWarning.sessionTimeout();
+        } else if (now > SessionExpireWarning.warnTime) {
+	        if (!SessionExpireWarning.warned) {
+                SessionExpireWarning.warn();
+            } else {
+	            SessionExpireWarning.log("Remaining until logout: " + (SessionExpireWarning.logoutTime-now));
+            }
+        } else {
+	        SessionExpireWarning.log("Remaining until warning: " + (SessionExpireWarning.warnTime-now));
+        }
+    },
 
 	/**
 	 * Warn user (and trigger inactive timer)
 	 */
 	warn: function() {
 		SessionExpireWarning.log("Warning Function Called");
+        SessionExpireWarning.warned = true;
 		if (typeof SessionExpireWarning.warnFunction == 'function') {
 			SessionExpireWarning.warnFunction();
 		} else {
 			alert("Warning: Your login session is about to expire.");
-		}
-		SessionExpireWarning.log("Setting inactive timer to " + SessionExpireWarning.responseTime);
-		if (SessionExpireWarning.responseTime > 0 && typeof SessionExpireWarning.inactiveFunction == 'function' ) {
-				// execute the inactiveFunction at responseTime
-				SessionExpireWarning.inactiveEvent = setTimeout(SessionExpireWarning.inactiveFunction, SessionExpireWarning.responseTime);
 		}
 	},
 
@@ -114,11 +114,7 @@ var SessionExpireWarning = {
 	 * Session is inactive and should be forced to home upon re-opening browser window
 	 */
 	sessionTimeout: function() {
-		SessionExpireWarning.log("Session Timed Out - forcing home page ");
-		if (SessionExpireWarning.sessionTimeoutTime > 0 && typeof SessionExpireWarning.inactiveFunction == 'function' ) {
-				// execute the inactiveFunction repeatedly
-				SessionExpireWarning.sessionTimeoutIntervalEvent = setInterval(SessionExpireWarning.inactiveFunction, SessionExpireWarning.sessionTimeoutIntervalTime);
-		}
+		SessionExpireWarning.logoutFunction();
 	},
 
 	/**

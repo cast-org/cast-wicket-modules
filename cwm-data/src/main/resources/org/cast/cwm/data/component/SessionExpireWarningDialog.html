@@ -1,12 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
 <wicket:panel>
-  <div wicket:id="dialogBorder">
-    <div class="warning">
-	  <p>Your session is about to expire.  Click the button below to stay logged in.</p>
-	</div>
-    <div class="actions">
-      <div class="actionsLeft">
-		<a wicket:id="keepAliveLink" href="javascript:void(0);" class="button standard">Stay Logged In</a>
-	  </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div wicket:id="header" class="modal-header"></div>
+            <div class="modal-body">
+                <wicket:message key="timeoutBody"/>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-cfw-dismiss="modal" type="button" aria-label="Close">OK</button>
+            </div>
+        </div>
     </div>
-  </div>
 </wicket:panel>
+</body>
+</html>
