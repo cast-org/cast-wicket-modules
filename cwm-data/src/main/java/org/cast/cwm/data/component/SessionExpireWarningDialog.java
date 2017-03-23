@@ -23,7 +23,9 @@ import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.databinder.auth.AuthApplication;
 import net.databinder.auth.AuthDataSessionBase;
+import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -144,11 +146,12 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 			cwmService.flushChanges();
 			CwmSession.get().setLoginSessionModel(null);
 			AuthDataSessionBase.get().signOut();
-			setResponsePage(CwmApplication.get().getSignInPageClass(), new PageParameters().set("expired", "true"));
+			setResponsePage(((AuthApplication)Application.get()).getSignInPageClass(),
+					new PageParameters().set("expired", "true"));
 		
 		// We're not signed in; redirect to home because page is no longer functional
 		} else {
-			setResponsePage(CwmApplication.get().getHomePage());
+			setResponsePage(Application.get().getHomePage());
 		}			
 	}
 
@@ -158,7 +161,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 			throw new IllegalStateException("Warning time must be greater than response time.");
 		}
 
-		if (warningTime >= CwmApplication.get().getSessionTimeout()) {
+		if (warningTime >= getSessionTimeout()) {
 			throw new IllegalStateException("Warning time must be less than session time.");
 		}
 
@@ -182,7 +185,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 		//	inactiveCallbackFunction - function that is triggered if the user does not respond to warning
 
 		String script = "SessionExpireWarning.init(" +
-				CwmApplication.get().getSessionTimeout() + ", " +
+				getSessionTimeout() + ", " +
 				warningTime + ", " +
 				"function() {" + getCommandJavascript("show") + "}, " +
 				responseTime + ", " +
@@ -191,6 +194,23 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 				"Wicket.Ajax.get({u:'" + inactiveBehavior.getCallbackUrl() + "'}); " +
 				"});";
 		return script;
+	}
+
+	/**
+	 * Return the session timeout defined in the application.
+	 * If the Application is not a CwmApplication (eg, in tests), we don't know how to find this,
+	 * so this method will return an arbitrary default.
+	 *
+	 * @return Number of seconds defined for web-server session time out
+	 */
+	protected int getSessionTimeout() {
+		Application app = Application.get();
+		if (app instanceof CwmApplication) {
+			return ((CwmApplication) app).getSessionTimeout();
+		} else {
+			log.warn("Not a CwmApplication, can't determine server session length, using default");
+			return 30*60; // 30 minutes
+		}
 	}
 
 	protected String getUserResponseWatcherJavascript() {
