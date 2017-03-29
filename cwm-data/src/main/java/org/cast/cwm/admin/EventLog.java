@@ -148,7 +148,8 @@ public class EventLog extends AdminPage {
 		numberOfEventTypes = eventTypes.size();
 		showEventTypesM = new ListModel<IEventType>(eventTypes);
 		form.add(new CheckBoxMultipleChoice<IEventType>("type", showEventTypesM, allEventTypes,
-				new ChoiceRenderer<IEventType>("displayName", "name")));
+				new ChoiceRenderer<IEventType>("displayName", "name"))
+				.setSuffix("<br/>"));
 	}
 
 	protected void addDateFilter(Form<Object> form) {
@@ -264,7 +265,7 @@ public class EventLog extends AdminPage {
 				Date startDate = midnightStart(fromDateM.getObject());
 				Date endDate = midnightEnd(toDateM.getObject());
 				log.debug("Considering events between {} and {}", startDate, endDate);
-				criteria.add(Restrictions.between("insertTime", startDate, endDate));
+				criteria.add(Restrictions.between("startTime", startDate, endDate));
 			}
 
 			//set permission check
