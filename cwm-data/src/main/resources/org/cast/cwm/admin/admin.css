@@ -1,29 +1,13 @@
-html {
-    font-size: 100%;
-}
-
 body {
     font-family: Arial, sans-serif;
-    font-size: 90%;
     background: #FFFFFF url("bg_fade.gif") top left repeat-x;
-    padding: 0;
-    margin: 0;
-}
-
-a {
-    color: #3333AA;
-    text-decoration: underline;
-}
-a:hover {
-    text-decoration: underline;
 }
 
 .wrapper {
     border-right: 1px solid #E2ECEC;
     border-left: 1px solid #E2ECEC;
     margin: 0 auto;
-	max-width: 88%;
-	min-width: 930px;
+    width: 88%;
 }
 
 .header {
@@ -97,20 +81,9 @@ a:hover {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: Georgia, "Times New Roman", Times, serif;
-    font-size: 130%;
     color: #227788;
-    font-weight: bold;
-    padding: 0;
-    margin: 0 0 0.7em 0
 }
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { color: #227788; }
-
-h1 { font-size: 130%; }
-h2 { font-size: 125%; }
-h3 { font-size: 120%; margin-top: .5em; }
-h4 { font-size: 115%; }
-h5 { font-size: 110%; }
-h6 { font-size: 105%; }
 
 table {
 	border: 1px solid #93b5b6;
@@ -300,17 +273,4 @@ label.aligned {
     border-left: 0;
     white-space: nowrap;
     text-align: right;
-}
-
-/* Screenreader-only content */
-
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    border: 0;
 }

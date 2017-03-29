@@ -35,6 +35,7 @@ import org.cast.cwm.CwmApplication;
 import org.cast.cwm.IAppConfiguration;
 
 import com.google.inject.Inject;
+import org.cast.cwm.figuration.FigurationUtil;
 
 /**
  * Base for all Admin Pages.
@@ -64,6 +65,7 @@ public abstract class AdminPage extends WebPage implements IHeaderContributor {
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
+		FigurationUtil.addFigurationHeaderItems(response);
 		response.render(CssHeaderItem.forReference(admincss));
 	}
 	
