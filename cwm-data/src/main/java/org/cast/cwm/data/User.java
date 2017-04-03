@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.databinder.auth.data.DataUser;
 import net.databinder.auth.data.hib.BasicPassword;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.wicket.util.string.Strings;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cache;

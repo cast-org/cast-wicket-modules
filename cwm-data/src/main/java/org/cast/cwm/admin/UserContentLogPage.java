@@ -74,10 +74,8 @@ import com.google.inject.Inject;
 @Slf4j
 public class UserContentLogPage extends AdminPage {
 
-	private static final long serialVersionUID = 1L;
-	
 	@Inject
-	ISiteService siteService;
+	private ISiteService siteService;
 	
 	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<List<Site>> showSitesM;

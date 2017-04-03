@@ -23,8 +23,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.util.string.Strings;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
@@ -38,6 +37,7 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -197,7 +197,7 @@ public class UserContent extends PersistedObject {
 	 * @param primaryFile value to set
 	 */
 	public void setPrimaryFile(BinaryFileData primaryFile) {
-		if (!ObjectUtils.equals(this.primaryFile, primaryFile))
+		if (!Objects.equals(this.primaryFile, primaryFile))
 			this.lastUpdated = new Date();
 		this.primaryFile = primaryFile;
 	}
@@ -208,7 +208,7 @@ public class UserContent extends PersistedObject {
 	 * @param secondaryFiles value to set
 	 */
 	public void setSecondaryFiles(Set<BinaryFileData> secondaryFiles) {
-		if (!ObjectUtils.equals(this.secondaryFiles, secondaryFiles))
+		if (!Objects.equals(this.secondaryFiles, secondaryFiles))
 			this.lastUpdated = new Date();
 		this.secondaryFiles = secondaryFiles;
 	}
