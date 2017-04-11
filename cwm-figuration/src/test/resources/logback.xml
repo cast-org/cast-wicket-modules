@@ -11,4 +11,6 @@
     <appender-ref ref="Stdout"/>
   </root>
 
+  <logger name="org.apache.wicket.util.tester" level="INFO"/>
+
 </configuration>

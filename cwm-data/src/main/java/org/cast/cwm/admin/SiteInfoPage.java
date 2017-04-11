@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import net.databinder.components.hib.DataForm;
 import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.RestartResponseAtInterceptPageException;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
@@ -49,10 +50,11 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
-import org.cast.cwm.data.component.DeletePersistedObjectDialog;
+import org.cast.cwm.figuration.component.ConfirmationModal;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.models.UserPeriodNamesModel;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
+import org.cast.cwm.figuration.behavior.ModalTriggerBehavior;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.ISpreadsheetReader;
@@ -80,8 +82,6 @@ public class SiteInfoPage extends AdminPage {
 
 	@Inject
 	private IAdminPageService adminPageService;
-
-	private static final long serialVersionUID = 1L;
 
 	public SiteInfoPage(PageParameters param) {
 		super(param);
@@ -113,25 +113,23 @@ public class SiteInfoPage extends AdminPage {
 		// List Existing Periods
 		ListView<Period> list = new ListView<Period>("periodList", new PropertyModel<List<Period>>(mSite, "periodsAsSortedReadOnlyList")) {
 
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			protected void populateItem(ListItem<Period> item) {
 				Link link = adminPageService.getPeriodEditPageLink("periodLink", item.getModel());
 				item.add(link);
 				link.add(new Label("name", item.getModelObject().getName()));
 
-				DeletePersistedObjectDialog<Period> dialog = new DeletePersistedObjectDialog<Period>("deletePeriodModal", item.getModel()) {
-
-					private static final long serialVersionUID = 1L;
+				ConfirmationModal<Period> deleteDialog = new ConfirmationModal<Period>("deletePeriodModal", item.getModel()) {
 
 					@Override
-					protected void deleteObject() {
+					protected boolean onConfirm(AjaxRequestTarget target) {
 						siteService.deletePeriod(getModel());
+						target.add(SiteInfoPage.this);
+						return true;
 					}
 				};
-				item.add(dialog);
-				item.add(new WebMarkupContainer("deletePeriodLink").add(dialog.getDialogBorder().getClickToOpenBehavior()));
+				item.add(deleteDialog);
+				item.add(new WebMarkupContainer("deletePeriodLink").add(new ModalTriggerBehavior(deleteDialog)));
 			}
 		};
 		add(list);

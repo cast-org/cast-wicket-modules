@@ -11,4 +11,8 @@
     <appender-ref ref="Stdout"/>
   </root>
 
+  <logger name="org.apache.wicket.util.tester" level="INFO"/>
+  <!--<logger name="org.apache.wicket.Localizer" level="DEBUG"/>-->
+  <!--<logger name="org.apache.wicket.resource.loader" level="DEBUG"/>-->
+
 </configuration>

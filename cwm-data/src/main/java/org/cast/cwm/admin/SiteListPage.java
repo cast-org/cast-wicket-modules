@@ -20,6 +20,8 @@
 package org.cast.cwm.admin;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -27,10 +29,12 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
-import org.cast.cwm.data.component.DeletePersistedObjectDialog;
+import org.cast.cwm.figuration.component.ConfirmationModal;
+import org.cast.cwm.figuration.behavior.ModalTriggerBehavior;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ISiteService;
@@ -58,7 +62,6 @@ public class SiteListPage extends AdminPage {
 	@Inject
 	private IModelProvider modelProvider;
 
-	private static final long serialVersionUID = 1L;
 
 	public SiteListPage(PageParameters parameters) {
 		super(parameters);
@@ -74,26 +77,26 @@ public class SiteListPage extends AdminPage {
 		// A list of Site objects for the application
 		siteList = new DataView<Site>("siteList", siteProvider) {
 
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			protected void populateItem(Item<Site> item) {
 				
 				// Link to edit site directly
 				item.add(adminPageService.getSiteEditPageLink("siteLink", item.getModel())
 						.add(new Label("name", item.getModelObject().getName())));
-				
-				DeletePersistedObjectDialog<Site> dialog = new DeletePersistedObjectDialog<Site>("deleteSiteModal", item.getModel()) {
-					
-					private static final long serialVersionUID = 1L;
+
+				ConfirmationModal<Site> deleteDialog
+						= new ConfirmationModal<Site>("deleteSiteModal", item.getModel()) {
 
 					@Override
-					protected void deleteObject() {
+					protected boolean onConfirm(AjaxRequestTarget target) {
 						cwmService.delete(getModel());
+						target.add(SiteListPage.this);
+						return true;
 					}
 				};
-				item.add(dialog);
-				item.add(new WebMarkupContainer("deleteSiteLink").add(dialog.getDialogBorder().getClickToOpenBehavior()));
+				item.add(deleteDialog);
+
+				item.add(new WebMarkupContainer("deleteSiteLink").add(new ModalTriggerBehavior(deleteDialog)));
 
 				// List of periods for the site
 				RepeatingView rv = new RepeatingView("periodList");

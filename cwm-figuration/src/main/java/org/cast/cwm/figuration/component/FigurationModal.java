@@ -42,6 +42,7 @@ import java.util.Map;
  * </pre></code>
  *
  * Wicket IDs of the header, body, and footer are set by this class to be "header", "body", and "footer".
+ * Components for each must be supplied, or explicitly set to be empty as in the example above.
  *
  * For modals that include behavior, buttons in the footer, etc, you will usually want to override this
  * class and provide your own markup.  Make sure the markup includes divs with the correct class attributes,
@@ -66,11 +67,11 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 
 	public FigurationModal(String id) {
 		this(id, null);
-		addClassAttributeModifier();
 	}
 
 	public FigurationModal(String id, IModel<T> model) {
 		super(id, model);
+		addClassAttributeModifier();
 	}
 
 	/**
