@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration;
+package org.cast.cwm.figuration.service;
 
+import lombok.Getter;
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.head.*;
 import org.apache.wicket.request.Url;
@@ -28,17 +29,42 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Default implementation of IFigurationService.
+ *
  * @author bgoldowsky
  */
-public class FigurationUtil {
+public class FigurationService implements IFigurationService {
+
+	private static final String FIGURATION_DEFAULT_VERSION = "2.0.0";
+
+	@Getter
+	private final String figurationVersion;
 
 	/**
-	 * The version of the Figuration library that will be used
-	 * if another version is not explicitly requested.
+	 * Default constructor.
+	 * Will set the library to use the default Figuration version.
+	 * @see #FIGURATION_DEFAULT_VERSION
 	 */
-	public static String FIGURATION_DEFAULT_VERSION = "2.0.0";
+	public FigurationService () {
+		this(FIGURATION_DEFAULT_VERSION);
+	}
 
-	public static JavaScriptHeaderItem makeJavaScriptReferenceHeaderItem(String version) {
+	/**
+	 * Construct with a specific version of Figuration.
+	 * You can request a specific version by constructing and binding an instance of this class:
+	 *
+	 * <code><pre>binder.bind(IFigurationService.class).toInstance(new FigurationService("3.0.0-alpha.2"));
+	 * </pre></code>
+	 *
+	 * Alternatively, subclass FigurationService and change its default.
+	 */
+	public FigurationService (String version) {
+		super();
+		figurationVersion = version;
+	}
+
+	@Override
+	public JavaScriptHeaderItem makeJavaScriptReferenceHeaderItem(String version) {
 		return JavaScriptHeaderItem.forReference(
 				new UrlResourceReference(Url.parse(
 						String.format("https://cdn.jsdelivr.net/figuration/%s/js/figuration.min.js",
@@ -55,34 +81,22 @@ public class FigurationUtil {
 	}
 
 
-	private static CssHeaderItem makeCssReferenceHeaderItem (String version) {
+	@Override
+	public CssHeaderItem makeCssReferenceHeaderItem(String version) {
 		return CssHeaderItem.forReference(
 				new UrlResourceReference(Url.parse(
 						String.format("https://cdn.jsdelivr.net/figuration/%s/css/figuration.min.css", version))));
 	}
 
-	/**
-	 * Add the header items needed to use the CAST Figuration framework.
-	 * Uses the default version of figuration as defined in this class.
-	 * @param response the IHeaderResponse that will have items added to it
-	 */
-	public static void addFigurationHeaderItems(IHeaderResponse response) {
-		addFigurationHeaderItems(response, FIGURATION_DEFAULT_VERSION);
-	}
-
-	/**
-	 * Add the header items needed to use the CAST Figuration framework.
-	 * @param response the IHeaderResponse that will have items added to it
-	 * @param figurationVersion the version of the figuration library to use
-	 */
-	public static void addFigurationHeaderItems(IHeaderResponse response, String figurationVersion) {
+	@Override
+	public void addFigurationHeaderItems(IHeaderResponse response) {
 		response.render(new PriorityHeaderItem(StringHeaderItem.forString(
 				"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">")));
 		response.render(new PriorityHeaderItem(StringHeaderItem.forString(
 				"<meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\">")));
 
-		response.render(makeJavaScriptReferenceHeaderItem(figurationVersion));
-		response.render(makeCssReferenceHeaderItem(figurationVersion));
+		response.render(makeJavaScriptReferenceHeaderItem(getFigurationVersion()));
+		response.render(makeCssReferenceHeaderItem(getFigurationVersion()));
 	}
 
 }
