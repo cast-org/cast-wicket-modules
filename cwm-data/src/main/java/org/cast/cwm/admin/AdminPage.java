@@ -44,8 +44,6 @@ import org.cast.cwm.figuration.service.IFigurationService;
  *
  */
 public abstract class AdminPage extends WebPage implements IHeaderContributor {
-	
-	private static final long serialVersionUID = 1L;
 
 	public static final ResourceReference admincss = new PackageResourceReference(AdminPage.class, "admin.css");
 	

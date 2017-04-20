@@ -85,7 +85,18 @@ public class UserContentLogPage extends AdminPage {
 	protected static final long ITEMS_PER_PAGE = 50;
 
 	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
-	
+
+	@Override
+	protected void onDetach() {
+		super.onDetach();
+		if (fromDateM != null)
+			fromDateM.detach();
+		if (toDateM != null)
+			toDateM.detach();
+		if (showSitesM != null)
+			showSitesM.detach();
+	}
+
 	public UserContentLogPage(PageParameters parameters) {
 		super(parameters);
 		
@@ -94,11 +105,8 @@ public class UserContentLogPage extends AdminPage {
 		AuditDataProvider<UserContent, DefaultRevisionEntity> provider = getDataProvider();
 		
 		List<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>> columns = makeColumns();
-		// Annoying to have to make a new List here; DataTable should use <? extends IColumn>.
-		ArrayList<IColumn<AuditTriple<UserContent,DefaultRevisionEntity>,String>> colList 
-			= new ArrayList<IColumn<AuditTriple<UserContent,DefaultRevisionEntity>,String>>(columns);
 		DataTable<AuditTriple<UserContent,DefaultRevisionEntity>,String> table 
-			= new DataTable<AuditTriple<UserContent,DefaultRevisionEntity>,String>("table", colList, provider, ITEMS_PER_PAGE);
+			= new DataTable<AuditTriple<UserContent,DefaultRevisionEntity>,String>("table", columns, provider, ITEMS_PER_PAGE);
 
 		table.addTopToolbar(new HeadersToolbar<String>(table, provider));
 		table.addBottomToolbar(new NavigationToolbar(table));
@@ -131,7 +139,9 @@ public class UserContentLogPage extends AdminPage {
 		showSitesM = new ListModel<Site>(sites);
 		numberOfSites = sites.size();
 		if (!allSites.getObject().isEmpty())
-			form.add(new CheckBoxMultipleChoice<Site>("site", showSitesM, allSites, new ChoiceRenderer<Site>("name", "id")));
+			// FIXME: this ends up serializing non-detached instances of Site
+			form.add(new CheckBoxMultipleChoice<Site>("site", showSitesM, allSites,
+					new ChoiceRenderer<Site>("name", "id")));
 		else
 			form.add(new WebMarkupContainer("site").setVisible(false));
 	}
@@ -185,7 +195,6 @@ public class UserContentLogPage extends AdminPage {
 		List<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>> columns = new ArrayList<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>>(10);
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev ID", "info.id"));
 		columns.add(new AbstractDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev Date") {
-			private static final long serialVersionUID = 1L;
 			@Override
 			public void populateItem(Item<ICellPopulator<AuditTriple<UserContent,DefaultRevisionEntity>>> cellItem, String componentId, 
 					IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
@@ -208,7 +217,6 @@ public class UserContentLogPage extends AdminPage {
 		
 		// What to do with the content column depends on the data type.
 		columns.add(new AbstractDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Content") {
-			private static final long serialVersionUID = 1L;
 			@Override
 			public void populateItem(
 					Item<ICellPopulator<AuditTriple<UserContent, DefaultRevisionEntity>>> item,
@@ -216,7 +224,7 @@ public class UserContentLogPage extends AdminPage {
 					IModel<AuditTriple<UserContent, DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
 				if (!rowModel.getObject().getType().equals(RevisionType.DEL)) {
-					if (uc.getDataType().getName().equals("TEXT"))
+					if (uc.getDataType().name().equals("TEXT"))
 						item.add(new Label(componentId, new PropertyModel<String>(rowModel, "entity.text")));
 					else
 						item.add(new ContentLinkPanel(componentId, rowModel.getObject().getEntity().getId(), rowModel.getObject().getInfo().getId()));					
@@ -228,7 +236,7 @@ public class UserContentLogPage extends AdminPage {
 			@Override
 			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
-				if (uc.getDataType().getName().equals("TEXT")) {
+				if (uc.getDataType().name().equals("TEXT")) {
 					return rowModel.getObject().getEntity().getText();
 				} else {
 					// output a text link for the spreadsheet
@@ -254,8 +262,6 @@ public class UserContentLogPage extends AdminPage {
 	
 	
 	private class ContentLinkPanel extends GenericPanel<Void> {
-
-		private static final long serialVersionUID = 1L;
 
 		public ContentLinkPanel(String id, long entityId, int revision) {
 			super(id);

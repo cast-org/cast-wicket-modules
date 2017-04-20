@@ -38,12 +38,7 @@ import com.google.inject.Inject;
 public class UserContentViewPage extends AdminPage {
 	
 	@Inject
-	IUserContentViewerFactory viewerFactory;
-	
-	@Inject
-	ICwmService cwmService;
-	
-	private static final long serialVersionUID = 1L;
+	private IUserContentViewerFactory viewerFactory;
 
 	public UserContentViewPage(PageParameters parameters) {
 		super(parameters);

@@ -24,7 +24,7 @@ import java.io.Serializable;
 /**
  * Applications must define an event-type enumerator implementing this interface.
  * Every stored event will have a type.
- * Event types have an internal name() for use in the databaes (eg the enum constant),
+ * Event types have an internal name() for use in the database (eg the enum constant),
  * a display name (what researchers will see in the event log),
  * and a documentation string describing what it means.
  *
