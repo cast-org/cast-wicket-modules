@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import com.google.inject.Singleton;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.util.file.File;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author bgoldowsky
  *
  */
+@Singleton
 public class AppConfiguration implements IAppConfiguration {
 	
 	String baseDirectory;

@@ -17,44 +17,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm;
+package org.cast.cwm.service;
 
-import java.util.Collection;
-
-import org.cast.cwm.data.IResponseType;
+import org.cast.cwm.data.IContentType;
 
 /**
- * IResponseTypeRegistry
- * 
- * A registry for the allowed response types for this application.
- * 
- * @author droby
+ * Methods for working with UserContent and IContentType.
+ *
+ * Since there is no universal list of content types,
+ * This has no default implementation.  One must be defined by the application.
  *
  */
-public interface IResponseTypeRegistry {
+public interface IUserContentService {
 
 	/**
-	 * Registers a response type for a name
-	 * 
-	 * @param name a String name used as lookup key
-	 * @param type the associated response type
+	 * Return the enumeration used for content types by the application.
+	 * @return IContentType class object
 	 */
-	void registerResponseType(String name, IResponseType type);
+	Class<? extends IContentType> getContentTypeClass();
 
 	/**
-	 * getResponseType
+	 * Look up the name and return the IEventType object that it represents.
 	 * 
 	 * @param name a String name used as lookup key
 	 * @return the associated response type
-	 * @throws IllegalArgumentException if the name is not a registered IResponseType
+	 * @throws IllegalArgumentException if the name is not a registered IContentType
 	 */
-	IResponseType getResponseType(String name);
-
-	/**
-	 * getLegalResponseTypes
-	 * 
-	 * @return all registered response types
-	 */
-	Collection<IResponseType> getLegalResponseTypes();
+	IContentType getContentType(String name);
 
 }

@@ -19,12 +19,14 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 
 import java.util.List;
 
+@ImplementedBy(CwmService.class)
 public interface ICwmService {
 
 	/**

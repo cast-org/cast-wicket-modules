@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
@@ -31,6 +32,7 @@ import org.cast.cwm.data.component.IEventDataContributor;
 import java.util.Date;
 import java.util.List;
 
+@ImplementedBy(EventService.class)
 public interface IEventService extends IEventLogger {
 
 	/** 

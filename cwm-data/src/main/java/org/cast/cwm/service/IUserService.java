@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.model.IModel;
@@ -32,6 +33,7 @@ import org.cast.cwm.service.UserService.LoginData;
 
 import java.util.List;
 
+@ImplementedBy(UserService.class)
 public interface IUserService {
 	
 	/**

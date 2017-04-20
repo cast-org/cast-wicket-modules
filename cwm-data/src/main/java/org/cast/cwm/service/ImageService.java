@@ -55,7 +55,7 @@ import com.google.inject.Inject;
  * TODO: Compare for quality with https://cwiki.apache.org/WICKET/uploaddownload.html as it was suggested by Igor
  * 
  * @author jbrookover
- *
+ * @deprecated
  */
 public class ImageService {
 

@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
@@ -32,6 +33,7 @@ import org.cast.cwm.data.User;
  * We'll add any that we need to wrap for mocks.
  * 
  */
+@ImplementedBy(CwmSessionService.class)
 public interface ICwmSessionService {
 
 	IModel<LoginSession> getLoginSessionModel();

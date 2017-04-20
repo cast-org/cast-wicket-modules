@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
@@ -33,6 +34,7 @@ import org.cast.cwm.data.User;
  *
  * @author bgoldowsky
  */
+@ImplementedBy(AdminPageService.class)
 public interface IAdminPageService {
 
 	Class<? extends WebPage> getAdminHomePage();

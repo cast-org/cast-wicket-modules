@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -28,6 +29,7 @@ import org.cast.cwm.data.User;
 
 import java.util.List;
 
+@ImplementedBy(SiteService.class)
 public interface ISiteService {
 
 	Class<? extends Site> getSiteClass();

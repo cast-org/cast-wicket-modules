@@ -21,8 +21,10 @@ package org.cwm.db.service;
 
 import java.io.Serializable;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.model.IModel;
 
+@ImplementedBy(HibernateObjectModelProvider.class)
 public interface IModelProvider {
 
 	<T extends Serializable> IModel<T> modelOf(T object);

@@ -21,6 +21,7 @@ package org.cwm.db.service;
 
 import java.io.Serializable;
 
+import com.google.inject.ImplementedBy;
 import net.databinder.hib.SessionUnit;
 
 import org.hibernate.Session;
@@ -31,6 +32,7 @@ import org.hibernate.Session;
  * @author bgoldowsky
  *
  */
+@ImplementedBy(DBService.class)
 public interface IDBService {
 
 	/**
