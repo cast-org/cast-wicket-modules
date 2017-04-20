@@ -95,8 +95,8 @@ public class FigurationService implements IFigurationService {
 		response.render(new PriorityHeaderItem(StringHeaderItem.forString(
 				"<meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\">")));
 
-		response.render(makeJavaScriptReferenceHeaderItem(getFigurationVersion()));
-		response.render(makeCssReferenceHeaderItem(getFigurationVersion()));
+		response.render(new PriorityHeaderItem(makeJavaScriptReferenceHeaderItem(getFigurationVersion())));
+		response.render(new PriorityHeaderItem(makeCssReferenceHeaderItem(getFigurationVersion())));
 	}
 
 }

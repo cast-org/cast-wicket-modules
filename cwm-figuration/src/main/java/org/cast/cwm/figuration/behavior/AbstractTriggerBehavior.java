@@ -41,10 +41,11 @@ public abstract class AbstractTriggerBehavior extends Behavior {
 
 	@Getter
 	@Setter
-	private String toggleId;
+	private String targetId;
 	
 	/**
-	 * What types of events (click, hover, etc) trigger the popover's display.
+	 * What types of events (click, hover, etc) trigger the action.
+	 * Used for tooltips and popovers.
 	 */
 	@Getter
 	@Setter
@@ -60,10 +61,10 @@ public abstract class AbstractTriggerBehavior extends Behavior {
 	protected boolean initializeOnLoad = true;
 	
 
-	public AbstractTriggerBehavior(String widgetType, String toggleId) {
-		Args.notEmpty(toggleId, "toggle ID");
+	public AbstractTriggerBehavior(String widgetType, String targetId) {
+		Args.notEmpty(targetId, "toggle ID");
 		this.widgetType = widgetType;
-		this.toggleId = toggleId;
+		this.targetId = targetId;
 	}
 	
 	@Override
@@ -80,7 +81,7 @@ public abstract class AbstractTriggerBehavior extends Behavior {
 		if (isInitializeOnLoad())
 			tag.put("data-cfw", widgetType);
 
-		tag.put("data-cfw-" + widgetType + "-toggle", "#"+getToggleId());
+		tag.put("data-cfw-" + widgetType + "-target", "#"+getTargetId());
 		
 		String triggerAtt = getTriggerAttribute();
 		if (triggerAtt != null)
