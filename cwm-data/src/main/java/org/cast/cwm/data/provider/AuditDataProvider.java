@@ -27,9 +27,11 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.builders.ISortableAuditQueryBuilder;
 import org.hibernate.envers.RevisionType;
+import org.hibernate.envers.internal.entities.mapper.relation.query.QueryConstants;
 import org.hibernate.envers.query.AuditQuery;
 import org.hibernate.envers.query.criteria.AuditProperty;
 import org.hibernate.envers.query.internal.property.RevisionNumberPropertyName;
+import org.hibernate.envers.query.projection.internal.EntityAuditProjection;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -68,7 +70,8 @@ public  class AuditDataProvider<E extends Serializable, R extends Serializable>
 	@Override
 	public long size() {
 		AuditQuery query = builder.build(Databinder.getHibernateSession());
-		query.addProjection(new AuditProperty<Long>("auditAlias", new RevisionNumberPropertyName()).count());
+		query.addProjection(new AuditProperty<Long>(QueryConstants.REFERENCED_ENTITY_ALIAS,
+				new RevisionNumberPropertyName()).count());
 		Number size = (Number) query.getSingleResult();
 		return size == null ? 0 : size.longValue();
 	}

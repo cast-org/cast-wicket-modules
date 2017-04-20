@@ -26,10 +26,8 @@ import ch.qos.logback.core.util.StatusPrinter;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import com.google.inject.Scopes;
 import lombok.Getter;
 import net.databinder.auth.hib.AuthDataApplication;
-import net.databinder.components.hib.DataForm;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
 import org.apache.wicket.*;
@@ -41,22 +39,21 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.admin.*;
-import org.cast.cwm.data.*;
+import org.cast.cwm.data.LoginSession;
+import org.cast.cwm.data.Role;
+import org.cast.cwm.data.User;
 import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
-import org.cast.cwm.service.*;
-import org.cwm.db.service.DBService;
-import org.cwm.db.service.HibernateObjectModelProvider;
-import org.cwm.db.service.IDBService;
-import org.cwm.db.service.IModelProvider;
+import org.cast.cwm.service.IAdminPageService;
+import org.cast.cwm.service.IEventService;
+import org.cast.cwm.service.IUserContentService;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -87,14 +84,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public abstract class CwmApplication extends AuthDataApplication<User> {
 
-	public static final String RESPTYPE_TEXT = "TEXT";
-	public static final String RESPTYPE_HTML = "HTML";
-	public static final String RESPTYPE_AUDIO = "AUDIO";
-	public static final String RESPTYPE_SVG = "SVG";
-	public static final String RESPTYPE_UPLOAD = "UPLOAD";
-	public static final String RESPTYPE_TABLE = "TABLE";
-	public static final String RESPTYPE_SINGLE_SELECT = "SINGLE_SELECT";
-	public static final String RESPTYPE_SCORE = "SCORE";
 	@Getter
 	protected IAppConfiguration configuration;
 	
@@ -114,9 +103,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	@Inject
 	private IEventService eventService;
 	
-	@Inject 
-	private IResponseTypeRegistry responseTypeRegistry;
-
 	@Inject
 	private IAdminPageService adminPageService;
 	
@@ -180,7 +166,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		
 		getDebugSettings().setOutputMarkupContainerClassName(true);		
 
-		initResponseTypes();
 		loadContent();
 		runDatabaseInitializers();
 		configureMountPaths();
@@ -208,16 +193,8 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		modules.add(new Module() {
 			@Override
 			public void configure(Binder binder) {
-				log.debug("Binding CWM Services");
-				binder.bind(IResponseTypeRegistry.class).to(ResponseTypeRegistry.class).in(Scopes.SINGLETON);
-				binder.bind(ICwmService.class).to(CwmService.class).in(Scopes.SINGLETON);
-				binder.bind(ICwmSessionService.class).to(CwmSessionService.class).in(Scopes.SINGLETON);
-				binder.bind(ISiteService.class).to(SiteService.class).in(Scopes.SINGLETON);
+				log.debug("Binding CWM Configuration");
 				binder.bind(IAppConfiguration.class).toInstance(configuration);
-				binder.bind(IModelProvider.class).to(HibernateObjectModelProvider.class);
-				binder.bind(IAdminPageService.class).to(AdminPageService.class);
-				binder.bind(IUserService.class).to(UserService.class);
-				binder.bind(IDBService.class).to(DBService.class);
 			}
 		});
 		return modules;
@@ -349,60 +326,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		super.sessionUnbound(sessionId);
 		log.debug("sessionUnbound called: {}", sessionId);
 		loginSessionCloser.closeQueue.add(sessionId);
-	}
-
-	/**
-	 * Set up some default response types used by many applications.
-	 */
-	protected void initResponseTypes() {
-		/*
-		 * Plain text is stored using {@link UserContent#setText(String)}.
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_TEXT, new ResponseType(RESPTYPE_TEXT, "Write"));
-
-		/*
-		 * Styled HTML text is stored using {@link UserContent#setText(String)}.
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_HTML, new ResponseType(RESPTYPE_HTML, "Write"));
-		
-		/*
-		 * Binary audio data is stored using {@link UserContent#setPrimaryFile(BinaryFileData)}.
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_AUDIO, new ResponseType(RESPTYPE_AUDIO, "Record"));
-		
-		/*
-		 * SVG markup is stored using {@link UserContent#setText(String)}
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_SVG, new ResponseType(RESPTYPE_SVG, "Draw"));
-		
-		/*
-		 * Uploaded files are stored using {@link UserContent#setPrimaryFile(BinaryFileData)}.
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_UPLOAD, new ResponseType(RESPTYPE_UPLOAD, "Upload"));
-		
-		/*
-		 * Table markup is stored using {@link ResponseData#setText(String)}
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_TABLE, new ResponseType(RESPTYPE_TABLE, "Table"));
-
-		/*
-		 * A response to a single-select, multiple choice prompt.  Actual answer stored using {@link UserContent#setText(String)}.
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_SINGLE_SELECT, new ResponseType(RESPTYPE_SINGLE_SELECT, "Multiple Choice"));
-		
-		/*
-		 * A score of some type -- star rating, rubric value, etc.
-		 */
-		responseTypeRegistry.registerResponseType(RESPTYPE_SCORE, new ResponseType(RESPTYPE_SCORE, "Score"));
-		
-	}
-	
-	public IResponseType getResponseType(String name) {
-		return responseTypeRegistry.getResponseType(name);
-	}
-	
-	public Collection<IResponseType> getLegalResposeTypes() {
-		return responseTypeRegistry.getLegalResponseTypes();
 	}
 	
 	@Override

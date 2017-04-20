@@ -25,7 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.wicket.injection.Injector;
-import org.cast.cwm.IResponseTypeRegistry;
+import org.cast.cwm.service.IUserContentService;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.StringType;
@@ -36,7 +36,7 @@ import com.google.inject.Inject;
 public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	@Inject
-	private IResponseTypeRegistry typeRegistry;
+	private IUserContentService typeRegistry;
 
 	public ResponseTypeHibernateType() {
 		super();
@@ -52,7 +52,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	@Override
 	public Class<?> returnedClass() {
-		return IResponseType.class;
+		return IContentType.class;
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 		String typeName = rs.getString(names[0]);
 		if (typeName == null)
 			return null;
-		return typeRegistry.getResponseType(typeName);
+		return typeRegistry.getContentType(typeName);
 	}
 
 	@Override
@@ -81,8 +81,8 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 		if (value == null) {
 			StringType.INSTANCE.set(st, null, index, session);
 		} else {
-			IResponseType rt = (IResponseType) value;
-			StringType.INSTANCE.set(st, rt.getName(), index, session);
+			IContentType rt = (IContentType) value;
+			StringType.INSTANCE.set(st, rt.name(), index, session);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class ResponseTypeHibernateType implements UserType, Serializable {
 
 	@Override
 	public Serializable disassemble(Object value) throws HibernateException {
-		return (IResponseType)value;
+		return (IContentType)value;
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class UserContent extends PersistedObject {
 	private User user;
 	
 	@Type(type="org.cast.cwm.data.ResponseTypeHibernateType")
-	private IResponseType dataType;
+	private IContentType dataType;
 	
 	/**
 	 * Date when content was originally created.
@@ -151,7 +151,7 @@ public class UserContent extends PersistedObject {
 	
 	public UserContent() { /* No Arg Constructor for DataStore */ }
 	
-	public UserContent(User author, IResponseType dataType) {
+	public UserContent(User author, IContentType dataType) {
 		this.user = author;
 		this.dataType = dataType;
 		this.createDate = new Date();
@@ -215,44 +215,20 @@ public class UserContent extends PersistedObject {
 
 	/**
 	 * Check whether this object has content that is considered empty based on its data type.
-	 * This incorporates rules and esoteric knowledge about a few commonly-used data types.
-	 * Probably needs rethinking to make this more general somehow.
+	 * Will probably need overriding if you define data types beyond ones that simply use "text"
+	 * or a primaryFile to contain their data.
 	 * @return true if the object contains no significant content.
 	 */
 	public boolean isEmpty() {
 		if (dataType == null)
 			throw new IllegalStateException("UserContent dataType is null");
-		String dtName = dataType.getName();
-		if (dtName.equals("TEXT") ||
-				dtName.equals("SINGLE_SELECT")) {
-			if (this.getText() == null || (StringUtils.isBlank(this.getText()))) {
-					return true;
-			}
+		// Check for text that is not null, empty, or whitespace.
+		if (!StringUtils.isBlank(this.getText()))
 			return false;
-		}
-		else if (dtName.equals(("SVG"))) {
-			if (this.getText() == null ||
-				(StringUtils.isBlank(text))  ||  
-				(this.getText().trim().replaceAll("\\s[\\s]*", "").equals("<svgwidth=\"535\"height=\"325\"xmlns=\"http://www.w3.org/2000/svg\"><gdisplay=\"inline\"><title>Layer1</title></g></svg>")) || 
-				(this.getText().trim().replaceAll("\\s[\\s]*", "").equals("<svgwidth=\"535\"height=\"325\"xmlns=\"http://www.w3.org/2000/svg\"><!--CreatedwithSVG-edit-http://svg-edit.googlecode.com/--><g><title>Layer1</title></g></svg>"))
-				) {		
-				return true;
-			}
+		// Check for blob content
+		if (this.getPrimaryFile() != null)
 			return false;
-		}
-		else if (dtName.equals(("AUDIO"))) {
-			if (this.getPrimaryFile() == null) {
-					return true;
-			}
-			return false;
-		}
-		else if (dtName.equals(("ARTIMAGE"))) {
-			return false;
-		}
-		else {
-			return true;
-		}
-		
+		return true;
 	}
 
 }

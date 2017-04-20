@@ -23,6 +23,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.apache.wicket.model.Model;
+import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IUserService;
@@ -33,6 +34,11 @@ public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 
 	public CwmDataInjectionTestHelper() {
 		super();
+	}
+
+	public IAppConfiguration injectAppConfiguration(CwmDataBaseTestCase baseInjectedTestCase) {
+		IAppConfiguration mock = injectMock(IAppConfiguration.class);
+		return mock;
 	}
 
 	public ICwmSessionService injectAndStubCwmSessionService (CwmDataBaseTestCase baseInjectedTestCase) {

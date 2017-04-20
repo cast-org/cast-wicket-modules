@@ -34,7 +34,7 @@ public class AdminHomeTest extends CwmDataTestCase {
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		helper.injectAndStubCwmSessionService(this);
-		helper.injectMock(IAppConfiguration.class);
+		helper.injectAppConfiguration(this);
 
 		// We use the real service class here, it is safe for testing
 		IAdminPageService adminPageService = helper.injectObject(IAdminPageService.class, new AdminPageService());

@@ -41,11 +41,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.IAppConfiguration;
-import org.cast.cwm.data.ResponseType;
-import org.cast.cwm.data.Role;
-import org.cast.cwm.data.Site;
-import org.cast.cwm.data.User;
-import org.cast.cwm.data.UserContent;
+import org.cast.cwm.data.*;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ICwmSessionService;
@@ -141,7 +137,16 @@ public class TestUserContentLogPage {
 			UserContent userContent = mock(UserContent.class);
 			when(userContent.getId()).thenReturn(1L);
 			when(userContent.getUser()).thenReturn(mockUser);
-			when(userContent.getDataType()).thenReturn(new ResponseType("TEXT", "Text"));
+			when(userContent.getDataType()).thenReturn(new IContentType() {
+				@Override
+				public String name() {
+					return "TEXT";
+				}
+				@Override
+				public String getDisplayName() {
+					return "Text";
+				}
+			});
 			when(userContent.getSortOrder()).thenReturn(1);
 			when(userContent.getTitle()).thenReturn("title");
 			when(userContent.getText()).thenReturn("sample usercontent text");

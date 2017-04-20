@@ -28,7 +28,7 @@ import java.util.Map;
 import lombok.Data;
 
 import org.apache.wicket.injection.Injector;
-import org.cast.cwm.IResponseTypeRegistry;
+import org.cast.cwm.service.IUserContentService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -41,22 +41,20 @@ import com.google.inject.Inject;
  */
 @Data
 public class ResponseMetadata implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
 
 	protected String id;
 
 	protected String collection = null;
 	
 	/** Map of metadata for each response type.  
-	 * Map key is the string value of the ResponseType object (eg "SVG") rather than the ResponseType enum object itself
+	 * Map key is the string name of the IContentType object (eg "SVG") rather than the IContentType enum object itself
 	 * to facilitate use in PropertyModel 
 	 * such as {@code  PropertyModel(responseMetadata, "type.SVG.preferred")}
 	 */
 	protected Map<String,TypeMetadata> typeMap;
 	
 	@Inject
-	protected IResponseTypeRegistry typeRegistry;
+	protected IUserContentService typeRegistry;
 
 	public ResponseMetadata () {
 		super();
@@ -126,12 +124,12 @@ public class ResponseMetadata implements Serializable {
 	}
 	
 	/**
-	 * Convenience method for getting metadata related to a given ResponseType.
+	 * Convenience method for getting metadata related to a given IContentType.
 	 * @param type
 	 * @return the TypeMetadata for the given type.
 	 */
-	public TypeMetadata getType (IResponseType type) {
-		return typeMap.get(type.getName());
+	public TypeMetadata getType (IContentType type) {
+		return typeMap.get(type.name());
 	}
 	
 	/**
@@ -144,29 +142,19 @@ public class ResponseMetadata implements Serializable {
 	}
 	
 	/**
-	 * Make sure the given ResponseType is included in this metadata object, and return it.
+	 * Make sure the given IContentType is included in this metadata object, and return it.
 	 * @param type
 	 * @return the TypeMetadata for the given type
 	 */
-	public TypeMetadata addType (IResponseType type) {
+	public TypeMetadata addType (IContentType type) {
 		if (typeMap == null)
 			typeMap = new HashMap<String,TypeMetadata>(4);
 		TypeMetadata typeMetadata = getType(type);
 		if (typeMetadata == null) {
 			typeMetadata = new TypeMetadata();
-			typeMap.put(type.getName(), typeMetadata);
+			typeMap.put(type.name(), typeMetadata);
 		}
 		return typeMetadata;
-	}
-	
-	/**
-	 * Make sure the reponse type with the given name is included in this metadata object,
-	 * and return it.
-	 * @param typeName
-	 * @return the TypeMetadata for the given type
-	 */
-	public TypeMetadata addType (String typeName) {
-		return addType (typeRegistry.getResponseType(typeName));
 	}
 	
 	/**

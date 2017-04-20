@@ -19,40 +19,18 @@
  */
 package org.cast.cwm.data;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import java.io.Serializable;
 
 /**
- * <p>
- * The type of content that a {@link Response} object represents and, therefore, a 
- * {@link ResponseData} object holds.  This will indicate what format the content 
- * is in, when it should be used, and whether certain extendible fields should be 
- * accessed (e.g. binary data).
- * 
- * TODO: There's too much overlap between PromptTypes and ResponseTypes.  The typing
- * should go in the prompt (Rating,
- * </p>
- * @author jbrookover
- *
+ * Applications must define a content-type enumerator implementing this interface.
+ * Every stored UserContent object will have a type.
+ * Content types have an internal name() for use in the database (eg the enum constant),
+ * and a display name (what researchers will see in the user-content log).
  */
-@EqualsAndHashCode
-public class ResponseType implements IResponseType {
+public interface IContentType extends Serializable {
 
-	@Getter
-	private String name;
-
-	@Getter
-	private String display;
+	public String name();
 	
-	private static final long serialVersionUID = 1L;
+	public String getDisplayName();
 
-	public ResponseType(String name, String display) {
-		this.name = name;
-		this.display = display;
-	}
-	
-	@Override
-	public String toString() {
-		return display;
-	}
 }
