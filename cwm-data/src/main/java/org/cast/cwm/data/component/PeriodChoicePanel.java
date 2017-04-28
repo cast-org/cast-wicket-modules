@@ -36,9 +36,12 @@ import org.cast.cwm.service.ICwmSessionService;
 
 import com.google.inject.Inject;
 
+/**
+ * Panel allowing the user to choose one of their Periods and set it as as the current Period in the session.
+ * A "View" button is also included.  When the Period is changed, an {@link UpdateCurrentPeriodMessage} is
+ * sent to all ancestor components.
+ */
 public class PeriodChoicePanel extends Panel {
-
-	private static final long serialVersionUID = 1L;
 
 	@Inject
 	ICwmSessionService sessionService;
@@ -56,8 +59,6 @@ public class PeriodChoicePanel extends Panel {
 
 	private class SelectForm extends Form<Void> {
 
-		private static final long serialVersionUID = 1L;
-
 		public SelectForm(String id) {
 			super(id);
 			
@@ -70,7 +71,6 @@ public class PeriodChoicePanel extends Panel {
 		}
 
 		private PropertyModel<List<Period>> getPeriodsForUser() {
-			System.err.println("User: " + sessionService.getUserModel());
 			return new PropertyModel<List<Period>>(sessionService.getUserModel(), "periodsAsList");
 		}
 
@@ -81,8 +81,6 @@ public class PeriodChoicePanel extends Panel {
 		
 		
 		private class ViewSubmitLink extends AjaxSubmitLink {
-
-			private static final long serialVersionUID = 1L;
 
 			public ViewSubmitLink(String id, Form<Void> form) {
 				super(id, form);

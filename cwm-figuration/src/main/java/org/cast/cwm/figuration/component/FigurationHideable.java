@@ -126,7 +126,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 */
 	protected Map<String,String> getShowParameters() {
 		Map<String,String> map = new HashMap<String, String>();
-		map.put("toggle", "#" + this.getMarkupId());
+		map.put("target", "#" + this.getMarkupId());
 		map.put("unlink", "true");
 		if (animated != null)
 			map.put("animate", animated.toString());
