@@ -19,71 +19,104 @@
  */
 package org.cast.cwm.figuration.component;
 
+import org.apache.wicket.ClassAttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.AbstractRepeater;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+
+import java.util.Map;
 
 /**
  * Base class for popovers built with Figuration.
- * The content of the Popover is a Component, which must use the ID given by {@link #getContentId()}.
- * The popover can be opened by client side Javascript, by a component with a
+ *
+ * A simple popover can be created with the default markup as follows:
+ * <code><pre>
+ *     new FigurationPopover&lt;Void>("id")
+ *         .withTitle("Popover title")
+ *         .withBody(bodyPanel);
+ * </pre></code>
+ *
+ * Wicket IDs of the header and body are fixed by FigurationHideable.
+ * Components for each must be supplied.
+ *
+ * Alternatively, override this and its markup to build a custom Popover.
+ * Make sure the markup includes divs with the correct class attributes.
+ *
+ * Popovers can be opened and closed in various ways: by client side Javascript, by a component with a
  * {@link org.cast.cwm.figuration.behavior.PopoverTriggerBehavior} attached, or as part of an AJAX request using
- * {@link #show(Component, org.apache.wicket.ajax.AjaxRequestTarget)} .
- * 
- * Designed to work similarly to org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow.
- * 
+ * {@link FigurationHideable#show(Component, AjaxRequestTarget)}.
+ *
+ * This class does not do any event logging itself, but you can easily log an event when a popover is
+ * opened or closed (or any other supported event) using org.cast.cwm.data.behavior.EventLoggingBehavior, eg:
+ * <code><pre>popover.add(new EventLoggingBehavior("beforeShow.cfw.popover", eventType));</pre></code>
+ *
  * @author bgoldowsky
  */
 public class FigurationPopover<T> extends FigurationHideable<T> {
 
-	public static final String CONTENT_ID = "content";
-
 	public FigurationPopover(String id) {
 		this(id, null);
-		// set a default of empty content.
-		add(new EmptyPanel(CONTENT_ID).setOutputMarkupPlaceholderTag(true));
 	}
 
 	public FigurationPopover(String id, IModel<T> model) {
 		super(id, model);
-	}
-	
-	@Override
-	protected CharSequence getShowMethodCall(String triggerMarkupId) {
-		// For popovers, need to call 'show' method after initialization
-		return super.getShowMethodCall(triggerMarkupId)
-				+ String.format("$('#%s').%s('show');",
-					triggerMarkupId,
-					getInitializationFunctionName());
+		addClassAttributeModifier();
 	}
 
 	/**
-	 * Returns the ID to use for the content component of the popover.
+	 * Sets up a ClassAttributeModifier that adds the figuration-required class attribute to the top level tag.
 	 */
-	public static String getContentId() {
-		return CONTENT_ID;
+	protected void addClassAttributeModifier() {
+		add(ClassAttributeModifier.append("class", "popover"));
 	}
 
 	/**
-	 * Sets the content of the popover to the given component.
+	 * Adds a simple header to the popover with the given title and a close button.
 	 *
-	 * @param component content component
-	 * @return this for chaining
+	 * @param title Title that will be shown in the header of the modal.
+	 * @return this, for chaining
 	 */
-	public FigurationPopover<T> setContent(final Component component) {
-		if (component.getId().equals(getContentId()) == false) {
-			throw new WicketRuntimeException("Popover content id is wrong. Component ID:" +
-					component.getId() + "; required ID: " + getContentId());
-		} else if (component instanceof AbstractRepeater) {
-			// Not sure if this restriction is necessary, since we repaint the whole object on open/close.
-			throw new WicketRuntimeException(
-					"A repeater component cannot be used as the content of a modal window, please use repeater's parent");
-		}
-		addOrReplace(component);
+	public FigurationPopover<T> withTitle(String title) {
+		return withTitle(Model.of(title));
+	}
+
+	/**
+	 * Adds a simple header to the popover with the given title and a close button.
+	 *
+	 * @param mTitle Model of the title that will be shown in the header of the popover.
+	 * @return this, for chaining
+	 */
+	public FigurationPopover<T> withTitle(IModel<String> mTitle) {
+		add(new Label(HEADER_ID, mTitle));
 		return this;
 	}
+
+	/**
+	 * Adds the given Panel as the body of this popover.
+	 *
+	 * @param bodyPanel panel to use as the body
+	 * @return this, for chaining
+	 */
+	public FigurationPopover<T> withBody(Panel bodyPanel) {
+		if (!bodyPanel.getId().equals(BODY_ID))
+			throw new IllegalArgumentException("Body panel must have id " + BODY_ID);
+		addOrReplace(bodyPanel);
+		return this;
+	}
+
+	@Override
+	protected Map<String, String> getShowParameters() {
+		Map<String, String> map = super.getShowParameters();
+		map.put("show", "true");
+		return map;
+	}
+
 	@Override
 	public String getInitializationFunctionName() {
 		return "CFW_Popover";

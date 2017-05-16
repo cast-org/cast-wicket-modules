@@ -40,6 +40,10 @@ import java.util.Map;
  */
 public abstract class FigurationHideable<T> extends GenericPanel<T> {
 
+	public static final String HEADER_ID = "header";
+	public static final String BODY_ID = "body";
+	public static final String FOOTER_ID = "footer";
+
 	/**
 	 * Whether the hide/show operation should be animated or not.
 	 * If null, the framework's default will prevail.
@@ -65,9 +69,6 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 		// setVersioned(false);
 		// setVisible(false);
 		setOutputMarkupPlaceholderTag(true);
-		
-		// set a default of empty content. 
-		//add(new EmptyPanel(CONTENT_ID).setOutputMarkupPlaceholderTag(true));
 	}
 
 	/**

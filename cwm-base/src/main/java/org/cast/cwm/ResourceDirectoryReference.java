@@ -21,6 +21,8 @@ package org.cast.cwm;
 
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.resource.FileSystemResource;
+import org.apache.wicket.resource.FileSystemResourceReference;
 import org.apache.wicket.util.file.File;
 
 /**
@@ -41,7 +43,7 @@ import org.apache.wicket.util.file.File;
  * @author bgoldowsky
  *
  */
-public class ResourceDirectoryReference extends ResourceReference {
+public class ResourceDirectoryReference extends FileSystemResourceReference {
 
 	private final File resourceDirectory;
 	
@@ -64,6 +66,6 @@ public class ResourceDirectoryReference extends ResourceReference {
 		if (!(other instanceof ResourceDirectoryReference))
 			return false;
 		ResourceDirectoryReference rdr = (ResourceDirectoryReference)other;
-		return (resourceDirectory.equals(rdr.resourceDirectory));
+		return (resourceDirectory.equals(rdr.resourceDirectory) && super.equals(other));
 	}
 }

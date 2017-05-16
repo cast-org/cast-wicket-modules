@@ -41,7 +41,7 @@ import java.util.Map;
  *         .withEmptyFooter();
  * </pre></code>
  *
- * Wicket IDs of the header, body, and footer are set by this class to be "header", "body", and "footer".
+ * Wicket IDs of the header, body, and footer are fixed by FigurationHideable.
  * Components for each must be supplied, or explicitly set to be empty as in the example above.
  *
  * For modals that include behavior, buttons in the footer, etc, you will usually want to override this
@@ -60,10 +60,6 @@ import java.util.Map;
  *
  */
 public class FigurationModal<T> extends FigurationHideable<T> {
-
-	public static final String HEADER_ID = "header";
-	public static final String BODY_ID = "body";
-	public static final String FOOTER_ID = "footer";
 
 	public FigurationModal(String id) {
 		this(id, null);
@@ -98,7 +94,7 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 	 * @return this, for chaining
 	 */
 	public FigurationModal<T> withTitle(IModel<String> mTitle) {
-		add(new FigurationModalBasicHeader("header", mTitle));
+		add(new FigurationModalBasicHeader(HEADER_ID, mTitle));
 		return this;
 	}
 
@@ -152,7 +148,10 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 		return withFooter(new EmptyPanel(FOOTER_ID));
 	}
 
-	// FIXME: explain
+	/**
+	 *
+	 * @return
+	 */
 	@Override
 	protected Map<String, String> getShowParameters() {
 		Map<String, String> map = super.getShowParameters();

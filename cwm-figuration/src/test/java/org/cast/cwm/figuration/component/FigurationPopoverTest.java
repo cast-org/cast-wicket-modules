@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.figuration.component;
 
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.util.tester.WicketTestCase;
@@ -32,16 +33,19 @@ public class FigurationPopoverTest extends WicketTestCase {
 	@Test
 	public void canRender() {
 		tester.startComponentInPage(new FigurationPopover<>("id")
-				.setContent(new PopoverBodyPanel("content")));
+				.withTitle("Test Popover")
+				.withBody(new PopoverBodyPanel("body")));
 		tester.assertComponent("id", FigurationPopover.class);
-		tester.assertComponent("id:content", PopoverBodyPanel.class);
+		tester.assertComponent("id:header", Label.class);
+		tester.assertComponent("id:body", PopoverBodyPanel.class);
 		tester.assertContains("Test popover body content.");
 	}
 
 	@Test
 	public void snapshotTest() throws Exception {
 		tester.startComponentInPage(new FigurationPopover<>("id")
-				.setContent(new PopoverBodyPanel("content")));
+				.withTitle("Test Popover")
+				.withBody(new PopoverBodyPanel("body")));
 		tester.assertResultPage(getClass(),"snapshot/FigurationPopoverTest.html");
 	}
 
