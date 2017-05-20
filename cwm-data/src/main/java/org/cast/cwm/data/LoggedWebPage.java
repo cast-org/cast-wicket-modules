@@ -52,7 +52,7 @@ import java.util.Date;
  * override {@link #shouldLogTiming()} to return false.
  */
 @Slf4j
-public abstract class LoggedWebPage extends WebPage implements IEventDataContributor<Event> {
+public abstract class LoggedWebPage<E extends Event> extends WebPage implements IEventDataContributor<E> {
 
 	@Inject
 	private IEventService eventService;
@@ -114,12 +114,12 @@ public abstract class LoggedWebPage extends WebPage implements IEventDataContrib
 	}
 
 	protected long storePageViewEvent() {
-		IModel<? extends Event> mEvent = eventService.storePageViewEvent(getPageName());
+		IModel<? extends Event> mEvent = eventService.storePageViewEvent(getPageName(), this);
 		return mEvent.getObject().getId();
 	}
 
 	@Override
-	public void contributeEventData(Event event) {
+	public void contributeEventData(E event) {
 		event.setPage(getPageName());
 		// TODO: consider if we want to add parentPageViewEvent tracking
 //		if (pageViewEventId > 0)

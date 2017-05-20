@@ -19,14 +19,13 @@
  */
 package org.cast.cwm.figuration.component;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.wicket.ClassAttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.repeater.AbstractRepeater;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 
@@ -59,6 +58,21 @@ import java.util.Map;
  * @author bgoldowsky
  */
 public class FigurationPopover<T> extends FigurationHideable<T> {
+
+	public enum Direction { TOP, BOTTOM, LEFT, RIGHT };
+
+	/**
+	 * Set placement to one of the four directions to position the popover with respect to its trigger.
+	 */
+	@Getter @Setter
+	private Direction placement = null;
+
+	/**
+	 * If true, and a {@link #placement} is set, then Figuration is allowed to flip
+	 * the placement to the other side in order to fit the popover on the screen.
+	 */
+	@Getter @Setter
+	private boolean placementAuto = false;
 
 	public FigurationPopover(String id) {
 		this(id, null);
@@ -111,9 +125,11 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 	}
 
 	@Override
-	protected Map<String, String> getShowParameters() {
-		Map<String, String> map = super.getShowParameters();
-		map.put("show", "true");
+	protected Map<String, String> getInitializeParameters() {
+		Map<String, String> map = super.getInitializeParameters();
+		if (placement != null) {
+			map.put("placement", placement.name().toLowerCase() + (placementAuto ? " auto" : ""));
+		}
 		return map;
 	}
 

@@ -24,7 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.BasicCriteriaBuilder;
 import net.databinder.models.hib.HibernateObjectModel;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.wicket.Component;
+import org.apache.wicket.Page;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
@@ -104,7 +107,12 @@ public abstract class EventService implements IEventService {
 		event.setDefaultValues();
 		cwmService.save(event);
 		cwmService.flushChanges();
-		log.debug("Saved event: {}", event);
+		if (log.isTraceEnabled()) {
+			// When tracing, build and output a complete description of the event.
+			log.trace("Saved event: {}", ReflectionToStringBuilder.reflectionToString(event), ToStringStyle.MULTI_LINE_STYLE);
+		} else {
+			log.debug("Saved event: {}", event);
+		}
 		return modelProvider.modelOf(event);
 	}
 
@@ -155,11 +163,12 @@ public abstract class EventService implements IEventService {
 	/**
 	 * {@inheritDoc}
 	 */
-	public IModel<? extends Event> storePageViewEvent(String pageName) {
+	@Override
+	public IModel<? extends Event> storePageViewEvent(String pageName, Page page) {
 		Event event = newEvent()
 				.setType(getPageViewEventType())
 				.setPage(pageName);
-		return storeEvent(event, null);
+		return storeEvent(event, page);
 	}
 
 	/**

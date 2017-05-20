@@ -153,8 +153,8 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 	 * @return
 	 */
 	@Override
-	protected Map<String, String> getShowParameters() {
-		Map<String, String> map = super.getShowParameters();
+	protected Map<String, String> getInitializeParameters() {
+		Map<String, String> map = super.getInitializeParameters();
 		map.put("show", "true");
 		return map;
 	}

@@ -20,6 +20,7 @@
 package org.cast.cwm.service;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.Page;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.cast.cwm.IEventLogger;
@@ -101,10 +102,11 @@ public interface IEventService extends IEventLogger {
 
 	/**
 	 * Create and store an event to record a page view.
-	 * @param pageName identifies which page was viewed
+	 * @param pageName name for the type of page viewed
+	 * @param page the Page component object
 	 * @return the persisted Event wrapped in a model
 	 */
-	IModel<? extends Event> storePageViewEvent(String pageName);
+	IModel<? extends Event> storePageViewEvent(String pageName, Page page);
 
 	/**
 	 * Store an event representing opening a dialog.
