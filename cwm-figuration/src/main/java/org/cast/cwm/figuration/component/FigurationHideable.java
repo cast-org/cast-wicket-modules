@@ -156,7 +156,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * @param triggerComponentId ID of the trigger component in the HTML page.
 	 * @param ajaxRequestTarget Request target associated with current AJAX request.
 	 */
-	public void connectAndhow(String triggerComponentId, AjaxRequestTarget ajaxRequestTarget) {
+	public void connectAndShow(String triggerComponentId, AjaxRequestTarget ajaxRequestTarget) {
 		Args.notNull(triggerComponentId, "Trigger ID");
 		Args.notNull(ajaxRequestTarget, "AjaxRequestTarget");
 		this.triggerComponentId = triggerComponentId;
@@ -247,7 +247,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 */
 	public String getCommandJavascript(String command) {
 		return String.format("$('#%s').%s('%s');",
-				getMarkupId(),
+				triggerComponentId,
 				getInitializationFunctionName(),
 				command);
 	}

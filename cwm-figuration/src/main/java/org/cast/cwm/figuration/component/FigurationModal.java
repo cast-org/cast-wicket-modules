@@ -37,12 +37,13 @@ import java.util.Map;
  * <code><pre>
  *     new FigurationModal&lt;Void>("modal")
  *         .withTitle("Modal Title")
- *         .withBody(bodyPanel)
+ *         .withBody(new MyBodyPanel(FigurationModal.BODY_ID))
  *         .withEmptyFooter();
  * </pre></code>
  *
- * Wicket IDs of the header, body, and footer are fixed by FigurationHideable.
- * Components for each must be supplied, or explicitly set to be empty as in the example above.
+ * Wicket IDs of the header, body, and footer are set in the markup for this class;
+ * you can use the defined constants for them as in the example above.
+ * Components for each must be supplied, or explicitly set to be empty.
  *
  * For modals that include behavior, buttons in the footer, etc, you will usually want to override this
  * class and provide your own markup.  Make sure the markup includes divs with the correct class attributes,
@@ -50,7 +51,7 @@ import java.util.Map;
  *
  * Modals can be opened and closed in various ways:  by client side Javascript, by a component with a
  * {@link ModalTriggerBehavior} attached, or as part of an AJAX request using
- * {@link FigurationHideable#show(Component, AjaxRequestTarget)}
+ * {@link FigurationHideable#connectAndShow(String, AjaxRequestTarget)}
  *
  * This class does not do any event logging itself, but you can easily log an event when a dialog is
  * opened or closed (or any other supported event) using org.cast.cwm.data.behavior.EventLoggingBehavior, eg:
