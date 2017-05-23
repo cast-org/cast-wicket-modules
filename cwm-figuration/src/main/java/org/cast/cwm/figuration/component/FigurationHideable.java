@@ -247,7 +247,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 */
 	public String getCommandJavascript(String command) {
 		return String.format("$('#%s').%s('%s');",
-				triggerComponentId,
+				getMarkupId(),
 				getInitializationFunctionName(),
 				command);
 	}

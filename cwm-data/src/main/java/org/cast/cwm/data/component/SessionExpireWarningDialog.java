@@ -157,12 +157,14 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		if (warningTime <= responseTime) {
-			throw new IllegalStateException("Warning time must be greater than response time.");
+		if (warningTime >= getSessionTimeout()) {
+			warningTime = getSessionTimeout() / 2;
+			log.debug("Warning time was longer than session timeout; reset to %d seconds", warningTime);
 		}
 
-		if (warningTime >= getSessionTimeout()) {
-			throw new IllegalStateException("Warning time must be less than session time.");
+		if (warningTime <= responseTime) {
+			responseTime = warningTime / 2;
+			log.debug("Response time was longer than warning time; reset to %d seconds", responseTime);
 		}
 
 		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
@@ -218,12 +220,13 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 				this.getMarkupId());
 	}
 
+	// Additional javascript that will be sent if debugging is on.
 	protected String getDebugJavascript() {
 		return "SessionExpireWarning.DEBUG = true;";
 	}
 	
 	protected String getBeforeInactiveTimeoutJavaScript() {
-		// Subclasses can use this to execute JavaScript just before the seeion close callback.
+		// Subclasses can use this to execute JavaScript just before the session close callback.
 		return "";
 	}
 

@@ -26,9 +26,6 @@ import org.cast.cwm.figuration.component.FigurationModal;
  * When attached to a component, adds the CFW attributes that make it open a modal.
  * Various setter methods are available to tune the behavior - whether to open on 
  * click or hover, etc.
- * 
- * Can also add an additional 'data-event-info' attribute for help in event logging.
- * 
  */
 public class ModalTriggerBehavior extends AbstractTriggerBehavior {
 
