@@ -25,19 +25,21 @@ import org.apache.wicket.Component;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.string.Strings;
-import org.cast.cwm.figuration.PopoverPlacement;
+import org.cast.cwm.figuration.Direction;
 import org.cast.cwm.figuration.component.FigurationPopover;
 
 /**
- * When attached to a component, adds the CFW attributes that make it open a popover.
+ * When attached to a component, adds the CFW attributes that make it control a popover.
  * Various setter methods are available to tune the behavior - whether to open on 
  * click or hover, the placement of the popover, etc.
- * Can also add an additional 'data-event-info' attribute for help in event logging.
- * 
+ *
+ * This can be used as a trigger for a FigurationPopover element, but also can control a
+ * pure HTML popover that's not a Wicket component.
+ * Currently, only linking to a separate popover component is handled, but Figuration also supports
+ * defining the popover's content through attributes on the trigger element.
+ *
  * TODO: CFW popovers have a lot of additional configuration options that are not yet exercised here.
- * Currently, only linking to a separate popover component is handled, but the entire popover
- * content could be specified through attributes on the trigger element.
- * 
+ *
  * @author bgoldowsky
  *
  */
@@ -48,7 +50,7 @@ public class PopoverTriggerBehavior extends AbstractTriggerBehavior {
 	 */
 	@Getter
 	@Setter
-	private PopoverPlacement placement = null;
+	private Direction placement = null;
 	
 	/**
 	 * If true, popover will be flipped to the other side of the triggerring element
@@ -67,11 +69,11 @@ public class PopoverTriggerBehavior extends AbstractTriggerBehavior {
 	
 	/**
 	 * Construct with a given FigurationPopover as the component to be toggled.
-	 * @param toggle
+	 * @param popover the Popover to be controlled by this trigger.
 	 */
-	public PopoverTriggerBehavior(FigurationPopover<?> toggle) {
-		this(toggle.getMarkupId());
-		Args.isTrue(toggle.getOutputMarkupId(), "Target must output its markup ID");
+	public PopoverTriggerBehavior(FigurationPopover<?> popover) {
+		this(popover.getMarkupId());
+		Args.isTrue(popover.getOutputMarkupId(), "Target must output its markup ID");
 	}
 	
 	/**
@@ -97,7 +99,7 @@ public class PopoverTriggerBehavior extends AbstractTriggerBehavior {
 	}
 
 	protected String getPlacementAttribute() {
-		PopoverPlacement place = getPlacement();
+		Direction place = getPlacement();
 		String autoExtension = isAutoSwitchPlacement() ? " auto" : "";
 		if (place != null) {
 			return place.name().toLowerCase() + autoExtension;

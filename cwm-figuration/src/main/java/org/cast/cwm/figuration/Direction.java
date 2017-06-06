@@ -20,12 +20,12 @@
 package org.cast.cwm.figuration;
 
 /**
- * Constants indicating where a popover may be placed.
+ * Constants indicating where a tooltip or popover may be placed.
  *
  * @author bgoldowsky
  *
  */
-public enum PopoverPlacement {
+public enum Direction {
 
 	TOP, BOTTOM, LEFT, RIGHT;
 	

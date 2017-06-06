@@ -91,10 +91,6 @@ public abstract class EventService implements IEventService {
 	 */
 	protected abstract IEventType getPageViewEventType();
 
-	/**
-	 * @return event type for opening a dialog
-	 */
-	protected abstract IEventType getDialogOpenEvent();
 
 	/**
 	 * {@inheritDoc}
@@ -169,14 +165,6 @@ public abstract class EventService implements IEventService {
 				.setType(getPageViewEventType())
 				.setPage(pageName);
 		return storeEvent(event, page);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public IModel<? extends Event> storeDialogOpenEvent(Component triggerComponent) {
-		return storeEvent(triggerComponent, getDialogOpenEvent(), null);
 	}
 
 	////// Login Session methods

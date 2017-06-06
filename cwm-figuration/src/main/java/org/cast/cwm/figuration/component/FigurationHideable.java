@@ -90,6 +90,13 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	@Getter @Setter
 	private Integer speed = null;
 
+	/**
+	 * Keep this component within the bounds of an HTML element.
+	 * The value of this field should be a jQuery selector to locate this element.
+	 */
+	@Getter @Setter
+	private String viewport = null;
+
 	public FigurationHideable(String id) {
 		this(id, null);
 	}
@@ -196,6 +203,8 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 			map.put("animate", animated.toString());
 		if (speed != null)
 			map.put("speed", speed.toString());
+		if (viewport != null)
+			map.put("viewport", viewport);
 		return map;
 	}
 

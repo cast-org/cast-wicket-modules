@@ -109,13 +109,6 @@ public interface IEventService extends IEventLogger {
 	IModel<? extends Event> storePageViewEvent(String pageName, Page page);
 
 	/**
-	 * Store an event representing opening a dialog.
-	 * @param triggerComponent the button clicked to open the dialog
-	 * @return the event logged
-	 */
-	IModel<? extends Event> storeDialogOpenEvent(Component triggerComponent);
-
-	/** 
 	 * Create a LoginSession object in the database based on the current Session and the given Request.
 	 * This should generally be called when a user logs in.
 	 * Many details about the client and session will be filled in automatically if you put this in your 

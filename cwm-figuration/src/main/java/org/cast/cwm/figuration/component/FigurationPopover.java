@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.cast.cwm.figuration.Direction;
 
 import java.util.Map;
 
@@ -49,7 +50,8 @@ import java.util.Map;
  *
  * Popovers can be opened and closed in various ways: by client side Javascript, by a component with a
  * {@link org.cast.cwm.figuration.behavior.PopoverTriggerBehavior} attached, or as part of an AJAX request using
- * {@link FigurationHideable#show(Component, AjaxRequestTarget)}.
+ * {@link FigurationHideable#show(AjaxRequestTarget)} or
+ * {@link FigurationHideable#connectAndShow(Component, AjaxRequestTarget)}.
  *
  * This class does not do any event logging itself, but you can easily log an event when a popover is
  * opened or closed (or any other supported event) using org.cast.cwm.data.behavior.EventLoggingBehavior, eg:
@@ -58,8 +60,6 @@ import java.util.Map;
  * @author bgoldowsky
  */
 public class FigurationPopover<T> extends FigurationHideable<T> {
-
-	public enum Direction { TOP, BOTTOM, LEFT, RIGHT };
 
 	/**
 	 * Set placement to one of the four directions to position the popover with respect to its trigger.
