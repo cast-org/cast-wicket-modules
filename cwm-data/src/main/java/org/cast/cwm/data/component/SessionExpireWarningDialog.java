@@ -224,10 +224,14 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 	protected String getDebugJavascript() {
 		return "SessionExpireWarning.DEBUG = true;";
 	}
-	
+
+	/**
+	 * Javascript to execute just before calling back to the server to report an expired session.
+	 * By default, this turns of any "onbeforeunload" function that would block a redirect.
+	 * @return string of javascript to execute
+	 */
 	protected String getBeforeInactiveTimeoutJavaScript() {
-		// Subclasses can use this to execute JavaScript just before the session close callback.
-		return "";
+		return "$(window).off('beforeunload');";
 	}
 
 	/**
