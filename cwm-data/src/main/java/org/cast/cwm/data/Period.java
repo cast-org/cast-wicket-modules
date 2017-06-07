@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.wicket.model.IModel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
@@ -80,7 +81,7 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 * Get a set of users in this period, filtered by
 	 * a specific role.
 	 *
-	 * @deprecated {@link org.cast.cwm.data.builders.UserCriteriaBuilder is more efficient and flexible}
+	 * @deprecated {@link org.cast.cwm.service.UserService#getByRole(IModel, Role)}  is more efficient}
 	 *
 	 * @param role return only users with at least this level of permission
 	 * @return a set of users, sorted in natural order

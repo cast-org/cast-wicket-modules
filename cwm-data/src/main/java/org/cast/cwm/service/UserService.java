@@ -208,6 +208,17 @@ public class UserService implements IUserService {
 		c.setRole(role);
 		return new UserListModel(c);
 	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.IUserService#getByRole(org.cast.cwm.data.Period, org.cast.cwm.data.Role)
+	 */
+	@Override
+	public UserListModel getByRole(IModel<Period> mPeriod, Role role) {
+		UserCriteriaBuilder c = new UserCriteriaBuilder();
+		c.setPeriod(mPeriod);
+		c.setRole(role);
+		return new UserListModel(c);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getUserListProvider()

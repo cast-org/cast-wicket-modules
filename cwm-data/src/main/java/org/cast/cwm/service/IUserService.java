@@ -95,7 +95,20 @@ public interface IUserService {
 	IModel<User> getByFullnameFromPeriod(String firstName,
 										 String lastName, IModel<? extends Period> period);
 
+	/**
+	 * Find all defined users with a specific role, eg all researchers.
+	 * @param role the role to find
+	 * @return model of the list of users
+	 */
 	UserListModel getByRole(Role role);
+
+	/**
+	 * Find users with a specific role, eg all teachers, in a given Period.
+	 * @param mPeriod model of Period
+	 * @param role the Role to find
+	 * @return model of the list of users
+	 */
+	UserListModel getByRole(IModel<Period> mPeriod, Role role);
 
 	ISortableDataProvider<User,String> getUserListProvider();
 
