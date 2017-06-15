@@ -100,7 +100,7 @@ public interface IUserService {
 	 * @param role the role to find
 	 * @return model of the list of users
 	 */
-	UserListModel getByRole(Role role);
+	IModel<List<User>> getByRole(Role role);
 
 	/**
 	 * Find users with a specific role, eg all teachers, in a given Period.
@@ -108,7 +108,7 @@ public interface IUserService {
 	 * @param role the Role to find
 	 * @return model of the list of users
 	 */
-	UserListModel getByRole(IModel<Period> mPeriod, Role role);
+	IModel<List<User>> getByRole(IModel<Period> mPeriod, Role role);
 
 	ISortableDataProvider<User,String> getUserListProvider();
 
