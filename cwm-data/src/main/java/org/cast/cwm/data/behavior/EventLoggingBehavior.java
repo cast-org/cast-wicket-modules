@@ -30,6 +30,7 @@ import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.IEventType;
+import org.cast.cwm.data.Event;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 
@@ -40,7 +41,7 @@ import org.cast.cwm.service.IEventService;
  * to the detail of the event (e.g. gathering page state).
  * 
  * @author jbrookover
- *
+ * @author bgoldowsky
  */
 @Slf4j
 public class EventLoggingBehavior extends AjaxEventBehavior {
@@ -53,20 +54,10 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	private IEventType eventType;
 	
 	/**
-	 * The detail of the event.
+	 * The base detail string for the event.
 	 */
 	@Getter @Setter
 	private String detail;
-	
-//	/**
-//	 * Javascript to be executed on the client side before
-//	 * the AJAX logging request.
-//	 * 
-//	 * TODO, bring this back, with a more descriptive name, if it's actually used.
-//	 * Will require an AjaxCallListener, see https://cwiki.apache.org/confluence/display/WICKET/Wicket+Ajax
-//	 */
-//	@Getter @Setter
-//	private String javascript;
 	
 	/**
 	 * Expression that will be evaluated on the client and
@@ -79,7 +70,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	 * </pre>
 	 */
 	@Getter @Setter
-	private String queryStringExpression;
+	private String detailsExpression;
 	
 	@Inject
 	private IEventService eventService;
@@ -103,34 +94,56 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
 	    super.updateAjaxAttributes(attributes);
 
-	    if (queryStringExpression != null) {
+	    if (detailsExpression != null) {
 		    // Add detail string dynamically
-		    attributes.getDynamicExtraParameters().add(String.format("{ %s : %s }",
-		    		queryVar, queryStringExpression));
+		    attributes.getDynamicExtraParameters().add(String.format("return { %s : %s }",
+		    		queryVar, detailsExpression));
 	    }
 	}
 	
 	@Override
 	protected void onEvent(AjaxRequestTarget target) {
-		// Construct Detail
+		if (cwmSessionService.isSignedIn()) {
+			Event event = eventService.newEvent();
+			event.setType(eventType);
+			event.setDetail(constructEventDetail());
+			onBeforeSaveEvent(event);
+			eventService.storeEvent(event, this.getComponent());
+		} else {
+			log.info("Event triggered for non-logged in user: {}, {}", eventType, constructEventDetail());
+		}
+	}
+
+	/**
+	 * Build a details string to be saved for this event.
+	 * This will contain the "detail" string given in the constructor, if any, plus whatever is returned by the
+	 * client-side "detailsExpression" javascript.
+	 * @return string that will be logged as the event details field
+	 */
+	protected String constructEventDetail() {
 		StringBuilder finalDetail = new StringBuilder();
 		if (!Strings.isEmpty(detail))
 			finalDetail.append(detail);
 
 		// Additional detail from client side
-		String clientSideInfo = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(queryVar).toString();
+		String clientSideInfo = getCustomParameterValue(queryVar);
 		if (!Strings.isEmpty(clientSideInfo)) {
 			if (finalDetail.length() > 0)
 				finalDetail.append(":");
 			finalDetail.append(clientSideInfo);
 		}
-		
-		// Log Event
-		if (cwmSessionService.isSignedIn())
-			eventService.storeEvent(this.getComponent(), eventType, finalDetail.toString());
-		else
-			log.info("Event triggered for non-logged in user: {}, {}", new Object[] {eventType, finalDetail});
+		return finalDetail.toString();
 	}
 
+	protected String getCustomParameterValue(String parameterName) {
+		return RequestCycle.get().getRequest().getQueryParameters().getParameterValue(parameterName).toString();
+	}
+
+	/**
+	 * Provided so that subclasses can add to or modify the event to be stored.
+	 * @param event event object that can be modified before being saved
+	 */
+	protected void onBeforeSaveEvent(Event event) {
+	}
 
 }

@@ -21,6 +21,7 @@ package org.cast.cwm.data.behavior;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.cast.cwm.TestingEventType;
+import org.cast.cwm.data.Event;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
@@ -29,6 +30,7 @@ import org.cast.cwm.test.CwmBaseTestCase;
 import org.cast.cwm.test.InjectionTestHelper;
 import org.junit.Test;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,6 +39,8 @@ import static org.mockito.Mockito.when;
 public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelper> {
 
 	private IEventService eventService;
+
+	private Event mockEvent;
 
 	@Override
 	public void populateInjection(InjectionTestHelper helper) {
@@ -60,6 +64,9 @@ public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelpe
 	
 	@Test
 	public void logsAnEvent() {
+		mockEvent = new Event();
+		when(eventService.newEvent()).thenReturn(mockEvent);
+
 		Label p = new Label("test", "test");
 		EventLoggingBehavior behavior = new EventLoggingBehavior("click", TestingEventType.CLICK);
 		behavior.setDetail("testDetail");
@@ -67,7 +74,9 @@ public class EventLoggingBehaviorTest extends CwmBaseTestCase<InjectionTestHelpe
 
 		tester.startComponentInPage(p);
 		tester.executeBehavior(behavior);
-		verify(eventService).storeEvent(eq(p), eq(TestingEventType.CLICK), eq("testDetail"));
+		verify(eventService).storeEvent(any(Event.class), eq(p));
+		assertEquals(TestingEventType.CLICK, mockEvent.getType());
+		assertEquals("testDetail", mockEvent.getDetail());
 	}
 
 	@Override
