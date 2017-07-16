@@ -23,6 +23,7 @@ import org.apache.wicket.mock.MockApplication;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
+import org.cast.cwm.service.IEventService;
 
 import java.util.Arrays;
 import java.util.TreeSet;
@@ -33,6 +34,14 @@ import java.util.TreeSet;
  *
  */
 public class CwmDataTestCase extends CwmDataBaseTestCase<CwmDataInjectionTestHelper> {
+
+	@Override
+	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		super.populateInjection(helper);
+		// IEventService is commonly needed.  It will be always needed if we update test application
+		// to use a CwmSession.
+		helper.injectEventService(this);
+	}
 
 	@Override
 	protected CwmDataInjectionTestHelper getInjectionTestHelper() {

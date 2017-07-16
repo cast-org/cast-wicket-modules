@@ -56,6 +56,7 @@ public class PeriodChoicePanelTest extends CwmDataTestCase {
 	
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		super.populateInjection(helper);
 		cwmSessionService = helper.injectAndStubCwmSessionService(this);
 	}
 

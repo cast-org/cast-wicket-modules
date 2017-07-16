@@ -23,11 +23,9 @@ import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.Application;
 import org.apache.wicket.Page;
+import org.apache.wicket.devutils.stateless.StatelessComponent;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponentLabel;
-import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.RequiredTextField;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
@@ -50,6 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Slf4j
+@StatelessComponent
 public class SignInFormPanel extends Panel {
 
 	private RequiredTextField<String> username;
@@ -66,7 +65,7 @@ public class SignInFormPanel extends Panel {
 		add(new SignInForm("form"));
 	}
 
-	public class SignInForm extends Form<User> {
+	public class SignInForm extends StatelessForm<User> {
 
 		public SignInForm(String id) {
 			super(id);

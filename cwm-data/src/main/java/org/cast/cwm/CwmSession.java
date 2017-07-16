@@ -34,6 +34,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.IEventService;
+import org.cwm.db.service.IModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,6 @@ import com.google.inject.Inject;
  */
 public class CwmSession extends AuthDataSessionBase<User> {
 
-	private static final long serialVersionUID = 1L;
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(CwmSession.class);
 
@@ -71,7 +71,10 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	private Long loginSessionId;
 	
 	@Inject
-	IEventService eventService;
+	private IEventService eventService;
+
+	@Inject
+	private IModelProvider modelProvider;
 
 	public CwmSession(Request request) {
 		super(request);
@@ -116,7 +119,7 @@ public class CwmSession extends AuthDataSessionBase<User> {
 
 	@Override
 	public IModel<User> createUserModel(User user) {
-		return new HibernateObjectModel<User>(user);
+		return modelProvider.modelOf(user);
 	}
 	
 	@Override

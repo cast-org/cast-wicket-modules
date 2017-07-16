@@ -26,6 +26,7 @@ import org.apache.wicket.model.Model;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
+import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.IUserService;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -62,6 +63,11 @@ public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 		when(userService.getByUsername(anyString())).thenReturn(Model.of((User) null));
 		when(userService.getBySubjectId(anyString())).thenReturn(Model.of((User) null));
 		return userService;
+	}
+
+	public IEventService injectEventService (CwmDataBaseTestCase testCase) {
+		IEventService eventService = injectMock(IEventService.class);
+		return eventService;
 	}
 
 }

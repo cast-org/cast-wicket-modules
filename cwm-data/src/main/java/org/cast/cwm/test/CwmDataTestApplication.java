@@ -20,7 +20,11 @@
 package org.cast.cwm.test;
 
 import net.databinder.auth.AuthApplication;
+import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
+import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
 
 import java.security.MessageDigest;
@@ -74,4 +78,14 @@ public class CwmDataTestApplication extends CwmTestApplication
 	public String getToken(User user) {
 		return null;
 	}
+
+//  TODO Consider using real CwmSession
+//  This would allow CwmSession.get() to work, which some classes need.
+//  However if we do this, we need EVERY test to bind an instance of IEventService since CwmSession uses it.
+//
+//	@Override
+//	public Session newSession(Request request, Response response) {
+//		return new CwmSession(request);
+//	}
+
 }

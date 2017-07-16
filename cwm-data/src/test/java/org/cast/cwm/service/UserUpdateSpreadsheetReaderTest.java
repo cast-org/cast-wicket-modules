@@ -44,6 +44,7 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		super.populateInjection(helper);
 		IUserService userService = helper.injectAndStubUserService(this);
 		helper.injectMock(ICwmService.class);
 		helper.injectMock(IDBService.class);

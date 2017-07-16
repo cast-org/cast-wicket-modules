@@ -29,6 +29,7 @@ public class RoleVisibilityContainerTest extends CwmDataTestCase {
 
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		super.populateInjection(helper);
 		helper.injectAndStubCwmSessionService(this);
 	}
 
