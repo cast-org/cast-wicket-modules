@@ -22,11 +22,14 @@ package org.cast.cwm.figuration.behavior;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.ComponentTag;
 import org.cast.cwm.figuration.TriggerType;
+import org.cast.cwm.figuration.component.FigurationHideable;
 
 /**
  * When attached to a component, adds the Figuration attributes that make it open a dropdown menu.
  * Various setter methods are available to tune the behavior - whether to open on 
  * click or hover, etc.
+ *
+ * FIXME: broken
  *
  */
 public class DropdownTriggerBehavior extends AbstractTriggerBehavior {
@@ -34,23 +37,17 @@ public class DropdownTriggerBehavior extends AbstractTriggerBehavior {
 	/**
 	 * Construct with a given markupId for the component to be toggled.
 	 * Caller is responsible for making sure that that element exists, and is a Figuration Modal.
-	 * @param toggleId ID of the modal
+	 * @param target
 	 */
-	public DropdownTriggerBehavior(String toggleId) {
-		super("dropdown", toggleId);
+	public DropdownTriggerBehavior(FigurationHideable target) {
+		super(target);
 	}
 
-	// Dropdown doesn't use the same trigger attribute as popover and modal,
-	// since its options are more restricted.
-	@Override
-	protected String getTriggerAttribute() {
-		return null;
-	}
 	
 	@Override
 	public void onComponentTag(Component component, ComponentTag tag) {
 		super.onComponentTag(component, tag);
-		if (getTriggers().contains(TriggerType.HOVER))
+		if (target.getTriggerEvents().contains(TriggerType.HOVER))
 			tag.put("data-cfw-dropdown-hover", "true");
 	}
 	

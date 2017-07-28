@@ -44,69 +44,13 @@ import org.cast.cwm.figuration.component.FigurationPopover;
  *
  */
 public class PopoverTriggerBehavior extends AbstractTriggerBehavior {
-
-	/**
-	 * Whether popover should be placed above, below, left or right of this trigger.
-	 */
-	@Getter
-	@Setter
-	private Direction placement = null;
-	
-	/**
-	 * If true, popover will be flipped to the other side of the triggerring element
-	 * if there is not room for it in the specified placement.
-	 */
-	@Getter
-	@Setter
-	private boolean autoSwitchPlacement = true;
-	
-	/**
-	 * Where the popover element will be attached; usually "body".
-	 */
-	@Getter
-	@Setter
-	private String popoverContainer = null;
 	
 	/**
 	 * Construct with a given FigurationPopover as the component to be toggled.
 	 * @param popover the Popover to be controlled by this trigger.
 	 */
 	public PopoverTriggerBehavior(FigurationPopover<?> popover) {
-		this(popover.getMarkupId());
-		Args.isTrue(popover.getOutputMarkupId(), "Target must output its markup ID");
+		super(popover);
 	}
-	
-	/**
-	 * Construct with a given markupId for the component to be toggled.
-	 * Caller is responsible for making sure that that element exists, and is a popover.
-	 * @param toggleId
-	 */
-	public PopoverTriggerBehavior(String toggleId) {
-		super("popover", toggleId);
-	}
-
-	@Override
-	public void onComponentTag(Component component, ComponentTag tag) {
-		super.onComponentTag(component, tag);
-		
-		String place = getPlacementAttribute();
-		if (place != null)
-			tag.put("data-cfw-popover-placement", place);
-		
-		String containerValue = getPopoverContainer();
-		if (!Strings.isEmpty(containerValue))
-			tag.put("data-cfw-popover-container", containerValue);
-	}
-
-	protected String getPlacementAttribute() {
-		Direction place = getPlacement();
-		String autoExtension = isAutoSwitchPlacement() ? " auto" : "";
-		if (place != null) {
-			return place.name().toLowerCase() + autoExtension;
-		} else {
-			return null;
-		}
-	}
-	
 
 }

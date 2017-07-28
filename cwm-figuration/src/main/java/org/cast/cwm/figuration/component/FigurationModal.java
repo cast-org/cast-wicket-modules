@@ -51,7 +51,7 @@ import java.util.Map;
  *
  * Modals can be opened and closed in various ways:  by client side Javascript, by a component with a
  * {@link ModalTriggerBehavior} attached, or as part of an AJAX request using
- * {@link FigurationHideable#connectAndShow(String, AjaxRequestTarget)}
+ * {@link FigurationHideable#connectAndShow(Component, AjaxRequestTarget)}
  *
  * This class does not do any event logging itself, but you can easily log an event when a dialog is
  * opened or closed (or any other supported event) using org.cast.cwm.data.behavior.EventLoggingBehavior, eg:
@@ -68,14 +68,6 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 
 	public FigurationModal(String id, IModel<T> model) {
 		super(id, model);
-		addClassAttributeModifier();
-	}
-
-	/**
-	 * Sets up a ClassAttributeModifier that adds the figuration-required class attribute to the top level tag.
-	 */
-	protected void addClassAttributeModifier() {
-		add(ClassAttributeModifier.append("class", "modal"));
 	}
 
 	/**
@@ -149,20 +141,14 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 		return withFooter(new EmptyPanel(FOOTER_ID));
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	@Override
-	protected Map<String, String> getInitializeParameters() {
-		Map<String, String> map = super.getInitializeParameters();
-		map.put("show", "true");
-		return map;
-	}
-
 	@Override
 	public String getInitializationFunctionName() {
 		return "CFW_Modal";
 	}
-	
+
+	@Override
+	public String getClassAttribute() {
+		return "modal";
+	}
+
 }

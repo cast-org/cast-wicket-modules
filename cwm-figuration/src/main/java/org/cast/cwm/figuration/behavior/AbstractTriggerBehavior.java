@@ -23,11 +23,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.util.lang.Args;
-import org.cast.cwm.figuration.TriggerType;
-
-import java.util.List;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnLoadHeaderItem;
+import org.cast.cwm.figuration.component.FigurationHideable;
 
 /**
  * Base class for triggering behaviors for modals, popovers, etc.
@@ -37,34 +35,24 @@ import java.util.List;
  */
 public abstract class AbstractTriggerBehavior extends Behavior {
 
-	protected final String widgetType;
+	@Getter
+	protected final FigurationHideable<?> target;
 
-	@Getter
-	@Setter
-	private String targetId;
-	
 	/**
-	 * What types of events (click, hover, etc) trigger the action.
-	 * Used for tooltips and popovers.
-	 */
-	@Getter
-	@Setter
-	protected List<TriggerType> triggers = null;
-	
-	/**
-	 * If set, popover behavior will be initialized by CFW based on the attributes set.
-	 * Set this to false if you want to initialize later via Javascript (eg, to set a 
-	 * placement function).
+	 * Whether this trigger should be connected and initialized on load.
+	 * Normally triggers and their hideable elements are one-to-one, and should be
+	 * connected and initialized immediately.
+	 * However, if you are re-using a single hideable element to be triggered dynamically by
+	 * several possible triggers, you can set this to false and later use connectAndShow
+	 * to initialize just in time.
 	 */
 	@Getter
 	@Setter
 	protected boolean initializeOnLoad = true;
-	
 
-	public AbstractTriggerBehavior(String widgetType, String targetId) {
-		Args.notEmpty(targetId, "toggle ID");
-		this.widgetType = widgetType;
-		this.targetId = targetId;
+
+	public AbstractTriggerBehavior(FigurationHideable target) {
+		this.target = target;
 	}
 	
 	@Override
@@ -72,39 +60,15 @@ public abstract class AbstractTriggerBehavior extends Behavior {
 		super.onConfigure(component);
 		// Trigger components must have a markupId available to Javascript.
 		component.setOutputMarkupId(true);
+		if (initializeOnLoad)
+			target.setTriggerComponent(component);
 	}
 
 	@Override
-	public void onComponentTag(Component component, ComponentTag tag) {
-		super.onComponentTag(component, tag);
-		
-		if (isInitializeOnLoad())
-			tag.put("data-cfw", widgetType);
-
-		tag.put("data-cfw-" + widgetType + "-target", "#"+getTargetId());
-		
-		String triggerAtt = getTriggerAttribute();
-		if (triggerAtt != null)
-			tag.put("data-cfw-" + widgetType + "-trigger", triggerAtt);
-	}
-	
-	/**
-	 * Return the string to use as the trigger value (types of action that will open the popover).
-	 * This is normally the values of {@link #triggers}, joined with spaces.
-	 * 
-	 * @return string value or null (meaning no attribute; CFW's defautl will be used)
-	 */
-	protected String getTriggerAttribute() {
-		List<TriggerType> triggerValues = getTriggers();
-		if (triggerValues != null && !triggerValues.isEmpty()) {
-			StringBuilder value = new StringBuilder();
-			for (TriggerType t : triggerValues)
-				value.append(t.name().toLowerCase()).append(' ');
-			value.deleteCharAt(value.length()-1); // remove trailing space
-			return value.toString();
-		} else {
-			return null;
-		}
+	public void renderHead(Component component, IHeaderResponse response) {
+		super.renderHead(component, response);
+		if (initializeOnLoad)
+			response.render(OnLoadHeaderItem.forScript(target.getInitializeJavascript()));
 	}
 
 }

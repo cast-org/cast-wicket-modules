@@ -59,20 +59,7 @@ import java.util.Map;
  *
  * @author bgoldowsky
  */
-public class FigurationPopover<T> extends FigurationHideable<T> {
-
-	/**
-	 * Set placement to one of the four directions to position the popover with respect to its trigger.
-	 */
-	@Getter @Setter
-	private Direction placement = null;
-
-	/**
-	 * If true, and a {@link #placement} is set, then Figuration is allowed to flip
-	 * the placement to the other side in order to fit the popover on the screen.
-	 */
-	@Getter @Setter
-	private boolean placementAuto = false;
+public class FigurationPopover<T> extends FigurationTooltip<T> {
 
 	public FigurationPopover(String id) {
 		this(id, null);
@@ -80,14 +67,6 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 
 	public FigurationPopover(String id, IModel<T> model) {
 		super(id, model);
-		addClassAttributeModifier();
-	}
-
-	/**
-	 * Sets up a ClassAttributeModifier that adds the figuration-required class attribute to the top level tag.
-	 */
-	protected void addClassAttributeModifier() {
-		add(ClassAttributeModifier.append("class", "popover"));
 	}
 
 	/**
@@ -118,19 +97,8 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 	 * @return this, for chaining
 	 */
 	public FigurationPopover<T> withBody(Panel bodyPanel) {
-		if (!bodyPanel.getId().equals(BODY_ID))
-			throw new IllegalArgumentException("Body panel must have id " + BODY_ID);
-		addOrReplace(bodyPanel);
+		super.withBody(bodyPanel);
 		return this;
-	}
-
-	@Override
-	protected Map<String, String> getInitializeParameters() {
-		Map<String, String> map = super.getInitializeParameters();
-		if (placement != null) {
-			map.put("placement", placement.name().toLowerCase() + (placementAuto ? " auto" : ""));
-		}
-		return map;
 	}
 
 	@Override
@@ -138,4 +106,8 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 		return "CFW_Popover";
 	}
 
+	@Override
+	public String getClassAttribute() {
+		return "popover";
+	}
 }

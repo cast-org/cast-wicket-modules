@@ -35,18 +35,7 @@ public class ModalTriggerBehavior extends AbstractTriggerBehavior {
 	 * @param modal the modal window that will be opened/closed by this component.
 	 */
 	public ModalTriggerBehavior(FigurationModal<?> modal) {
-		this(modal.getMarkupId());
-		Args.isTrue(modal.getOutputMarkupId(), "Target must output its markup ID");
-	}
-
-	/**
-	 * Construct with a given markupId for the component to be toggled.
-	 * Caller is responsible for making sure that that element exists, and is a Figuration Modal.
-	 *
-	 * @param toggleId HTML ID of the modal
-	 */
-	public ModalTriggerBehavior(String toggleId) {
-		super("modal", toggleId);
+		super(modal);
 	}
 
 }

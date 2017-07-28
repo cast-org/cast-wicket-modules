@@ -22,7 +22,7 @@ package org.cast.cwm.figuration.behavior;
 
 /**
  * When attached to a component, adds the Figuration attributes that make it open a collapsible section.
- *
+ * FIXME broken
  */
 public class CollapseTriggerBehavior extends AbstractTriggerBehavior {
 
@@ -32,7 +32,7 @@ public class CollapseTriggerBehavior extends AbstractTriggerBehavior {
 	 * @param toggleId ID of the collapsible section.
 	 */
 	public CollapseTriggerBehavior(String toggleId) {
-		super("collapse", toggleId);
+		super(null);
 	}
 	
 }
