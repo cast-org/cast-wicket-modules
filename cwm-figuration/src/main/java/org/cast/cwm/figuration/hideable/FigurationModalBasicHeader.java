@@ -17,16 +17,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration;
+package org.cast.cwm.figuration.hideable;
+
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.GenericPanel;
+import org.apache.wicket.model.IModel;
 
 /**
- * Constants indicating where a tooltip or popover may be placed.
+ * Simple header for a modal including a title and a close button.
  *
  * @author bgoldowsky
- *
  */
-public enum Direction {
+public class FigurationModalBasicHeader extends GenericPanel<String> {
 
-	TOP, BOTTOM, LEFT, RIGHT;
-	
+	public FigurationModalBasicHeader(String id, IModel<String> model) {
+		super(id);
+		add(new FigurationModalCloseButton("close"));
+		add(new Label("title", model));
+	}
+
 }

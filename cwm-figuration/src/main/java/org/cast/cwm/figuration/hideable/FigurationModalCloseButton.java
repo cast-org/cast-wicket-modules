@@ -17,23 +17,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.GenericPanel;
-import org.apache.wicket.model.IModel;
+import org.apache.wicket.markup.html.panel.Panel;
 
 /**
- * Simple header for a modal including a title and a close button.
+ * Simple Panel just including a button to close a modal.
  *
  * @author bgoldowsky
  */
-public class FigurationModalBasicHeader extends GenericPanel<String> {
+public class FigurationModalCloseButton extends Panel {
 
-	public FigurationModalBasicHeader(String id, IModel<String> model) {
+	public FigurationModalCloseButton(String id) {
 		super(id);
-		add(new FigurationModalCloseButton("close"));
-		add(new Label("title", model));
 	}
 
 }

@@ -17,22 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.behavior;
-
+package org.cast.cwm.figuration.hideable;
 
 /**
- * When attached to a component, adds the Figuration attributes that make it open a collapsible section.
+ * Constants indicating what kind of events should trigger showing a figuration hideable, popover, or modal.
+ *
+ * @author bgoldowsky
  *
  */
-public class CollapseTriggerBehavior extends AbstractTriggerBehavior {
+public enum TriggerType {
 
-	/**
-	 * Construct with a given markupId for the component to be toggled.
-	 * Caller is responsible for making sure that that element exists.
-	 * @param toggleId ID of the collapsible section.
-	 */
-	public CollapseTriggerBehavior(String toggleId) {
-		super("collapse", toggleId);
-	}
+	CLICK, HOVER, FOCUS, MANUAL;
 	
 }

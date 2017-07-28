@@ -39,8 +39,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.figuration.component.FigurationModal;
-import org.cast.cwm.figuration.component.FigurationModalBasicHeader;
+import org.cast.cwm.figuration.hideable.FigurationModal;
+import org.cast.cwm.figuration.hideable.FigurationModalBasicHeader;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.IEventService;
 
@@ -61,7 +61,7 @@ import java.util.Map;
  * In your base logged-in Page object:
  * <code><pre>
  * add(new SessionExpireWarningDialog("timeoutModal"));
- * add(new WebMarkupContainer("timeoutButton").add(new ModalTriggerBehavior(timeoutModal)));
+ * add(new WebMarkupContainer("timeoutButton").add(new FigurationTriggerBehavior(timeoutModal)));
  * </pre></code>
  *
  * In the base logged-in Page HTML:

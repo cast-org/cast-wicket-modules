@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package pagination;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.UnmodifiableIterator;
@@ -28,9 +28,9 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.tester.TagTester;
 import org.apache.wicket.util.tester.WicketTestCase;
+import org.cast.cwm.figuration.pagination.FigurationAjaxPagingNavigator;
 import org.junit.Test;
 
-import javax.sound.midi.Sequence;
 import java.util.Iterator;
 import java.util.List;
 

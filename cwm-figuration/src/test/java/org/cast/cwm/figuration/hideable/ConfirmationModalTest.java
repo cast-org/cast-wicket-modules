@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.util.tester.WicketTestCase;

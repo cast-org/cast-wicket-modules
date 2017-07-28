@@ -50,11 +50,11 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.behavior.MaxLengthAttribute;
-import org.cast.cwm.figuration.component.ConfirmationModal;
+import org.cast.cwm.figuration.hideable.ConfirmationModal;
 import org.cast.cwm.data.component.FormComponentContainer;
 import org.cast.cwm.data.models.UserPeriodNamesModel;
 import org.cast.cwm.data.validator.UniqueDataFieldValidator;
-import org.cast.cwm.figuration.behavior.ModalTriggerBehavior;
+import org.cast.cwm.figuration.hideable.FigurationTriggerBehavior;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.ISpreadsheetReader;
@@ -129,7 +129,7 @@ public class SiteInfoPage extends AdminPage {
 					}
 				};
 				item.add(deleteDialog);
-				item.add(new WebMarkupContainer("deletePeriodLink").add(new ModalTriggerBehavior(deleteDialog)));
+				item.add(new WebMarkupContainer("deletePeriodLink").add(new FigurationTriggerBehavior(deleteDialog)));
 			}
 		};
 		add(list);

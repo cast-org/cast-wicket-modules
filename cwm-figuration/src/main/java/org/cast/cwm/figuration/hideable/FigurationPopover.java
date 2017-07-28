@@ -17,20 +17,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.wicket.ClassAttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.figuration.Direction;
-
-import java.util.Map;
 
 /**
  * Base class for popovers built with Figuration.
@@ -45,11 +39,12 @@ import java.util.Map;
  * Wicket IDs of the header and body are fixed by FigurationHideable.
  * Components for each must be supplied.
  *
- * Alternatively, override this and its markup to build a custom Popover.
- * Make sure the markup includes divs with the correct class attributes.
+ * Alternatively, override this and provide your own markup to build a custom Popover.
+ * You still have to make sure the markup includes divs with the correct class attributes,
+ * just like the markup for this class, since that's how Figuration attaches its styling and behavior.
  *
- * Popovers can be opened and closed in various ways: by client side Javascript, by a component with a
- * {@link org.cast.cwm.figuration.behavior.PopoverTriggerBehavior} attached, or as part of an AJAX request using
+ * Popovers can be opened and closed in various ways: by client side Javascript, by a
+ * {@link FigurationTriggerBehavior}, or as part of an AJAX request using
  * {@link FigurationHideable#show(AjaxRequestTarget)} or
  * {@link FigurationHideable#connectAndShow(Component, AjaxRequestTarget)}.
  *
@@ -59,20 +54,7 @@ import java.util.Map;
  *
  * @author bgoldowsky
  */
-public class FigurationPopover<T> extends FigurationHideable<T> {
-
-	/**
-	 * Set placement to one of the four directions to position the popover with respect to its trigger.
-	 */
-	@Getter @Setter
-	private Direction placement = null;
-
-	/**
-	 * If true, and a {@link #placement} is set, then Figuration is allowed to flip
-	 * the placement to the other side in order to fit the popover on the screen.
-	 */
-	@Getter @Setter
-	private boolean placementAuto = false;
+public class FigurationPopover<T> extends FigurationTooltip<T> {
 
 	public FigurationPopover(String id) {
 		this(id, null);
@@ -80,14 +62,6 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 
 	public FigurationPopover(String id, IModel<T> model) {
 		super(id, model);
-		addClassAttributeModifier();
-	}
-
-	/**
-	 * Sets up a ClassAttributeModifier that adds the figuration-required class attribute to the top level tag.
-	 */
-	protected void addClassAttributeModifier() {
-		add(ClassAttributeModifier.append("class", "popover"));
 	}
 
 	/**
@@ -118,19 +92,8 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 	 * @return this, for chaining
 	 */
 	public FigurationPopover<T> withBody(Panel bodyPanel) {
-		if (!bodyPanel.getId().equals(BODY_ID))
-			throw new IllegalArgumentException("Body panel must have id " + BODY_ID);
-		addOrReplace(bodyPanel);
+		super.withBody(bodyPanel);
 		return this;
-	}
-
-	@Override
-	protected Map<String, String> getInitializeParameters() {
-		Map<String, String> map = super.getInitializeParameters();
-		if (placement != null) {
-			map.put("placement", placement.name().toLowerCase() + (placementAuto ? " auto" : ""));
-		}
-		return map;
 	}
 
 	@Override
@@ -138,4 +101,8 @@ public class FigurationPopover<T> extends FigurationHideable<T> {
 		return "CFW_Popover";
 	}
 
+	@Override
+	public String getClassAttribute() {
+		return "popover";
+	}
 }
