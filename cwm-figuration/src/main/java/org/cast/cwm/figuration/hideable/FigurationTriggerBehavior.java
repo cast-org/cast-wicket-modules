@@ -17,23 +17,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.behavior;
+package org.cast.cwm.figuration.hideable;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnLoadHeaderItem;
-import org.cast.cwm.figuration.component.FigurationHideable;
 
 /**
- * Base class for triggering behaviors for modals, popovers, etc.
+ * Add this behavior to a button or other component that should cause a FigurationHideable to open/close.
+ *
+ * After creating a component with one of the hideable types (FigurationModal, FigurationPopover,
+ * FigurationCollapse, or FigurationTooltip), construct this behavior and attach it to the button
+ * that should open that object.  This will add any linking attributes that are needed, and
+ * call the Javascript function to initialize the behavior.
+ *
+ * This can also be used in cases where there are many buttons for one dynamically-constructed popover or
+ * modal.  See {@link #initializeOnLoad} and {@link FigurationHideable#connectAndShow(Component, AjaxRequestTarget)}.
  * 
  * @author bgoldowsky
  *
  */
-public abstract class AbstractTriggerBehavior extends Behavior {
+public class FigurationTriggerBehavior extends Behavior {
 
 	@Getter
 	protected final FigurationHideable<?> target;
@@ -51,7 +59,7 @@ public abstract class AbstractTriggerBehavior extends Behavior {
 	protected boolean initializeOnLoad = true;
 
 
-	public AbstractTriggerBehavior(FigurationHideable target) {
+	public FigurationTriggerBehavior(FigurationHideable target) {
 		this.target = target;
 	}
 	

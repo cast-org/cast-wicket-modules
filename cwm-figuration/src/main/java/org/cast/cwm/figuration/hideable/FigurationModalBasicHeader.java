@@ -17,25 +17,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.behavior;
+package org.cast.cwm.figuration.hideable;
 
-import org.apache.wicket.util.lang.Args;
-import org.cast.cwm.figuration.component.FigurationModal;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.GenericPanel;
+import org.apache.wicket.model.IModel;
 
 /**
- * When attached to a component, adds the CFW attributes that make it open a modal.
- * Various setter methods are available to tune the behavior - whether to open on 
- * click or hover, etc.
+ * Simple header for a modal including a title and a close button.
+ *
+ * @author bgoldowsky
  */
-public class ModalTriggerBehavior extends AbstractTriggerBehavior {
+public class FigurationModalBasicHeader extends GenericPanel<String> {
 
-	/**
-	 * Construct with a given {@link FigurationModal} as the component to be toggled.
-	 *
-	 * @param modal the modal window that will be opened/closed by this component.
-	 */
-	public ModalTriggerBehavior(FigurationModal<?> modal) {
-		super(modal);
+	public FigurationModalBasicHeader(String id, IModel<String> model) {
+		super(id);
+		add(new FigurationModalCloseButton("close"));
+		add(new Label("title", model));
 	}
 
 }

@@ -17,13 +17,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
-import org.cast.cwm.figuration.Direction;
 
 import java.util.Map;
 
@@ -89,7 +88,7 @@ public class FigurationTooltip<T> extends FigurationHideable<T> {
 
 	@Override
 	public String getClassAttribute() {
-		return null; // Not applicable for tooltips
+		return "tooltip";
 	}
 
 }

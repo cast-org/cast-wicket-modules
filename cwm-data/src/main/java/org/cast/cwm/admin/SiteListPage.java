@@ -20,7 +20,6 @@
 package org.cast.cwm.admin;
 
 import com.google.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -29,12 +28,11 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
-import org.cast.cwm.figuration.component.ConfirmationModal;
-import org.cast.cwm.figuration.behavior.ModalTriggerBehavior;
+import org.cast.cwm.figuration.hideable.ConfirmationModal;
+import org.cast.cwm.figuration.hideable.FigurationTriggerBehavior;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ISiteService;
@@ -96,7 +94,7 @@ public class SiteListPage extends AdminPage {
 				};
 				item.add(deleteDialog);
 
-				item.add(new WebMarkupContainer("deleteSiteLink").add(new ModalTriggerBehavior(deleteDialog)));
+				item.add(new WebMarkupContainer("deleteSiteLink").add(new FigurationTriggerBehavior(deleteDialog)));
 
 				// List of periods for the site
 				RepeatingView rv = new RepeatingView("periodList");

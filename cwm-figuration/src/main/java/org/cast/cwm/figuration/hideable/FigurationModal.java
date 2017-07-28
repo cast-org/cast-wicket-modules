@@ -17,18 +17,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
-import org.apache.wicket.ClassAttributeModifier;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.cast.cwm.figuration.behavior.ModalTriggerBehavior;
 
 import java.util.Map;
+
+import static org.cast.cwm.figuration.hideable.FigurationModal.BackdropType.ACTIVE;
+import static org.cast.cwm.figuration.hideable.FigurationModal.BackdropType.STATIC;
 
 /**
  * Base class for modal dialogs built with Figuration.
@@ -45,12 +48,14 @@ import java.util.Map;
  * you can use the defined constants for them as in the example above.
  * Components for each must be supplied, or explicitly set to be empty.
  *
- * For modals that include behavior, buttons in the footer, etc, you will usually want to override this
- * class and provide your own markup.  Make sure the markup includes divs with the correct class attributes,
- * just like the markup for this class.
+ * Alternatively, provide your own markup and avoid these restrictions.
+ * For modals that include behavior, buttons in the footer, etc, you will usually want to do this.
+ * You still have to make sure the markup includes divs with the correct class attributes,
+ * just like the markup for this class, since that's how Figuration attaches its styling and behavior.
  *
- * Modals can be opened and closed in various ways:  by client side Javascript, by a component with a
- * {@link ModalTriggerBehavior} attached, or as part of an AJAX request using
+ * Modals can be opened and closed in various ways:  by client side Javascript, by
+ * {@link FigurationTriggerBehavior}, or as part of an AJAX request using
+ * {@link FigurationHideable#show(AjaxRequestTarget)} or
  * {@link FigurationHideable#connectAndShow(Component, AjaxRequestTarget)}
  *
  * This class does not do any event logging itself, but you can easily log an event when a dialog is
@@ -61,6 +66,18 @@ import java.util.Map;
  *
  */
 public class FigurationModal<T> extends FigurationHideable<T> {
+
+	/**
+	 * The backdrop is the grey overlay that dims the part of the page that's not the modal.
+	 * BackdropType NONE means that no backdrop should be added.
+	 * STATIC is a simple, non-clickable backdrop.
+	 * ACTIVE (the default) is a backdrop that closes the modal when clicked.
+	 */
+	public enum BackdropType { NONE, STATIC, ACTIVE }
+
+	@Getter @Setter
+	protected BackdropType backdrop = ACTIVE;
+
 
 	public FigurationModal(String id) {
 		this(id, null);
@@ -139,6 +156,15 @@ public class FigurationModal<T> extends FigurationHideable<T> {
 	 */
 	public FigurationModal<T> withEmptyFooter() {
 		return withFooter(new EmptyPanel(FOOTER_ID));
+	}
+
+	@Override
+	public Map<String, String> getInitializeParameters() {
+		Map<String, String> map = super.getInitializeParameters();
+		// active backdrop is the default.
+		if (backdrop != ACTIVE)
+			map.put("backdrop", backdrop==STATIC ? "static" : "false");
+		return map;
 	}
 
 	@Override

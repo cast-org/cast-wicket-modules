@@ -17,19 +17,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
-import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 
 /**
- * Simple Panel just including a button to close a modal.
+ * Base class for collapsible panels built with Figuration.
+ *
+ * You will have to extend this and provide some markup, since there is no specific markup
+ * required for collapse areas.
  *
  * @author bgoldowsky
  */
-public class FigurationModalCloseButton extends Panel {
+public abstract class FigurationCollapse<T> extends FigurationHideable<T> {
 
-	public FigurationModalCloseButton(String id) {
-		super(id);
+	public FigurationCollapse(String id) {
+		this(id, null);
+	}
+
+	public FigurationCollapse(String id, IModel<T> model) {
+		super(id, model);
+	}
+
+	@Override
+	public String getInitializationFunctionName() {
+		return "CFW_Collapse";
+	}
+
+	@Override
+	public String getClassAttribute() {
+		return "collapse";
 	}
 
 }

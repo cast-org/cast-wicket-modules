@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration.component;
+package org.cast.cwm.figuration.hideable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,9 +26,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.util.lang.Args;
 import org.apache.wicket.util.string.AppendingStringBuffer;
-import org.cast.cwm.figuration.TriggerType;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -83,7 +81,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	private String container = null;
 
 	/**
-	 * Keep this component within the bounds of an HTML element.
+	 * Keep this hideable within the bounds of an HTML element.
 	 * The value of this field should be a jQuery selector to locate this element.
 	 */
 	@Getter @Setter
@@ -102,7 +100,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * Should link to trigger element be removed when Hideable is hidden?
 	 * If null, the framework's default will prevail.
 	 */
-	private Boolean unlink = null;
+	protected Boolean unlink = null;
 
 	public FigurationHideable(String id) {
 		this(id, null);
@@ -122,7 +120,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	}
 
 	/**
-	 * Send the javascript command to show this component.
+	 * Send the javascript command to show this hideable.
 	 *
 	 * @param ajaxRequestTarget required ajax context
 	 */
@@ -168,7 +166,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 *
 	 * @return String of javascript.
 	 */
-	public CharSequence getInitializeJavascript() {
+	protected CharSequence getInitializeJavascript() {
 		if (triggerComponent == null)
 			throw new IllegalStateException("Can't initialize; no trigger component is set");
 		return String.format("$('#%s').%s(%s);",
@@ -195,12 +193,13 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 		buf.append("}");
 		return buf.toString();
 	}
+
 	/**
 	 * Returns a map of parameters that are used to initialize the Figuration widget.
 	 * These are passed as a JS Object to the initialization method.
 	 * @return Map of parameter names to values.
 	 */
-	public Map<String,String> getInitializeParameters() {
+	protected Map<String,String> getInitializeParameters() {
 		Map<String,String> map = new HashMap<>();
 		map.put("target", "#" + this.getMarkupId());
 		if (triggerEvents!=null && !triggerEvents.isEmpty())
@@ -245,7 +244,7 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * @param command command string, see Figuration documentation for appropriate widget
 	 * @return a javascript statement
 	 */
-	public String getCommandJavascript(String command) {
+	protected String getCommandJavascript(String command) {
 		return String.format("$('#%s').%s('%s');",
 				getMarkupId(),
 				getInitializationFunctionName(),
@@ -256,12 +255,12 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * Should return the Javascript method that is called to initialize this type of object.
 	 * @return name of the javascript initialization function as defined by Figuration
 	 */
-	public abstract String getInitializationFunctionName();
+	protected abstract String getInitializationFunctionName();
 
 	/**
 	 * Should return the Figuration-defined class name that distinguishes this type of hideable.
-	 * @return
+	 * @return a class attribute to add to this component's tag
 	 */
-	public abstract String getClassAttribute();
+	protected abstract String getClassAttribute();
 
 }

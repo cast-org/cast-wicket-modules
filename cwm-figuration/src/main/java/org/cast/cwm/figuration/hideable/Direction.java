@@ -17,16 +17,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.figuration;
+package org.cast.cwm.figuration.hideable;
 
 /**
- * Constants indicating what kind of events should trigger showing a figuration hideable, popover, or modal.
+ * Constants indicating where a tooltip or popover may be placed.
  *
  * @author bgoldowsky
  *
  */
-public enum TriggerType {
+public enum Direction {
 
-	CLICK, HOVER, FOCUS, MANUAL;
+	TOP, BOTTOM, LEFT, RIGHT;
 	
 }
