@@ -53,6 +53,7 @@ public abstract class ConfirmationModal<T> extends FigurationModal<T> {
 				new StringResourceModel("cancelButtonLabel", this)));
 
 		add(new AjaxLink<Void>("confirm") {
+
 			@Override
 			protected void onInitialize() {
 				super.onInitialize();
@@ -79,12 +80,12 @@ public abstract class ConfirmationModal<T> extends FigurationModal<T> {
 	}
 
 	public ConfirmationModal<T> setConfirmButtonTextModel(IModel<String> model) {
-		get("cancel").setDefaultModel(model);
+		((AjaxLink)get("confirm")).setDefaultModel(model);
 		return this;
 	}
 
 	public ConfirmationModal<T> setCancelButtonTextModel(IModel<String> model) {
-		((AjaxLink)get("confirm")).setBody(model);
+		get("cancel").setDefaultModel(model);
 		return this;
 	}
 
@@ -93,7 +94,7 @@ public abstract class ConfirmationModal<T> extends FigurationModal<T> {
 	}
 
 	public ConfirmationModal<T> setMessageText(String text) {
-		return setConfirmButtonTextModel(Model.of(text));
+		return setMessageTextModel(Model.of(text));
 	}
 
 	public ConfirmationModal<T> setConfirmButtonText(String text) {
