@@ -62,6 +62,8 @@ import org.w3c.dom.NodeList;
  * Service class to deal with XML Documents.
  * Has methods to load XML documents, set up and request XSL transforms, 
  * manage caching and updating from the filesystem, etc.
+ *
+ * Important: acts as a registry of files, so must be bound as a singleton instance.
  *  
  * @author bgoldowsky
  *
