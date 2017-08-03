@@ -22,11 +22,13 @@ package org.cast.cwm.figuration.hideable;
 /**
  * Constants indicating where a tooltip or popover may be placed.
  *
+ * For left-to-write language environments, REVERSE corresponds to the left side and FORWARD to the right.
+ *
  * @author bgoldowsky
  *
  */
 public enum Direction {
 
-	TOP, BOTTOM, LEFT, RIGHT;
+	TOP, BOTTOM, REVERSE, FORWARD
 	
 }

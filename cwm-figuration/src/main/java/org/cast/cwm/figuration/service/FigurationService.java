@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class FigurationService implements IFigurationService {
 
-	private static final String FIGURATION_DEFAULT_VERSION = "2.0.0";
+	private static final String FIGURATION_DEFAULT_VERSION = "3.0.0-beta.2";
 
 	@Getter
 	private final String figurationVersion;
@@ -67,7 +67,7 @@ public class FigurationService implements IFigurationService {
 	public JavaScriptHeaderItem makeJavaScriptReferenceHeaderItem(String version) {
 		return JavaScriptHeaderItem.forReference(
 				new UrlResourceReference(Url.parse(
-						String.format("https://cdn.jsdelivr.net/figuration/%s/js/figuration.min.js",
+						String.format("https://cdn.jsdelivr.net/npm/figuration@%s/dist/js/figuration.min.js",
 								version))) {
 					@Override
 					public List<HeaderItem> getDependencies() {
@@ -85,15 +85,13 @@ public class FigurationService implements IFigurationService {
 	public CssHeaderItem makeCssReferenceHeaderItem(String version) {
 		return CssHeaderItem.forReference(
 				new UrlResourceReference(Url.parse(
-						String.format("https://cdn.jsdelivr.net/figuration/%s/css/figuration.min.css", version))));
+						String.format("https://cdn.jsdelivr.net/npm/figuration@%s/dist/css/figuration.min.css", version))));
 	}
 
 	@Override
 	public void addFigurationHeaderItems(IHeaderResponse response) {
 		response.render(new PriorityHeaderItem(StringHeaderItem.forString(
 				"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">")));
-		response.render(new PriorityHeaderItem(StringHeaderItem.forString(
-				"<meta http-equiv=\"x-ua-compatible\" content=\"ie=edge\">")));
 
 		response.render(new PriorityHeaderItem(makeJavaScriptReferenceHeaderItem(getFigurationVersion())));
 		response.render(new PriorityHeaderItem(makeCssReferenceHeaderItem(getFigurationVersion())));
