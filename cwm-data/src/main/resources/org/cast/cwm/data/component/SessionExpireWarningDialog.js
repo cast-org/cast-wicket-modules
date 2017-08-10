@@ -51,6 +51,7 @@ var SessionExpireWarning = {
 			SessionExpireWarning.logoutDelay = responseTime * 1000; // In milliseconds
 			SessionExpireWarning.log("Time to respond to Warning Message = " + SessionExpireWarning.logoutDelay);
 			SessionExpireWarning.sessionTimeoutTime = SessionExpireWarning.warnDelay + SessionExpireWarning.logoutDelay + 2000;
+			SessionExpireWarning.reset();
 			SessionExpireWarning.start();
 		} else {
 			SessionExpireWarning.log("Invalid Time Parameters");
@@ -85,15 +86,16 @@ var SessionExpireWarning = {
     check: function() {
 	    var now = new Date().getTime();
 	    if (now > SessionExpireWarning.logoutTime) {
+            SessionExpireWarning.log("Logging out: current time " + now + " is after " + SessionExpireWarning.logoutTime);
             SessionExpireWarning.sessionTimeout();
         } else if (now > SessionExpireWarning.warnTime) {
 	        if (!SessionExpireWarning.warned) {
                 SessionExpireWarning.warn();
             } else {
-	            SessionExpireWarning.log("Remaining until logout: " + (SessionExpireWarning.logoutTime-now));
+	            SessionExpireWarning.log("Remaining until logout: " + (SessionExpireWarning.logoutTime-now)/1000 + "s");
             }
         } else {
-	        SessionExpireWarning.log("Remaining until warning: " + (SessionExpireWarning.warnTime-now));
+	        SessionExpireWarning.log("Remaining until warning: " + (SessionExpireWarning.warnTime-now)/1000 + "s");
         }
     },
 
