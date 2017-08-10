@@ -115,9 +115,10 @@ public class Event extends PersistedObject {
 	protected String componentPath;
 
 	/**
-	 * Should be set to true if there is a UserContent object connected to this event.
+	 * ID of a UserContent object connected to this event, if there is one.
+	 * Not an actual reference to the object, since UserContent objects can be deleted while Events should never be.
 	 */
-	protected boolean hasUserContent = false;
+	protected Long userContentId;
 
 
 	/**

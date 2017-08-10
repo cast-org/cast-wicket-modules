@@ -29,7 +29,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.RelationTargetAuditMode;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -127,7 +126,7 @@ public class UserContent extends PersistedObject {
 	 *
 	 * Private to force use of setter, which also updates lastUpdated.
 	 */
-	@ManyToOne(optional=true, fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@Cascade({CascadeType.ALL})
 	private BinaryFileData primaryFile;
 
@@ -138,16 +137,7 @@ public class UserContent extends PersistedObject {
 	 */
 	@ManyToMany
 	@JoinTable(inverseJoinColumns={@JoinColumn(name="file_id")})
-	private Set<BinaryFileData> secondaryFiles = new HashSet<BinaryFileData>();
-
-	/**
-	 * Related event - eg the "post" or "save" that resulted in this content getting stored or updated.
-	 *
-	 * Private to force use of setter, which also updates lastUpdated.
-	 */
-	@ManyToOne(optional=true, fetch=FetchType.LAZY)
-	@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
-	private Event event;
+	private Set<BinaryFileData> secondaryFiles = new HashSet<>();
 	
 	public UserContent() { /* No Arg Constructor for DataStore */ }
 	
@@ -161,7 +151,7 @@ public class UserContent extends PersistedObject {
 	/**
 	 * Sets the createDate field, as well as the lastUpdated field.
 	 * This is because lastUpdated should never be earlier than createDate and should always be set.
-	 * @param createDate
+	 * @param createDate when this object was originally created
 	 */
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
@@ -172,7 +162,7 @@ public class UserContent extends PersistedObject {
 	/**
 	 * Sets the text value, as well as the lastUpdated field if the text has changed.
 	 * This enforces that lastUpdated will track any changes to the text.
-	 * @param text
+	 * @param text text content to be stored
 	 */
 	public void setText(String text) {
 		if (!Strings.isEqual(this.text, text))
@@ -226,9 +216,7 @@ public class UserContent extends PersistedObject {
 		if (!StringUtils.isBlank(this.getText()))
 			return false;
 		// Check for blob content
-		if (this.getPrimaryFile() != null)
-			return false;
-		return true;
+		return this.getPrimaryFile() == null;
 	}
 
 }
