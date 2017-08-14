@@ -48,6 +48,7 @@ import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.ResourceLink;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -89,8 +90,6 @@ public class EventLog extends AdminPage {
 	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<Boolean> inAPeriod;
 	protected IModel<Boolean> showPermissionUsers;
-
-	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	@Inject
 	private IEventService eventService;
@@ -187,20 +186,8 @@ public class EventLog extends AdminPage {
 		
 		columns.add(new PropertyDataColumn<Event>("EventID", "id", "id"));
 
-		columns.add(new AbstractDataColumn<Event>("Date/Time", "startTime") {
-
-			@Override
-			public void populateItem(Item<ICellPopulator<Event>> cellItem, String componentId, IModel<Event> rowModel) {
-				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "startTime"), eventDateFormat));
-			}
-
-			@Override
-			public String getItemString(IModel<Event> rowModel) {
-				Event event = rowModel.getObject();
-				Date insertTime = event.getStartTime();
-				return new SimpleDateFormat(eventDateFormat).format(insertTime); 			
-			}
-		});
+		columns.add(new DateDataColumn<Event>("Start time", "startTime"));
+		columns.add(new DateDataColumn<Event>("End time", "endTime"));
 		
 		columns.add(new PropertyDataColumn<Event>("User", "user.subjectId", "user.subjectId"));
 		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type.displayName"));
