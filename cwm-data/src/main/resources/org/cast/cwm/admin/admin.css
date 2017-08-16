@@ -152,13 +152,15 @@ label.leftlabel {
 
 .formRow .checkboxes {
 	float:left;
-	padding: 0.2em 0 0 15px;
 	text-align:left;
 }
 .formRow .checkboxes label {
 	font-weight:normal;
 	padding:0;
 	width:auto;
+    float: none;
+    display: inline;
+    margin-left: 1em;
 }
 
 .formRow .inputItem {

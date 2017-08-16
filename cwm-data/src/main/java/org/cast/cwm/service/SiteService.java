@@ -21,10 +21,7 @@ package org.cast.cwm.service;
 
 import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
-import net.databinder.models.hib.BasicCacheableCriteriaBuilder;
-import net.databinder.models.hib.HibernateListModel;
-import net.databinder.models.hib.HibernateObjectModel;
-import net.databinder.models.hib.HibernateProvider;
+import net.databinder.models.hib.*;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
@@ -146,7 +143,7 @@ public class SiteService implements ISiteService {
 	 */
 	@Override
 	public IModel<List<Period>> listPeriods() {
-		return new HibernateListModel<Period>(Period.class);
+		return new HibernateListModel<Period>(Period.class, new BasicCriteriaBuilder(Order.asc("name")));
 	}
 	
 	/* (non-Javadoc)

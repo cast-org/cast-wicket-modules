@@ -391,8 +391,10 @@ public class EditUserPanel extends Panel {
 				
 			});
 			periods.setVisible(periods.getChoices().size() > 0 && getModelObject().usesPeriods());
+			periods.setPrefix("<div>");
+			periods.setSuffix("</div>");
 			periods.setEscapeModelStrings(false);
-			
+
 			FormComponentContainer periodsContainer = new FormComponentContainer("periodsEnclosure", periods).setLabel("Periods:");
 			components.put("periods", periodsContainer);
 			add(periodsContainer);
