@@ -109,6 +109,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 			event.setDetail(constructEventDetail());
 			onBeforeSaveEvent(event);
 			eventService.storeEvent(event, this.getComponent());
+			onAfterSaveEvent(event);
 		} else {
 			log.info("Event triggered for non-logged in user: {}, {}", eventType, constructEventDetail());
 		}
@@ -146,4 +147,10 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	protected void onBeforeSaveEvent(Event event) {
 	}
 
+	/**
+	 * Provided so that subclasses can add post Save.
+	 * @param event event object that can be modified before being saved
+	 */
+	protected void onAfterSaveEvent(Event event) {
+	}
 }
