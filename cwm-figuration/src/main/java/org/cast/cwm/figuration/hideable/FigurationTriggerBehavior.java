@@ -75,7 +75,7 @@ public class FigurationTriggerBehavior extends Behavior {
 	@Override
 	public void renderHead(Component component, IHeaderResponse response) {
 		super.renderHead(component, response);
-		if (initializeOnLoad)
+		if (initializeOnLoad && component.isEnabledInHierarchy())
 			response.render(OnLoadHeaderItem.forScript(target.getInitializeJavascript()));
 	}
 

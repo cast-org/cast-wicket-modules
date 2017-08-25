@@ -125,7 +125,17 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * @param ajaxRequestTarget required ajax context
 	 */
 	public void show(AjaxRequestTarget ajaxRequestTarget) {
-		sendCommand(ajaxRequestTarget, "show");
+		appendCommand(ajaxRequestTarget, "show");
+	}
+
+	/**
+	 * Send the javascript command to show this hideable before other ajax operations.
+	 * (See {@link #prependCommand(AjaxRequestTarget, String)})
+	 *
+	 * @param ajaxRequestTarget required ajax context
+	 */
+	public void prependShow(AjaxRequestTarget ajaxRequestTarget) {
+		prependCommand(ajaxRequestTarget, "show");
 	}
 
 	/**
@@ -134,7 +144,17 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * @param ajaxRequestTarget required ajax context
 	 */
 	public void hide(AjaxRequestTarget ajaxRequestTarget) {
-		sendCommand(ajaxRequestTarget, "hide");
+		appendCommand(ajaxRequestTarget, "hide");
+	}
+
+	/**
+	 * Send the javascript command to hide this object before other ajax operations.
+	 * (See {@link #prependCommand(AjaxRequestTarget, String)})
+	 *
+	 * @param ajaxRequestTarget required ajax context
+	 */
+	public void prependHide(AjaxRequestTarget ajaxRequestTarget) {
+		prependCommand(ajaxRequestTarget, "hide");
 	}
 
 	/**
@@ -233,8 +253,18 @@ public abstract class FigurationHideable<T> extends GenericPanel<T> {
 	 * Sends a Figuration-defined command to the modal window via javascript.
 	 * Recognized commands are 'show', 'hide', 'toggle', 'unlink', and 'destroy'.
 	 */
-	protected void sendCommand(AjaxRequestTarget ajaxRequestTarget, String command) {
+	protected void appendCommand(AjaxRequestTarget ajaxRequestTarget, String command) {
 		ajaxRequestTarget.appendJavaScript(getCommandJavascript(command));
+	}
+
+	/**
+	 * Sends a Figuration-defined command to the modal window via javascript, to be done BEFORE other ajax operations.
+	 * Normally hide & show commands are appended to the end of the AJAX operation, but
+	 * sometimes prepending is necessary, for example when closing a window BEFORE removing its triggering button.
+	 * Recognized commands are 'show', 'hide', 'toggle', 'unlink', and 'destroy'.
+	 */
+	protected void prependCommand(AjaxRequestTarget ajaxRequestTarget, String command) {
+		ajaxRequestTarget.prependJavaScript(getCommandJavascript(command));
 	}
 
 	/**
