@@ -19,10 +19,12 @@
  */
 package org.cast.cwm.data.validator;
 
-import net.databinder.models.hib.ICriteriaBuilder;
+import lombok.Getter;
+import lombok.Setter;
 import net.databinder.models.hib.HibernateObjectModel;
+import net.databinder.models.hib.ICriteriaBuilder;
+import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.util.lang.Classes;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
@@ -31,6 +33,7 @@ import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.User;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -53,23 +56,25 @@ import java.util.Map;
  *
  * @param <T>
  */
-public class UniqueDataFieldValidator<T> implements IValidator<T> {
+public class UniqueDataFieldValidator<T> implements IValidator<T>, IDetachable {
 
-	private static final long serialVersionUID = 1L;
 	private Class<? extends PersistedObject> clazz;
-	private IModel<? extends PersistedObject> current = new Model<PersistedObject>(null);
+	private IModel<? extends PersistedObject> mCurrent = null;
 	private String field;
-	private Map<String, IModel<? extends Serializable>> scope = new HashMap<String, IModel<? extends Serializable>>();
+	private Map<String, IModel<? extends Serializable>> scope = new HashMap<>();
+
+	@Getter @Setter
+	private boolean caseSensitive = true;
 
 	/**
 	 * Constructor used when editing a persistent object.
 	 *
-	 * @param current the object being edited
+	 * @param mCurrent model of the object being edited
 	 * @param fieldName the field to confirm for uniqueness among objects of this type
 	 */
-	public UniqueDataFieldValidator(IModel<? extends PersistedObject> current, String fieldName) {
-		this.current = current;
-		this.clazz = current.getObject().getClass();
+	public UniqueDataFieldValidator(IModel<? extends PersistedObject> mCurrent, String fieldName) {
+		this.mCurrent = mCurrent;
+		this.clazz = mCurrent.getObject().getClass();
 		this.field = fieldName;
 	}
 	
@@ -86,10 +91,13 @@ public class UniqueDataFieldValidator<T> implements IValidator<T> {
 
 	@Override
 	public void validate(final IValidatable<T> validatable) {
-		HibernateObjectModel<PersistedObject> other = new HibernateObjectModel<PersistedObject>(clazz, new ICriteriaBuilder() {
+		HibernateObjectModel<PersistedObject> mOther = new HibernateObjectModel<>(clazz, new ICriteriaBuilder() {
 			@Override
 			public void buildUnordered(Criteria criteria) {
-				criteria.add(Restrictions.eq(field, validatable.getValue()));
+				SimpleExpression comparison = Restrictions.eq(field, validatable.getValue());
+				if (!isCaseSensitive())
+					comparison.ignoreCase();
+				criteria.add(comparison);
 				for (String field : scope.keySet()) {
 					criteria.add(Restrictions.eq(field, scope.get(field).getObject()));
 				}
@@ -99,10 +107,13 @@ public class UniqueDataFieldValidator<T> implements IValidator<T> {
 				buildUnordered(criteria);
 			}
 		});	
-		
-		if (other.getObject() != null && !other.getObject().equals(current.getObject())) {
+
+		// Raise an error if we found an object with that field value, and it's not the current object
+		if (mOther.getObject() != null) {
+			if (mCurrent != null && mOther.getObject().equals(mCurrent.getObject()))
+				return;
 			ValidationError err = new ValidationError(this).addKey(getResourceKey());
-			err.setVariables(variablesMap());
+			err.setVariables(getVariablesMap());
 			validatable.error(err);
 		}
 	}
@@ -118,6 +129,9 @@ public class UniqueDataFieldValidator<T> implements IValidator<T> {
 	 * </code> 
 	 * would limit the unique field validation to a given site, allowing
 	 * you to have objects with non-unique fields in <i>different</i> sites.
+	 *
+	 * This method can be called multiple times to add several scope limits,
+	 * all of which must be satisfied.
 	 * 
 	 * @param field the name of the field in the object
 	 * @param value the object that this field must represent
@@ -132,11 +146,17 @@ public class UniqueDataFieldValidator<T> implements IValidator<T> {
 		return Classes.simpleName(getClass());
 	}
 
-	protected Map<String, Object> variablesMap() {
-		Map<String, Object> map = new HashMap<String, Object>(2);
+	protected Map<String, Object> getVariablesMap() {
+		Map<String, Object> map = new HashMap<>(2);
 		map.put("field", field);
 		map.put("object", clazz.getSimpleName());
 		return map;
+	}
+
+	@Override
+	public void detach() {
+		if (mCurrent != null)
+			mCurrent.detach();
 	}
 
 }
