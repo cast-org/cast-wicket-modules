@@ -19,13 +19,24 @@ var SessionExpireWarning = {
     logoutTime: null, // Time when the user will be declared inactive and logged out
 
 	/**
-	 * Reset the timer
+	 * Reset the timers to their initial state.
+	 * This is called at page load, and when the warning dialog is closed by the user.
 	 */
 	reset: function() {		
 		SessionExpireWarning.log("resetting the timers");
 		SessionExpireWarning.warned = false;
         SessionExpireWarning.warnTime = new Date().getTime() + SessionExpireWarning.warnDelay;
         SessionExpireWarning.logoutTime = SessionExpireWarning.warnTime + SessionExpireWarning.logoutDelay;
+	},
+
+    /**
+	 * Reset the timer unless the warning dialog is already open.
+	 * This is called by the AJAX listener to monitor "activity".
+	 * If the dialog is open, then the user must explicitly indicate activity.
+     */
+	keepAlive: function() {
+		if (!SessionExpireWarning.warned)
+			SessionExpireWarning.reset();
 	},
 	
 	/**
@@ -76,7 +87,7 @@ var SessionExpireWarning = {
 	 * Stop the timer
 	 */
 	stop: function() {
-		if (SessionExpireWarning.timer != null) {
+		if (SessionExpireWarning.timer !== null) {
 			clearInterval(SessionExpireWarning.timer);
 			SessionExpireWarning.timer = null;
 		}
@@ -105,7 +116,7 @@ var SessionExpireWarning = {
 	warn: function() {
 		SessionExpireWarning.log("Warning Function Called");
         SessionExpireWarning.warned = true;
-		if (typeof SessionExpireWarning.warnFunction == 'function') {
+		if (typeof SessionExpireWarning.warnFunction === 'function') {
 			SessionExpireWarning.warnFunction();
 		} else {
 			alert("Warning: Your login session is about to expire.");

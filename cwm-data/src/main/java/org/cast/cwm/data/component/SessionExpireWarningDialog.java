@@ -117,15 +117,6 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 	}
 	
 	/**
-	 * Called when the user indicates that they are still working.
-	 * 
-	 * @param target Ajax request target
-	 */
-	protected void keepAliveCall(AjaxRequestTarget target) {
-		target.appendJavaScript(getResetJavascript());
-	}
-	
-	/**
 	 * Called when the user did not respond to warning in the designated time.  This
 	 * is where you can logout and redirect.  By default, a logged in user is redirected
 	 * to {@link CwmApplication#getSignInPageClass()} with parameter 'expired=true' and 
@@ -157,15 +148,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		if (warningTime >= getSessionTimeout()) {
-			warningTime = getSessionTimeout() / 2;
-			log.debug("Warning time was longer than session timeout; reset to %d seconds", warningTime);
-		}
-
-		if (warningTime <= responseTime) {
-			responseTime = warningTime / 2;
-			log.debug("Response time was longer than warning time; reset to %d seconds", responseTime);
-		}
+		sanityCheckTimings();
 
 		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
 
@@ -174,8 +157,19 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 		script.append(getUserResponseWatcherJavascript());
 		if (debug)
 			script.append(getDebugJavascript());
-
 		response.render(OnDomReadyHeaderItem.forScript(script.toString()));
+	}
+
+	protected void sanityCheckTimings() {
+		if (warningTime >= getSessionTimeout()) {
+			warningTime = getSessionTimeout() / 2;
+			log.debug("Warning time was longer than session timeout; reset to {} seconds", warningTime);
+		}
+
+		if (warningTime <= responseTime) {
+			responseTime = warningTime / 2;
+			log.debug("Response time was longer than warning time; reset to {} seconds", responseTime);
+		}
 	}
 
 	protected String getInitializationJavascript() {
@@ -186,7 +180,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 		//	logoutDelay - time, in seconds, the user has to respond to the warning
 		//	inactiveCallbackFunction - function that is triggered if the user does not respond to warning
 
-		String script = "SessionExpireWarning.init(" +
+		return "SessionExpireWarning.init(" +
 				getSessionTimeout() + ", " +
 				warningTime + ", " +
 				"function() {" + getCommandJavascript("show") + "}, " +
@@ -195,7 +189,6 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 				getBeforeInactiveTimeoutJavaScript() +
 				"Wicket.Ajax.get({u:'" + inactiveBehavior.getCallbackUrl() + "'}); " +
 				"});";
-		return script;
 	}
 
 	/**
@@ -240,8 +233,8 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 	 *
 	 * @return Javascript string.
 	 */
-	public static String getResetJavascript() {
-		return "if (typeof SessionExpireWarning != \"undefined\" && typeof SessionExpireWarning.reset == \"function\") { SessionExpireWarning.reset(); }";
+	public static String getKeepAliveJavascript() {
+		return "if (typeof SessionExpireWarning != \"undefined\" && typeof SessionExpireWarning.keepAlive == \"function\") { SessionExpireWarning.keepAlive(); }";
 	}
 
 	/**
@@ -269,7 +262,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 
 		@Override
 		public void onAfterRespond(Map<String, Component > map, AjaxRequestTarget.IJavaScriptResponse response) {
-			response.addJavaScript(getResetJavascript());
+			response.addJavaScript(getKeepAliveJavascript());
 		}
 
 	}
