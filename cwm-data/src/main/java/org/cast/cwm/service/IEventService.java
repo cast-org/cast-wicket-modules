@@ -73,12 +73,25 @@ public interface IEventService extends IEventLogger {
 	 * and working down to the triggeringComponent, can add any relevant contextual
 	 * information to the Event.  Any component that wants to add information should
 	 * implement the {@link IEventDataContributor} interface.
+	 * Storing an event may register activity with the session; see {@link #registerActivityWithSession(IModel)}.
 	 *
 	 * @param event the Event to be filled out and saved
 	 * @param triggeringComponent the Component where the event was initiated (eg, a button)
 	 * @return the persisted Event wrapped in a model
 	 */
 	<T extends Event> IModel<T> storeEvent(T event, Component triggeringComponent);
+
+	/**
+	 * Update the session's last-known activity timestamp based on this event, if appropriate.
+	 * Most events reflect activity that should keep the session active, but some, like "logout"
+	 * or "timeout", do not.  If you are using CWM's session timeout management
+	 * (see {@link org.cast.cwm.data.LoggedWebPage} then you may need to override this method to
+	 * test the events that your application uses and call {@link ICwmSessionService#registerActivity()}
+	 * for the appropriate set of them.
+	 *
+	 * @param mEvent an event that was just stored.
+	 */
+	<T extends Event> void registerActivityWithSession(IModel<T> mEvent);
 
 	/**
 	 * Create and store an event.

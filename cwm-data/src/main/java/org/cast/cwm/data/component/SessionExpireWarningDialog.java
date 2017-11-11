@@ -23,40 +23,32 @@ import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.databinder.auth.AuthApplication;
-import net.databinder.auth.AuthDataSessionBase;
 import org.apache.wicket.Application;
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
+import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxCallListener;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.CwmApplication;
-import org.cast.cwm.CwmSession;
+import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.figuration.hideable.FigurationModal;
 import org.cast.cwm.figuration.hideable.FigurationModalBasicHeader;
 import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
-
-import java.util.Map;
 
 /**
  * Dialog that warns the user that their session is going to expire soon.
  *
- * <p>To use, add this and a button tied to it (needed for focus management) to any page that
- * is part of a logged-in session.  Also, add a listener so that the Javascript knows when
- * AJAX requests are keeping the session active.</p>
- *
- * In Application.init():
- * <code><pre>
- * SessionExpireWarningDialog.addAjaxListener(this);
- * </pre></code>
+ * To use, add this and a button tied to it (needed for focus management) to any page that
+ * is part of a logged-in session.
  *
  * In your base logged-in Page object:
  * <code><pre>
@@ -80,19 +72,17 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 	@Getter @Setter
 	private boolean debug = false;
 
-	// Note that the session timeout is set in CwmApplication - sessionTimeout
-
-	@Getter @Setter
-	private int warningTime = 60 * 5; // Number of seconds before session expires that the user receives a warning.
-
-	@Getter @Setter
-	private int responseTime = 60 * 4; // Number of seconds after warning before the user is automatically logged out.
-
 	protected static final PackageResourceReference JAVASCRIPT_REFERENCE
 			= new PackageResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
+
+	protected static final String CHECK_EVENT_NAME = "session-expire-check";
+	protected static final String REFRESH_EVENT_NAME = "session-expire-dialog-closed";
 	
 	@Inject
 	private ICwmService cwmService;
+
+	@Inject
+	private ICwmSessionService cwmSessionService;
 	
 	@Inject
 	private IEventService eventService;
@@ -104,166 +94,139 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 
 		add(new FigurationModalBasicHeader("header", new ResourceModel("timeoutHeader")));
 
-		inactiveBehavior = new AbstractDefaultAjaxBehavior() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void respond(AjaxRequestTarget target) {
-				onInactive(target);
-			}
-		};
-		add(inactiveBehavior);
-	}
-	
-	/**
-	 * Called when the user did not respond to warning in the designated time.  This
-	 * is where you can logout and redirect.  By default, a logged in user is redirected
-	 * to {@link CwmApplication#getSignInPageClass()} with parameter 'expired=true' and 
-	 * all others are directed to the homepage.
-	 * 
-	 * <p><strong>Note</strong>: In a proper setup, this call itself will refresh
-	 * the HttpSession.  So, if no action is taken, the mere presence of this component
-	 * will keep the session alive.</p>
-	 *
-	 * @param target the ajax request target
-	 */
-	protected void onInactive(AjaxRequestTarget target) {
-		log.info("Inactive User Detected");
-		
-		// We're signed in; redirect to login.
-		if (CwmSession.get().getLoginSession() != null) {
-			eventService.forceCloseLoginSession(CwmSession.get().getLoginSession(), "[timeout]");
-			cwmService.flushChanges();
-			CwmSession.get().setLoginSessionModel(null);
-			AuthDataSessionBase.get().signOut();
-			setResponsePage(((AuthApplication)Application.get()).getSignInPageClass(),
-					new PageParameters().set("expired", "true"));
-		
-		// We're not signed in; redirect to home because page is no longer functional
-		} else {
-			setResponsePage(Application.get().getHomePage());
-		}			
+		add(new ActivityCheckBehavior());
+		add(new SessionRefreshBehavior());
 	}
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
-		sanityCheckTimings();
-
 		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
-
-		StringBuilder script = new StringBuilder();
-		script.append(getInitializationJavascript());
-		script.append(getUserResponseWatcherJavascript());
-		if (debug)
-			script.append(getDebugJavascript());
-		response.render(OnDomReadyHeaderItem.forScript(script.toString()));
-	}
-
-	protected void sanityCheckTimings() {
-		if (warningTime >= getSessionTimeout()) {
-			warningTime = getSessionTimeout() / 2;
-			log.debug("Warning time was longer than session timeout; reset to {} seconds", warningTime);
-		}
-
-		if (warningTime <= responseTime) {
-			responseTime = warningTime / 2;
-			log.debug("Response time was longer than warning time; reset to {} seconds", responseTime);
-		}
+		response.render(OnDomReadyHeaderItem.forScript(getInitializationJavascript()));
 	}
 
 	protected String getInitializationJavascript() {
 		// initialize the warning js by calling SessionExpireWarning.init with the following params
-		//	sessionLength - length, in seconds, of the HttpSession
-		//	warningTime - time, in seconds, before HttpSession ends to trigger a warning
-		//	warningCallbackFunction - function that is triggered to warn the user of impending session expiration
-		//	logoutDelay - time, in seconds, the user has to respond to the warning
-		//	inactiveCallbackFunction - function that is triggered if the user does not respond to warning
+		//	id - this dialog's markup ID (for triggering JS events)
+		//	nextCheckTime - time, in seconds, before client should call back to check status
+		//  checkEventName - name of event that will be triggered to check in with server
+		//  closeEventName - name of event that will be triggered when the warning dialog is closed by the user
+		//  homePage - URL to redirect to on session timeout
+		//  debug - whether debugging messages should be output to the javascript console
 
-		return "SessionExpireWarning.init(" +
-				getSessionTimeout() + ", " +
-				warningTime + ", " +
-				"function() {" + getCommandJavascript("show") + "}, " +
-				responseTime + ", " +
-				"function() { " +
-				getBeforeInactiveTimeoutJavaScript() +
-				"Wicket.Ajax.get({u:'" + inactiveBehavior.getCallbackUrl() + "'}); " +
-				"});";
+		return String.format("SessionExpireWarning.init('%s', %d, '%s', '%s', '%s', %b);",
+				this.getMarkupId(),
+				cwmSessionService.getSessionWarningTime(),
+				CHECK_EVENT_NAME,
+				REFRESH_EVENT_NAME,
+				urlFor(Application.get().getHomePage(), new PageParameters().set("expired", "true")),
+				debug);
+	}
+
+	protected String nextCheckJavascript(long seconds) {
+		return String.format("SessionExpireWarning.setNextCheck(%d);", seconds);
+	}
+
+	private void onWarning(AjaxRequestTarget target) {
+		log.debug("Sending inactive warning to user");
+		show(target);
+		target.appendJavaScript(nextCheckJavascript(cwmSessionService.timeToTimeout()));
 	}
 
 	/**
-	 * Return the session timeout defined in the application.
-	 * If the Application is not a CwmApplication (eg, in tests), we don't know how to find this,
-	 * so this method will return an arbitrary default.
+	 * Called when the user did not respond to warning in the designated time.  This
+	 * is where you can logout and redirect.  By default, a logged in user is redirected
+	 * to {@link CwmApplication#getSignInPageClass()} with parameter 'expired=true' and
+	 * all others are directed to the homepage.
 	 *
-	 * @return Number of seconds defined for web-server session time out
+	 * @param target the ajax request target
 	 */
-	protected int getSessionTimeout() {
-		Application app = Application.get();
-		if (app instanceof CwmApplication) {
-			return ((CwmApplication) app).getSessionTimeout();
+	protected void onInactive(AjaxRequestTarget target) {
+		log.info("User logged out due to inactivity");
+
+		// We're signed in; force logout and redirect to login.
+		LoginSession loginSession = cwmSessionService.getLoginSession();
+		if (loginSession != null) {
+			eventService.forceCloseLoginSession(loginSession, "[timeout]");
+			cwmService.flushChanges();
+			cwmSessionService.setLoginSessionModel(null);
+			cwmSessionService.signOut();
+//			setResponsePage(((AuthApplication)Application.get()).getSignInPageClass(),
+//					new PageParameters().set("expired", "true"));
+
+			// We're not signed in; redirect to home because page is no longer functional
 		} else {
-			log.warn("Not a CwmApplication, can't determine server session length, using default");
-			return 30*60; // 30 minutes
+//			setResponsePage(Application.get().getHomePage());
 		}
-	}
 
-	protected String getUserResponseWatcherJavascript() {
-		return String.format("$('#%s').on('afterHide.cfw.modal', SessionExpireWarning.reset);",
-				this.getMarkupId());
-	}
-
-	// Additional javascript that will be sent if debugging is on.
-	protected String getDebugJavascript() {
-		return "SessionExpireWarning.DEBUG = true;";
-	}
-
-	/**
-	 * Javascript to execute just before calling back to the server to report an expired session.
-	 * By default, this turns of any "onbeforeunload" function that would block a redirect.
-	 * @return string of javascript to execute
-	 */
-	protected String getBeforeInactiveTimeoutJavaScript() {
-		return "$(window).off('beforeunload');";
-	}
-
-	/**
-	 * Returns a javascript that will reset the timer.
-	 * Used after AJAX requests, see {@link #addAjaxListener(WebApplication)}
-	 *
-	 * @return Javascript string.
-	 */
-	public static String getKeepAliveJavascript() {
-		return "if (typeof SessionExpireWarning != \"undefined\" && typeof SessionExpireWarning.keepAlive == \"function\") { SessionExpireWarning.keepAlive(); }";
-	}
-
-	/**
-	 * Add the appropriate AJAX request listener so that the session expiry warning is aware of AJAX traffic.
-	 * Sessions that are actively making AJAX requests should not be considered idle, and user
-	 * does not need to be warned about expiry.
-	 *
-	 * All applications that use the SessinExpireWarningDialog should call this method from Application.init().
-	 *
-	 * @param application the wicket application object
-	 */
-	public static void addAjaxListener(WebApplication application) {
-		application.getAjaxRequestTargetListeners().add(new SessionAliveListener());
+		// Tell client side to redirect to login page.
+		target.appendJavaScript("SessionExpireWarning.expired();");
 	}
 
 
-	/**
-	 * Ajax request target listener that resets session expiry timer on every AJAX request,
-	 * so that a session that is actively making AJAX requests is not considered inactive
-	 * and user is not warned about expiry.
-	 *
-	 * @see #addAjaxListener(WebApplication)
-	 */
-	public static class SessionAliveListener extends AjaxRequestTarget.AbstractListener {
+	protected class ActivityCheckBehavior extends AjaxEventBehavior {
+
+		public ActivityCheckBehavior() {
+			super(CHECK_EVENT_NAME);
+		}
 
 		@Override
-		public void onAfterRespond(Map<String, Component > map, AjaxRequestTarget.IJavaScriptResponse response) {
-			response.addJavaScript(getKeepAliveJavascript());
+		protected void onEvent(AjaxRequestTarget target) {
+			log.debug("ActivityCheckBehavior triggered");
+
+			// Possible future extension: Read last known activity from request, store into session
+			// This would be useful if we want to count pure client-side non-ajax user actions as "activity"
+			// for keep-alive purposes.  Would require some code like the following; and see also updateAjaxAttrs below.
+			//
+			// String LKA = RequestCycle.get().getRequest().getQueryParameters()
+			//		.getParameterValue("lastKnownActivity").toString();
+			// log.debug("Last known activity: {}", LKA);
+			// cwmSessionService.registerActivity(LKA);
+
+			long timeToExpiryWarning = cwmSessionService.timeToExpiryWarning();
+			long timeToLogout = cwmSessionService.timeToTimeout();
+			if (timeToLogout < 0) {
+				onInactive(target);
+			} else if (timeToExpiryWarning < 0) {
+				onWarning(target);
+			} else {
+				// Session is still active; set up next check time to be current warn time.
+				target.appendJavaScript(nextCheckJavascript(timeToExpiryWarning));
+				// Close warning dialog if it happened to be open
+				target.appendJavaScript("SessionExpireWarning.clearWarning();");
+			}
+		}
+
+		@Override
+		protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+			super.updateAjaxAttributes(attributes);
+			// In case server can't be reached, invoke a client-side handler rather than default error behavior.
+			attributes.getAjaxCallListeners()
+					.add(new AjaxCallListener()
+							.onFailure("SessionExpireWarning.checkFailed(attrs, jqXHR, errorMessage, textStatus);"));
+
+			// More code needed if we need additional client-side activity tracking
+			// attributes.getDynamicExtraParameters().add(String.format("return { %s : %s }",
+			//  "lastKnownActivity", "SessionExpireWarning.lastKnownActivity"));
 		}
 
 	}
+
+
+	protected class SessionRefreshBehavior extends AjaxEventBehavior {
+
+		public SessionRefreshBehavior() {
+			super(REFRESH_EVENT_NAME);
+		}
+
+		@Override
+		protected void onEvent(AjaxRequestTarget target) {
+			log.debug("SessionRefreshBehavior triggered");
+
+			cwmSessionService.registerActivity();
+			target.appendJavaScript(nextCheckJavascript(cwmSessionService.timeToExpiryWarning()));
+		}
+
+	}
+
+
 }

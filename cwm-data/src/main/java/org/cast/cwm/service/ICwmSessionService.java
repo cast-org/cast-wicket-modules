@@ -26,6 +26,8 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 
+import java.util.Date;
+
 /*
  * Service Wrapper for CwmSession that we can inject and mock to isolate session stuff in tests.
  * 
@@ -35,6 +37,47 @@ import org.cast.cwm.data.User;
  */
 @ImplementedBy(CwmSessionService.class)
 public interface ICwmSessionService {
+
+	/**
+	 * Number of seconds of inactivity before the session should be considered possibly stale,
+	 * and the user warned (if possible) that it will timeout.
+	 * In the default implementation, this is based on the cwm.sessionWarningTime configuration setting.
+	 * @return number of seconds.
+	 */
+	int getSessionWarningTime();
+
+	/**
+	 * Number of seconds of inactivity before a session should be invalidated by the server.
+ 	 * In the default implementation, this is based on the cwm.sessionTimeoutTime configuration setting.
+	 * @return number of seconds
+	 */
+	int getSessionTimeoutTime();
+
+	/**
+	 * Number of seconds left before the user should be warned that this session is inactive and will expire.
+	 * Based on {@link #getSessionWarningTime()} and the last registered activity in the session.
+	 * @return number of seconds; may be negative if warning time has passed.
+	 */
+	int timeToExpiryWarning();
+
+	/**
+	 * Number of seconds left before this session should be terminated for inactivity.
+	 * Based on {@link #getSessionTimeoutTime()} and the last registered activity in the session.
+	 * @return number of seconds; may be negative if warning time has passed.
+	 */
+	int timeToTimeout();
+
+	/**
+	 * Update the last-activity field in the session to the given time.
+	 * If a later time has already been recorded, this will have no effect.
+	 * @param date The time when some activity is known to have occurred in the session.
+	 */
+	void registerActivity(Date date);
+
+	/**
+	 * Update the last-activity field in the session to the current time.
+	 */
+	void registerActivity();
 
 	IModel<LoginSession> getLoginSessionModel();
 	IModel<Site> getCurrentSiteModel();

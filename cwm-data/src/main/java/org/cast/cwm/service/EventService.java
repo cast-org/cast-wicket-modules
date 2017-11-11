@@ -109,7 +109,17 @@ public abstract class EventService implements IEventService {
 		} else {
 			log.debug("Saved event: {}", event);
 		}
-		return modelProvider.modelOf(event);
+		IModel<T> mEvent = modelProvider.modelOf(event);
+		registerActivityWithSession(mEvent);
+		return mEvent;
+	}
+
+	@Override
+	public <T extends Event> void registerActivityWithSession(IModel<T> mEvent) {
+		IEventType type = mEvent.getObject().getType();
+		if (type != getLogoutEventType()
+				&& type != getTimeoutEventType())
+			cwmSessionService.registerActivity(mEvent.getObject().getStartTime());
 	}
 
 	/**
@@ -190,14 +200,12 @@ public abstract class EventService implements IEventService {
 		if (r instanceof ServletWebRequest) 
 			loginSession.setIpAddress(((ServletWebRequest)r).getContainerRequest().getRemoteAddr());
 		
-		loginSession.setCookiesEnabled(false);
 		if (cwmSession.getClientInfo() != null) {
 			ClientProperties info = cwmSession.getClientInfo().getProperties();
 			loginSession.setScreenHeight(info.getBrowserHeight());
 			loginSession.setScreenWidth(info.getBrowserWidth());
 			if (info.getTimeZone() != null)
 				loginSession.setTimezoneOffset(info.getTimeZone().getOffset(new Date().getTime()));
-			loginSession.setCookiesEnabled(info.isNavigatorCookieEnabled());
 			loginSession.setPlatform(info.getNavigatorPlatform());
 			loginSession.setUserAgent(cwmSession.getClientInfo().getUserAgent());
 		}

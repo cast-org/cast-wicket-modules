@@ -24,10 +24,10 @@ import java.util.Date;
 import net.databinder.models.hib.HibernateListModel;
 
 import org.apache.wicket.injection.Injector;
-import org.cast.cwm.CwmApplication;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,10 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 	
 	@Inject
 	private IEventService eventService;
-	
+
+	@Inject
+	private ICwmSessionService cwmSessionService;
+
 	public CloseOldLoginSessions() {
 		super();
 		Injector.get().inject(this);
@@ -69,7 +72,7 @@ public class CloseOldLoginSessions implements IDatabaseInitializer {
 	public boolean run(IAppConfiguration appProperties) {
 		boolean changesMade = false;
 		Date now = new Date();
-		long expiryTime = now.getTime() - CwmApplication.get().getSessionTimeout()*1000;
+		long expiryTime = now.getTime() - cwmSessionService.getSessionTimeoutTime()*1000;
 		for (LoginSession ls : new HibernateListModel<LoginSession>(LoginSession.class, new LoginSessionCriteriaBuilder()).getObject()) {
 			Date lastEventTime = eventService.getLastEventTime(ls);
 			if (lastEventTime == null || lastEventTime.getTime()<expiryTime) {
