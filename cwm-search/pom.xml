@@ -19,6 +19,7 @@
   	<dependency>
   		<groupId>org.projectlombok</groupId>
   		<artifactId>lombok</artifactId>
-  	</dependency>
+		<scope>provided</scope>
+	</dependency>
   </dependencies>
 </project>
