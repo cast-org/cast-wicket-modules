@@ -17,6 +17,11 @@
             <groupId>org.cast.cwm</groupId>
             <artifactId>cwm-xml</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
   
 </project>

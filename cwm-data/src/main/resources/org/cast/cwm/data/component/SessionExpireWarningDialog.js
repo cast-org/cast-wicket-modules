@@ -4,89 +4,51 @@
  */
 var SessionExpireWarning = {
 
-	// Parameters that can be adjusted
-    warnDelay: 0,         // Time until user receives a warning
-	logoutDelay: 0,       // Additional time user has to respond to the warning
-    checkPeriod: 10000,   // how often to check (in ms)
-    warnFunction: null,   // Callback to warn that the session is about to expire
-    logoutFunction: null, // Callback if user does not respond to warning
-    DEBUG: false,
-
-    // Internal variables
-    timer: null, // Timer for periodic checks
-    warned: false, // If true, warning has been popped up
-    warnTime: null, // Time when the warning will be displayed
-    logoutTime: null, // Time when the user will be declared inactive and logged out
-
-	/**
-	 * Reset the timers to their initial state.
-	 * This is called at page load, and when the warning dialog is closed by the user.
-	 */
-	reset: function() {		
-		SessionExpireWarning.log("resetting the timers");
-		SessionExpireWarning.warned = false;
-        SessionExpireWarning.warnTime = new Date().getTime() + SessionExpireWarning.warnDelay;
-        SessionExpireWarning.logoutTime = SessionExpireWarning.warnTime + SessionExpireWarning.logoutDelay;
-	},
+    dialogId: null,                 // Markup ID of the warning dialog
+    tickPeriod: 10000,              // how often to wake up and check the time (in ms)
+    nextCheckTime: null,            // Time when we should next check with server for status
+    checkEventName: null,           // Event that will be triggered to check with server
+    refreshEventName: null,         // Event that will be triggered when the warning dialog is closed by the user
+    homePage: null,                 // URL to redirect to on logout
+    timer: null,                    // Timer for periodic checks
+    ignoreDialogClose: false,       // Set temporarily to true when we're programmatically closing the dialog
+    debug: false,                   // whether debugging information should be logged to the console.
 
     /**
-	 * Reset the timer unless the warning dialog is already open.
-	 * This is called by the AJAX listener to monitor "activity".
-	 * If the dialog is open, then the user must explicitly indicate activity.
+     * Initialize the SessionExpireWarning timer.
+     *
+     * @param dialogId
+     * @param secondsUntilCheck
+     * @param checkEventName
+     * @param refreshEventName
+     * @param homePage
+     * @param debug
      */
-	keepAlive: function() {
-		if (!SessionExpireWarning.warned)
-			SessionExpireWarning.reset();
-	},
-	
-	/**
-	 * Initialize the SessionExpireWarning timer.  The timer
-	 * will only function if session timeout is longer than 
-	 * one minute.
-	 * 
-	 * @param {Object} sessionLength - length, in seconds, of the HttpSession
-	 * @param {Object} warningTime - time, in seconds, before HttpSession ends to trigger a warning
-	 * @param {Object} warningCallbackFunction - function that is triggered to warn the user of impending session expiration
-	 * @param {Object} responseTime - time, in seconds, the user has to respond to the warning
-	 * @param {Object} inactiveCallbackFunction - function that is triggered if the user does not respond to warning
-	 */
-	init: function(sessionLength, warningTime, warningCallbackFunction, responseTime, inactiveCallbackFunction) {
-		
-		SessionExpireWarning.warnFunction = warningCallbackFunction;
-		SessionExpireWarning.logoutFunction = inactiveCallbackFunction;
-		
-		// Timeout must be at least a minute.
-		if (sessionLength > warningTime && responseTime < warningTime) {
-			SessionExpireWarning.warnDelay = (sessionLength - warningTime) * 1000; // In milliseconds
-			SessionExpireWarning.log("Time till Warning Message = " + SessionExpireWarning.warnDelay);
-			SessionExpireWarning.logoutDelay = responseTime * 1000; // In milliseconds
-			SessionExpireWarning.log("Time to respond to Warning Message = " + SessionExpireWarning.logoutDelay);
-			SessionExpireWarning.sessionTimeoutTime = SessionExpireWarning.warnDelay + SessionExpireWarning.logoutDelay + 2000;
-			SessionExpireWarning.reset();
-			SessionExpireWarning.start();
-		} else {
-			SessionExpireWarning.log("Invalid Time Parameters");
-			return;
-		}
-		SessionExpireWarning.log("warningCallback =" + warningCallbackFunction);
-		
+	init: function(dialogId, secondsUntilCheck, checkEventName, refreshEventName, homePage, debug) {
+	    SessionExpireWarning.dialogId = dialogId;
+        SessionExpireWarning.setNextCheck(secondsUntilCheck);
+        SessionExpireWarning.checkEventName = checkEventName;
+        SessionExpireWarning.refreshEventName = refreshEventName;
+        SessionExpireWarning.homePage = homePage;
+        SessionExpireWarning.debug = debug;
+        SessionExpireWarning.startTimer();
+
+        $('#' + dialogId).on('afterHide.cfw.modal', SessionExpireWarning.dialogClosed);
 	},
 	
 	/**
 	 * Start the timer
 	 */
-	start: function() {
-		if (SessionExpireWarning.warnDelay > 0 ) {
-			// We use an interval timer since one-shot timers might never fire if, say, laptop is closed.
-			SessionExpireWarning.timer = setInterval(SessionExpireWarning.check, SessionExpireWarning.checkPeriod);
-			SessionExpireWarning.log("Starting Timer = " + SessionExpireWarning.timer);
-		}
+	startTimer: function() {
+		// We use an interval timer since one-shot timers might never fire if, say, laptop is closed for a while.
+		SessionExpireWarning.timer = setInterval(SessionExpireWarning.tick, SessionExpireWarning.tickPeriod);
+		SessionExpireWarning.log("Starting Timer = " + SessionExpireWarning.timer);
 	},
 	
 	/**
-	 * Stop the timer
+	 * Stop the timer (not normally used)
 	 */
-	stop: function() {
+	stopTimer: function() {
 		if (SessionExpireWarning.timer !== null) {
 			clearInterval(SessionExpireWarning.timer);
 			SessionExpireWarning.timer = null;
@@ -94,51 +56,83 @@ var SessionExpireWarning = {
 		SessionExpireWarning.log("Timer Stopped");
 	},
 
-    check: function() {
-	    var now = new Date().getTime();
-	    if (now > SessionExpireWarning.logoutTime) {
-            SessionExpireWarning.log("Logging out: current time " + now + " is after " + SessionExpireWarning.logoutTime);
-            SessionExpireWarning.sessionTimeout();
-        } else if (now > SessionExpireWarning.warnTime) {
-	        if (!SessionExpireWarning.warned) {
-                SessionExpireWarning.warn();
+    /**
+     * Called by timer periodically; if it is time to check in with the server this will trigger the appropriate event.
+     */
+    tick: function() {
+        // Is it time to check with the server?
+        if (SessionExpireWarning.nextCheckTime !== null) {
+            var now = new Date().getTime();
+            if (now > SessionExpireWarning.nextCheckTime) {
+                SessionExpireWarning.log("Checking...");
+                SessionExpireWarning.nextCheckTime = null;
+                $('#' + SessionExpireWarning.dialogId).trigger(SessionExpireWarning.checkEventName);
             } else {
-	            SessionExpireWarning.log("Remaining until logout: " + (SessionExpireWarning.logoutTime-now)/1000 + "s");
+                SessionExpireWarning.log("Remaining until check: " +
+                    Math.ceil((SessionExpireWarning.nextCheckTime - now)/1000) + "s");
             }
         } else {
-	        SessionExpireWarning.log("Remaining until warning: " + (SessionExpireWarning.warnTime-now)/1000 + "s");
+            window.console.log("SessionExpireWarning error - no next check time");
         }
     },
 
-	/**
-	 * Warn user (and trigger inactive timer)
-	 */
-	warn: function() {
-		SessionExpireWarning.log("Warning Function Called");
-        SessionExpireWarning.warned = true;
-		if (typeof SessionExpireWarning.warnFunction === 'function') {
-			SessionExpireWarning.warnFunction();
-		} else {
-			alert("Warning: Your login session is about to expire.");
-		}
-	},
+    /**
+     * Called by the server to request that the client should check in after a given period of time.
+     *
+     * @param secondsUntilNextCheck
+     */
+    setNextCheck: function(secondsUntilNextCheck) {
+        SessionExpireWarning.log("Next check time: " + secondsUntilNextCheck);
+        SessionExpireWarning.nextCheckTime = new Date().getTime() + secondsUntilNextCheck*1000;
+    },
 
-	/**
-	 * Session is inactive and should be forced to home upon re-opening browser window
-	 */
-	sessionTimeout: function() {
-		SessionExpireWarning.logoutFunction();
-	},
+    /**
+     * Called by the server when check result is that the session is alive and well.
+     */
+    clearWarning: function() {
+        // Close the warning dialog if it is open.
+        if ($('#' + SessionExpireWarning.dialogId + ":visible").length) {
+            // Set this flag so that we'll ignore the afterHide.cfw.modal callback.
+            SessionExpireWarning.ignoreDialogClose = true;
+            var dialog = $('#' + SessionExpireWarning.dialogId);
+            dialog.CFW_Modal('hide');
+        }
+    },
 
-	/**
-	 * Log a message to Firebug's console
-	 * 
-	 * @param {Object} val
+    /**
+     * Callback function invoked when warning dialog is closed.
+     */
+    dialogClosed: function() {
+        // The dialog box may be closed in two ways:
+        // 1. Programmatically closed via clearWarning() method due to activity in another window.
+        // 2. Closed by the user clicking on it, in which case we need to notify the server of new activity.
+        if (SessionExpireWarning.ignoreDialogClose) {
+            SessionExpireWarning.log("Dialog closed programmatically, not notifying server");
+            SessionExpireWarning.ignoreDialogClose = false;
+        } else {
+            SessionExpireWarning.log("User closed the warning dialog, notifying server of activity");
+            $('#' + SessionExpireWarning.dialogId).trigger(SessionExpireWarning.refreshEventName);
+        }
+    },
+
+    expired: function() {
+        SessionExpireWarning.log("Session expired");
+        $(window).off('beforeunload');
+        window.location = SessionExpireWarning.homePage;
+    },
+
+    checkFailed: function(attrs, xhr, message, failType) {
+        SessionExpireWarning.log("Check failure: attrs=" + attrs + "; type=" + failType + "; message=" + message);
+    },
+
+    /**
+	 * Log a message to Firebug's console if debugging is turned on.
 	 */
-	log: function(val) {
-		if (SessionExpireWarning.DEBUG && window.console && window.console.log)
-			window.console.log(val);
+	log: function(message) {
+		if (SessionExpireWarning.debug && window.console && window.console.log)
+			window.console.log(message);
 	}
+
 };
 
 

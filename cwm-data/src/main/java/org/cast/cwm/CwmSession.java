@@ -21,6 +21,7 @@ package org.cast.cwm;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.databinder.auth.AuthDataSessionBase;
 import net.databinder.models.hib.HibernateObjectModel;
 
@@ -33,6 +34,7 @@ import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.cwm.db.service.IModelProvider;
 import org.slf4j.Logger;
@@ -40,20 +42,35 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
+import java.util.Date;
+
 /**
  * Extension of Databinder's AuthDataSession that keeps track of the LoginSession.
  * 
  * @author bgoldowsky
  *
  */
+@Slf4j
 public class CwmSession extends AuthDataSessionBase<User> {
 
-	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(CwmSession.class);
-
+	/**
+	 * The database representation of this session (if logged in)
+	 */
 	@Getter
 	private IModel<LoginSession> loginSessionModel;
-	
+
+	// Would not ordinarily keep track of this separately, but there may be situations
+	// where you can't trust HibnerateObjectModel  (TODO not sure if this still applies)
+	@Getter
+	private Long loginSessionId;
+
+	/**
+	 * Most recent time that we know there was activity in this session.
+	 * This is used to determine when the user should be warned, and then automatically logged out.
+	 */
+	@Getter
+	private Date lastKnownActivity = new Date();
+
 	/** Can be used to hold one of the Sites that the user is connected to,
 	 * this would be considered their "current" site.
 	 */
@@ -66,10 +83,6 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	@Getter @Setter
 	private IModel<Period> currentPeriodModel;
 	
-	// Would not ordinarily keep track of this separately, but CwmSessionStore needs it & can't trust HibnerateObjectModel
-	@Getter
-	private Long loginSessionId;
-	
 	@Inject
 	private IEventService eventService;
 
@@ -79,10 +92,30 @@ public class CwmSession extends AuthDataSessionBase<User> {
 	public CwmSession(Request request) {
 		super(request);
 		Injector.get().inject(this);
+		registerActivity();
 	}
 	
 	public static CwmSession get() {
 		return (CwmSession) Session.get();
+	}
+
+	/**
+	 * Let the session know that some activity has just happened (eg, an AJAX operation).
+	 * Call whenever there is activity in the session that should re-start the counter to session expiry.
+	 */
+	public void registerActivity() {
+		registerActivity(new Date());
+	}
+
+	/**
+	 * Let the session know that some activity happened at a given time.
+	 * If this is later than the currently last-known activity, it will update that information.
+	 * @param date Date of some activity in the session
+	 */
+	public void registerActivity(Date date) {
+		if (date.after(lastKnownActivity)) {
+			lastKnownActivity = date;
+		}
 	}
 
 	@Override
@@ -97,6 +130,7 @@ public class CwmSession extends AuthDataSessionBase<User> {
 				if (getUser() != null)
 					eventService.recordLogout(triggerComponent);
 				loginSessionModel = null;
+				loginSessionId = null;
 			}
 		}
 		super.signOut();

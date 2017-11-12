@@ -47,8 +47,8 @@ import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.service.IAdminPageService;
+import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.IUserContentService;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,10 +89,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Getter 
 	protected String appInstanceId;
-
-	@Getter 
-	protected int sessionTimeout; // Session timeout, in seconds.  
-	protected final int DEFAULT_SESSION_TIMEOUT = 90*60; // Defaults to 90 minutes
 	
 	@Getter 
 	private String mailHost;
@@ -105,6 +101,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Inject
 	private IAdminPageService adminPageService;
+
+	@Inject
+	private ICwmSessionService cwmSessionService;
 	
 	private LoginSessionCloser loginSessionCloser;
 	
@@ -248,12 +247,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		new DatabaseInitializerRunner(configuration).run(getDatabaseInitializers());
 	}
 
-// TODO: can't override session store any more - how to get this functionality back?
-//	@Override
-//	protected ISessionStore newSessionStore() {
-//		return new CwmSessionStore(this, new DiskPageStore());
-//	}
-
 	public static CwmApplication get() {
 		return (CwmApplication) Application.get();
 	}
@@ -306,7 +299,6 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	public void loadAppProperties() {
 		configuration = AppConfiguration.loadFor(this);
 		appInstanceId = configuration.getString("cwm.instanceId", "unknown");
-		sessionTimeout = configuration.getInteger("cwm.sessionTimeout", DEFAULT_SESSION_TIMEOUT);
 	}
 	
 	// Called to create a Wicket session
@@ -315,7 +307,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	public Session newSession(Request request, Response response) {
 		if (request instanceof ServletWebRequest) {
 			((ServletWebRequest) request).getContainerRequest()
-					.getSession().setMaxInactiveInterval(sessionTimeout);
+					.getSession().setMaxInactiveInterval(cwmSessionService.getSessionTimeoutTime());
 		}
 		return new CwmSession(request);
 	}
