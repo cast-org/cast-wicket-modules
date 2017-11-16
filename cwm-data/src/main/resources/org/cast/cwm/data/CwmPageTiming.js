@@ -13,6 +13,10 @@
 
 CwmPageTiming = {};
 
+CwmPageTiming.startInactiveTime = null;
+CwmPageTiming.totalInactiveTime = 0;
+CwmPageTiming.pageBlocked = false;
+
 /**
  * Call to initiate time tracking of this page.
  * @param eventId the ID that we use to identify this page view event to the server.
@@ -20,11 +24,22 @@ CwmPageTiming = {};
  */
 CwmPageTiming.trackPage = function(eventId, url) {
     CwmPageTiming.eventId = eventId;
+
+
+    var currentTime = Date.now();
     var timingSupported = CwmPageTiming.isTimingSupported();
     var storageSupported = CwmPageTiming.isLocalStorageSupported();
 
     if (!timingSupported && !storageSupported)
         return; // nothing we can do with very old browsers
+
+    // Tracking for visible/invisible time
+    if (document.hasFocus !== 'undefined') {
+        CwmPageTiming.handleFocusChange();
+        $(window).on('focusin focusout', CwmPageTiming.handleFocusChange);
+    } else {
+        console.log("Browser doesn't support focus checking; hidden time won't be reported.")
+    }
 
     var loadTime = null;
     var endPageInfo = "";
@@ -39,7 +54,7 @@ CwmPageTiming.trackPage = function(eventId, url) {
         $(window).on('beforeunload', function () { CwmPageTiming.saveEndTime(eventId); });
 
         // Save current time - end time will be calculated as an offset to this.
-        localStorage['pageStartTime.' + eventId] = Date.now();
+        localStorage['pageStartTime.' + eventId] = currentTime;
 
         // Gather up any saved end times from previous pages.
         // endPageInfo variable will get zero or more  "id=duration;" items
@@ -50,8 +65,9 @@ CwmPageTiming.trackPage = function(eventId, url) {
                 var id = match[1];
                 var endTime = localStorage[key];
                 var startTime = localStorage['pageStartTime.' + id];
+                var inactiveTime = localStorage['pageInactiveTime.' + id];
                 if (startTime) {
-                    endPageInfo += id + "=" + (endTime - startTime) + ";";
+                    endPageInfo += id + "=" + (endTime - startTime) + "=" + inactiveTime + ";";
                     itemsSent.push(id);
                 } else {
                     console.log("Weird - end time but no start time for event " + id);
@@ -69,10 +85,41 @@ CwmPageTiming.trackPage = function(eventId, url) {
     CwmPageTiming.sendData(url, data, itemsSent);
 };
 
+
+CwmPageTiming.blocked = function(isBlocked) {
+    CwmPageTiming.pageBlocked = isBlocked;
+    CwmPageTiming.handleFocusChange();
+};
+
+CwmPageTiming.handleFocusChange = function() {
+    if (!CwmPageTiming.pageBlocked && document.hasFocus()) {
+        // page is active.  If it was inactive before, record duration of inactivity.
+        CwmPageTiming.recordInactiveTime();
+    } else {
+        // Page is either blocked or blurred.  Record start of inactive time if this is new.
+        if (CwmPageTiming.startInactiveTime === null) {
+            CwmPageTiming.startInactiveTime = Date.now();
+            console.log("Window went inactive at ", CwmPageTiming.startInactiveTime);
+        }
+    }
+};
+
+CwmPageTiming.recordInactiveTime = function() {
+    if (CwmPageTiming.startInactiveTime !== null) {
+        var now = Date.now();
+        CwmPageTiming.totalInactiveTime += (now - CwmPageTiming.startInactiveTime);
+        console.log("Window reactivated. Was inactive from ", CwmPageTiming.startInactiveTime, " to ", now);
+        console.log("Cumulative inactive time = ", CwmPageTiming.totalInactiveTime);
+        CwmPageTiming.startInactiveTime = null;
+    }
+};
+
 // Called in page's onbeforeunload event:
 // saves a timestamp to local storage as the page gets unloaded
 CwmPageTiming.saveEndTime = function(eventId) {
     localStorage['pageEndTime.' + eventId] = Date.now();
+    CwmPageTiming.recordInactiveTime();
+    localStorage['pageInactiveTime.' + eventId] = CwmPageTiming.totalInactiveTime;
 };
 
 // Send the collected data to the server AJAX endpoint

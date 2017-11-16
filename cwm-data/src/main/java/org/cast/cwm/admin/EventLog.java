@@ -188,6 +188,7 @@ public class EventLog extends AdminPage {
 
 		columns.add(new DateDataColumn<Event>("Start time", "startTime"));
 		columns.add(new DateDataColumn<Event>("End time", "endTime"));
+		columns.add(new PropertyDataColumn<Event>("Active duration", "activeDuration"));
 		
 		columns.add(new PropertyDataColumn<Event>("User", "user.subjectId", "user.subjectId"));
 		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type.displayName"));

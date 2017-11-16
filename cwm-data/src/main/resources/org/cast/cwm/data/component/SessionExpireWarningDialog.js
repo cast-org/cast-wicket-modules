@@ -87,6 +87,18 @@ var SessionExpireWarning = {
     },
 
     /**
+     * Called by the server when we're in the warning zone.
+     */
+    warning: function() {
+        // Open the dialog if it is not open already
+        if ($('#' + SessionExpireWarning.dialogId + ":visible").length === 0) {
+            $('#' + SessionExpireWarning.dialogId).CFW_Modal('show');
+            if (CwmPageTiming)
+                CwmPageTiming.blocked(true);
+        }
+    },
+
+    /**
      * Called by the server when check result is that the session is alive and well.
      */
     clearWarning: function() {
@@ -113,6 +125,8 @@ var SessionExpireWarning = {
             SessionExpireWarning.log("User closed the warning dialog, notifying server of activity");
             $('#' + SessionExpireWarning.dialogId).trigger(SessionExpireWarning.refreshEventName);
         }
+        if (CwmPageTiming)
+            CwmPageTiming.blocked(false);
     },
 
     expired: function() {

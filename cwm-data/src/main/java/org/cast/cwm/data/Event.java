@@ -85,6 +85,13 @@ public class Event extends PersistedObject {
 	protected Date endTime;
 
 	/**
+	 * Number of milliseconds of the event's duration that are considered "inactive".
+	 * For page-view events, LoggedWebPage will set this to the time that the page's window
+	 * was not focused.
+	 */
+	protected long inactiveDuration = 0L;
+
+	/**
 	 * For page view events, the time in ms that the browser took to load this page.
 	 */
 	@Column(nullable=true)
@@ -145,6 +152,10 @@ public class Event extends PersistedObject {
 			return 0;
 		else
 			return endTime.getTime() - startTime.getTime();
+	}
+
+	public long getActiveDuration() {
+		return getDuration() - inactiveDuration;
 	}
 
 }

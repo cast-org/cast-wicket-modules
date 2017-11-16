@@ -128,8 +128,8 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 
 	private void onWarning(AjaxRequestTarget target) {
 		log.debug("Sending inactive warning to user");
-		show(target);
 		target.appendJavaScript(nextCheckJavascript(cwmSessionService.timeToTimeout()));
+		target.appendJavaScript("SessionExpireWarning.warning();");
 	}
 
 	/**
@@ -150,16 +150,16 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 			cwmService.flushChanges();
 			cwmSessionService.setLoginSessionModel(null);
 			cwmSessionService.signOut();
-//			setResponsePage(((AuthApplication)Application.get()).getSignInPageClass(),
-//					new PageParameters().set("expired", "true"));
-
-			// We're not signed in; redirect to home because page is no longer functional
-		} else {
-//			setResponsePage(Application.get().getHomePage());
 		}
-
 		// Tell client side to redirect to login page.
 		target.appendJavaScript("SessionExpireWarning.expired();");
+	}
+
+	protected void onActive(AjaxRequestTarget target) {
+		// Session is still active; set up next check time to be current warn time.
+		target.appendJavaScript(nextCheckJavascript(cwmSessionService.timeToExpiryWarning()));
+		// Close warning dialog if it happened to be open
+		target.appendJavaScript("SessionExpireWarning.clearWarning();");
 	}
 
 
@@ -182,17 +182,12 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 			// log.debug("Last known activity: {}", LKA);
 			// cwmSessionService.registerActivity(LKA);
 
-			long timeToExpiryWarning = cwmSessionService.timeToExpiryWarning();
-			long timeToLogout = cwmSessionService.timeToTimeout();
-			if (timeToLogout < 0) {
+			if (cwmSessionService.timeToTimeout() < 0) {
 				onInactive(target);
-			} else if (timeToExpiryWarning < 0) {
+			} else if (cwmSessionService.timeToExpiryWarning() < 0) {
 				onWarning(target);
 			} else {
-				// Session is still active; set up next check time to be current warn time.
-				target.appendJavaScript(nextCheckJavascript(timeToExpiryWarning));
-				// Close warning dialog if it happened to be open
-				target.appendJavaScript("SessionExpireWarning.clearWarning();");
+				onActive(target);
 			}
 		}
 

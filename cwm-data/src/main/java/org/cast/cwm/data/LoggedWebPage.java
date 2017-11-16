@@ -155,23 +155,25 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 			if (!Strings.isEmpty(endPageInfo)) {
 				for (String item : endPageInfo.split(";")) {
 					String[] info = item.split("=");
-					if (info.length == 2) {
+					if (info.length == 3) {
 						try {
 							Long eventId = Long.valueOf(info[0]);
 							Long duration = Long.valueOf(info[1]);
+							Long inactiveDuration = Long.valueOf(info[2]);
 							IModel<Event> mEndingEvent = cwmService.getById(Event.class, eventId);
 							if (mEndingEvent != null && mEndingEvent.getObject() != null) {
 								Event event = mEndingEvent.getObject();
 								Date endTime = new Date(event.getStartTime().getTime() + duration);
 								event.setEndTime(endTime);
+								event.setInactiveDuration(inactiveDuration);
 							} else {
 								log.warn("End time information received but could not find event id={}", eventId);
 							}
 						} catch (NumberFormatException e) {
-							log.warn("Ajax request contained invalid number, should be 'id=time': {}", item);
+							log.warn("Ajax request contained invalid number, should be 'id=##=##': {}", item);
 						}
 					} else {
-						log.warn("Ajax request contained invalid format, should be 'id=time': {}", item);
+						log.warn("Ajax request contained invalid format, should be 'id=##=##': {}", item);
 					}
 				}
 
