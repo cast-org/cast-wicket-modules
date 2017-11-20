@@ -50,8 +50,6 @@ import org.hibernate.annotations.GenericGenerator;
 		@Index(columnList="sessionId", name="loginsession_session_idx", unique = true)
 })
 public class LoginSession extends PersistedObject {
-  
-	private static final long serialVersionUID = 1L;
 
 	@Id @GeneratedValue(generator = "my_generator")
 	@Setter(AccessLevel.NONE) 
@@ -74,16 +72,14 @@ public class LoginSession extends PersistedObject {
 	private Integer screenWidth;
 	private Integer screenHeight;
 	private String platform;
-	private Boolean cookiesEnabled;
 	private String locale;
-	private String flashVersion;
-	
+
 	/** Return duration of this LoginSession in seconds */
 	public Long getDuration() {
 		if (startTime != null && endTime != null)
 			return( (endTime.getTime() - startTime.getTime()) / 1000L );
 		if (startTime == null)
-		throw new IllegalStateException("Start time is null");
+			throw new IllegalStateException("Start time is null");
 		return( (new Date().getTime() - startTime.getTime()) / 1000L );
 	}
 
