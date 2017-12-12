@@ -1,9 +1,10 @@
 /**
  * page-timing.js
  *
- * Tracks two pieces of timing information about pages to be reported to the server:
- * How long the page takes to load
- * How long the page remains loaded before the user leaves the page or its window is closed.
+ * Tracks three pieces of timing information about pages to be reported to the server:
+ *   How long the page takes to load
+ *   How long the page remains loaded before the user leaves the page or its window is closed.
+ *   How much of that time the window was not actually focused, or had the timeout warning modal showing.
  *
  * An AJAX request cannot be initiated as the page is being unloaded, so instead the information
  * is cached in LocalStorage and then sent to the server by a subsequent page that also loads this file.
@@ -51,7 +52,7 @@ CwmPageTiming.trackPage = function(eventId, url) {
 
     if (storageSupported) {
         // Set up so that end time will be recorded
-        $(window).on('beforeunload', function () { CwmPageTiming.saveEndTime(eventId); });
+        $(window).on('pagehide', function () { CwmPageTiming.saveEndTime(eventId); });
 
         // Save current time - end time will be calculated as an offset to this.
         localStorage['pageStartTime.' + eventId] = currentTime;
@@ -117,9 +118,14 @@ CwmPageTiming.recordInactiveTime = function() {
 // Called in page's onbeforeunload event:
 // saves a timestamp to local storage as the page gets unloaded
 CwmPageTiming.saveEndTime = function(eventId) {
-    localStorage['pageEndTime.' + eventId] = Date.now();
-    CwmPageTiming.recordInactiveTime();
-    localStorage['pageInactiveTime.' + eventId] = CwmPageTiming.totalInactiveTime;
+    if (!localStorage['pageEndTime.' + eventId]) {
+        console.log("Saving end time for page: " + Date.now());
+        localStorage['pageEndTime.' + eventId] = Date.now();
+        CwmPageTiming.recordInactiveTime();
+        localStorage['pageInactiveTime.' + eventId] = CwmPageTiming.totalInactiveTime;
+    } else {
+        console.log('Pagehide event received, but end time was already recorded');
+    }
 };
 
 // Send the collected data to the server AJAX endpoint
