@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2017 CAST, Inc.
+ * Copyright 2011-2018 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class FigurationService implements IFigurationService {
 
-	private static final String FIGURATION_DEFAULT_VERSION = "3.0.0-beta.2";
+	private static final String FIGURATION_DEFAULT_VERSION = "3.0.4";
 
 	@Getter
 	private final String figurationVersion;
