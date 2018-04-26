@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.navigation.paging.IPageable;
 import org.apache.wicket.markup.html.navigation.paging.IPagingLabelProvider;
 import org.apache.wicket.markup.html.navigation.paging.PagingNavigation;
+import org.apache.wicket.markup.html.navigation.paging.PagingNavigator;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.AbstractRepeater;
 
@@ -40,23 +41,15 @@ import org.apache.wicket.markup.repeater.AbstractRepeater;
  *
  * @author bgoldowsky
  */
-public class FigurationAjaxPagingNavigator extends Panel {
-
-	private final IPageable pageable;
-	private final IPagingLabelProvider labelProvider = null;
-
+public class FigurationAjaxPagingNavigator extends AjaxPagingNavigator {
 
 	public FigurationAjaxPagingNavigator(String id, IPageable pageable) {
-		super(id);
-		this.pageable = pageable;
-		setOutputMarkupId(true);
+		super(id, pageable);
 	}
 
 	@Override
-	protected void onInitialize() {
-		super.onInitialize();
-
-		PagingNavigation pagingNavigation = new AjaxPagingNavigation("navigation", pageable, labelProvider) {
+	protected AjaxPagingNavigation newNavigation(String id, IPageable pageable, IPagingLabelProvider labelProvider) {
+		AjaxPagingNavigation pagingNavigation = new AjaxPagingNavigation(id, pageable, labelProvider) {
 			@Override
 			protected Link<?> newPagingNavigationLink(String id, IPageable pageable, long pageIndex) {
 				return new AjaxPagingNavigationLink(id, pageable, pageIndex) {
@@ -65,6 +58,8 @@ public class FigurationAjaxPagingNavigator extends Panel {
 						super.onComponentTag(tag);
 						if (getPageNumber() == pageable.getCurrentPage())
 							tag.append("class", "active", " ");
+						if (!isEnabledInHierarchy())
+							tag.append("class", "disabled", " ");
 					}
 
 					@Override
@@ -75,14 +70,13 @@ public class FigurationAjaxPagingNavigator extends Panel {
 				}.setAutoEnable(false);
 			}
 		};
-		add(pagingNavigation);
+		return pagingNavigation;
 	}
-
 
 	protected void onAjaxEvent(AjaxRequestTarget target)
 	{
 		// Update a parental container of the pageable, this assumes that the pageable is a component.
-		Component container = ((Component)pageable);
+		Component container = ((Component)getPageable());
 		while (container instanceof AbstractRepeater || !container.getOutputMarkupId())
 		{
 			Component parent = container.getParent();
