@@ -19,21 +19,13 @@
  */
 package org.cast.cwm.admin;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.models.hib.ICriteriaBuilder;
 import net.databinder.models.hib.SortableHibernateProvider;
-
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.datetime.markup.html.basic.DateLabel;
-import org.apache.wicket.extensions.markup.html.form.DateTextField;
-import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
@@ -42,24 +34,19 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationTo
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.ResourceLink;
-import org.apache.wicket.markup.html.panel.EmptyPanel;
-import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.IEventType;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.ISiteService;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -69,33 +56,28 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.joda.time.DateTime;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
- * 
  * This page enables searching of events by type, site, date or period related.
  * Events are then displayed in a table and may be downloaded.
  *
  */
 @AuthorizeInstantiation("RESEARCHER")
 @Slf4j
-public class EventLog extends AdminPage {
+public class EventLog extends LogPage {
 
 	protected int numberOfEventTypes;
 	
-	protected IModel<List<IEventType>> showEventTypesM;
-	protected int numberOfSites;
-	protected IModel<List<Site>> showSitesM;
+	protected IModel<List<IEventType>> mShowEventTypes;
 
-	protected IModel<Date> fromDateM, toDateM;
 	protected IModel<Boolean> inAPeriod;
 	protected IModel<Boolean> showPermissionUsers;
 
 	@Inject
 	private IEventService eventService;
-	
-	@Inject
-	private ISiteService siteService;
 
 	public EventLog(final PageParameters params) {
 		super(params);
@@ -106,7 +88,7 @@ public class EventLog extends AdminPage {
 		ICriteriaBuilder builder = makeCriteriaBuilder();
 		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
-		DataTable<Event,String> table = new DataTable<>("eventtable", columns, eventsprovider, 30);
+		DataTable<Event,String> table = new DataTable<>("eventtable", columns, eventsprovider, ITEMS_PER_PAGE);
 		table.addTopToolbar(new HeadersToolbar<>(table, eventsprovider));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
@@ -145,34 +127,12 @@ public class EventLog extends AdminPage {
 		List<IEventType> eventTypes = new ArrayList<>();
 		eventTypes.addAll(allEventTypes);
 		numberOfEventTypes = eventTypes.size();
-		showEventTypesM = new ListModel<IEventType>(eventTypes);
-		form.add(new CheckBoxMultipleChoice<IEventType>("type", showEventTypesM, allEventTypes,
+		mShowEventTypes = new ListModel<IEventType>(eventTypes);
+		form.add(new CheckBoxMultipleChoice<IEventType>("type", mShowEventTypes, allEventTypes,
 				new ChoiceRenderer<IEventType>("displayName", "name"))
 				.setSuffix("<br/>"));
 	}
 
-	protected void addDateFilter(Form<Object> form) {
-		DateTime currentDateTime = new DateTime(new Date());
-		toDateM = new Model<Date>(currentDateTime.toDate());
-		fromDateM = new Model<Date>(currentDateTime.minusMonths(1).toDate());
-
-		form.add(new DateTextField("from", fromDateM));
-		form.add(new DateTextField("to", toDateM));		
-	}
-	
-	protected void addSiteFilter(Form<Object> form) {
-		IModel<List<Site>> allSites = siteService.listSites();
-		List<Site> sites = new ArrayList<Site>();
-		sites.addAll(allSites.getObject());
-		numberOfSites = sites.size();
-		showSitesM = new ListModel<>(sites);
-		if (!allSites.getObject().isEmpty())
-			form.add(new CheckBoxMultipleChoice<>("site", showSitesM, allSites,
-					new ChoiceRenderer<Site>("name", "id")));
-		else
-			form.add(new WebMarkupContainer("site").setVisible(false));
-	}
-	
 	protected void addOtherFilters(Form<Object> form) {
 		inAPeriod = new Model<Boolean>(false);
 		form.add(new CheckBox("showNoSite", inAPeriod));		
@@ -224,15 +184,15 @@ public class EventLog extends AdminPage {
 		public void buildUnordered(Criteria criteria) {
 			
 			// Type check
-			if (showEventTypesM.getObject().size() < numberOfEventTypes)
-				criteria.add(Restrictions.in("type", showEventTypesM.getObject()));
+			if (mShowEventTypes.getObject().size() < numberOfEventTypes)
+				criteria.add(Restrictions.in("type", mShowEventTypes.getObject()));
 			else
 				log.debug("Not filtering by event type");
 
 			criteria.createAlias("user", "user");
 			
 			// Site Check
-			List<Site> siteList = showSitesM.getObject();
+			List<Site> siteList = mShowSites.getObject();
 			if (siteList.size() < numberOfSites || inAPeriod.getObject()) {
 				criteria.createAlias("user.periods", "period", JoinType.LEFT_OUTER_JOIN);
 				Disjunction siteRestriction = Restrictions.disjunction();
@@ -249,9 +209,9 @@ public class EventLog extends AdminPage {
 				log.debug("Not filtering by period/site");
 			}
 			
-			if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
-				Date startDate = midnightStart(fromDateM.getObject());
-				Date endDate = midnightEnd(toDateM.getObject());
+			if (mFromDate.getObject()!=null && mToDate.getObject() != null) {
+				Date startDate = midnightStart(mFromDate.getObject());
+				Date endDate = midnightEnd(mToDate.getObject());
 				log.debug("Considering events between {} and {}", startDate, endDate);
 				criteria.add(Restrictions.between("startTime", startDate, endDate));
 			}
@@ -281,13 +241,6 @@ public class EventLog extends AdminPage {
 					criteria.addOrder(Order.desc(sort.getProperty()).ignoreCase());
 			}
 		}
-	}
-
-	@Override
-	protected void onDetach() {
-		super.onDetach();
-		if (showSitesM != null)
-			showSitesM.detach();
 	}
 
 }

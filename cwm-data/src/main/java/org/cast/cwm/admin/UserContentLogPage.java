@@ -19,28 +19,16 @@
  */
 package org.cast.cwm.admin;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.models.hib.HibernateListModel;
-
 import org.apache.wicket.Application;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
-import org.apache.wicket.datetime.markup.html.basic.DateLabel;
-import org.apache.wicket.extensions.markup.html.form.DateTextField;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToolbar;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
-import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ResourceLink;
@@ -51,51 +39,27 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.IAppConfiguration;
-import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserContent;
 import org.cast.cwm.data.builders.UserContentAuditQueryBuilder;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
-import org.cast.cwm.service.ISiteService;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
-import org.joda.time.DateTime;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 @AuthorizeInstantiation("RESEARCHER")
 @Slf4j
-public class UserContentLogPage extends AdminPage {
-
-	@Inject
-	private ISiteService siteService;
+public class UserContentLogPage extends LogPage {
 	
-	protected IModel<Date> fromDateM, toDateM;
-	protected IModel<List<Site>> showSitesM;
-	protected int numberOfSites;
 	protected String urlPrefix;
-	
-	protected static final long ITEMS_PER_PAGE = 50;
-
-	protected static final String eventDateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
-
-	@Override
-	protected void onDetach() {
-		super.onDetach();
-		if (fromDateM != null)
-			fromDateM.detach();
-		if (toDateM != null)
-			toDateM.detach();
-		if (showSitesM != null)
-			showSitesM.detach();
-	}
 
 	public UserContentLogPage(PageParameters parameters) {
 		super(parameters);
@@ -132,29 +96,6 @@ public class UserContentLogPage extends AdminPage {
 		addOtherFilters(form);
 	}
 	
-	protected void addSiteFilter(Form<Object> form) {
-		IModel<List<Site>> allSites = siteService.listSites();
-		List<Site> sites = new ArrayList<Site>();
-		sites.addAll(allSites.getObject());
-		showSitesM = new ListModel<Site>(sites);
-		numberOfSites = sites.size();
-		if (!allSites.getObject().isEmpty())
-			// FIXME: this ends up serializing non-detached instances of Site
-			form.add(new CheckBoxMultipleChoice<Site>("site", showSitesM, allSites,
-					new ChoiceRenderer<Site>("name", "id")));
-		else
-			form.add(new WebMarkupContainer("site").setVisible(false));
-	}
-	
-	protected void addDateFilter(Form<Object> form) {
-		DateTime currentDateTime = new DateTime(new Date());
-		toDateM = new Model<Date>(currentDateTime.toDate());
-		fromDateM = new Model<Date>(currentDateTime.minusMonths(1).toDate());
-
-		form.add(new DateTextField("from", fromDateM));
-		form.add(new DateTextField("to", toDateM));		
-	}
-	
 	protected void addOtherFilters(Form<Object> form) {
 	}
 
@@ -162,10 +103,10 @@ public class UserContentLogPage extends AdminPage {
 	public AuditDataProvider<UserContent, DefaultRevisionEntity> getDataProvider() {
 		UserContentAuditQueryBuilder qb = new UserContentAuditQueryBuilder();
 		
-		if (fromDateM.getObject()!=null && toDateM.getObject() != null) {
-			log.debug("Considering events between {} and {}", fromDateM.getObject(), toDateM.getObject());
-			qb.setMFromDate(fromDateM);
-			qb.setMToDate(toDateM);
+		if (mFromDate.getObject()!=null && mToDate.getObject() != null) {
+			log.debug("Considering events between {} and {}", mFromDate.getObject(), mToDate.getObject());
+			qb.setMFromDate(mFromDate);
+			qb.setMToDate(mToDate);
 			
 			// Model to return list of users to be considered -- based on choices made in Sites form
 			qb.setMUsers(new AbstractReadOnlyModel<List<User>>() {
@@ -173,14 +114,14 @@ public class UserContentLogPage extends AdminPage {
 				@Override
 				public List<User> getObject() {
 					// If sites is set, create a list of users in those sites for the query.
-					if (showSitesM.getObject().size() < numberOfSites) {
+					if (mShowSites.getObject().size() < numberOfSites) {
 						UserCriteriaBuilder ucb = new UserCriteriaBuilder();
-						ucb.setSites(showSitesM);
+						ucb.setSites(mShowSites);
 						List<User> list = new HibernateListModel<User>(User.class, ucb).getObject();
-						log.debug("users: {}", list);
+						log.trace("users: {}", list);
 						return list;
 					} else {
-						log.debug("All sites checked");
+						log.trace("All sites checked");
 						return null;
 					}
 				}
@@ -194,21 +135,7 @@ public class UserContentLogPage extends AdminPage {
 	protected List<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>> makeColumns() {
 		List<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>> columns = new ArrayList<IDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>>(10);
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev ID", "info.id"));
-		columns.add(new AbstractDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev Date") {
-			@Override
-			public void populateItem(Item<ICellPopulator<AuditTriple<UserContent,DefaultRevisionEntity>>> cellItem, String componentId, 
-					IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
-				cellItem.add(DateLabel.forDatePattern(componentId, new PropertyModel<Date>(rowModel, "info.revisionDate"), eventDateFormat));				
-			}
-
-			@Override
-			public String getItemString(IModel<AuditTriple<UserContent,DefaultRevisionEntity>> rowModel) {
-				AuditTriple<UserContent, DefaultRevisionEntity> triple = rowModel.getObject();
-				DefaultRevisionEntity info = triple.getInfo();
-				Date revisionDate = info.getRevisionDate();
-				return new SimpleDateFormat(eventDateFormat).format(revisionDate);			
-			}
-		});
+		columns.add(new DateDataColumn<AuditTriple<UserContent, DefaultRevisionEntity>>("Rev Date", "info.revisionDate"));
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("Rev Type", "type"));
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("UC ID", "entity.id"));
 		columns.add(new PropertyDataColumn<AuditTriple<UserContent,DefaultRevisionEntity>>("User", "entity.user.subjectId"));
