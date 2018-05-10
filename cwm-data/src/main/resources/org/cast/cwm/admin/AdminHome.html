@@ -1,12 +1,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html xmlns:wicket="http://wicket.apache.org">
 <head></head>
 <body>
 <wicket:extend>
     <h2>Admin page</h2>
-    <ul>
-      <li wicket:id="linkRepeater"><a wicket:id="link"><span wicket:id="label">Link</span></a></li>
-	</ul>
+
+    <div wicket:id="category">
+        <h3 wicket:id="header">Category header</h3>
+        <ul>
+            <li wicket:id="linkRepeater"><a wicket:id="link">Link</a></li>
+        </ul>
+    </div>
+
 </wicket:extend>
 </body>
 </html>

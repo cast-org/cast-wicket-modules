@@ -70,8 +70,9 @@ public class PropertyDataColumn<E> extends PropertyColumn<E,String>
 		return null;
 	}
 
-	public void setDocumentation(String documentation) {
+	public PropertyDataColumn<E> setDocumentation(String documentation) {
 		documentationModel = Model.of(documentation);
+		return this;
 	}
 
 	@Override

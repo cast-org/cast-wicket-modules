@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+</head>
+<body>
+
+<wicket:extend>
+    <h2>Event Log</h2>
+    <form wicket:id="filter" class="filter">
+
+        <fieldset>
+            <legend>Event types</legend>
+            <div class="scrollable" wicket:id="type"></div>
+        </fieldset>
+
+        <wicket:enclosure child="site">
+            <fieldset>
+                <legend>Sites</legend>
+                <div class="scrollable" wicket:id="site"></div>
+            </fieldset>
+        </wicket:enclosure>
+
+        <fieldset>
+            <legend>Date Range</legend>
+            <label for="from">From: </label>
+            <input wicket:id="from" type="text" name="from" />
+            <br />
+            <label for="to">To: </label>
+            <input wicket:id="to" type="text" name="to" />
+        </fieldset>
+
+        <fieldset>
+            <legend>Other Filters</legend>
+            <input wicket:id="showNoSite" type="checkbox" name="showNoSite" />
+            <label for="showNoSite">Only events for users connected to a classroom</label>
+            <br />
+            <input wicket:id="showPermissionUsers" type="checkbox" name="showPermissionUsers" />
+            <label for="showPermissionUsers">Only events for users with research permission</label>
+            <br />
+        </fieldset>
+
+        <br clear="both" />
+        <input type="submit" value="filter list"/>
+        <br />
+    </form>
+
+    <p><wicket:message key="Notes">Notes</wicket:message></p>
+
+    <a wicket:id="downloadLink" href="#">Download data table</a>
+
+    <table wicket:id="eventtable" class="dataTable">Table goes here</table>
+
+</wicket:extend>
+
+</body>
+</html>

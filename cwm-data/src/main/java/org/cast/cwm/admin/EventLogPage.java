@@ -28,10 +28,7 @@ import net.databinder.models.hib.SortableHibernateProvider;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortState;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.ISortStateLocator;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.NavigationToolbar;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.*;
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -67,7 +64,7 @@ import java.util.List;
  */
 @AuthorizeInstantiation("RESEARCHER")
 @Slf4j
-public class EventLog extends LogPage {
+public class EventLogPage extends LogPage {
 
 	protected int numberOfEventTypes;
 	
@@ -79,17 +76,18 @@ public class EventLog extends LogPage {
 	@Inject
 	private IEventService eventService;
 
-	public EventLog(final PageParameters params) {
+	public EventLogPage(final PageParameters params) {
 		super(params);
 		setPageTitle("Event Log");
 
 		addFilterForm();
 		
 		ICriteriaBuilder builder = makeCriteriaBuilder();
-		SortableHibernateProvider<Event> eventsprovider = makeHibernateProvider(builder);
+		ISortableDataProvider<Event, String> eventsprovider = makeDataProvider(builder);
 		List<IDataColumn<Event>> columns = makeColumns();
 		DataTable<Event,String> table = new DataTable<>("eventtable", columns, eventsprovider, ITEMS_PER_PAGE);
 		table.addTopToolbar(new HeadersToolbar<>(table, eventsprovider));
+		table.addTopToolbar(new DocumentationToolbar(table));
 		table.addTopToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NavigationToolbar(table));
 		table.addBottomToolbar(new NoRecordsToolbar(table, new Model<>("No events found")));
@@ -107,7 +105,7 @@ public class EventLog extends LogPage {
 		return eventCriteriaBuilder;
 	}
 
-	protected SortableHibernateProvider<Event> makeHibernateProvider(ICriteriaBuilder builder) {
+	protected ISortableDataProvider<Event,String> makeDataProvider(ICriteriaBuilder builder) {
 		SortableHibernateProvider<Event> provider = new SortableHibernateProvider<>(Event.class, builder);
 		provider.setWrapWithPropertyModel(false);
 		return provider;
@@ -144,16 +142,18 @@ public class EventLog extends LogPage {
 	protected List<IDataColumn<Event>> makeColumns() {
 		List<IDataColumn<Event>> columns = new ArrayList<IDataColumn<Event>>();
 		
-		columns.add(new PropertyDataColumn<Event>("EventID", "id", "id"));
+		columns.add(new DocumentedEventColumn("EventID", "id", "id"));
 
-		columns.add(new DateDataColumn<Event>("Start time", "startTime"));
-		columns.add(new DateDataColumn<Event>("End time", "endTime"));
-		columns.add(new PropertyDataColumn<Event>("Active duration", "activeDuration"));
+		columns.add(new DateDataColumn<Event>("Start time", "startTime")
+			.setDocumentation(getString("documentation.startTime")));
+		columns.add(new DateDataColumn<Event>("End time", "endTime")
+			.setDocumentation(getString("documentation.endTime")));
+		columns.add(new DocumentedEventColumn("Active duration", "activeDuration"));
 		
-		columns.add(new PropertyDataColumn<Event>("User", "user.subjectId", "user.subjectId"));
-		columns.add(new PropertyDataColumn<Event>("Event Type", "type", "type.displayName"));
-		columns.add(new PropertyDataColumn<Event>("Details", "detail"));
-		columns.add(new PropertyDataColumn<Event>("Page", "page"));
+		columns.add(new DocumentedEventColumn("User", "user.subjectId", "user.subjectId"));
+		columns.add(new DocumentedEventColumn("Event Type", "type", "type.displayName"));
+		columns.add(new DocumentedEventColumn("Details", "detail"));
+		columns.add(new DocumentedEventColumn("Page", "page"));
 
 		return columns;
 	}
@@ -173,6 +173,26 @@ public class EventLog extends LogPage {
 			= dateTime
 				.withTimeAtStartOfDay();
 		return adjustedDateTime.toDate();
+	}
+
+
+	public class DocumentedEventColumn extends DateDataColumn<Event> {
+
+		public DocumentedEventColumn(String headerString, String propertyExpression) {
+			super(headerString, propertyExpression);
+			addDocumentationProperty();
+		}
+
+		public DocumentedEventColumn(String headerString, String sortProperty, String propertyExpression) {
+			super(headerString, sortProperty, propertyExpression);
+			addDocumentationProperty();
+		}
+
+		protected void addDocumentationProperty() {
+			// Would be simpler to just pass a ResourceModel here, but that doesn't resolve properly in CSV download.
+			setDocumentation(getLocalizer().getString("documentation."+getPropertyExpression(),
+					EventLogPage.this));
+		}
 	}
 
 	public class EventCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<String> {

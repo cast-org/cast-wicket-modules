@@ -114,7 +114,7 @@ public class UserCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<
 				criteria.add(Restrictions.in("p.site", sites.getObject().toArray()));
 			else
 				criteria.add(Restrictions.idEq(0L));  // no sites selected, return no users
-			// TODO should allow queries for users with no site at all, like @EventLog .
+			// TODO should allow queries for users with no site at all, like @EventLogPage .
 		}
 
 		if (cacheResults)

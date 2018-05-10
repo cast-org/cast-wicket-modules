@@ -233,7 +233,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 
 		mountPage("stats", DatabaseStatisticsPage.class);
 		mountPage("cache", CacheManagementPage.class);
-		mountPage("eventlog", EventLog.class);
+		mountPage("eventlog", EventLogPage.class);
 		mountPage("uclog", UserContentLogPage.class);
 		mountPage("ucview", UserContentViewPage.class);
 		

@@ -20,39 +20,52 @@
 package org.cast.cwm.admin;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.cast.cwm.IAppConfiguration;
+import org.cast.cwm.IEventType;
+import org.cast.cwm.TestingEventType;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.service.AdminPageService;
 import org.cast.cwm.service.IAdminPageService;
-import org.cast.cwm.test.CwmDataBaseTestCase;
+import org.cast.cwm.service.IEventService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
-public class AdminHomeTest extends CwmDataTestCase {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+
+public class TestEventLogDocumentationPage extends CwmDataTestCase {
+
+	private IEventService eventService;
 
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
-		helper.injectAndStubCwmSessionService(this);
 		helper.injectAppConfiguration(this);
+		helper.injectAndStubCwmSessionService(this);
 
-		// We use the real service class here, it is safe for testing
-		IAdminPageService adminPageService = helper.injectObject(IAdminPageService.class, new AdminPageService());
-	}
+		eventService = helper.injectEventService(this);
+		when(eventService.listEventTypes()).thenAnswer(new Answer<List<TestingEventType>>() {
+			@Override
+			public List<TestingEventType> answer(InvocationOnMock invocation) {
+				return Arrays.asList(TestingEventType.values());
+			}
+		});
 
-	@Override
-	public void setUpData() {
-		super.setUpData();
-		loggedInUser.setRole(Role.ADMIN);
 	}
 	
 	@Test
 	public void canRender() {
-		tester.startPage(AdminHome.class);
-		tester.assertRenderedPage(AdminHome.class);
-		tester.assertContains("Administrator area");
-		tester.assertBookmarkablePageLink("linkRepeater:1:link", UserListPage.class, new PageParameters());
+		tester.startPage(EventLogDocumentationPage.class);
+		tester.assertRenderedPage(EventLogDocumentationPage.class);
+		tester.assertContains("Event Types");
+		tester.assertLabel("type:1:name", "LOGIN");
+		tester.assertLabel("type:1:displayName", "login");
+		tester.assertLabel("type:1:documentation", "Documentation for LOGIN");
 	}
 	
 }

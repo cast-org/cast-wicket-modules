@@ -276,3 +276,12 @@ label.aligned {
     white-space: nowrap;
     text-align: right;
 }
+
+/*================================================================*/
+/* Definition Lists                                               */
+/*================================================================*/
+
+dd {
+    margin-left: 2em;
+    font-weight: normal;
+}

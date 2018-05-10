@@ -20,6 +20,7 @@
 package org.cast.cwm.admin;
 
 import com.google.inject.Inject;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.wicket.Page;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.devutils.inspector.InspectorPage;
@@ -27,6 +28,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.service.IAdminPageService;
@@ -37,24 +39,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * This is the home page for the ADMIN users.
+ * This is the home page for the RESEARCHER and ADMIN users.
  *
  */
 @AuthorizeInstantiation("RESEARCHER")
 public class AdminHome extends AdminPage {
-	
-	@Inject
-	private ICwmSessionService cwmSessionService;
 
 	@Inject
 	private IAdminPageService adminPageService;
 
-	private static final long serialVersionUID = 1L;
+	@Inject
+	private ICwmSessionService cwmSessionService;
 
 	public AdminHome(PageParameters parameters) {
 		super(parameters);
 		setPageTitle("Admin Home");
-		RepeatingView linkRepeater = new RepeatingView("linkRepeater");
+		RepeatingView linkRepeater = new RepeatingView("category");
 		add(linkRepeater);
 		addLinks(linkRepeater);
 	}
@@ -66,39 +66,81 @@ public class AdminHome extends AdminPage {
 	 * Each repeater item has a "link" with a "label".
 	 */
 	protected void addLinks(RepeatingView repeater) {
-		for (Entry<String, Class<? extends Page>> e : getHomePageLinkMap().entrySet()) {
+		for (Entry<String, Map<String, Class<? extends Page>>> cat : getHomePageLinkMap().entrySet()) {
 			WebMarkupContainer container = new WebMarkupContainer(repeater.newChildId());
-			BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>("link", e.getValue());
-			link.add(new Label("label", e.getKey()));
-			container.add(link);
 			repeater.add(container);
+
+			container.add(new Label("header", cat.getKey()));
+
+			RepeatingView linkRepeater = new RepeatingView("linkRepeater");
+			container.add(linkRepeater);
+			for (Entry<String, Class<? extends Page>> link : cat.getValue().entrySet()) {
+				WebMarkupContainer linkContainer = new WebMarkupContainer(linkRepeater.newChildId());
+				linkRepeater.add(linkContainer);
+				linkContainer.add(new BookmarkablePageLink<Void>("link", link.getValue())
+					.setBody(Model.of(link.getKey())));
+			}
 		}
 	}
 	
 	/**
 	 * Return a map of components to be added to the list on the home page.
-	 * This is usually a list of links.
-	 * @return 
+	 * Maps from category names (presented as headers) to submaps where they
+	 * key is the link text and the value is the Page class to link to.
+	 *
+	 * @return Map of category - link - page class
 	 */
-	protected Map<String,Class<? extends Page>> getHomePageLinkMap() {
-		Map<String,Class<? extends Page>> map = new LinkedHashMap<String,Class<? extends Page>>();
-			
-		// Links for users with full admin rights
-		if (cwmSessionService.getUser().hasRole(Role.ADMIN)) {
-			map.put("Create/Edit Users", adminPageService.getUserListPage());
-			map.put("Create/Edit Sites", adminPageService.getSiteListPage());
-			map.put("Bulk Update Users", adminPageService.getBulkUpdatePage());
-			map.put("Database Statistics", DatabaseStatisticsPage.class);
-			map.put("Cache Management", CacheManagementPage.class);
-			map.put("Open login sessions", SessionListPage.class);
-			map.put("Wicket Inspector Page", InspectorPage.class);
-		}
-		
-		// Links for admins and researchers
-		map.put("Event Log", EventLog.class);
-		map.put("User Content Log", UserContentLogPage.class);
-		
+	protected LinkMap getHomePageLinkMap() {
+
+		LinkMap map = new LinkMap();
+
+		map.addToCategory(Role.ADMIN, "Accounts",
+				"Create/Edit Users", adminPageService.getUserListPage());
+		map.addToCategory(Role.ADMIN, "Accounts",
+				"Create/Edit Sites", adminPageService.getSiteListPage());
+		map.addToCategory(Role.ADMIN, "Accounts",
+				"Bulk Update Users", adminPageService.getBulkUpdatePage());
+
+		map.addToCategory(Role.RESEARCHER, "Data Analysis",
+			"Event Log", EventLogPage.class);
+		map.addToCategory(Role.RESEARCHER, "Data Analysis",
+				"Event Log Documentation", EventLogDocumentationPage.class);
+		map.addToCategory(Role.RESEARCHER, "Data Analysis",
+			"User Content Log", UserContentLogPage.class);
+
+		map.addToCategory(Role.ADMIN, "System",
+				"Database Statistics", DatabaseStatisticsPage.class);
+		map.addToCategory(Role.ADMIN, "System",
+				"Cache Management", CacheManagementPage.class);
+		map.addToCategory(Role.ADMIN, "System",
+				"Open login sessions", SessionListPage.class);
+		map.addToCategory(Role.ADMIN, "System",
+				"Wicket Inspector Page", InspectorPage.class);
+
 		return map;
 	}
 
+
+	public class LinkMap extends ListOrderedMap<String, Map<String, Class<? extends Page>>> {
+
+		public LinkMap addCategory(String category) {
+			if (!containsKey(category))
+				put(category, new LinkedHashMap<String, Class<? extends Page>>());
+			return this;
+		}
+
+		public LinkMap addToCategory(Role role, String category, String linkName, Class<? extends Page> page) {
+			if (cwmSessionService.getUser().hasRole(role)) {
+				addCategory(category);
+				get(category).put(linkName, page);
+			}
+			return this;
+		}
+
+		public LinkMap setCategoryPosition(String category, int position) {
+			put(position, category, remove(category));
+			return this;
+		}
+
+	}
 }
