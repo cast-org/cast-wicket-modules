@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data;
 
+import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -127,6 +128,31 @@ public class Event extends PersistedObject {
 	 */
 	protected Long userContentId;
 
+	/**
+	 * Add a string-valued key=value pair to the "detail" string of this event.
+	 * @param key the type of information being stored
+	 * @param value the value for this event
+	 * @return this
+	 */
+	public Event addDetail(String key, String value) {
+		detail = String.format("%s%s=\"%s\"",
+				Strings.isNullOrEmpty(detail) ? "" : detail + ", ",
+				key, value);
+		return this;
+	}
+
+	/**
+	 * Add a numeric-valued key=value pair to the "detail" string of this event.
+	 * @param key the type of information being stored
+	 * @param value the value for this event
+	 * @return this
+	 */
+	public Event addDetail(String key, Long value) {
+		detail = String.format("%s%s=%d",
+				Strings.isNullOrEmpty(detail) ? "" : detail + ", ",
+				key, value);
+		return this;
+	}
 
 	/**
 	 * Called just before saving Event to database to set various fields
