@@ -26,6 +26,7 @@ CwmPageTiming.pageBlocked = false;
 CwmPageTiming.trackPage = function(eventId, url) {
     CwmPageTiming.eventId = eventId;
 
+    console.log('Started tracking page ' + eventId);
 
     var currentTime = Date.now();
     var timingSupported = CwmPageTiming.isTimingSupported();
@@ -100,7 +101,7 @@ CwmPageTiming.handleFocusChange = function() {
         // Page is either blocked or blurred.  Record start of inactive time if this is new.
         if (CwmPageTiming.startInactiveTime === null) {
             CwmPageTiming.startInactiveTime = Date.now();
-            console.log("Window went inactive at ", CwmPageTiming.startInactiveTime);
+            console.log("Window went inactive at ", CwmPageTiming.startInactiveTime, " with cumulative ", CwmPageTiming.totalInactiveTime);
         }
     }
 };
