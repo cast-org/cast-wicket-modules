@@ -22,43 +22,48 @@ package org.cast.cwm.components;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.markup.repeater.RefreshingView;
+import org.apache.wicket.model.IModel;
 
 /**
- * A RepeatingView that introduces some plain-text markup between children.
+ * A RefreshingView that introduces some plain-text markup between children.
  * By default the separator is simply a space, but it can be set to any string.
  */
-public class DelimitedRepeatingView extends RepeatingView {
+public abstract class DelimitedRefreshingView<T> extends RefreshingView<T> {
 
-	private boolean firstChildRendered = false;
+    private boolean firstChildRendered = false;
 
-	@Getter @Setter
-	private String delimiter = " "; 
+    @Getter @Setter
+    private String delimiter = " ";
 
-	public DelimitedRepeatingView(String id) {
-		super(id);
-	}
+    public DelimitedRefreshingView(String id) {
+        super(id);
+    }
 
-	@Override 
-	protected void onBeforeRender() { 
-		firstChildRendered = false; 
-		super.onBeforeRender(); 
-	} 
+    public DelimitedRefreshingView(String id, IModel<?> model) {
+        super(id, model);
+    }
 
-	@Override 
-	protected void renderChild(Component child) { 
+    @Override
+    protected void onBeforeRender() {
+        firstChildRendered = false;
+        super.onBeforeRender();
+    }
 
-		boolean childVisible = child.isVisible(); 
+    @Override
+    protected void renderChild(Component child) {
 
-		if (firstChildRendered && childVisible && delimiter != null) { 
-			getResponse().write(delimiter); 
-		} 
+        boolean childVisible = child.isVisible();
 
-		super.renderChild(child); 
+        if (firstChildRendered && childVisible && delimiter != null) {
+            getResponse().write(delimiter);
+        }
 
-		if (childVisible) { 
-			firstChildRendered = true; 
-		} 
-	}
+        super.renderChild(child);
+
+        if (childVisible) {
+            firstChildRendered = true;
+        }
+    }
 
 }
