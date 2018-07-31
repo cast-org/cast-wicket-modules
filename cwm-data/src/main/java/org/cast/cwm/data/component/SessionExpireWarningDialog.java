@@ -69,9 +69,6 @@ import org.cast.cwm.service.IEventService;
 @Slf4j
 public class SessionExpireWarningDialog extends FigurationModal<Void> implements IHeaderContributor {
 
-	@Getter @Setter
-	private boolean debug = false;
-
 	protected static final PackageResourceReference JAVASCRIPT_REFERENCE
 			= new PackageResourceReference(SessionExpireWarningDialog.class, "SessionExpireWarningDialog.js");
 
@@ -100,6 +97,8 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 
 	@Override
 	public void renderHead(IHeaderResponse response) {
+		// The Javascript makes use of Loglevel for debugging
+		response.render(JavaScriptHeaderItem.forReference(cwmService.getLoglevelJavascriptResourceReference()));
 		response.render(JavaScriptHeaderItem.forReference(JAVASCRIPT_REFERENCE));
 		response.render(OnDomReadyHeaderItem.forScript(getInitializationJavascript()));
 	}
@@ -113,13 +112,12 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 		//  homePage - URL to redirect to on session timeout
 		//  debug - whether debugging messages should be output to the javascript console
 
-		return String.format("SessionExpireWarning.init('%s', %d, '%s', '%s', '%s', %b);",
+		return String.format("SessionExpireWarning.init('%s', %d, '%s', '%s', '%s');",
 				this.getMarkupId(),
 				cwmSessionService.getSessionWarningTime(),
 				CHECK_EVENT_NAME,
 				REFRESH_EVENT_NAME,
-				urlFor(Application.get().getHomePage(), new PageParameters().set("expired", "true")),
-				debug);
+				urlFor(Application.get().getHomePage(), new PageParameters().set("expired", "true")));
 	}
 
 	protected String nextCheckJavascript(long seconds) {

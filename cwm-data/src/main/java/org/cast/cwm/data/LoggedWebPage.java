@@ -79,6 +79,7 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 	public void renderHead(IHeaderResponse response) {
 		// Set up the javascript to log load time and end time of page view.
 		if (shouldLogPageView() && shouldLogTiming()) {
+			response.render(JavaScriptHeaderItem.forReference(cwmService.getLoglevelJavascriptResourceReference()));
 			response.render(JavaScriptHeaderItem.forReference(
 					new PackageResourceReference(LoggedWebPage.class, "CwmPageTiming.js")));
 			response.render(OnLoadHeaderItem.forScript(

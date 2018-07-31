@@ -26,7 +26,9 @@ import ch.qos.logback.core.util.StatusPrinter;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import de.agilecoders.wicket.webjars.WicketWebjars;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
@@ -50,7 +52,6 @@ import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.hibernate.cfg.Configuration;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -82,6 +83,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * 
  * @author bgoldowsky
  */
+@Slf4j
 public abstract class CwmApplication extends AuthDataApplication<User> {
 
 	@Getter
@@ -106,9 +108,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	private ICwmSessionService cwmSessionService;
 	
 	private LoginSessionCloser loginSessionCloser;
-	
-	private static final Logger log = LoggerFactory.getLogger(CwmApplication.class);
-		
+
     // A few things that need to get set up before regular init().
 	@Override
 	protected void internalInit() {
@@ -171,6 +171,8 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 		
 		loginSessionCloser = new LoginSessionCloser(this);
 		loginSessionCloser.start();
+
+		WicketWebjars.install(this);
 		
 		log.debug("Finished CWM Application Init");
 	}
@@ -188,7 +190,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 * @return list of com.google.inject.Module objects
 	 */
 	protected List<Module> getInjectionModules() {
-		ArrayList<Module> modules = new ArrayList<Module>();
+		ArrayList<Module> modules = new ArrayList<>();
 		modules.add(new Module() {
 			@Override
 			public void configure(Binder binder) {
@@ -214,7 +216,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 * @return list of initializer objects, which all must implement IDatabaseInitializer
 	 */
 	protected List<IDatabaseInitializer> getDatabaseInitializers() {
-		LinkedList<IDatabaseInitializer> list = new LinkedList<IDatabaseInitializer>();
+		LinkedList<IDatabaseInitializer> list = new LinkedList<>();
 		list.add(new CreateAdminUser());
 		list.add(new CreateDefaultUsers());
 		list.add(new CloseOldLoginSessions());
@@ -357,7 +359,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 */
 	protected class LoginSessionCloser extends Thread {
 		
-		private BlockingQueue<String> closeQueue = new LinkedBlockingQueue<String>();
+		private BlockingQueue<String> closeQueue = new LinkedBlockingQueue<>();
 		private Application application;
 		
 		protected LoginSessionCloser (Application app) {

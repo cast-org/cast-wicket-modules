@@ -21,6 +21,7 @@ package org.cast.cwm.service;
 
 import com.google.inject.ImplementedBy;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 
@@ -102,5 +103,11 @@ public interface ICwmService {
 	 * @param initializer the database initializer that was run.
 	 */
 	void saveInitialization(IDatabaseInitializer initializer);
+
+	/**
+	 * Return a ResourceReference for the Loglevel Javascript library.
+	 * @return reference
+	 */
+    JavaScriptResourceReference getLoglevelJavascriptResourceReference();
 
 }

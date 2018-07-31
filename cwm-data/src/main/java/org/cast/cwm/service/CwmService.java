@@ -19,10 +19,12 @@
  */
 package org.cast.cwm.service;
 
+import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateObjectModel;
 import org.apache.wicket.model.IChainingModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.cast.cwm.data.Initialization;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.init.IDatabaseInitializer;
@@ -143,5 +145,10 @@ public class CwmService implements ICwmService {
 		Databinder.getHibernateSession().save(init);
 		flushChanges();
 	}
-	
+
+	@Override
+	public JavaScriptResourceReference getLoglevelJavascriptResourceReference() {
+		return new WebjarsJavaScriptResourceReference("github-com-pimterry-loglevel/current/loglevel.js");
+	}
+
 }

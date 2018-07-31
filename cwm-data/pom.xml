@@ -110,7 +110,16 @@
  	  		<artifactId>cwm-db</artifactId>
  	  	</dependency>
 
-        <!-- required for non-parallelizable tests -->
+		<dependency>
+			<groupId>de.agilecoders.wicket.webjars</groupId>
+			<artifactId>wicket-webjars</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>github-com-pimterry-loglevel</artifactId>
+		</dependency>
+
+		<!-- required for non-parallelizable tests -->
         <dependency>
             <groupId>net.jcip</groupId>
             <artifactId>jcip-annotations</artifactId>

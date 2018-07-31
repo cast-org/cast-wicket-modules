@@ -19,7 +19,10 @@
  */
 package org.cast.cwm.data.behavior;
 
+import com.google.inject.Inject;
+import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ClassAttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
@@ -30,6 +33,9 @@ import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.cast.cwm.service.ICwmService;
+
+import java.util.Set;
 
 /**
  * This behavior will submit a form at regular intervals.  Any HTML element
@@ -41,44 +47,52 @@ import org.apache.wicket.request.resource.PackageResourceReference;
  */
 public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 
-	private static final long serialVersionUID = 1L;
-	
+	@Inject
+	private ICwmService cwmService;
+
 	private static long updateInterval = 30000; 
 
 	private static final String AUTOSAVE_EVENT = "autosave";
 	
-	public static final PackageResourceReference AUTOSAVING_JAVASCRIPT = new PackageResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
+	private static final PackageResourceReference AUTOSAVING_JAVASCRIPT
+			= new PackageResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
 
 	/**
 	 * Constructor - attach to a component INSIDE the form.
 	 */
 	public AjaxAutoSavingBehavior() {
 		super(AUTOSAVE_EVENT);
-		init();
 	}
 	
 	/**
-	 * Constructor - attach to a component outside the form
-	 * or the form itself.
+	 * Constructor - attach to a component outside the form or the form itself.
 	 * 
-	 * @param form
+	 * @param form the form to be autosaved
 	 */
 	public AjaxAutoSavingBehavior(Form<?> form) {
 		super(form, AUTOSAVE_EVENT);
-		init();
 	}
-	
-	/**
-	 * Initialize the Autosave behavior for this form.
-	 */
-	protected void init() {
+
+    @Override
+    protected void onBind() {
+        super.onBind();
+    }
+
+    @Override
+	public void onConfigure(Component component) {
 		getForm().setOutputMarkupId(true);
-		getForm().add(AttributeModifier.append("class", "ajaxAutoSave"));
+		getForm().add(new ClassAttributeModifier() {
+            @Override
+            protected Set<String> update(Set<String> classes) {
+                classes.add("ajaxAutoSave");
+                return classes;
+            }
+        });
+		super.onConfigure(component);
 	}
 
 	@Override
 	protected void onError(AjaxRequestTarget target) {
-		
 	}
 	
 	@Override
@@ -98,6 +112,9 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	@Override
 	public void renderHead(Component component, final IHeaderResponse response) {
 		super.renderHead(component, response);
+
+		// The Javascript makes use of Loglevel for debugging
+		response.render(JavaScriptHeaderItem.forReference(cwmService.getLoglevelJavascriptResourceReference()));
 		
 		// Run once to initialize
 		response.render(JavaScriptHeaderItem.forReference(AUTOSAVING_JAVASCRIPT));
@@ -114,17 +131,16 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 	 * the form should process silently in the background.  Override this method to provide
 	 * additional ajax changes to the page.
 	 * 
-	 * @param target
+	 * @param target AJAX request
 	 */
 	protected void onAutoSave(AjaxRequestTarget target) {
-		
 	}
 	
 	/**
 	 * Set the AutoSaving update interval for this application, in milliseconds.  Default
 	 * is every 30 seconds.
 	 * 
-	 * @param milliseconds
+	 * @param milliseconds new interval, in milliseconds
 	 */
 	public static void setUpdateInterval(long milliseconds) {
 		updateInterval = milliseconds;

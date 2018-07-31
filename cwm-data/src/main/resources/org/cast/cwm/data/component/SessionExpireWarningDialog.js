@@ -12,7 +12,6 @@ var SessionExpireWarning = {
     homePage: null,                 // URL to redirect to on logout
     timer: null,                    // Timer for periodic checks
     ignoreDialogClose: false,       // Set temporarily to true when we're programmatically closing the dialog
-    debug: false,                   // whether debugging information should be logged to the console.
 
     /**
      * Initialize the SessionExpireWarning timer.
@@ -22,15 +21,13 @@ var SessionExpireWarning = {
      * @param checkEventName
      * @param refreshEventName
      * @param homePage
-     * @param debug
      */
-	init: function(dialogId, secondsUntilCheck, checkEventName, refreshEventName, homePage, debug) {
+	init: function(dialogId, secondsUntilCheck, checkEventName, refreshEventName, homePage) {
 	    SessionExpireWarning.dialogId = dialogId;
         SessionExpireWarning.setNextCheck(secondsUntilCheck);
         SessionExpireWarning.checkEventName = checkEventName;
         SessionExpireWarning.refreshEventName = refreshEventName;
         SessionExpireWarning.homePage = homePage;
-        SessionExpireWarning.debug = debug;
         SessionExpireWarning.startTimer();
 
         $('#' + dialogId).on('afterHide.cfw.modal', SessionExpireWarning.dialogClosed);
@@ -42,7 +39,7 @@ var SessionExpireWarning = {
 	startTimer: function() {
 		// We use an interval timer since one-shot timers might never fire if, say, laptop is closed for a while.
 		SessionExpireWarning.timer = setInterval(SessionExpireWarning.tick, SessionExpireWarning.tickPeriod);
-		SessionExpireWarning.log("Starting Timer = " + SessionExpireWarning.timer);
+		log.debug("Starting Timer = ", SessionExpireWarning.timer);
 	},
 	
 	/**
@@ -53,7 +50,7 @@ var SessionExpireWarning = {
 			clearInterval(SessionExpireWarning.timer);
 			SessionExpireWarning.timer = null;
 		}
-		SessionExpireWarning.log("Timer Stopped");
+		log.debug("Timer Stopped");
 	},
 
     /**
@@ -64,15 +61,15 @@ var SessionExpireWarning = {
         if (SessionExpireWarning.nextCheckTime !== null) {
             var now = new Date().getTime();
             if (now > SessionExpireWarning.nextCheckTime) {
-                SessionExpireWarning.log("Checking...");
+                log.debug("Checking...");
                 SessionExpireWarning.nextCheckTime = null;
                 $('#' + SessionExpireWarning.dialogId).trigger(SessionExpireWarning.checkEventName);
             } else {
-                SessionExpireWarning.log("Remaining until check: " +
-                    Math.ceil((SessionExpireWarning.nextCheckTime - now)/1000) + "s");
+                log.debug("Remaining until check: ",
+                    Math.ceil((SessionExpireWarning.nextCheckTime - now)/1000), "s");
             }
         } else {
-            window.console.log("SessionExpireWarning error - no next check time");
+            log.error("SessionExpireWarning error - no next check time");
         }
     },
 
@@ -82,7 +79,7 @@ var SessionExpireWarning = {
      * @param secondsUntilNextCheck
      */
     setNextCheck: function(secondsUntilNextCheck) {
-        SessionExpireWarning.log("Next check time: " + secondsUntilNextCheck);
+        log.debug("Next check time: " + secondsUntilNextCheck);
         SessionExpireWarning.nextCheckTime = new Date().getTime() + secondsUntilNextCheck*1000;
     },
 
@@ -119,10 +116,10 @@ var SessionExpireWarning = {
         // 1. Programmatically closed via clearWarning() method due to activity in another window.
         // 2. Closed by the user clicking on it, in which case we need to notify the server of new activity.
         if (SessionExpireWarning.ignoreDialogClose) {
-            SessionExpireWarning.log("Dialog closed programmatically, not notifying server");
+            log.debug("Dialog closed programmatically, not notifying server");
             SessionExpireWarning.ignoreDialogClose = false;
         } else {
-            SessionExpireWarning.log("User closed the warning dialog, notifying server of activity");
+            log.debug("User closed the warning dialog, notifying server of activity");
             $('#' + SessionExpireWarning.dialogId).trigger(SessionExpireWarning.refreshEventName);
         }
         if (CwmPageTiming)
@@ -130,22 +127,14 @@ var SessionExpireWarning = {
     },
 
     expired: function() {
-        SessionExpireWarning.log("Session expired");
+        log.debug("Session expired");
         $(window).off('beforeunload');
         window.location = SessionExpireWarning.homePage;
     },
 
     checkFailed: function(attrs, xhr, message, failType) {
-        SessionExpireWarning.log("Check failure: attrs=" + attrs + "; type=" + failType + "; message=" + message);
-    },
-
-    /**
-	 * Log a message to Firebug's console if debugging is turned on.
-	 */
-	log: function(message) {
-		if (SessionExpireWarning.debug && window.console && window.console.log)
-			window.console.log(message);
-	}
+        log.error("Check failure: attrs=" + attrs + "; type=" + failType + "; message=" + message);
+    }
 
 };
 

@@ -26,7 +26,7 @@ CwmPageTiming.pageBlocked = false;
 CwmPageTiming.trackPage = function(eventId, url) {
     CwmPageTiming.eventId = eventId;
 
-    console.log('Started tracking page ' + eventId);
+    log.debug('Started tracking page ', eventId);
 
     var currentTime = Date.now();
     var timingSupported = CwmPageTiming.isTimingSupported();
@@ -40,7 +40,7 @@ CwmPageTiming.trackPage = function(eventId, url) {
         CwmPageTiming.handleFocusChange();
         $(window).on('focusin focusout', CwmPageTiming.handleFocusChange);
     } else {
-        console.log("Browser doesn't support focus checking; hidden time won't be reported.")
+        log.warn("Browser doesn't support focus checking; hidden time won't be reported.")
     }
 
     var loadTime = null;
@@ -72,7 +72,7 @@ CwmPageTiming.trackPage = function(eventId, url) {
                     endPageInfo += id + "=" + (endTime - startTime) + "=" + inactiveTime + ";";
                     itemsSent.push(id);
                 } else {
-                    console.log("Weird - end time but no start time for event " + id);
+                    log.warn("Weird - end time but no start time for event ", id);
                 }
             }
         }
@@ -101,7 +101,7 @@ CwmPageTiming.handleFocusChange = function() {
         // Page is either blocked or blurred.  Record start of inactive time if this is new.
         if (CwmPageTiming.startInactiveTime === null) {
             CwmPageTiming.startInactiveTime = Date.now();
-            console.log("Window went inactive at ", CwmPageTiming.startInactiveTime, " with cumulative ", CwmPageTiming.totalInactiveTime);
+            log.debug("Window went inactive at ", CwmPageTiming.startInactiveTime, " with cumulative ", CwmPageTiming.totalInactiveTime);
         }
     }
 };
@@ -110,8 +110,8 @@ CwmPageTiming.recordInactiveTime = function() {
     if (CwmPageTiming.startInactiveTime !== null) {
         var now = Date.now();
         CwmPageTiming.totalInactiveTime += (now - CwmPageTiming.startInactiveTime);
-        console.log("Window reactivated. Was inactive from ", CwmPageTiming.startInactiveTime, " to ", now);
-        console.log("Cumulative inactive time = ", CwmPageTiming.totalInactiveTime);
+        log.debug("Window reactivated. Was inactive from ", CwmPageTiming.startInactiveTime, " to ", now);
+        log.debug("Cumulative inactive time = ", CwmPageTiming.totalInactiveTime);
         CwmPageTiming.startInactiveTime = null;
     }
 };
@@ -120,12 +120,12 @@ CwmPageTiming.recordInactiveTime = function() {
 // saves a timestamp to local storage as the page gets unloaded
 CwmPageTiming.saveEndTime = function(eventId) {
     if (!localStorage['pageEndTime.' + eventId]) {
-        console.log("Saving end time for page: " + Date.now());
+        log.debug("Saving end time for page: ", Date.now());
         localStorage['pageEndTime.' + eventId] = Date.now();
         CwmPageTiming.recordInactiveTime();
         localStorage['pageInactiveTime.' + eventId] = CwmPageTiming.totalInactiveTime;
     } else {
-        console.log('Pagehide event received, but end time was already recorded');
+        log.warn('Pagehide event received, but end time was already recorded');
     }
 };
 
@@ -136,7 +136,7 @@ CwmPageTiming.sendData = function (url, data, itemsSent) {
         ep: data,
         rt: 10000,           // 10-second timeout
         sh: [function () {   // Success Handler
-            console.log("Success sending liveness data");
+            log.debug("Success sending liveness data");
             // Remove localstorage so that these items are not sent again later.
             for (var i in itemsSent) {
                 localStorage.removeItem('pageStartTime.' + itemsSent[i]);
@@ -144,7 +144,7 @@ CwmPageTiming.sendData = function (url, data, itemsSent) {
             }
         }],
         fh: [function () {   // Failure Handler
-            console.log("Failure sending liveness data");
+            log.error("Failure sending liveness data");
         }]
     });
 };
