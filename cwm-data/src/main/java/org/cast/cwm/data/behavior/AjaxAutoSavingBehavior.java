@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.data.behavior;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.AttributeModifier;
@@ -118,13 +119,34 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 		
 		// Run once to initialize
 		response.render(JavaScriptHeaderItem.forReference(AUTOSAVING_JAVASCRIPT));
-		response.render(JavaScriptHeaderItem.forScript("AutoSaver.setup(" + updateInterval + ");", "AjaxAutoSavingBehaviorSetup"));
-		
-		response.render(OnDomReadyHeaderItem.forScript("AutoSaver.makeLinksSafe();"));
+		response.render(JavaScriptHeaderItem.forScript("AutoSaver.setup(" + updateInterval + ");",
+                "AjaxAutoSavingBehaviorSetup"));
 
-		// Run each time to register this Form's default values and call-back URL with the AutoSaver
-		response.render(OnDomReadyHeaderItem.forScript("AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');"));
+		String callback = getBeforeSaveCallbackJavascript();
+		if (!Strings.isNullOrEmpty(callback))
+            response.render(JavaScriptHeaderItem.forScript(
+                    String.format("AutoSaver.addOnBeforeSaveCallBack(function() { %s; });", callback),
+                    "AjaxAutoSavingCallbackSetup"));
+
+		// Run on each render to make sure page links trigger a save first
+        response.render(OnDomReadyHeaderItem.forScript("AutoSaver.makeLinksSafe();"));
+
+		// Run on each render to register this Form's default values and call-back URL with the AutoSaver
+		response.render(OnDomReadyHeaderItem.forScript(
+		        "AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');"));
 	}
+
+    /**
+     * Define Javascript code that will be executed before the form is checked for changes.
+     * When using tools such as WYSIWYG editors or drawing tools, there is often code needed to pull
+     * out the information from the fancy widget and put it in a regular form field for saving.
+     * Override this method in those cases to return the appropriate code.
+     *
+     * @return Javascript code, or null if none
+     */
+	protected String getBeforeSaveCallbackJavascript() {
+	    return null;
+    }
 
 	/**
 	 * Called when the form auto-submits itself.  By default, this does nothing and presumes
