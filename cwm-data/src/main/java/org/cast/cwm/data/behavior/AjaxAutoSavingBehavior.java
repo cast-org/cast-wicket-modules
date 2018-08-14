@@ -21,8 +21,6 @@ package org.cast.cwm.data.behavior;
 
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
-import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ClassAttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -59,14 +57,15 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 			= new PackageResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
 
 	/**
-	 * Constructor - attach to a component INSIDE the form.
+	 * No-arg constructor; can be used when attaching to a component INSIDE the form.
 	 */
 	public AjaxAutoSavingBehavior() {
 		super(AUTOSAVE_EVENT);
 	}
 	
 	/**
-	 * Constructor - attach to a component outside the form or the form itself.
+	 * Constructor including the form.
+     * Used when attaching to a component outside the form, or to the form itself.
 	 * 
 	 * @param form the form to be autosaved
 	 */
@@ -133,7 +132,7 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 
 		// Run on each render to register this Form's default values and call-back URL with the AutoSaver
 		response.render(OnDomReadyHeaderItem.forScript(
-		        "AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');"));
+				String.format("AutoSaver.addForm('%s', '%s');", getForm().getMarkupId(), this.getCallbackUrl())));
 	}
 
     /**

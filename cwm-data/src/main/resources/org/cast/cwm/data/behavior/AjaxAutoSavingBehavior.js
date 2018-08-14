@@ -9,7 +9,7 @@
  */
 var AutoSaver = {
 		
-	    autoSaveInterval: 30000,  // time between autosaves, in ms
+	    autoSaveInterval: 30000,   // time between autosaves, in ms
 	    onBeforeSaveCallBacks: [], // Collection of callbacks to run before checking if the form needs to be saved.
 	    formsInProgress: [], // Collection of forms that are being saved
 	    
@@ -59,10 +59,7 @@ var AutoSaver = {
 	        });
 			
 			log.debug("Running AutoSave Processing...");
-			
-			$('.autosave_info').each(function() {	
-            	$(this).html('<strong>Auto Saving...</strong>');
-            });
+			$('.autosave_info').html('<strong>Auto Saving...</strong>');
 
 			var statusObject = { hasErrors: false, callbackDone: false }; // this will collect any errors
 			
@@ -155,33 +152,13 @@ var AutoSaver = {
 		},
 		
 		/**
-		 * Get a friendly Clock Time for display.
-		 */
-		getClockTime: function() {
-	    	var now    = new Date();
-	        var hour   = now.getHours();
-	        var minute = now.getMinutes();
-	        var second = now.getSeconds();
-	        var ap = "AM";
-	        if (hour   > 11) { ap = "PM";             }
-	        if (hour   > 12) { hour = hour - 12;      }
-	        if (hour   === 0) { hour = 12;             }
-	        if (hour   < 10) { hour   = "0" + hour;   }
-	        if (minute < 10) { minute = "0" + minute; }
-	        if (second < 10) { second = "0" + second; }
-            return hour + ':' + minute + ':' + second + " " + ap;
-	    },
-		
-		/**
 		 * Recursive timed loop on itself.  Calls autoSaveMaybeSave(), updates display messages,
 		 * and then sets another timeout on itself.
 		 * 
 		 */
 	    recurringAutoSave: function() {
 	    	AutoSaver.autoSaveMaybeSave(function() {
-       			$('.autosave_info').each(function() {	
-                        $(this).html('<strong>Last Saved:</strong> ' + AutoSaver.getClockTime());
-                });
+       			$('.autosave_info').html('<strong>Last Saved:</strong> ' + new Date().toLocaleTimeString());
        		});
 	    	window.setTimeout(AutoSaver.recurringAutoSave, AutoSaver.autoSaveInterval);
 	    },
@@ -242,6 +219,7 @@ var AutoSaver = {
 		
 		/**
 		 * Start the timer on the auto-save.
+         * @param {Number} updateInterval interval between save checks in ms.
 		 */
 		setup: function(updateInterval) {
 			 AutoSaver.autoSaveInterval = updateInterval;
