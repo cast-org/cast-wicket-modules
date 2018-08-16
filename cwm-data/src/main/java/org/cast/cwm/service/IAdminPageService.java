@@ -34,7 +34,6 @@ import org.cast.cwm.data.User;
  *
  * @author bgoldowsky
  */
-@ImplementedBy(AdminPageService.class)
 public interface IAdminPageService {
 
 	Class<? extends WebPage> getAdminHomePage();

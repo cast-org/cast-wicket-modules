@@ -45,7 +45,7 @@ public class Html5PlayerPanelTest extends CwmDataTestCase {
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
-		helper.injectMock(ICwmService.class);
+		helper.injectCwmService(this);
 	}
 
 	@Test

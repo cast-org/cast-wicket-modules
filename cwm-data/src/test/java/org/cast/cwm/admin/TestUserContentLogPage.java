@@ -46,37 +46,31 @@ import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.ISiteService;
+import org.cast.cwm.test.CwmDataInjectionTestHelper;
+import org.cast.cwm.test.CwmDataTestCase;
 import org.cast.cwm.test.CwmTestApplication;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestUserContentLogPage {
-	
-	private WicketTester tester;
+public class TestUserContentLogPage extends CwmDataTestCase {
 
-	@Before
-	public void setUp() {
-        Map<Class<? extends Object>, Object> injectionMap = new HashMap<Class<? extends Object>, Object>();        
+	@Override
+	public void populateInjection(CwmDataInjectionTestHelper helper) {
+		helper.injectAppConfiguration(this);
+		helper.injectCwmSessionService(this);
+		helper.injectFigurationService(this);
 
-		IAppConfiguration appConfig = mock(IAppConfiguration.class);
-		injectionMap.put(IAppConfiguration.class, appConfig);
-		
-		ICwmSessionService cwmSessionService = mock(ICwmSessionService.class);
-        when(cwmSessionService.getUser()).thenReturn(new User(Role.ADMIN));
-		injectionMap.put(ICwmSessionService.class, cwmSessionService);
-
-		ISiteService siteService = mock(ISiteService.class);
+		ISiteService siteService = helper.injectMock(ISiteService.class);
 		when(siteService.listSites()).thenReturn(getMockSiteList());
-		injectionMap.put(ISiteService.class,  siteService);
-
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		CwmTestApplication application = new CwmTestApplication(injectionMap);
-
-		tester = new WicketTester(application);
 	}
 
+	@Override
+	public void setUpData() {
+		super.setUpData();
+		loggedInUser.setRole(Role.ADMIN);
+	}
 
 	@Test
 	public void pageRendersSuccessfully() {

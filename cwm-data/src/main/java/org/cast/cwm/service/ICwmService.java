@@ -27,7 +27,6 @@ import org.cast.cwm.data.init.IDatabaseInitializer;
 
 import java.util.List;
 
-@ImplementedBy(CwmService.class)
 public interface ICwmService {
 
 	/**

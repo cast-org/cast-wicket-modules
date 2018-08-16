@@ -29,7 +29,6 @@ import org.apache.wicket.markup.head.JavaScriptHeaderItem;
  *
  * @author bgoldowsky
  */
-@ImplementedBy(FigurationService.class)
 public interface IFigurationService {
 
 	/**

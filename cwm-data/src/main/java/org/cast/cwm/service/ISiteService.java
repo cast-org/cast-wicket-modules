@@ -29,7 +29,6 @@ import org.cast.cwm.data.User;
 
 import java.util.List;
 
-@ImplementedBy(SiteService.class)
 public interface ISiteService {
 
 	Class<? extends Site> getSiteClass();

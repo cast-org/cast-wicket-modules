@@ -45,9 +45,10 @@ public class TestEventLogPage extends CwmDataTestCase {
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
-		helper.injectMock(ICwmService.class);
-		helper.injectAndStubCwmSessionService(this);
+		helper.injectCwmService(this);
+		helper.injectCwmSessionService(this);
 		helper.injectAppConfiguration(this);
+		helper.injectFigurationService(this);
 		helper.injectObject(IModelProvider.class, new SimpleModelProvider());
 		siteService = helper.injectMock(ISiteService.class);
 		when(siteService.listSites()).thenReturn(new ListModel<Site>(Collections.singletonList(mockSite())));

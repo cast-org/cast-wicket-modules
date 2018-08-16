@@ -22,12 +22,13 @@ package org.cast.cwm.test;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.ICwmSessionService;
-import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.IUserService;
+import org.cast.cwm.figuration.service.IFigurationService;
+import org.cast.cwm.service.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -37,21 +38,28 @@ public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 		super();
 	}
 
-	public IAppConfiguration injectAppConfiguration(CwmDataBaseTestCase baseInjectedTestCase) {
+	public IAppConfiguration injectAppConfiguration(CwmDataBaseTestCase testCase) {
 		IAppConfiguration mock = injectMock(IAppConfiguration.class);
 		return mock;
 	}
 
-	public ICwmSessionService injectAndStubCwmSessionService (CwmDataBaseTestCase baseInjectedTestCase) {
+	public ICwmService injectCwmService(CwmDataBaseTestCase testCase) {
+		ICwmService mock = injectMock(ICwmService.class);
+		when(mock.getLoglevelJavascriptResourceReference())
+				.thenReturn(new JavaScriptResourceReference(ICwmService.class, "logLevel"));
+		return mock;
+	}
+
+	public ICwmSessionService injectCwmSessionService(CwmDataBaseTestCase testCase) {
 		ICwmSessionService cwmSessionService = injectMock(ICwmSessionService.class);
 	    when(cwmSessionService.isSignedIn()).thenReturn(true);
-	    when(cwmSessionService.getUserModel()).thenReturn(Model.of(baseInjectedTestCase.loggedInUser));
-	    when(cwmSessionService.getUser()).thenReturn(baseInjectedTestCase.loggedInUser);
-	    when(cwmSessionService.getCurrentPeriodModel()).thenReturn(Model.of(baseInjectedTestCase.period));
+	    when(cwmSessionService.getUserModel()).thenReturn(Model.of(testCase.loggedInUser));
+	    when(cwmSessionService.getUser()).thenReturn(testCase.loggedInUser);
+	    when(cwmSessionService.getCurrentPeriodModel()).thenReturn(Model.of(testCase.period));
 		return cwmSessionService;
 	}
 
-	public IUserService injectAndStubUserService (CwmDataBaseTestCase testCase) {
+	public IUserService injectUserService(CwmDataBaseTestCase testCase) {
 		IUserService userService = injectMock(IUserService.class);
 		when(userService.newUser()).thenAnswer(new Answer<User>() {
 			@Override
@@ -69,5 +77,9 @@ public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 		IEventService eventService = injectMock(IEventService.class);
 		return eventService;
 	}
+
+	public IFigurationService injectFigurationService(CwmDataBaseTestCase testCase) {
+	    return injectMock(IFigurationService.class);
+    }
 
 }

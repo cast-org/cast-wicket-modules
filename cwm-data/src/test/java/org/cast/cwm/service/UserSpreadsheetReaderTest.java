@@ -32,7 +32,6 @@ import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +46,8 @@ public class UserSpreadsheetReaderTest extends CwmDataTestCase {
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
-		helper.injectAndStubUserService(this);
-		helper.injectMock(ICwmService.class);
+		helper.injectUserService(this);
+		helper.injectCwmService(this);
 		helper.injectMock(IDBService.class);
 		helper.injectObject(IModelProvider.class, new SimpleModelProvider());
 

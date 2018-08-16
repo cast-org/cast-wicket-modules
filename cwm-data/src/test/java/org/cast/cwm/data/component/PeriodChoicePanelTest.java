@@ -27,7 +27,6 @@ import java.util.TreeSet;
 import org.apache.wicket.util.tester.FormTester;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.service.ICwmSessionService;
-import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
 import org.cast.cwm.test.TestDataUtil;
@@ -57,7 +56,7 @@ public class PeriodChoicePanelTest extends CwmDataTestCase {
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
-		cwmSessionService = helper.injectAndStubCwmSessionService(this);
+		cwmSessionService = helper.injectCwmSessionService(this);
 	}
 
 	@Test

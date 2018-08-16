@@ -33,7 +33,6 @@ import org.cast.cwm.service.UserService.LoginData;
 
 import java.util.List;
 
-@ImplementedBy(UserService.class)
 public interface IUserService {
 	
 	/**

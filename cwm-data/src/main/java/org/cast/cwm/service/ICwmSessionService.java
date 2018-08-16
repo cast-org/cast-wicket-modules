@@ -35,7 +35,6 @@ import java.util.Date;
  * We'll add any that we need to wrap for mocks.
  * 
  */
-@ImplementedBy(CwmSessionService.class)
 public interface ICwmSessionService {
 
 	/**

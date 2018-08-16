@@ -23,7 +23,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
-import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
 import org.cwm.db.service.IDBService;
@@ -31,7 +30,6 @@ import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -45,8 +43,8 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
-		IUserService userService = helper.injectAndStubUserService(this);
-		helper.injectMock(ICwmService.class);
+		IUserService userService = helper.injectUserService(this);
+		helper.injectCwmService(this);
 		helper.injectMock(IDBService.class);
 		helper.injectMock(ISiteService.class);
 		helper.injectObject(IModelProvider.class, new SimpleModelProvider());

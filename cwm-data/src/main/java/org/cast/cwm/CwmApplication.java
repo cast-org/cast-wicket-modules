@@ -23,9 +23,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import com.google.inject.Binder;
-import com.google.inject.Inject;
-import com.google.inject.Module;
+import com.google.inject.*;
 import de.agilecoders.wicket.webjars.WicketWebjars;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +46,9 @@ import org.cast.cwm.data.init.CloseOldLoginSessions;
 import org.cast.cwm.data.init.CreateAdminUser;
 import org.cast.cwm.data.init.CreateDefaultUsers;
 import org.cast.cwm.data.init.IDatabaseInitializer;
-import org.cast.cwm.service.IAdminPageService;
-import org.cast.cwm.service.ICwmSessionService;
-import org.cast.cwm.service.IEventService;
+import org.cast.cwm.figuration.service.FigurationService;
+import org.cast.cwm.figuration.service.IFigurationService;
+import org.cast.cwm.service.*;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.LoggerFactory;
 
@@ -191,11 +189,19 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	 */
 	protected List<Module> getInjectionModules() {
 		ArrayList<Module> modules = new ArrayList<>();
-		modules.add(new Module() {
+		modules.add(new AbstractModule() {
 			@Override
-			public void configure(Binder binder) {
-				log.debug("Binding CWM Configuration");
-				binder.bind(IAppConfiguration.class).toInstance(configuration);
+			protected void configure() {
+				log.debug("Binding CWM default configuration");
+				bind(IAppConfiguration.class).toInstance(configuration);
+				bind(ICwmService.class).to(CwmService.class);
+				bind(ICwmSessionService.class).to(CwmSessionService.class);
+				bind(IUserPreferenceService.class).to(UserPreferenceService.class);
+				bind(IAdminPageService.class).to(AdminPageService.class);
+				bind(IUserService.class).to(UserService.class);
+				bind(ISiteService.class).to(SiteService.class);
+				bind(IFigurationService.class).to(FigurationService.class);
+				bind(IUserContentViewerFactory.class).to(DefaultUserContentViewerFactory.class);
 			}
 		});
 		return modules;

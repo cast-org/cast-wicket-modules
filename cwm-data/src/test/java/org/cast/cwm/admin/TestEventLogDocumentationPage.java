@@ -19,12 +19,7 @@
  */
 package org.cast.cwm.admin;
 
-import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.cast.cwm.IEventType;
 import org.cast.cwm.TestingEventType;
-import org.cast.cwm.data.Role;
-import org.cast.cwm.service.AdminPageService;
-import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
@@ -32,7 +27,6 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +40,8 @@ public class TestEventLogDocumentationPage extends CwmDataTestCase {
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
 		super.populateInjection(helper);
 		helper.injectAppConfiguration(this);
-		helper.injectAndStubCwmSessionService(this);
+		helper.injectCwmSessionService(this);
+		helper.injectFigurationService(this);
 
 		eventService = helper.injectEventService(this);
 		when(eventService.listEventTypes()).thenAnswer(new Answer<List<TestingEventType>>() {
