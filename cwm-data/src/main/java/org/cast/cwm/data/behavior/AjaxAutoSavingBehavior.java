@@ -19,7 +19,8 @@
  */
 package org.cast.cwm.data.behavior;
 
-import org.apache.wicket.AttributeModifier;
+import com.google.common.base.Strings;
+import org.apache.wicket.ClassAttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
@@ -31,6 +32,8 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
 
+import java.util.Set;
+
 /**
  * This behavior will submit a form at regular intervals.  Any HTML element
  * with class='autosave_info' will display the status of these automatic
@@ -41,44 +44,45 @@ import org.apache.wicket.request.resource.PackageResourceReference;
  */
 public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 
-	private static final long serialVersionUID = 1L;
-	
 	private static long updateInterval = 30000; 
 
 	private static final String AUTOSAVE_EVENT = "autosave";
 	
-	public static final PackageResourceReference AUTOSAVING_JAVASCRIPT = new PackageResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
+	private static final PackageResourceReference AUTOSAVING_JAVASCRIPT
+			= new PackageResourceReference(AjaxAutoSavingBehavior.class, "AjaxAutoSavingBehavior.js");
 
 	/**
-	 * Constructor - attach to a component INSIDE the form.
+	 * No-arg constructor; can be used when attaching to a component INSIDE the form.
 	 */
 	public AjaxAutoSavingBehavior() {
 		super(AUTOSAVE_EVENT);
-		init();
 	}
 	
 	/**
-	 * Constructor - attach to a component outside the form
-	 * or the form itself.
+	 * Constructor including the form.
+     * Used when attaching to a component outside the form, or to the form itself.
 	 * 
-	 * @param form
+	 * @param form the form to be autosaved
 	 */
 	public AjaxAutoSavingBehavior(Form<?> form) {
 		super(form, AUTOSAVE_EVENT);
-		init();
 	}
-	
-	/**
-	 * Initialize the Autosave behavior for this form.
-	 */
-	protected void init() {
+
+    @Override
+	public void onConfigure(Component component) {
 		getForm().setOutputMarkupId(true);
-		getForm().add(AttributeModifier.append("class", "ajaxAutoSave"));
+		getForm().add(new ClassAttributeModifier() {
+            @Override
+            protected Set<String> update(Set<String> classes) {
+                classes.add("ajaxAutoSave");
+                return classes;
+            }
+        });
+		super.onConfigure(component);
 	}
 
 	@Override
 	protected void onError(AjaxRequestTarget target) {
-		
 	}
 	
 	@Override
@@ -101,30 +105,50 @@ public class AjaxAutoSavingBehavior extends AjaxFormSubmitBehavior {
 		
 		// Run once to initialize
 		response.render(JavaScriptHeaderItem.forReference(AUTOSAVING_JAVASCRIPT));
-		response.render(JavaScriptHeaderItem.forScript("AutoSaver.setup(" + updateInterval + ");", "AjaxAutoSavingBehaviorSetup"));
-		
-		response.render(OnDomReadyHeaderItem.forScript("AutoSaver.makeLinksSafe();"));
+		response.render(JavaScriptHeaderItem.forScript("AutoSaver.setup(" + updateInterval + ");",
+                "AjaxAutoSavingBehaviorSetup"));
 
-		// Run each time to register this Form's default values and call-back URL with the AutoSaver
-		response.render(OnDomReadyHeaderItem.forScript("AutoSaver.addForm('" + getForm().getMarkupId() + "', '" + this.getCallbackUrl() + "');"));
+		String callback = getBeforeSaveCallbackJavascript();
+		if (!Strings.isNullOrEmpty(callback))
+            response.render(JavaScriptHeaderItem.forScript(
+                    String.format("AutoSaver.addOnBeforeSaveCallBack(function() { %s; });", callback),
+                    "AjaxAutoSavingCallbackSetup"));
+
+		// Run on each render to make sure page links trigger a save first
+        response.render(OnDomReadyHeaderItem.forScript("AutoSaver.makeLinksSafe();"));
+
+		// Run on each render to register this Form's default values and call-back URL with the AutoSaver
+		response.render(OnDomReadyHeaderItem.forScript(
+				String.format("AutoSaver.addForm('%s', '%s');", getForm().getMarkupId(), this.getCallbackUrl())));
 	}
+
+    /**
+     * Define Javascript code that will be executed before the form is checked for changes.
+     * When using tools such as WYSIWYG editors or drawing tools, there is often code needed to pull
+     * out the information from the fancy widget and put it in a regular form field for saving.
+     * Override this method in those cases to return the appropriate code.
+     *
+     * @return Javascript code, or null if none
+     */
+	protected String getBeforeSaveCallbackJavascript() {
+	    return null;
+    }
 
 	/**
 	 * Called when the form auto-submits itself.  By default, this does nothing and presumes
 	 * the form should process silently in the background.  Override this method to provide
 	 * additional ajax changes to the page.
 	 * 
-	 * @param target
+	 * @param target AJAX request
 	 */
 	protected void onAutoSave(AjaxRequestTarget target) {
-		
 	}
 	
 	/**
 	 * Set the AutoSaving update interval for this application, in milliseconds.  Default
 	 * is every 30 seconds.
 	 * 
-	 * @param milliseconds
+	 * @param milliseconds new interval, in milliseconds
 	 */
 	public static void setUpdateInterval(long milliseconds) {
 		updateInterval = milliseconds;
