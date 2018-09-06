@@ -19,10 +19,11 @@
  */
 package org.cast.cwm.data.validator;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
-import net.databinder.models.hib.HibernateObjectModel;
-import net.databinder.models.hib.ICriteriaBuilder;
+import net.databinder.models.hib.ModelRestrictions;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.lang.Classes;
@@ -31,6 +32,7 @@ import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.User;
+import org.cwm.db.service.IDBService;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
@@ -61,10 +63,13 @@ public class UniqueDataFieldValidator<T> implements IValidator<T>, IDetachable {
 	private Class<? extends PersistedObject> clazz;
 	private IModel<? extends PersistedObject> mCurrent = null;
 	private String field;
-	private Map<String, IModel<? extends Serializable>> scope = new HashMap<>();
+	private Map<String, IModel<? extends Serializable>> scopes = new HashMap<>();
 
 	@Getter @Setter
 	private boolean caseSensitive = true;
+
+	@Inject
+    private IDBService dbService;
 
 	/**
 	 * Constructor used when editing a persistent object.
@@ -73,9 +78,8 @@ public class UniqueDataFieldValidator<T> implements IValidator<T>, IDetachable {
 	 * @param fieldName the field to confirm for uniqueness among objects of this type
 	 */
 	public UniqueDataFieldValidator(IModel<? extends PersistedObject> mCurrent, String fieldName) {
-		this.mCurrent = mCurrent;
-		this.clazz = mCurrent.getObject().getClass();
-		this.field = fieldName;
+		this(mCurrent.getObject().getClass(), fieldName);
+	    this.mCurrent = mCurrent;
 	}
 	
 	/**
@@ -87,39 +91,38 @@ public class UniqueDataFieldValidator<T> implements IValidator<T>, IDetachable {
 	public UniqueDataFieldValidator(Class<? extends PersistedObject> clazz, String fieldName) {
 		this.clazz = clazz;
 		this.field = fieldName;
+        Injector.get().inject(this);
 	}
 
 	@Override
 	public void validate(final IValidatable<T> validatable) {
-		HibernateObjectModel<PersistedObject> mOther = new HibernateObjectModel<>(clazz, new ICriteriaBuilder() {
-			@Override
-			public void buildUnordered(Criteria criteria) {
-				SimpleExpression comparison = Restrictions.eq(field, validatable.getValue());
-				if (!isCaseSensitive())
-					comparison.ignoreCase();
-				criteria.add(comparison);
-				for (String field : scope.keySet()) {
-					criteria.add(Restrictions.eq(field, scope.get(field).getObject()));
-				}
-			}
-			@Override
-			public void buildOrdered(Criteria criteria) {
-				buildUnordered(criteria);
-			}
-		});	
+        Criteria criteria = dbService.getHibernateSession().createCriteria(clazz);
 
-		// Raise an error if we found an object with that field value, and it's not the current object
-		if (mOther.getObject() != null) {
-			if (mCurrent != null && mOther.getObject().equals(mCurrent.getObject()))
-				return;
-			ValidationError err = new ValidationError(this).addKey(getResourceKey());
-			err.setVariables(getVariablesMap());
-			validatable.error(err);
-		}
+        SimpleExpression comparison = Restrictions.eq(field, validatable.getValue());
+        if (!isCaseSensitive())
+            comparison.ignoreCase();
+        criteria.add(comparison);
+
+        for (String field : scopes.keySet()) {
+            criteria.add(ModelRestrictions.eq(field, scopes.get(field)));
+        }
+
+        // Normally, there will be at most one object found, but make this robust to other cases.
+        // If any object found is not the current object, raise an error.
+        for (Object found : criteria.list()) {
+            if (mCurrent != null && mCurrent.getObject().equals(found)) {
+                // Finding current object is expected; ignore
+                continue;
+            }
+            ValidationError err = new ValidationError(this).addKey(getResourceKey());
+            err.setVariables(getVariablesMap());
+            validatable.error(err);
+            return;
+        }
 	}
 
 	/**
-	 * Limit the scope of this validation.  Allows you to ensure that a
+	 * Limit the scopes of this validation.  Allows you to ensure that a
 	 * data field is unique only within a certain group.  For example,
 	 * <code>
 	 * <pre>
@@ -138,7 +141,7 @@ public class UniqueDataFieldValidator<T> implements IValidator<T>, IDetachable {
 	 * @return this object, for chaining
 	 */
 	public UniqueDataFieldValidator<T> limitScope(String field, IModel<? extends Serializable> value) {
-		scope.put(field, value);
+		scopes.put(field, value);
 		return this;
 	}
 
@@ -157,6 +160,8 @@ public class UniqueDataFieldValidator<T> implements IValidator<T>, IDetachable {
 	public void detach() {
 		if (mCurrent != null)
 			mCurrent.detach();
+		for (IModel<?> model : scopes.values())
+		    model.detach();
 	}
 
 }
