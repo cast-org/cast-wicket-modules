@@ -43,7 +43,7 @@ public class ConfirmationModalTest extends WicketTestCase {
 	@Test
 	public void hasExpectedTexts() {
 		tester.startComponentInPage(new TestConfirmationModal("id"));
-		tester.assertContains("Confirmation</h4>");
+		tester.assertContains("Confirmation</h2>");
 		tester.assertContains("Confirm</button>");
 		tester.assertContains("Cancel</button>");
 		tester.assertContains("Do you really");
