@@ -19,14 +19,15 @@
  */
 package org.cast.cwm.data.component;
 
-import java.util.List;
-
+import com.google.inject.Inject;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.Period;
+import org.cast.cwm.service.ICwmSessionService;
+
+import java.util.List;
 
 /** A DropDownChoice of Periods.
  * 
@@ -35,27 +36,29 @@ import org.cast.cwm.data.Period;
  */
 public class PeriodChoice extends DropDownChoice<Period> {
 
-	private static final long serialVersionUID = 1L;
+	@Inject
+	private ICwmSessionService cwmSessionService;
 	
-	private static ChoiceRenderer<Period> renderer = new ChoiceRenderer<Period>("name", "id");
+	private static ChoiceRenderer<Period> renderer = new ChoiceRenderer<>("name", "id");
 
 	/**
-	 * Normal constructor, uses the list of Periods associated with the currently logged-in user.
-	 * @param wicketId
-	 * @param model
+	 * Normal constructor; uses the list of Periods associated with the currently logged-in user.
+	 * @param wicketId component ID
+	 * @param mPeriod model for the choice
 	 */
-	public PeriodChoice (String wicketId, IModel<Period> model) {
-		this (wicketId, model, new PropertyModel<List<Period>>(CwmSession.get().getUserModel(), "periodsAsList"));
+	public PeriodChoice (String wicketId, IModel<Period> mPeriod) {
+		this (wicketId, mPeriod, null);
+		setChoices(new PropertyModel<List<Period>>(cwmSessionService.getUserModel(), "periodsAsList"));
 	}
 	
 	/**
 	 * Construct with a model for the list of Periods from which to choose.
-	 * @param id
-	 * @param model
-	 * @param choices
+	 * @param wicketId component ID
+	 * @param mPeriod model for the choice
+	 * @param mChoices model that resolves to the list of choices to be presented in the menu.
 	 */
-	public PeriodChoice(String id, IModel<Period> model, IModel<? extends List<? extends Period>> choices) {
-		super(id, model, choices, renderer);
+	public PeriodChoice(String wicketId, IModel<Period> mPeriod, IModel<? extends List<? extends Period>> mChoices) {
+		super(wicketId, mPeriod, mChoices, renderer);
 	}
 
 }
