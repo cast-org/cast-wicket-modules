@@ -75,6 +75,7 @@ public class UploadedFileResource extends AbstractResource {
 					"Data not found [id=" + id + "]");
 		BinaryFileData bfd = mBfd.getObject();
 
+        response.setAcceptRange(ContentRangeType.BYTES);
 		response.setLastModified(Time.valueOf(bfd.getLastModified()));
 
 		if (response.dataNeedsToBeWritten(attributes)) {
