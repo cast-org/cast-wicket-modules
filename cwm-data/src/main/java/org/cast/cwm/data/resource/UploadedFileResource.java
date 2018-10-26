@@ -22,10 +22,12 @@ package org.cast.cwm.data.resource;
 import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.request.resource.PartWriterCallback;
 import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.time.Time;
@@ -33,6 +35,7 @@ import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 
 /**
  * A simple resource that accepts an "id" parameter and serves up
@@ -90,12 +93,11 @@ public class UploadedFileResource extends AbstractResource {
 			response.setContentDisposition(ContentDisposition.INLINE);
 			response.setCacheDuration(Duration.days(1));
 			response.setCacheScope(WebResponse.CacheScope.PUBLIC);
-			response.setWriteCallback(new WriteCallback() {
-				@Override
-				public void writeData(final Attributes attributes) {
-					attributes.getResponse().write(data);
-				}
-			});
+            RequestCycle cycle = RequestCycle.get();
+            Long startbyte = cycle.getMetaData(CONTENT_RANGE_STARTBYTE);
+            Long endbyte = cycle.getMetaData(CONTENT_RANGE_ENDBYTE);
+            response.setWriteCallback(
+                    new PartWriterCallback(new ByteArrayInputStream(data), (long)data.length, startbyte, endbyte));
 		}
 		return response;
 	}
