@@ -142,18 +142,18 @@ public class EventLogPage extends LogPage {
 	protected List<IDataColumn<Event>> makeColumns() {
 		List<IDataColumn<Event>> columns = new ArrayList<IDataColumn<Event>>();
 		
-		columns.add(new DocumentedEventColumn("EventID", "id", "id"));
+		columns.add(new DocumentedPropertyColumn("EventID", "id", "id"));
 
 		columns.add(new DateDataColumn<Event>("Start time", "startTime")
 			.setDocumentation(getString("documentation.startTime")));
 		columns.add(new DateDataColumn<Event>("End time", "endTime")
 			.setDocumentation(getString("documentation.endTime")));
-		columns.add(new DocumentedEventColumn("Active duration", "activeDuration"));
+		columns.add(new DocumentedPropertyColumn("Active duration", "activeDuration"));
 		
-		columns.add(new DocumentedEventColumn("User", "user.subjectId", "user.subjectId"));
-		columns.add(new DocumentedEventColumn("Event Type", "type", "type.displayName"));
-		columns.add(new DocumentedEventColumn("Details", "detail"));
-		columns.add(new DocumentedEventColumn("Page", "page"));
+		columns.add(new DocumentedPropertyColumn("User", "user.subjectId", "user.subjectId"));
+		columns.add(new DocumentedPropertyColumn("Event Type", "type", "type.displayName"));
+		columns.add(new DocumentedPropertyColumn("Details", "detail"));
+		columns.add(new DocumentedPropertyColumn("Page", "page"));
 
 		return columns;
 	}
@@ -176,14 +176,34 @@ public class EventLogPage extends LogPage {
 	}
 
 
-	public class DocumentedEventColumn extends DateDataColumn<Event> {
+	public class DocumentedPropertyColumn extends PropertyDataColumn<Event> {
 
-		public DocumentedEventColumn(String headerString, String propertyExpression) {
+		public DocumentedPropertyColumn(String headerString, String propertyExpression) {
 			super(headerString, propertyExpression);
 			addDocumentationProperty();
 		}
 
-		public DocumentedEventColumn(String headerString, String sortProperty, String propertyExpression) {
+		public DocumentedPropertyColumn(String headerString, String sortProperty, String propertyExpression) {
+			super(headerString, sortProperty, propertyExpression);
+			addDocumentationProperty();
+		}
+
+		protected void addDocumentationProperty() {
+			// Would be simpler to just pass a ResourceModel here, but that doesn't resolve properly in CSV download.
+			setDocumentation(getLocalizer().getString("documentation."+getPropertyExpression(),
+					EventLogPage.this));
+		}
+	}
+
+
+	public class DocumentedDateColumn extends DateDataColumn<Event> {
+
+		public DocumentedDateColumn(String headerString, String propertyExpression) {
+			super(headerString, propertyExpression);
+			addDocumentationProperty();
+		}
+
+		public DocumentedDateColumn(String headerString, String sortProperty, String propertyExpression) {
 			super(headerString, sortProperty, propertyExpression);
 			addDocumentationProperty();
 		}
