@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,16 +19,15 @@
  */
 package org.cast.cwm.xml;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.cast.cwm.xml.parser.XmlParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a section of an XML document.  A "section" in this case means a structural element,

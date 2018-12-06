@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -18,8 +18,6 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.cast.cwm;
-
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

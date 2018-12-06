@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,13 +19,13 @@
  */
 package org.cast.cwm.xml;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * An ordered list of XmlDocument objects.

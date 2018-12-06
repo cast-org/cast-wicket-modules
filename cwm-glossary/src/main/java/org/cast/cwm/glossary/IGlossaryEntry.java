@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,11 @@
  */
 package org.cast.cwm.glossary;
 
-import java.io.Serializable;
-import java.util.Collection;
-
 import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IXmlPointer;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * An interface for a glossary entry representing a single glossary word.

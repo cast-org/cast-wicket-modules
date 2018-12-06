@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.components.head;
 
-import java.util.Collections;
-
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.request.Response;
+
+import java.util.Collections;
 
 /**
  * Inserts the Google "Universal Analytics" tracking code into the page header.

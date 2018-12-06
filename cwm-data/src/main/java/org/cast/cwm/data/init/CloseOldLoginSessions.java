@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,8 @@
  */
 package org.cast.cwm.data.init;
 
-import java.util.Date;
-
+import com.google.inject.Inject;
 import net.databinder.models.hib.HibernateListModel;
-
 import org.apache.wicket.injection.Injector;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.LoginSession;
@@ -32,7 +30,7 @@ import org.cast.cwm.service.IEventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import java.util.Date;
 
 /**
  * Database initializer that will close any open LoginSession objects that have expired.

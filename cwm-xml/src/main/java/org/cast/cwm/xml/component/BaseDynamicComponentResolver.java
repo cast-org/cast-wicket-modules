@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,13 @@
  */
 package org.cast.cwm.xml.component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.cast.cwm.xml.handler.DefaultDynamicComponentHandler;
 import org.cast.cwm.xml.handler.IDynamicComponentHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A  basic Component Resolver which can be constructed with a default handler and a list of handlers.

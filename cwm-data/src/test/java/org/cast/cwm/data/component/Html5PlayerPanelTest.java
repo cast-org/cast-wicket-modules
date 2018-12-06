@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,11 +21,8 @@ package org.cast.cwm.data.component;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.service.ICwmService;
-import org.cast.cwm.test.CwmDataBaseTestCase;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
 import org.cast.cwm.test.TestIdSetter;

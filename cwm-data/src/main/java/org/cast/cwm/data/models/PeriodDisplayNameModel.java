@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -24,7 +24,6 @@ import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.AbstractPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Period;
-import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.ICwmSessionService;
 

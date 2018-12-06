@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.test;
 
-import java.lang.reflect.Field;
-
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
+
+import java.lang.reflect.Field;
 
 public class TestDataUtil {
 

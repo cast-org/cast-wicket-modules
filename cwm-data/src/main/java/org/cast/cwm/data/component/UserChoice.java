@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,12 @@
  */
 package org.cast.cwm.data.component;
 
-import java.util.List;
-
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.User;
+
+import java.util.List;
 
 /** A DropDownChoice of Users.
  * 

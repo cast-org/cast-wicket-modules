@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,10 @@
  */
 package org.cast.cwm.data;
 
+import net.jcip.annotations.NotThreadSafe;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import net.jcip.annotations.NotThreadSafe;
 
 import java.util.Date;
 import java.util.concurrent.Exchanger;

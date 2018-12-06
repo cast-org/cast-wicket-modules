@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,42 +21,21 @@ package org.cast.cwm.admin;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.devutils.stateless.StatelessChecker;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.mock.MockApplication;
-import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
-import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.CwmSession;
-import org.cast.cwm.IAppConfiguration;
-import org.cast.cwm.data.*;
-import org.cast.cwm.data.provider.AuditDataProvider;
-import org.cast.cwm.data.provider.AuditTriple;
-import org.cast.cwm.service.ICwmSessionService;
+import org.cast.cwm.data.User;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestApplication;
 import org.cast.cwm.test.CwmDataTestCase;
-import org.cast.cwm.test.CwmTestApplication;
 import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
-import org.hibernate.envers.DefaultRevisionEntity;
-import org.hibernate.envers.RevisionType;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.*;
+import java.util.Map;
 
 public class TestSignInFormPanel extends CwmDataTestCase {
 

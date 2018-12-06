@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,15 +19,14 @@
  */
 package org.cast.cwm.data.models;
 
-import java.io.Serializable;
-
 import net.databinder.hib.Databinder;
-
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
+
+import java.io.Serializable;
 
 /**
  * Model for a single historical state of an audited Hibernate object.

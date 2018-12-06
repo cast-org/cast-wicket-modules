@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,15 +19,9 @@
  */
 package org.cast.cwm.xml;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IInputStreamProvider;
@@ -38,7 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import com.google.inject.Inject;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class that parses and holds the high level structure of an XML document.  Also,

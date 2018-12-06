@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -26,12 +26,12 @@ import lombok.ToString;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.wicket.markup.html.list.ListView;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.*;
 import java.util.*;
 
 /**

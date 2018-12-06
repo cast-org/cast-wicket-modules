@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,13 +19,12 @@
  */
 package org.cast.cwm.search;
 
-import java.io.Serializable;
-
 import lombok.Data;
-
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.hibernate.search.query.facet.Facet;
+
+import java.io.Serializable;
 
 /**
  * Holds various information about a facet value, used in displaying the search box

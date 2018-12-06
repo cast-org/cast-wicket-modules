@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,13 @@
  */
 package org.cast.cwm.xml;
 
-import java.io.Serializable;
-
 import lombok.Getter;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
+
+import java.io.Serializable;
 
 /**
  * Holds both the Element and serialized String form of the result of a transformation.

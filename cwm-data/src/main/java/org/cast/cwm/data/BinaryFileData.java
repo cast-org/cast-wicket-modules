@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,25 +19,19 @@
  */
 package org.cast.cwm.data;
 
-import java.util.Date;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
+
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * An object that holds a binary file, such as an image

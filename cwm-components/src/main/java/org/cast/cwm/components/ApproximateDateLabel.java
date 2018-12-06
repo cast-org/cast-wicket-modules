@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,6 @@
  */
 package org.cast.cwm.components;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import org.apache.wicket.datetime.DateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.model.IModel;
@@ -33,6 +29,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * A Label that displays its model-object Date with varying precision depending on how recent it is.

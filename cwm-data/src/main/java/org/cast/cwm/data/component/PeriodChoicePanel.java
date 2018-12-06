@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,8 +19,7 @@
  */
 package org.cast.cwm.data.component;
 
-import java.util.List;
-
+import com.google.inject.Inject;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.event.Broadcast;
@@ -34,7 +33,7 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.event.UpdateCurrentPeriodMessage;
 import org.cast.cwm.service.ICwmSessionService;
 
-import com.google.inject.Inject;
+import java.util.List;
 
 /**
  * Panel allowing the user to choose one of their Periods and set it as as the current Period in the session.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,10 @@
  */
 package org.cast.cwm.service;
 
+import org.cast.cwm.service.HighlightService.HighlightType;
+
 import java.util.List;
 import java.util.Map;
-
-import com.google.inject.ImplementedBy;
-import org.cast.cwm.service.HighlightService.HighlightType;
 
 public interface IHighlightService {
 

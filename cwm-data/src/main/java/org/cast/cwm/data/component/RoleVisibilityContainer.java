@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,11 @@
  */
 package org.cast.cwm.data.component;
 
+import com.google.inject.Inject;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.service.ICwmSessionService;
-
-import com.google.inject.Inject;
 
 /**
  * Container whose visibility is set based on the role of the logged-in user.

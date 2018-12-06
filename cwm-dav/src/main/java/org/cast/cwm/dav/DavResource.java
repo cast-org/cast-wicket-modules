@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,7 @@
  */
 package org.cast.cwm.dav;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
+import com.xmlmind.davclient.*;
 import org.apache.wicket.Application;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.IResource;
@@ -42,12 +35,12 @@ import org.cast.cwm.InputStreamNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xmlmind.davclient.Constants;
-import com.xmlmind.davclient.Content;
-import com.xmlmind.davclient.DAVClient;
-import com.xmlmind.davclient.DAVException;
-import com.xmlmind.davclient.Property;
-import com.xmlmind.davclient.PropertyList;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Resource for a file on a DAV server.

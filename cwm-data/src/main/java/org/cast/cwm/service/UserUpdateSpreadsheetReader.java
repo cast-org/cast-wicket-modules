@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -24,7 +24,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.wicket.Component;
 import org.cast.cwm.data.User;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Read a spreadsheet of user data and update user account information.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,16 +19,15 @@
  */
 package org.cast.cwm.xml.transform;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.inject.Inject;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.xml.service.IXmlService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnsureUniqueWicketIds implements IDOMTransformer {
 

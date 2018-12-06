@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -18,15 +18,6 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.cast.cwm.test;
-
-import org.apache.wicket.mock.MockApplication;
-import org.cast.cwm.data.Period;
-import org.cast.cwm.data.Role;
-import org.cast.cwm.data.User;
-import org.cast.cwm.service.IEventService;
-
-import java.util.Arrays;
-import java.util.TreeSet;
 
 /**
  * Base class for the tests of cwm-data module components.

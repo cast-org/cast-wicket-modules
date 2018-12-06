@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,9 @@
  */
 package org.cast.cwm.service;
 
-import org.apache.wicket.injection.Injector;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.apache.wicket.injection.Injector;
 
 /**
  * Guice Provider that chooses one of the IUserPreferenceService implementations for the current session.

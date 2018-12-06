@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,11 @@
  */
 package org.cwm.db.service;
 
-import java.io.Serializable;
-
 import com.google.inject.ImplementedBy;
 import net.databinder.hib.SessionUnit;
-
 import org.hibernate.Session;
+
+import java.io.Serializable;
 
 /**
  * An injectable service for interacting with Hibernate and cwm-db classes.

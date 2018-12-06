@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,13 @@
  */
 package org.cast.cwm.glossary;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.cast.cwm.xml.ICacheableModel;
 import org.cast.cwm.xml.IXmlPointer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A simple, in-memory implementation of IWritableGlossaryEntry, based on the

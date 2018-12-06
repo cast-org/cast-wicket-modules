@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,8 +19,8 @@
  */
 package org.cast.cwm.admin;
 
+import com.google.inject.Inject;
 import lombok.Getter;
-
 import org.apache.wicket.Application;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -33,8 +33,6 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.IAppConfiguration;
-
-import com.google.inject.Inject;
 import org.cast.cwm.figuration.service.IFigurationService;
 
 /**

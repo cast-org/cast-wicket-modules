@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cwm.db;
 
+import org.hibernate.ScrollableResults;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.hibernate.ScrollableResults;
 
 public class ResultSetIterator<T> implements Iterator<T> {
 	

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -20,11 +20,7 @@
 package org.cast.cwm.test;
 
 import net.databinder.auth.AuthApplication;
-import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.request.Request;
-import org.apache.wicket.request.Response;
-import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
 
 import java.security.MessageDigest;

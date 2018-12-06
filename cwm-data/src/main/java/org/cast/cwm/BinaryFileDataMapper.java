@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,8 +19,6 @@
  */
 package org.cast.cwm;
 
-import java.util.List;
-
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Url;
@@ -28,6 +26,8 @@ import org.apache.wicket.request.handler.resource.ResourceRequestHandler;
 import org.apache.wicket.request.mapper.AbstractMapper;
 import org.apache.wicket.request.resource.IResource;
 import org.cast.cwm.data.resource.BinaryFileDataResource;
+
+import java.util.List;
 
 /**
  * This maps URLs like '/app/userdata/47' to the contents of the BinaryFileData with ID 47.

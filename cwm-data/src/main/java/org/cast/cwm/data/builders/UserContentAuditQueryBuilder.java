@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,8 @@
  */
 package org.cast.cwm.data.builders;
 
-import java.util.Date;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserContent;
@@ -34,6 +30,9 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
 import org.joda.time.DateTime;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Builds queries over the audit data for UserContent.

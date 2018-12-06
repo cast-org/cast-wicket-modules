@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.service;
 
-import com.google.inject.ImplementedBy;
 import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.model.IModel;
@@ -28,7 +27,6 @@ import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
-import org.cast.cwm.data.models.UserListModel;
 import org.cast.cwm.service.UserService.LoginData;
 
 import java.util.List;

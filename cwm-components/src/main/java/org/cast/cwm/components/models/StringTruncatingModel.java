@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,12 @@
  */
 package org.cast.cwm.components.models;
 
-import java.text.BreakIterator;
-
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.lang.Args;
+
+import java.text.BreakIterator;
 
 /**
  * Model for potentially long strings that will only show the first N characters.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,11 @@
  */
 package org.cast.cwm.search;
 
-import java.io.Serializable;
-
 import org.apache.lucene.search.Query;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.query.dsl.QueryBuilder;
+
+import java.io.Serializable;
 
 /**
  * An object that can construct a full-text query.

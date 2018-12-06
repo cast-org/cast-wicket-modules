@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,16 +19,15 @@
  */
 package org.cast.cwm.data;
 
-import javax.persistence.Entity;
-
 import lombok.Getter;
-
 import org.apache.wicket.Session;
 import org.apache.wicket.ThreadContext;
 import org.cast.cwm.CwmSession;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionListener;
+
+import javax.persistence.Entity;
 
 /**
  * Custom RevisionEntity for audit logs.

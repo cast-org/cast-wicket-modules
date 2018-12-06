@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,12 @@
  */
 package org.cast.cwm.xml.component;
 
-import java.util.List;
-
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.cast.cwm.xml.XmlSection;
+
+import java.util.List;
 
 public abstract class ChildListView extends ListView<XmlSection> {
 

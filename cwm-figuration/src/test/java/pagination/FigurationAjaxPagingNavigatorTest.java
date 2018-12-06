@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,19 +19,11 @@
  */
 package pagination;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.UnmodifiableIterator;
-import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
-import org.apache.wicket.markup.repeater.data.IDataProvider;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.util.tester.TagTester;
-import org.apache.wicket.util.tester.WicketTestCase;
 import org.cast.cwm.figuration.pagination.FigurationAjaxPagingNavigator;
 import org.junit.Test;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**

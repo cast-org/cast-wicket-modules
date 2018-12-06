@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,20 +19,18 @@
  */
 package org.cast.cwm.data;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import lombok.Data;
-
 import org.apache.wicket.injection.Injector;
 import org.cast.cwm.service.IUserContentService;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.google.inject.Inject;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * All the data the application needs to know from the XML to set up a response area.

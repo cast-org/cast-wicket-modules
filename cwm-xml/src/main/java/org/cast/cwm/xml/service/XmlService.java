@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,44 +19,23 @@
  */
 package org.cast.cwm.xml.service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
 import lombok.Getter;
-
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IInputStreamProvider;
-import org.cast.cwm.xml.DomCache;
-import org.cast.cwm.xml.FileXmlDocumentSource;
-import org.cast.cwm.xml.ICacheableModel;
-import org.cast.cwm.xml.IDocumentObserver;
-import org.cast.cwm.xml.IXmlPointer;
-import org.cast.cwm.xml.TransformResult;
-import org.cast.cwm.xml.XmlDocument;
-import org.cast.cwm.xml.XmlSection;
+import org.cast.cwm.xml.*;
 import org.cast.cwm.xml.parser.XmlParser;
-import org.cast.cwm.xml.transform.EnsureUniqueWicketIds;
-import org.cast.cwm.xml.transform.IDOMTransformer;
-import org.cast.cwm.xml.transform.TransformChain;
-import org.cast.cwm.xml.transform.TransformParameters;
-import org.cast.cwm.xml.transform.XslTransformer;
+import org.cast.cwm.xml.transform.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.*;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Service class to deal with XML Documents.

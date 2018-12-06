@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.xml.component;
 
+import com.google.inject.Inject;
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.IInputStreamProvider;
@@ -28,8 +29,6 @@ import org.cast.cwm.xml.IXmlPointer;
 import org.cast.cwm.xml.XmlSection;
 import org.cast.cwm.xml.handler.IDynamicComponentHandler;
 import org.w3c.dom.Element;
-
-import com.google.inject.Inject;
 
 /**
  * An extension of XmlComponent using an injected IDynamicComponentResolver to 

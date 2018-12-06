@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,9 +19,6 @@
  */
 package org.cast.cwm.glossary;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.ComponentTag;
@@ -36,6 +33,9 @@ import org.apache.wicket.model.IModel;
 import org.cast.cwm.xml.IXmlPointer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is intended to be an easy-to-extend base class for a Panel that 

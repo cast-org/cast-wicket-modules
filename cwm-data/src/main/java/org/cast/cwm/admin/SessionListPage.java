@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,7 @@
  */
 package org.cast.cwm.admin;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.databinder.models.hib.SortableHibernateProvider;
-
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -35,6 +31,9 @@ import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This page shows information about each currently-open login session.

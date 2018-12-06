@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -20,8 +20,6 @@
 package org.cast.cwm.data.component;
 
 import com.google.inject.Inject;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.Application;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;

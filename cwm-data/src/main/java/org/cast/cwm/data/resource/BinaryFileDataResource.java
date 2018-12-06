@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,8 @@
  */
 package org.cast.cwm.data.resource;
 
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.inject.Inject;
 import lombok.Getter;
-
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
 import org.apache.wicket.request.resource.AbstractResource;
@@ -30,7 +28,7 @@ import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.service.ICwmService;
 
-import com.google.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * A Resource that serves a single BinaryFileData object.

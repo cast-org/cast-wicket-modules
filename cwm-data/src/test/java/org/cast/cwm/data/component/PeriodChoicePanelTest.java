@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,6 @@
  */
 package org.cast.cwm.data.component;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.wicket.util.tester.FormTester;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.service.ICwmSessionService;
@@ -31,6 +26,9 @@ import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
 import org.cast.cwm.test.TestDataUtil;
 import org.junit.Test;
+
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class PeriodChoicePanelTest extends CwmDataTestCase {
 

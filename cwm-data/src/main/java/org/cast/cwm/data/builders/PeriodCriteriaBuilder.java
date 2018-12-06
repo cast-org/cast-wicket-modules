@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -22,7 +22,6 @@ package org.cast.cwm.data.builders;
 import lombok.Getter;
 import lombok.Setter;
 import net.databinder.models.hib.ICriteriaBuilder;
-
 import org.cast.cwm.data.Site;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;

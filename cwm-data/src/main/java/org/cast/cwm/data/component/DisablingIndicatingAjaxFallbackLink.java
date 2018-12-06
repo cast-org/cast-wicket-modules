@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,12 @@
  */
 package org.cast.cwm.data.component;
 
-import java.util.Collection;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxFallbackLink;
 import org.apache.wicket.model.IModel;
+
+import java.util.Collection;
 
 /**
  * An instance of {@link IndicatingAjaxFallbackLink} that can disable components during

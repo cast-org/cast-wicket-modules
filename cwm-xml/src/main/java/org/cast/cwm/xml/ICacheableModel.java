@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.xml;
 
-import java.io.Serializable;
-
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.time.Time;
+
+import java.io.Serializable;
 
 /**
  * A Model that can be used for caching derived objects.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,12 @@
  */
 package org.cast.cwm.xml.transform;
 
+import org.apache.wicket.util.time.Time;
+import org.w3c.dom.Element;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.wicket.util.time.Time;
-import org.w3c.dom.Element;
 
 /**
  * A transform that is composed of a chain of other transformers.

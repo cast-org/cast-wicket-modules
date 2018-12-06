@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -18,17 +18,16 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.cast.cwm.test;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.wicket.Application;
-import org.apache.wicket.guice.GuiceComponentInjector;
-import org.apache.wicket.mock.MockApplication;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.apache.wicket.guice.GuiceComponentInjector;
+import org.apache.wicket.mock.MockApplication;
 import org.apache.wicket.util.file.Path;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CwmTestApplication<T> extends MockApplication {
 

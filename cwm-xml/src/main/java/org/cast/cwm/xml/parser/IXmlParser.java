@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.xml.parser;
 
+import org.cast.cwm.xml.XmlSection;
+
 import java.io.InputStream;
 import java.io.Serializable;
-
-import org.cast.cwm.xml.XmlSection;
 
 public interface IXmlParser extends Serializable {
 	

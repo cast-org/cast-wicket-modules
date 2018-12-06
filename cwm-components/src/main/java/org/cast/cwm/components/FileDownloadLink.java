@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,6 @@
  */
 package org.cast.cwm.components;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
@@ -32,6 +28,10 @@ import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.resource.AbstractResourceStream;
 import org.apache.wicket.util.resource.ResourceStreamNotFoundException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A download link to a byte[] of binary data.  Use this to download files that have

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,24 +19,10 @@
  */
 package org.cast.cwm.service;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.imageio.ImageIO;
-
+import com.google.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.sanselan.Sanselan;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.injection.Injector;
@@ -50,7 +36,17 @@ import org.cast.cwm.data.BinaryFileData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 /**
  * TODO: Compare for quality with https://cwiki.apache.org/WICKET/uploaddownload.html as it was suggested by Igor
  * 

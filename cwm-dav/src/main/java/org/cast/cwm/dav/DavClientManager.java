@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,13 @@
  */
 package org.cast.cwm.dav;
 
-import java.net.Authenticator;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.xmlmind.davclient.DAVClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xmlmind.davclient.DAVClient;
+import java.net.Authenticator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Singleton object to keep track of DAV Client sessions, without having to store them in 

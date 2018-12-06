@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -24,7 +24,6 @@ import org.apache.wicket.feedback.FeedbackCollector;
 import org.apache.wicket.feedback.IFeedbackMessageFilter;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.border.Border;
-import org.apache.wicket.markup.html.form.validation.FormComponentFeedbackBorder;
 
 public class FeedbackBorder extends Border {
 

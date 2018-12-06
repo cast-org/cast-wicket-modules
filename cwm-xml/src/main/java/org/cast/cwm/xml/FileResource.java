@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,7 @@
  */
 package org.cast.cwm.xml;
 
-import java.io.InputStream;
-
 import lombok.ToString;
-
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.PackageResource;
 import org.apache.wicket.request.resource.ResourceReference;
@@ -30,6 +27,8 @@ import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 import org.cast.cwm.IRelativeLinkSource;
+
+import java.io.InputStream;
 
 @ToString
 public class FileResource extends PackageResource implements IRelativeLinkSource {

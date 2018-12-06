@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,13 @@
  */
 package org.cast.cwm.components.models;
 
-import static org.junit.Assert.*;
-
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class StringTruncatingModelTest {
 	

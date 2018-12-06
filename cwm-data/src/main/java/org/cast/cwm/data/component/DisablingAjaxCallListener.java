@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,14 @@
  */
 package org.cast.cwm.data.component;
 
-import java.util.Collection;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.attributes.AjaxCallListener;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IComponentAwareHeaderContributor;
 import org.apache.wicket.request.resource.PackageResourceReference;
+
+import java.util.Collection;
 
 /**
  * Disables some set of components during an AJAX call.  

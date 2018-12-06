@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -20,7 +20,6 @@
 package org.cast.cwm.search;
 
 import net.databinder.hib.Databinder;
-
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 

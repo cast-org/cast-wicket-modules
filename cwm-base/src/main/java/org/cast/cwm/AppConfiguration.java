@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,15 +19,15 @@
  */
 package org.cast.cwm;
 
-import java.io.FileInputStream;
-import java.net.URL;
-import java.util.Properties;
-
 import com.google.inject.Singleton;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.util.file.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.net.URL;
+import java.util.Properties;
 
 /**
  * Holds instance-specific configuration information for an application.

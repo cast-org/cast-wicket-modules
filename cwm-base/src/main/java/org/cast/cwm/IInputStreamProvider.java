@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm;
 
+import org.apache.wicket.util.watch.IModifiable;
+
 import java.io.InputStream;
 import java.io.Serializable;
-
-import org.apache.wicket.util.watch.IModifiable;
 
 /**
  * An object that can provide an InputStream on request,

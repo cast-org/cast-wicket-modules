@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,11 +19,10 @@
  */
 package org.cwm.db.service;
 
-import java.io.Serializable;
-
 import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.wicket.model.IModel;
+
+import java.io.Serializable;
 
 public class HibernateObjectModelProvider implements IModelProvider {
 

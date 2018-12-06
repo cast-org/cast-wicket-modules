@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,8 +19,8 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
-
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserPreference;
@@ -29,8 +29,6 @@ import org.cast.cwm.data.UserPreferenceString;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-
-import com.google.inject.Inject;
 
 /**
  * Database operations on UsersPreferences.

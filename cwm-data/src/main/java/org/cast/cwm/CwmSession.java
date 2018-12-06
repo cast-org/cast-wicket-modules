@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,12 +19,11 @@
  */
 package org.cast.cwm;
 
+import com.google.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.auth.AuthDataSessionBase;
-import net.databinder.models.hib.HibernateObjectModel;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.Session;
 import org.apache.wicket.injection.Injector;
@@ -34,13 +33,8 @@ import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
-import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
 import org.cwm.db.service.IModelProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
 
 import java.util.Date;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,40 +19,30 @@
  */
 package org.cast.cwm.admin;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.util.tester.WicketTester;
-import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.*;
 import org.cast.cwm.data.provider.AuditDataProvider;
 import org.cast.cwm.data.provider.AuditTriple;
-import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
-import org.cast.cwm.test.CwmTestApplication;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.hibernate.envers.RevisionType;
-import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.*;
 
 public class TestUserContentLogPage extends CwmDataTestCase {
 

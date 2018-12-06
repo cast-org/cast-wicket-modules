@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.data.builders;
 
-import java.io.Serializable;
-
 import org.hibernate.Session;
 import org.hibernate.envers.query.AuditQuery;
+
+import java.io.Serializable;
 
 /**
  * Interface for a class that can build a query over Hibernate Envers audit tables.

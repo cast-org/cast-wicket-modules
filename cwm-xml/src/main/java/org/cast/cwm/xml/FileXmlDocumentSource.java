@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,13 +19,8 @@
  */
 package org.cast.cwm.xml;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import lombok.Getter;
 import lombok.ToString;
-
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.file.File;
@@ -34,6 +29,10 @@ import org.apache.wicket.util.time.Time;
 import org.cast.cwm.IInputStreamProvider;
 import org.cast.cwm.IRelativeLinkSource;
 import org.cast.cwm.InputStreamNotFoundException;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 @ToString
 public class FileXmlDocumentSource implements IInputStreamProvider, IRelativeLinkSource {

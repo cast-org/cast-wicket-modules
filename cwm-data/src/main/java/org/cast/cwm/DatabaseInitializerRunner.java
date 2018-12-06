@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,18 +19,16 @@
  */
 package org.cast.cwm;
 
-import java.util.List;
-
+import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
-
 import org.apache.wicket.injection.Injector;
 import org.cast.cwm.data.init.IDatabaseInitializer;
 import org.cast.cwm.service.ICwmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
+import java.util.List;
 
 class DatabaseInitializerRunner {
 

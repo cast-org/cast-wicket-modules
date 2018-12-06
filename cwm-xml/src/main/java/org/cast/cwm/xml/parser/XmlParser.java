@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,14 +19,13 @@
  */
 package org.cast.cwm.xml.parser;
 
-import java.io.InputStream;
-import java.util.Map;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.cast.cwm.xml.XmlDocument;
 import org.cast.cwm.xml.XmlSection;
+
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * Parses XML input and returns a root {@link XmlSection} for the parsed tree.  The

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,16 +19,15 @@
  */
 package org.cast.cwm.data.component;
 
-import java.security.MessageDigest;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.value.IValueMap;
 import org.cast.cwm.data.User;
+
+import java.security.MessageDigest;
 
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -28,13 +28,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.wicket.util.string.Strings;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.*;
 import org.hibernate.annotations.Index;
+import org.hibernate.annotations.*;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 

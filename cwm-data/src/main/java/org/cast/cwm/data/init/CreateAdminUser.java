@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,8 +19,8 @@
  */
 package org.cast.cwm.data.init;
 
+import com.google.inject.Inject;
 import net.databinder.hib.Databinder;
-
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.IAppConfiguration;
@@ -28,8 +28,6 @@ import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.IUserService;
 import org.hibernate.Session;
-
-import com.google.inject.Inject;
 
 /**
  * This initializer makes sure that an administrative user is defined.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,25 +19,18 @@
  */
 package org.cast.cwm.xml.service;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.xml.namespace.NamespaceContext;
-
 import org.apache.wicket.util.file.File;
 import org.cast.cwm.IInputStreamProvider;
-import org.cast.cwm.xml.FileXmlDocumentSource;
-import org.cast.cwm.xml.ICacheableModel;
-import org.cast.cwm.xml.IDocumentObserver;
-import org.cast.cwm.xml.IXmlPointer;
-import org.cast.cwm.xml.TransformResult;
-import org.cast.cwm.xml.XmlDocument;
-import org.cast.cwm.xml.XmlSection;
+import org.cast.cwm.xml.*;
 import org.cast.cwm.xml.parser.XmlParser;
 import org.cast.cwm.xml.transform.IDOMTransformer;
 import org.cast.cwm.xml.transform.TransformParameters;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.annotation.Resource;
+import javax.xml.namespace.NamespaceContext;
+import java.util.List;
 
 /**
  * Service interface to load XML documents, set up and request XSL transforms, manage caching and updating from the filesystem, etc.

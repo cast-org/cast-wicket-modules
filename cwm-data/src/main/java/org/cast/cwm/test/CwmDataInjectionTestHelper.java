@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,18 +19,20 @@
  */
 package org.cast.cwm.test;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
-
-import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.cast.cwm.IAppConfiguration;
 import org.cast.cwm.data.User;
 import org.cast.cwm.figuration.service.IFigurationService;
-import org.cast.cwm.service.*;
+import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.service.ICwmSessionService;
+import org.cast.cwm.service.IEventService;
+import org.cast.cwm.service.IUserService;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 public class CwmDataInjectionTestHelper extends InjectionTestHelper {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,9 +19,6 @@
  */
 package org.cast.cwm.glossary;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.xml.IDocumentObserver;
@@ -33,6 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.List;
+import java.util.Map;
 
 public class GlossaryXmlDocumentObserver  implements IDocumentObserver {
 	

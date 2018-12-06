@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -19,10 +19,10 @@
  */
 package org.cast.cwm.data;
 
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-
-import lombok.Setter;
 
 /**
  * Boolean User Preference values such as open/close state of toggle areas

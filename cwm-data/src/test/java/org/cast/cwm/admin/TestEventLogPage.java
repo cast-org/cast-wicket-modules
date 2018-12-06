@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -24,19 +24,19 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.cast.cwm.data.*;
-import org.cast.cwm.service.*;
+import org.cast.cwm.data.Event;
+import org.cast.cwm.data.Site;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
 import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestEventLogPage extends CwmDataTestCase {
 

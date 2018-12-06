@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
@@ -21,7 +21,6 @@ package org.cast.cwm;
 
 import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.apache.wicket.resource.FileSystemResource;
 import org.apache.wicket.resource.FileSystemResourceReference;
 import org.apache.wicket.util.file.File;
 
