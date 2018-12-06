@@ -42,9 +42,9 @@ public class SingularPluralModel extends AbstractReadOnlyModel<String> {
 
 	/**
 	 * Construct a model with a given value field, singular form, and plural form.
-	 * @param mNumber
-	 * @param singular
-	 * @param plural
+	 * @param mNumber delegate model whose object is a number
+	 * @param singular string to return when number is 1
+	 * @param plural string to return when number is not 1
 	 */
 	public SingularPluralModel(IModel<? extends Number> mNumber, String singular, String plural) {
 		Args.notNull(mNumber, "Chained model");
@@ -57,8 +57,8 @@ public class SingularPluralModel extends AbstractReadOnlyModel<String> {
 	/**
 	 * Construct for regular English pluralization.
 	 * The plural form will be assumed to be the singular form with an "s" added. 
-	 * @param mNumber
-	 * @param singular
+	 * @param mNumber delegate model whose object is a number
+	 * @param singular string to return when number is 1
 	 */
 	public SingularPluralModel(IModel<? extends Number> mNumber, String singular) {
 		this(mNumber, singular, singular+"s");
@@ -66,7 +66,9 @@ public class SingularPluralModel extends AbstractReadOnlyModel<String> {
 	
 	@Override
 	public String getObject() {
-		if (mNumber.getObject().equals(1))
+		if (mNumber.getObject() == null)
+			return null;
+		if (mNumber.getObject().intValue() == 1)
 			return singular;
 		else
 			return plural;

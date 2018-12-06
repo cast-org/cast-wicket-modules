@@ -29,10 +29,12 @@ import org.apache.wicket.model.IModel;
  * overriding the {@link #format(Number, String)} method.
  * 
  * If the number itself should not be part of the result, use @SingularPluralModel instead.
+ *
+ * Note: this is intended for use with integral types:  Integer, Long, BigInteger.
+ * If you want to apply it to floats, override {@link #format(Number, String)} to format the
+ * floating-point number the way that makes sense for you application.
  */
 public class SingularPluralCountModel extends SingularPluralModel {
-
-	private static final long serialVersionUID = 1L;
 
 	public SingularPluralCountModel(IModel<? extends Number> mNumber, String singular, String plural) {
 		super(mNumber, singular, plural);
@@ -43,7 +45,9 @@ public class SingularPluralCountModel extends SingularPluralModel {
 
 	@Override
 	public String getObject() {
-		if (mNumber.getObject().equals(1))
+		if (mNumber.getObject() == null)
+			return null;
+		if (mNumber.getObject().intValue() == 1)
 			return format(mNumber.getObject(), singular);
 		else
 			return format(mNumber.getObject(), plural);
