@@ -25,25 +25,25 @@ import org.apache.wicket.Application;
 import org.apache.wicket.Page;
 import org.apache.wicket.devutils.stateless.StatelessComponent;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
-import org.apache.wicket.markup.html.form.*;
+import org.apache.wicket.markup.html.form.FormComponentLabel;
+import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.CwmSession;
+import org.cast.cwm.components.BrowserInfoGatheringForm;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FeedbackBorder;
 import org.cast.cwm.service.IEventService;
-import org.cast.cwm.service.ISiteService;
 import org.cwm.db.service.IModelProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A simple Sign-In form for authenticating users.
- * 
+ * Also will gather extended client info as part of the form submit; {@see BrowserInfoGatheringForm}
  * @author jbrookover
  *
  */
@@ -65,22 +65,24 @@ public class SignInFormPanel extends Panel {
 		add(new SignInForm("form"));
 	}
 
-	public class SignInForm extends StatelessForm<User> {
+	public class SignInForm extends BrowserInfoGatheringForm<Void> {
 
 		public SignInForm(String id) {
 			super(id);
-			
+
 			add(new FeedbackPanel("feedback", new ContainerFeedbackMessageFilter(this)));
 			
 			add((new FeedbackBorder("usernameBorder")).add(username = new RequiredTextField<>("username", new Model<String>())));
 			add((new FeedbackBorder("passwordBorder")).add(password = new PasswordTextField("password", new Model<String>())));
-			
+
 			add(new FormComponentLabel("usernameLabel", username));
 			add(new FormComponentLabel("passwordLabel", password));
 		}
 		
 		@Override
 		protected void onSubmit()	{
+			super.onSubmit();
+
 			CwmSession session = CwmSession.get();
 
 			boolean loginSessionExists = false;

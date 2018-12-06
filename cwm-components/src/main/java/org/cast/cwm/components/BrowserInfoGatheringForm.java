@@ -19,35 +19,30 @@
  */
 package org.cast.cwm.components;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.wicket.core.request.ClientInfo;
-import org.apache.wicket.markup.html.form.HiddenField;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnLoadHeaderItem;
 import org.apache.wicket.markup.html.form.StatelessForm;
+import org.apache.wicket.markup.html.pages.BrowserInfoForm;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
-import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.util.io.IClusterable;
 
 /**
  * A stateless form component that will, as a side effect, gather extended browser information.
- * 
- * Based on the standard {@see org.apache.wicket.markup.html.pages.BrowserInfoForm}, but allows
- * other form fields to be added so that you can gather the browser information as part of,
- * say, a login form rather than as a separate page where the browser has to be redirected.
- * 
+ * Designed for use as a base class for a login form that all users will pass through; client
+ * information is gathered and submitted as part of the login process.
+ *
+ * Based on the standard Wicket {@see org.apache.wicket.markup.html.pages.BrowserInfoForm},
+ * but avoids the need for a redirect and stealthy form submission.
+ *
  * @author bgoldowsky
  *
  * @param <T> the model type of the form.  Can be void.
  */
+@Slf4j
 public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
-
-	private static final long serialVersionUID = 1L;
-
-	protected ClientPropertiesBean bean = new ClientPropertiesBean();
 
 	public BrowserInfoGatheringForm(String id) {
 		this(id, null);
@@ -55,23 +50,36 @@ public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
 
 	public BrowserInfoGatheringForm(String id, IModel<T> model) {
 		super(id, model);
+		setOutputMarkupId(true);
+	}
 
-		add(new HiddenField<String>("navigatorAppName", new PropertyModel<String>(this, "bean.navigatorAppName")));
-		add(new HiddenField<String>("navigatorAppVersion", new PropertyModel<String>(this, "bean.navigatorAppVersion")));
-		add(new HiddenField<String>("navigatorAppCodeName", new PropertyModel<String>(this, "bean.navigatorAppCodeName")));
-		add(new HiddenField<Boolean>("navigatorCookieEnabled", new PropertyModel<Boolean>(this, "bean.navigatorCookieEnabled")));
-		add(new HiddenField<Boolean>("navigatorJavaEnabled", new PropertyModel<Boolean>(this, "bean.navigatorJavaEnabled")));
-		add(new HiddenField<String>("navigatorLanguage", new PropertyModel<String>(this, "bean.navigatorLanguage")));
-		add(new HiddenField<String>("navigatorPlatform", new PropertyModel<String>(this, "bean.navigatorPlatform")));
-		add(new HiddenField<String>("navigatorUserAgent", new PropertyModel<String>(this, "bean.navigatorUserAgent")));
-		add(new HiddenField<String>("screenWidth", new PropertyModel<String>(this, "bean.screenWidth")));
-		add(new HiddenField<String>("screenHeight", new PropertyModel<String>(this, "bean.screenHeight")));
-		add(new HiddenField<String>("screenColorDepth", new PropertyModel<String>(this, "bean.screenColorDepth")));
-		add(new HiddenField<String>("utcOffset", new PropertyModel<String>(this, "bean.utcOffset")));
-		add(new HiddenField<String>("utcDSTOffset", new PropertyModel<String>(this, "bean.utcDSTOffset")));
-		add(new HiddenField<String>("browserWidth", new PropertyModel<String>(this, "bean.browserWidth")));
-		add(new HiddenField<String>("browserHeight", new PropertyModel<String>(this, "bean.browserHeight")));
-		add(new HiddenField<String>("hostname", new PropertyModel<String>(this, "bean.hostname")));
+	@Override
+	public void renderHead(IHeaderResponse response)
+	{
+		super.renderHead(response);
+		// This javascript will create HTML input fields for all browser info items, and populate them on page load.
+		response.render(JavaScriptHeaderItem.forReference(BrowserInfoForm.JS));
+		response.render(OnLoadHeaderItem.forScript(getOnLoadScript()));
+	}
+
+	/**
+	 * Javascript to create a hidden container in the form and populate it with the required form fields.
+	 * @return Javascript string to be run after page load.
+	 */
+	protected String getOnLoadScript() {
+		String hiddenDivId = getHiddenDivId();
+		return String.format(
+				"var div = document.createElement('div');" +
+						"div.id='%s';" +
+						"div.style.display='none';" +
+						"document.getElementById('%s').appendChild(div);" +
+						"Wicket.BrowserInfo.populateFields('%s');",
+				hiddenDivId, getMarkupId(), hiddenDivId);
+	}
+
+	// ID of the hidden container that will be created inside the form.
+	protected String getHiddenDivId() {
+		return "browserInfoContainer";
 	}
 
 	/**
@@ -79,76 +87,14 @@ public class BrowserInfoGatheringForm<T> extends StatelessForm<T> {
 	 */
 	@Override
 	protected void onSubmit() {
-		RequestCycle requestCycle = getRequestCycle();
 		WebSession session = (WebSession) getSession();
-		ClientInfo ci = session.getClientInfo();
-
+		WebClientInfo ci = session.getClientInfo();
 		if (ci == null) {
-			ci = new WebClientInfo(requestCycle);
-			getSession().setClientInfo(ci);
-		} else {
-			if (!(ci instanceof WebClientInfo))
-				throw new RuntimeException("ClientInfo is not of expected type");
+			ci = new WebClientInfo(getRequestCycle());
+			session.setClientInfo(ci);
 		}
-		WebClientInfo clientInfo = (WebClientInfo) ci;
-
-		ClientProperties properties = clientInfo.getProperties();
-		bean.merge(properties);
-	}
-
-	public ClientPropertiesBean getBean() {
-		return bean;
-	}
-
-	@Getter
-	@Setter
-	protected static class ClientPropertiesBean {
-
-		private String navigatorAppName;
-		private String navigatorAppVersion;
-		private String navigatorAppCodeName;
-		private Boolean navigatorCookieEnabled = Boolean.FALSE;
-		private Boolean navigatorJavaEnabled = Boolean.FALSE;
-		private String navigatorLanguage;
-		private String navigatorPlatform;
-		private String navigatorUserAgent;
-		private String screenHeight;
-		private String screenWidth;
-		private String screenColorDepth;
-		private String utcOffset;
-		private String utcDSTOffset;
-		private String browserWidth;
-		private String browserHeight;
-		private String hostname;
-
-		public void merge(ClientProperties properties) {
-			properties.setNavigatorAppName(navigatorAppName);
-			properties.setNavigatorAppVersion(navigatorAppVersion);
-			properties.setNavigatorAppCodeName(navigatorAppCodeName);
-			properties.setNavigatorCookieEnabled(navigatorCookieEnabled);
-			properties.setNavigatorLanguage(navigatorLanguage);
-			properties.setNavigatorPlatform(navigatorPlatform);
-			properties.setNavigatorUserAgent(navigatorUserAgent);
-			properties.setScreenWidth(getInt(screenWidth));
-			properties.setScreenHeight(getInt(screenHeight));
-			properties.setBrowserWidth(getInt(browserWidth));
-			properties.setBrowserHeight(getInt(browserHeight));
-			properties.setScreenColorDepth(getInt(screenColorDepth));
-			properties.setUtcOffset(utcOffset);
-			properties.setUtcDSTOffset(utcDSTOffset);
-			properties.setHostname(hostname);
-		}
-
-		private int getInt(String value) {
-			int intValue = -1;
-			try {
-				intValue = Integer.parseInt(value);
-			} catch (NumberFormatException e) {
-				// Do nothing
-			}
-			return intValue;
-		}
-
+		ci.getProperties().read(getRequest().getPostParameters());
+		log.debug("Set client properties.  utcOffset={}", ci.getProperties().getUtcOffset());
 	}
 
 }
