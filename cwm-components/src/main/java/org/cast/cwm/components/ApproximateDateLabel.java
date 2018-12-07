@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.components;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.datetime.DateConverter;
 import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.model.IModel;
@@ -27,8 +28,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Locale;
@@ -45,11 +44,8 @@ import java.util.TimeZone;
  * </ul>
  *
  */
+@Slf4j
 public class ApproximateDateLabel extends DateLabel {
-
-	private static final long serialVersionUID = 1L;
-
-	private static final Logger log = LoggerFactory.getLogger(ApproximateDateLabel.class);
 
 	public ApproximateDateLabel(String id, IModel<Date> mDate) {
 		super(id, mDate, new ApproximateDateConverter());
@@ -61,8 +57,6 @@ public class ApproximateDateLabel extends DateLabel {
 
 	protected static class ApproximateDateConverter extends DateConverter {
 
-		private static final long serialVersionUID = 1L;
-		
 		// For dates that are today
 		private static final String TODAY_PATTERN = "h:mma 'Today'";
 		private static final String YESTERDAY_PATTERN =  "h:mma 'Yesterday'";
@@ -100,7 +94,7 @@ public class ApproximateDateLabel extends DateLabel {
 			String pattern;
             // First check if given time is yesterday - might be in a different year...
 			DateTime now = new DateTime(dt.getZone());
-			if (now.minusDays(1).toDateMidnight().isEqual(dt.toDateMidnight())) {
+			if (now.minusDays(1).withTimeAtStartOfDay().isEqual(dt.withTimeAtStartOfDay())) {
 				pattern = YESTERDAY_PATTERN;
 			} else if (dt.getYear() == now.getYear()) {
 				if (dt.getDayOfYear() == now.getDayOfYear())
@@ -122,5 +116,5 @@ public class ApproximateDateLabel extends DateLabel {
 		protected DateTimeFormatter getFormat(Locale locale) {
 			throw new RuntimeException ("Shouldn't be called");
 		}
-	}	
+	}
 }
