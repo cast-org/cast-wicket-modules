@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.cast.cwm</groupId>
         <artifactId>cwm-parent</artifactId>
-        <version>4.5</version>
+        <version>4.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>cwm-figuration</artifactId>
