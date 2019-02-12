@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 CAST, Inc.
+ * Copyright 2011-2019 CAST, Inc.
  *
  * This file is part of the CAST Wicket Modules:
  * see <http://code.google.com/p/cast-wicket-modules>.
