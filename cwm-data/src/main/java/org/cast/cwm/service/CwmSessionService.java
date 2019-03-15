@@ -45,7 +45,7 @@ public class CwmSessionService implements ICwmSessionService {
 	private int sessionWarningTime = -1; // Time before session warning, in seconds.
 
 	private final int DEFAULT_SESSION_TIMEOUT = 30*60; // Defaults to 30 minutes
-	private int sessionTimeoutTime = -1; // Time before session is forcibly closed, in seconds.
+	private int sessionTimeoutTime = -1; // Time after warning before session is forcibly closed, in seconds.
 
 
 	@Override

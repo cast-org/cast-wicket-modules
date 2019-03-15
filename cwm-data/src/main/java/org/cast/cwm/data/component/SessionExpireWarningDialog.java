@@ -60,6 +60,11 @@ import org.cast.cwm.service.IEventService;
  * &lt;div wicket:id="timeoutModal">&lt;/div>
  * </pre></code>
  *
+ * The timing of when this dialog pops up and how long it remains displayed is defined by CwmSessionService;
+ * the default implementation there reads two configuration settings:
+ * cwm.sessionWarningTime (time before warning) and cwm.sessionTimeoutTime (time to leave warning up before
+ * logging the user out).
+ *
  * @author jbrookover
  * @author bgoldowsky
  *

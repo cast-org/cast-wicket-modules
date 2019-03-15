@@ -40,13 +40,15 @@ public interface ICwmSessionService {
 	 * Number of seconds of inactivity before the session should be considered possibly stale,
 	 * and the user warned (if possible) that it will timeout.
 	 * In the default implementation, this is based on the cwm.sessionWarningTime configuration setting.
+	 * After the warning, the session is still kept alive for {@link #getSessionTimeoutTime()} seconds.
 	 * @return number of seconds.
 	 */
 	int getSessionWarningTime();
 
 	/**
-	 * Number of seconds of inactivity before a session should be invalidated by the server.
+	 * Number of seconds of additional inactivity after the user is warned before a session should be closed.
  	 * In the default implementation, this is based on the cwm.sessionTimeoutTime configuration setting.
+	 * This time is in addition to {@link #getSessionWarningTime()}.
 	 * @return number of seconds
 	 */
 	int getSessionTimeoutTime();
@@ -60,8 +62,9 @@ public interface ICwmSessionService {
 
 	/**
 	 * Number of seconds left before this session should be terminated for inactivity.
+	 * Only accurate if expiry warning has already been posted.
 	 * Based on {@link #getSessionTimeoutTime()} and the last registered activity in the session.
-	 * @return number of seconds; may be negative if warning time has passed.
+	 * @return number of seconds; may be negative if expiry time has passed.
 	 */
 	int timeToTimeout();
 
