@@ -114,7 +114,7 @@ public class HighlightService implements IHighlightService {
 		
 		Map<Character,String> highlights = new HashMap<Character,String>();
 
-		List<String> colors = Arrays.asList(s.split(HIGHLIGHTINGSPACER));
+		String[] colors = s.split(HIGHLIGHTINGSPACER);
 		
 		for (String colorString : colors) {
 			String[] highlight = colorString.split(CHARACTERSPACER);

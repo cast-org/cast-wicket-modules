@@ -35,7 +35,6 @@ import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -109,8 +108,7 @@ public class UserContentLogPage extends LogPage {
 			qb.setMToDate(mToDate);
 			
 			// Model to return list of users to be considered -- based on choices made in Sites form
-			qb.setMUsers(new AbstractReadOnlyModel<List<User>>() {
-				private static final long serialVersionUID = 1L;
+			qb.setMUsers(new IModel<List<User>>() {
 				@Override
 				public List<User> getObject() {
 					// If sites is set, create a list of users in those sites for the query.

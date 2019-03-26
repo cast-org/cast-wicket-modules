@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -122,7 +123,7 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 					.withHeader()
 					.withIgnoreEmptyLines()
 					.withIgnoreSurroundingSpaces()
-					.parse(new InputStreamReader(new BOMInputStream(stream), "UTF-8"));
+					.parse(new InputStreamReader(new BOMInputStream(stream), StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			log.error(e.getMessage());
 			globalError = e.getMessage();

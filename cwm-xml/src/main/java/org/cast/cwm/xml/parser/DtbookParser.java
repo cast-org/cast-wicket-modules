@@ -229,7 +229,7 @@ public class DtbookParser extends XmlParser implements Serializable {
 			// Make sure all elements we work with have IDs; generate if necessary
 			String id = child.getAttributeNS(null, "id");
 			if (id == null || id.equals("")) {
-				id = IDGENERATORSTRING + String.valueOf(idSerial++);
+				id = IDGENERATORSTRING + idSerial++;
 				child.setAttribute("id", id);
 			}
 			XmlSection subsect = section.addChild(id, child, "Title Unknown");

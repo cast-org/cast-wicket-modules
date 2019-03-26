@@ -24,6 +24,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,8 +46,7 @@ public class XmlDocumentList implements Iterable<XmlDocument> {
 	}
 	
 	public XmlDocumentList add (XmlDocument... documents) {
-		for (XmlDocument doc : documents)
-			documentList.add(doc);
+		documentList.addAll(Arrays.asList(documents));
 		return this;
 	}
 	

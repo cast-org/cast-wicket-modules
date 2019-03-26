@@ -24,7 +24,6 @@ import org.apache.wicket.authroles.authorization.strategies.role.annotations.Aut
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -74,15 +73,12 @@ public class PeriodInfoPage extends AdminPage {
 			add(new EmptyPanel("userList"));
 
 		} else {
-			add(new Label("instructions", new AbstractReadOnlyModel<String>() {
-
-				private static final long serialVersionUID = 1L;
-
+			add(new Label("instructions", new IModel<String>() {
 				@Override
 				public String getObject() {
 					return "Edit Period: " + period.getObject().getName();
 				}
-				
+
 			}));
 			add(siteService.getPeriodEditForm("form", siteService.getPeriodClass(), site, period));
 

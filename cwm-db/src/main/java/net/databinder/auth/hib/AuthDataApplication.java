@@ -18,17 +18,11 @@
  */
 package net.databinder.auth.hib;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import net.databinder.auth.AuthApplication;
 import net.databinder.auth.AuthSession;
 import net.databinder.auth.data.DataUser;
 import net.databinder.hib.DataApplication;
 import net.databinder.hib.Databinder;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.Session;
@@ -42,9 +36,13 @@ import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.util.crypt.Base64;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
+
+import javax.servlet.http.HttpServletRequest;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 /**
  * Adds basic authentication functionality to DataApplication. This class is a derivative
@@ -177,6 +175,6 @@ implements IUnauthorizedComponentInstantiationListener, IRoleCheckingStrategy, A
 		user.getPassword().update(digest);
 		digest.update((fwd + "-" + req.getRemoteAddr()).getBytes());
 		byte[] hash = digest.digest(user.getUsername().getBytes());
-		return new String(Base64.encodeBase64(hash));
+		return new String(Base64.getEncoder().encode(hash));
 	}
 }

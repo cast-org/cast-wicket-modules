@@ -225,9 +225,9 @@ public class DataForm<T> extends DataFormBase<T> {
 	 * This is a good time to make last minute changes to new objects that
 	 * couldn't be easily serialized (adding relationships to existing persistent 
 	 * entities, for example).
-	 * @param generally, the persistent model for this form (but subclasses may also call saveIfNew)
+	 * @param model generally, the persistent model for this form (but subclasses may also call saveIfNew)
 	 */
-	protected void onBeforeSave(HibernateObjectModel<T> model) { };
+	protected void onBeforeSave(HibernateObjectModel<T> model) { }
 
 	/**
 	 * Checks that the version number, if present, is the last known version number.

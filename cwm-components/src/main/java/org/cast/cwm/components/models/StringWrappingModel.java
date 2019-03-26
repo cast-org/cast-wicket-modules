@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.components.models;
 
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.lang.Args;
@@ -36,14 +35,12 @@ import org.apache.wicket.util.lang.Args;
  * @author bgoldowsky
  *
  */
-public class StringWrappingModel extends AbstractReadOnlyModel<String> implements IDetachable {
+public class StringWrappingModel implements IModel<String>, IDetachable {
 
 	private IModel<String> delegateModel;
 	
 	private final String before;
 	private final String after;
-
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Construct with before and after strings.

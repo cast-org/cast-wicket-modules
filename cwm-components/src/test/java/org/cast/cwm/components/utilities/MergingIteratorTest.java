@@ -35,11 +35,7 @@ public class MergingIteratorTest {
 
 	@Before
 	public void setUp() {
-		comparator = new Comparator<String>(){
-
-			public int compare(String arg0, String arg1) {
-				return arg0.compareTo(arg1);
-			}};		
+		comparator = String::compareTo;
 	}
 
 	@Test
@@ -53,7 +49,7 @@ public class MergingIteratorTest {
 
 	@Test
 	public void testSimpleMergeWithEmptyFirst() {
-		List<String> listOfOne = Arrays.asList("a");
+		List<String> listOfOne = Collections.singletonList("a");
 		iterator2 = listOfOne.iterator();
 		iterator1 = Collections.<String>emptyList().iterator();
 		mergedIterator = new MergingIterator<String>(iterator1, iterator2, comparator);
@@ -63,7 +59,7 @@ public class MergingIteratorTest {
 
 	@Test
 	public void testSimpleMergeWithEmptySecond() {
-		List<String> listOfOne = Arrays.asList("a");
+		List<String> listOfOne = Collections.singletonList("a");
 		iterator1 = listOfOne.iterator();
 		iterator2 = Collections.<String>emptyList().iterator();
 		mergedIterator = new MergingIterator<String>(iterator1, iterator2, comparator);
@@ -73,8 +69,8 @@ public class MergingIteratorTest {
 
 	@Test
 	public void testSimpleNonEmptyMerge() {
-		iterator1 = Arrays.asList("a").iterator();
-		iterator2 = Arrays.asList("b").iterator();
+		iterator1 = Collections.singletonList("a").iterator();
+		iterator2 = Collections.singletonList("b").iterator();
 		mergedIterator = new MergingIterator<String>(iterator1, iterator2, comparator);
 		List<String> mergedList = toList(mergedIterator);
 		assertEquals( Arrays.asList("a", "b"), mergedList);
@@ -82,8 +78,8 @@ public class MergingIteratorTest {
 
 	@Test
 	public void testSimpleNonEmptyMergeReversed() {
-		iterator1 = Arrays.asList("b").iterator();
-		iterator2 = Arrays.asList("a").iterator();
+		iterator1 = Collections.singletonList("b").iterator();
+		iterator2 = Collections.singletonList("a").iterator();
 		mergedIterator = new MergingIterator<String>(iterator1, iterator2, comparator);
 		List<String> mergedList = toList(mergedIterator);
 		assertEquals( Arrays.asList("a", "b"), mergedList);

@@ -82,6 +82,6 @@ public class DataFormBase<T> extends Form<T> {
 	}
 	
 	/** Called before committing a transaction by {@link #commitTransactionIfValid()}. */
-	protected void onBeforeCommit() { };
+	protected void onBeforeCommit() { }
 
 }

@@ -22,7 +22,6 @@ package org.cast.cwm.admin;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.*;
@@ -40,8 +39,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class TestUserContentLogPage extends CwmDataTestCase {
@@ -86,13 +83,7 @@ public class TestUserContentLogPage extends CwmDataTestCase {
 	}
 	
 	public IModel<List<Site>> getMockSiteList() {
-		return new AbstractReadOnlyModel<List<Site>>() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public List<Site> getObject() {
-				return new ArrayList<Site>();
-			}
-		};
+		return (IModel<List<Site>>) () -> new ArrayList<Site>();
 	}
 	
 

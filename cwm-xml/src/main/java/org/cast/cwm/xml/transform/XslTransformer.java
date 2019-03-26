@@ -36,6 +36,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -70,13 +71,11 @@ public class XslTransformer implements IDOMTransformer {
 	 * Modification times of these dependent resources will be considered when the
 	 * modification time of this transformer is requested.
 	 * 
-	 * @param resource
+	 * @param resources all the resources
 	 * @return this, for chaining
 	 */
 	public XslTransformer addDependentResources (IInputStreamProvider... resources) {
-		for (IInputStreamProvider r : resources) {
-			dependentResources.add(r);
-		}
+		dependentResources.addAll(Arrays.asList(resources));
 		return this;
 	}
 	

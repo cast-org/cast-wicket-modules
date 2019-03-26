@@ -49,7 +49,7 @@ public class UploadedFileResourceTest {
 	@Before
 	public void setUp() {
 		
-		Map<Class<? extends Object>, Object> injectionMap = new HashMap<Class<? extends Object>, Object>();
+		Map<Class<?>, Object> injectionMap = new HashMap<>();
 		
 		BinaryFileData sampleBFD = getBinaryFileDataObject();
 		IModel<BinaryFileData> mSampleBFD = Model.of(sampleBFD);

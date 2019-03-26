@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.components.models;
 
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.lang.Args;
@@ -41,7 +40,7 @@ import java.text.BreakIterator;
  * @author bgoldowsky
  *
  */
-public class StringTruncatingModel extends AbstractReadOnlyModel<String> implements IDetachable {
+public class StringTruncatingModel implements IModel<String>, IDetachable {
 
 	private IModel<String> delegateModel;
 
@@ -50,8 +49,6 @@ public class StringTruncatingModel extends AbstractReadOnlyModel<String> impleme
 	private boolean breakAtWordBoundary = true;
 
 	private String continuationIndicator;
-
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Construct with all configurable parameters specified.

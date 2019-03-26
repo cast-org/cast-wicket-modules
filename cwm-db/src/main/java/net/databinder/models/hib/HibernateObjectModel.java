@@ -237,11 +237,11 @@ public class HibernateObjectModel<T> extends LoadableWritableModel<T> implements
 				for (Method m : c.getMethods())
 					if (m.isAnnotationPresent(Version.class)
 							&& m.getParameterTypes().length == 0
-							&& m.getReturnType() instanceof Serializable)
+							&& m.getReturnType() != null)
 						return (Serializable) m.invoke(o, new Object[] {});
 				for (Field f : c.getDeclaredFields())
 					if (f.isAnnotationPresent(Version.class) 
-							&& f.getType() instanceof Serializable) {
+							&& f.getType() != null) {
 						f.setAccessible(true);
 						return (Serializable) f.get(o);
 					}

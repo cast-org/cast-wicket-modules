@@ -26,11 +26,11 @@ import static org.mockito.Mockito.mock;
 
 public class InjectionTestHelper {
 
-	protected Map<Class<? extends Object>, Object> injectionMap;
+	protected Map<Class<?>, Object> injectionMap;
 
 	public InjectionTestHelper() {
 		super();
-		injectionMap = new HashMap<Class<? extends Object>, Object>();
+		injectionMap = new HashMap<>();
 	}
 
 	public <T> T injectMock(Class<T> clazz) {
@@ -47,7 +47,7 @@ public class InjectionTestHelper {
 		return (T) injectionMap.get(clazz);
 	}
 
-	public Map<Class<? extends Object>, Object> getMap() {
+	public Map<Class<?>, Object> getMap() {
 		return injectionMap;
 	}
 

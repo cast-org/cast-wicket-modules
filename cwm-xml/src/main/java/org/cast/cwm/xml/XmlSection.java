@@ -291,7 +291,7 @@ public class XmlSection implements IXmlPointer, Serializable, Comparable<XmlSect
 	
 	public String getNumbering(int depth, String separator) {
 		if (depth > 1 && parent != null) {
-			return parent.getNumbering(depth-1, separator) + separator + String.valueOf(getIndex()+1);
+			return parent.getNumbering(depth-1, separator) + separator + (getIndex() + 1);
 		} else {
 			return String.valueOf(getIndex()+1);
 		}

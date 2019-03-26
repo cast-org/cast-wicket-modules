@@ -122,8 +122,7 @@ public class EventLogPage extends LogPage {
 
 	protected void addEventTypeFilter(Form<Object> form) {
 		List<? extends IEventType> allEventTypes = eventService.listEventTypes();
-		List<IEventType> eventTypes = new ArrayList<>();
-		eventTypes.addAll(allEventTypes);
+		List<IEventType> eventTypes = new ArrayList<>(allEventTypes);
 		numberOfEventTypes = eventTypes.size();
 		mShowEventTypes = new ListModel<IEventType>(eventTypes);
 		form.add(new CheckBoxMultipleChoice<IEventType>("type", mShowEventTypes, allEventTypes,

@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.components.models;
 
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IDetachable;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.lang.Args;
@@ -32,7 +31,7 @@ import org.apache.wicket.util.lang.Args;
  * @author bgoldowsky
  *
  */
-public class DefaultingModel<T> extends AbstractReadOnlyModel<T> implements IDetachable {
+public class DefaultingModel<T> implements IModel<T>, IDetachable {
 
 	private final IModel<T> delegateModel;
 

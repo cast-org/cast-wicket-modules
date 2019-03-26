@@ -37,7 +37,7 @@ public class CwmDataTestApplication extends CwmTestApplication
 	implements AuthApplication<User> {
 
 
-	public CwmDataTestApplication(Map<Class<? extends Object>, Object> map) {
+	public CwmDataTestApplication(Map<Class<?>, Object> map) {
 		super(map);
 	}
 

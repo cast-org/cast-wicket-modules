@@ -40,7 +40,6 @@ import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -99,12 +98,8 @@ public class SiteInfoPage extends AdminPage {
 		add(adminPageService.getSiteListPageLink("siteList"));
 
 		// Directions (Create New vs Existing)
-		add(new Label("instructions", new AbstractReadOnlyModel<String>() {
-
-			private static final long serialVersionUID = 1L;
-
+		add(new Label("instructions", new IModel<String>() {
 			@Override
-
 			public String getObject() {
 				Site s = mSite.getObject();
 				return (s == null ? "Create New Site" : "Edit Site: " + s.getName());

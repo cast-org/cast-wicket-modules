@@ -27,6 +27,6 @@ package org.cast.cwm.figuration.hideable;
  */
 public enum TriggerType {
 
-	CLICK, HOVER, FOCUS, MANUAL;
+	CLICK, HOVER, FOCUS, MANUAL
 	
 }

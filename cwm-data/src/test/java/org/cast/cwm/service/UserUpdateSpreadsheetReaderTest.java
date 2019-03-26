@@ -30,6 +30,9 @@ import org.cwm.db.service.IModelProvider;
 import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +41,7 @@ import static org.mockito.Mockito.when;
  */
 public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 
-	UserSpreadsheetReader reader;
+	private UserSpreadsheetReader reader;
 
 	@Override
 	public void populateInjection(CwmDataInjectionTestHelper helper) {
@@ -73,7 +76,7 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 	@Test
 	public void rejectsEmptyFile() {
 		reader = new UserUpdateSpreadsheetReader();
-		assertFalse(reader.readInput(IOUtils.toInputStream("")));
+		assertFalse(reader.readInput(IOUtils.toInputStream("", StandardCharsets.UTF_8)));
 		assertEquals("Either a 'username' column or a 'subjectid' column must be included.",
 				reader.getGlobalError());
 	}
@@ -83,7 +86,8 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 		reader = new UserUpdateSpreadsheetReader();
 		String minimalFile = "username,firstname\r\n"
 				+ "user,first\r\n";
-		assertTrue("should accept this file", reader.readInput(IOUtils.toInputStream(minimalFile)));
+		assertTrue("should accept this file",
+				reader.readInput(IOUtils.toInputStream(minimalFile, StandardCharsets.UTF_8)));
 		assertEquals("should have no global error", "", reader.getGlobalError());
 
 		assertEquals("should have resulted in 1 potential user", 1, reader.getPotentialUsers().size());
@@ -104,7 +108,8 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 		reader = new UserUpdateSpreadsheetReader();
 		String minimalFile = "username,firstname\r\n"
 				+ "user,\r\n";
-		assertTrue("should accept this file", reader.readInput(IOUtils.toInputStream(minimalFile)));
+		assertTrue("should accept this file",
+				reader.readInput(IOUtils.toInputStream(minimalFile, StandardCharsets.UTF_8)));
 		assertEquals("should have no global error", "", reader.getGlobalError());
 
 		assertEquals("should have resulted in 1 potential user", 1, reader.getPotentialUsers().size());
@@ -126,7 +131,8 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 		String minimalFile = "username,firstname\r\n"
 				+ "user,first\r\n"
 				+ "nonuser,first\r\n";
-		assertFalse("Should reject this file", reader.readInput(IOUtils.toInputStream(minimalFile)));
+		assertFalse("Should reject this file",
+				reader.readInput(IOUtils.toInputStream(minimalFile, StandardCharsets.UTF_8)));
 		assertEquals("", reader.getGlobalError());
 
 		assertEquals("should have resulted in 2 potential users", 2, reader.getPotentialUsers().size());
@@ -142,8 +148,9 @@ public class UserUpdateSpreadsheetReaderTest extends CwmDataTestCase {
 		reader = new UserUpdateSpreadsheetReader();
 		String minimalFile = "subjectid,firstname\r\n"
 				+ "subj,Field\r\n";
-		assertEquals("should have no global error", null, reader.getGlobalError());
-		assertTrue("should accept this file", reader.readInput(IOUtils.toInputStream(minimalFile)));
+		assertNull("should have no global error", reader.getGlobalError());
+		assertTrue("should accept this file",
+				reader.readInput(IOUtils.toInputStream(minimalFile, StandardCharsets.UTF_8)));
 
 		assertEquals("should have resulted in 1 potential user", 1, reader.getPotentialUsers().size());
 		UserSpreadsheetReader.PotentialUserSave potential = reader.getPotentialUsers().get(0);

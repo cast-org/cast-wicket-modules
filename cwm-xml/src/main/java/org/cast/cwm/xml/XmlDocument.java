@@ -115,8 +115,7 @@ public class XmlDocument implements Serializable, Comparable<XmlDocument> {
 	protected void parseLabels(XmlSection sec) {
 		
 		for(Serializable label : sec.getLabels()) {
-			if (labelMap.get(label) == null)
-				labelMap.put(label, new ArrayList<XmlSection>());
+			labelMap.computeIfAbsent(label, k -> new ArrayList<XmlSection>());
 			labelMap.get(label).add(sec);
 		}
 		if (sec.getChildren() != null) {

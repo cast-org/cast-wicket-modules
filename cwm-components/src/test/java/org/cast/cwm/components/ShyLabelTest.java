@@ -62,6 +62,7 @@ public class ShyLabelTest {
 	@Test
 	public void canBeMadeVisible() {
 		ShyLabel label = new ShyLabel("id", new Model<String>(""));
+		label.setOutputMarkupPlaceholderTag(true);
 		wicketTester.startComponentInPage(label);
 		wicketTester.assertInvisible("id");		
 

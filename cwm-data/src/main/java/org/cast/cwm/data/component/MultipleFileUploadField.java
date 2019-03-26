@@ -166,10 +166,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 	{
 		super.onComponentTag(tag);
 		// remove the name attribute added by the FormComponent
-		if (tag.getAttributes().containsKey(NAME_ATTR))
-		{
-			tag.getAttributes().remove(NAME_ATTR);
-		}
+		tag.getAttributes().remove(NAME_ATTR);
 	}
 
 	/**
@@ -259,7 +256,7 @@ public class MultipleFileUploadField extends FormComponentPanel<Collection<FileU
 				}
 			}
 			if (names != null) {
-				inputArrayCache = names.toArray(new String[names.size()]);
+				inputArrayCache = names.toArray(new String[0]);
 			}
 		}
 		return inputArrayCache;

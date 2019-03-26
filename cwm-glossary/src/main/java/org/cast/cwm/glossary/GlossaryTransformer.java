@@ -70,7 +70,7 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 	 * 
 	 */
 	protected final List<String> glosswordBlockingClasses =
-		new ArrayList<String>(Arrays.asList("nolink"));
+		new ArrayList<String>(Collections.singletonList("nolink"));
 
 	/** 
 	 * Any element with this class attribute will be linked to the glossary
@@ -80,7 +80,7 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 	 * 
 	 */
 	protected final List<String> glosswordLinkButNotRecordElements =
-	    new ArrayList<String>(Arrays.asList("imggroup"));
+	    new ArrayList<String>(Collections.singletonList("imggroup"));
 	
 	/**
 	 * Underlying Glossary object, if any.
@@ -303,7 +303,7 @@ public class GlossaryTransformer implements IDOMTransformer, Serializable {
 			if (((Integer)o1.start).equals(o2.start)) {
 				return o2.length - o1.length;
 			} else {
-				return ((Integer)(o1.start)).compareTo((o2.start));
+				return Integer.compare(o1.start, o2.start);
 			}
 		}
 	}

@@ -19,7 +19,6 @@
  */
 package pagination;
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.UnmodifiableIterator;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;

@@ -287,9 +287,7 @@ public class DavResource extends AbstractResource implements IInputStreamProvide
 			try {
 				content = getClient().get(path);
 				log.debug("GET file content for {}", path);
-			} catch (IOException e) {
-				throw new ResourceStreamNotFoundException(e);
-			} catch (DAVException e) {
+			} catch (IOException | DAVException e) {
 				throw new ResourceStreamNotFoundException(e);
 			}
 			// Update file size and mod date based on the Content object

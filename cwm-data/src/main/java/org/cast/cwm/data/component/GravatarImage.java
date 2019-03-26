@@ -27,6 +27,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.value.IValueMap;
 import org.cast.cwm.data.User;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 
@@ -46,13 +47,13 @@ public class GravatarImage extends WebComponent {
 	private static final String GRAVATAR_URL = "http://www.gravatar.com/avatar/";
 	private static final int DEFAULT_SIZE = 80;
 	
-	public static enum DefaultImage {
+	public enum DefaultImage {
 		
 		DEFAULT(""), HTTP_404("404"), IDENTICON("identicon"), MONSTERID("monsterid"), WAVATAR("wavatar"), MYSTERY_MAN("mm"), RETRO("retro");
 		
 		private String param;
 		
-		private DefaultImage(String param) {
+		DefaultImage(String param) {
 			this.param = param;
 		}
 		
@@ -132,7 +133,7 @@ public class GravatarImage extends WebComponent {
 		try {             
 			MessageDigest md = 
 				MessageDigest.getInstance("MD5");             
-			return hex (md.digest(email.getBytes("UTF-8")));         
+			return hex (md.digest(email.getBytes(StandardCharsets.UTF_8)));
 		} catch (Exception ex) {
 			/* No Action */
 		}

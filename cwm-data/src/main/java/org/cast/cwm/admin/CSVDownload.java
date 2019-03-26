@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
@@ -112,7 +113,8 @@ public class CSVDownload<E extends Serializable> extends AbstractResource {
 					Response response = attributes.getResponse();
 
 					try {
-						CSVPrinter writer = new CSVPrinter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"),
+						CSVPrinter writer = new CSVPrinter(
+								new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8),
 								CSVFormat.EXCEL);
 
 						// Write header row

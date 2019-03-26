@@ -19,7 +19,6 @@
  */
 package org.cast.cwm.components.models;
 
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.lang.Args;
 
@@ -30,15 +29,13 @@ import org.apache.wicket.util.lang.Args;
  * The number itself is not part of the result of this Model.
  * If you need that, use @SingularPluralCountModel.
  */
-public class SingularPluralModel extends AbstractReadOnlyModel<String> {
+public class SingularPluralModel implements IModel<String> {
 
 	protected IModel<? extends Number> mNumber;
 
 	protected String singular;
 
 	protected String plural;
-
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Construct a model with a given value field, singular form, and plural form.

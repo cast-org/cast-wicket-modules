@@ -18,17 +18,15 @@
  */
 package net.databinder.auth.data.hib;
 
-import java.io.Serializable;
-import java.security.MessageDigest;
+import net.databinder.auth.AuthApplication;
+import net.databinder.auth.data.DataPassword;
+import org.apache.wicket.Application;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-
-import net.databinder.auth.AuthApplication;
-import net.databinder.auth.data.DataPassword;
-
-import org.apache.wicket.Application;
-import org.apache.wicket.util.crypt.Base64;
+import java.io.Serializable;
+import java.security.MessageDigest;
+import java.util.Base64;
 
 /**
  * Simple, optional implementation of {@link DataPassword}. Maps as an embedded
@@ -50,7 +48,7 @@ public class BasicPassword implements DataPassword, Serializable {
 	public void change(String password) {
 		MessageDigest md = ((AuthApplication)Application.get()).getDigest();
 		byte[] hash = md.digest(password.getBytes());
-		passwordHash = new String(Base64.encodeBase64(hash));
+		passwordHash = new String(Base64.getEncoder().encode(hash));
 	}
 	
 	@Override

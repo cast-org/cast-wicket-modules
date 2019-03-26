@@ -31,7 +31,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -153,8 +152,7 @@ public class EditUserPanel extends Panel {
 	 */
 	protected Component getSubmitComponent(String id) {
 		SubmitLink link = new SubmitLink(id);
-		link.add(new Label("operation", new AbstractReadOnlyModel<String>() {
-			private static final long serialVersionUID = 1L;
+		link.add(new Label("operation", new IModel<String>() {
 			@Override
 			public String getObject() {
 				return userForm.getModelObject().isTransient() ? "Create User" : "Update User";

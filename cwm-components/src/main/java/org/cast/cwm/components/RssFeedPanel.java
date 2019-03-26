@@ -25,7 +25,7 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class RssFeedPanel extends Panel {
 	 * Model that will return just N of the syndicated items.
 	 * Wraps a SyndEntryListModel and peels off the initial items.
 	 */
-	protected class LimitedSyndEntryListModel extends AbstractReadOnlyModel<List<SyndEntry>> {
+	protected class LimitedSyndEntryListModel implements IModel<List<SyndEntry>> {
 
 		private int maxItems;
 		private SyndEntryListModel delegate;

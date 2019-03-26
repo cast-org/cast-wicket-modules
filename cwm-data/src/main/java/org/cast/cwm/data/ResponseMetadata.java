@@ -102,22 +102,26 @@ public class ResponseMetadata implements Serializable {
 			for (int j=0; j<starters.getLength(); j++)
 				typeMD.fragments.add(normalizeWhitespace(starters.item(j).getTextContent()));
 			
-			// FIXME - remove interactive applet?
-			// determine a way for this to be set to the default response types set by the application  - ldm			
-			if (type.equals("text"))
-				typeMap.put("HTML", typeMD);
-			else if (type.equals("image"))
-				typeMap.put("SVG", typeMD);
-			else if (type.equals("audio"))
-				typeMap.put("AUDIO", typeMD);
-			else if (type.equals("file"))
-				typeMap.put("UPLOAD", typeMD);
-			else if (type.equals("table"))
-				typeMap.put("TABLE", typeMD);
-			else if (type.equals("applet"))
-				typeMap.put("APPLET", typeMD);
-			else
-				throw new IllegalArgumentException("Unknown response type in XML: " + type);				
+			// determine a way for this to be set to the default response types set by the application  - ldm
+			switch (type) {
+				case "text":
+					typeMap.put("HTML", typeMD);
+					break;
+				case "image":
+					typeMap.put("SVG", typeMD);
+					break;
+				case "audio":
+					typeMap.put("AUDIO", typeMD);
+					break;
+				case "file":
+					typeMap.put("UPLOAD", typeMD);
+					break;
+				case "table":
+					typeMap.put("TABLE", typeMD);
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown response type in XML: " + type);
+			}
 		}
 	}
 	

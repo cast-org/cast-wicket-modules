@@ -52,7 +52,7 @@ public class FileTypeValidator implements IValidator<FileUpload> {
 		if (uploadType == null || !mimeTypes.contains(uploadType)) {
 			ValidationError error = new ValidationError(this);
 			error.setVariable("type", validatable.getValue().getContentType());
-			String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[mimeTypes.size()])) + "'";
+			String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[0])) + "'";
 			error.setVariable("allowed", types);
 			validatable.error(error);
 		}

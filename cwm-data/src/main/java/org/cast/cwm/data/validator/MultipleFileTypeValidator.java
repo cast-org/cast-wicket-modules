@@ -55,7 +55,7 @@ public class MultipleFileTypeValidator implements IValidator<Collection<FileUplo
 			if (uploadType == null || !mimeTypes.contains(uploadType)) {
 				ValidationError error = new ValidationError(this);
 				error.setVariable("type", uploadType);
-				String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[mimeTypes.size()])) + "'";
+				String types = "'" + Strings.join("', '", mimeTypes.toArray(new String[0])) + "'";
 				error.setVariable("allowed", types);
 				validatable.error(error);
 			}

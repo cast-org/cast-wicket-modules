@@ -153,7 +153,7 @@ public class Glossary {
 	 */
 	public void detach() {
 		for (IModel<? extends IGlossaryEntry> m : mapIdToModel.values())
-			if (m instanceof IDetachable)
+			if (m != null)
 				m.detach();
 	}
 
