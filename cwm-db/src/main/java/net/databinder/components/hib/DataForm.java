@@ -275,16 +275,18 @@ public class DataForm<T> extends DataFormBase<T> {
 	 * Instances of this nested class call #{@link DataForm#clearPersistentObject()}
 	 * on their instantiating DataForm when clicked.
 	 */ 
-	public class ClearLink extends Link {
-		private static final long serialVersionUID = 1L;
+	public class ClearLink extends Link<Void> {
+
 		public ClearLink(String id) {
 			super(id);
 		}
+
 		/** @return true if visible and the form's perisistent model is bound */
 		@Override
 		public boolean isEnabled() {
 			return !DataForm.this.isVisibleInHierarchy() || getPersistentObjectModel().isBound();
 		}
+
 		@Override
 		public void onClick() {
 			clearPersistentObject();
