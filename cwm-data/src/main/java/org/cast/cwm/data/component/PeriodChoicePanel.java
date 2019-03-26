@@ -86,7 +86,7 @@ public class PeriodChoicePanel extends Panel {
 			}
 
 			@Override
-			protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+			protected void onSubmit(AjaxRequestTarget target) {
 				// update the current period if not already set
 				if (getSelectedPeriodModel() != getCurrentPeriodModel()) {
 					sessionService.setCurrentPeriodModel(getSelectedPeriodModel());
@@ -94,7 +94,7 @@ public class PeriodChoicePanel extends Panel {
 				
 				// send out the value of the current measure type
 				send(getParent(), Broadcast.BUBBLE, new UpdateCurrentPeriodMessage(target));
-				super.onSubmit(target, form);
+				super.onSubmit(target);
 			}			
 		}		
 	}

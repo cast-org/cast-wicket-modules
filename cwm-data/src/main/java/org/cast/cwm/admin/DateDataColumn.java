@@ -21,10 +21,10 @@ package org.cast.cwm.admin;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.wicket.datetime.markup.html.basic.DateLabel;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
+import org.wicketstuff.datetime.markup.html.basic.DateLabel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

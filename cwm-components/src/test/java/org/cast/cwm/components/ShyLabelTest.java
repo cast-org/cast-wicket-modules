@@ -54,7 +54,8 @@ public class ShyLabelTest {
 		wicketTester.assertVisible("id");
 		
 		label.setDefaultModelObject("");
-		label.render();
+		label.beforeRender();
+		label.renderPart();
 		wicketTester.assertInvisible("id");		
 	}
 	
@@ -65,7 +66,8 @@ public class ShyLabelTest {
 		wicketTester.assertInvisible("id");		
 
 		label.setDefaultModelObject("test");
-		label.render();
+		label.beforeRender();
+		label.renderPart();
 		
 		wicketTester.assertComponent("id", ShyLabel.class);
 		wicketTester.assertVisible("id");

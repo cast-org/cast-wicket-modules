@@ -168,12 +168,11 @@ public class XmlComponent extends Panel implements IMarkupResourceStreamProvider
 		// Remove any stale components that might have been added during previous renders.
 		List<Component> removeList = new ArrayList<Component>(); // To be removed
 		if (updateable) {
-			for (int i = 0; i < size(); i++) {
-				if (!wicketIds.contains(get(i).getId()))
-					removeList.add(get(i));
+			Iterator<Component> childIt = this.iterator();
+			while(childIt.hasNext()) {
+				if (!wicketIds.contains(childIt.next().getId()))
+					childIt.remove();
 			}
-			for(Component c: removeList)
-				c.remove();
 		}
 		
 	}

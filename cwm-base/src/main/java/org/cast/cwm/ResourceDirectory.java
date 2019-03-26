@@ -102,7 +102,7 @@ public class ResourceDirectory extends FileSystemResource {
 
 		ResourceResponse resourceResponse = null;
 		try {
-			resourceResponse = createResourceResponse(filePath);
+			resourceResponse = createResourceResponse(attributes, filePath);
 
 			// allow caching
 			resourceResponse.setCacheScope(WebResponse.CacheScope.PUBLIC);

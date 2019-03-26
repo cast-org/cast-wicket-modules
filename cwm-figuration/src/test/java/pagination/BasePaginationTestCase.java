@@ -60,7 +60,22 @@ public class BasePaginationTestCase extends WicketTestCase {
 		@Override
 		public Iterator<? extends Long> iterator(long first, long count) {
 			if (first > 1000)
-				return Iterators.emptyIterator();
+				return new Iterator<Long>() {
+					@Override
+					public void remove() {
+						throw new RuntimeException("Not implemented");
+					}
+
+					@Override
+					public boolean hasNext() {
+						return false;
+					}
+
+					@Override
+					public Long next() {
+						return null;
+					}
+				};
 			if (first + count < size)
 				return new SequenceIterator(first, count);
 			else
