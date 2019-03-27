@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.xml.service;
 
+import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.time.Time;
@@ -53,18 +54,18 @@ public class XmlService implements IXmlService {
 	 * Keeps track of all XmlDocuments in the system, hashed by their name.
 	 * This allows XmlDocument objects to be accessed without serializing and keeping copies of them.
 	 */
-	private Map<String,XmlDocument> documents = new HashMap<String,XmlDocument>();
+	private Map<String,XmlDocument> documents = new HashMap<>();
 	
 	/**
 	 * Tracks all known transformers, by name.
 	 */
-	private Map<String,IDOMTransformer> transformers = new HashMap<String,IDOMTransformer>();
+	private Map<String,IDOMTransformer> transformers = new HashMap<>();
 	
 	/**
 	 * Tracks all known transformer directories.  The order of these directories determines the 
 	 * search order.  In general, load any custom directories first.
 	 */
-	private List<String> transformerDirectories = new ArrayList<String>();
+	private List<String> transformerDirectories = new ArrayList<>();
 
 	/**
 	 * Wait at least this many seconds between checks of files for updates.
@@ -293,7 +294,7 @@ public class XmlService implements IXmlService {
 		return (tr);
 	}
 
-	protected DomCache getDomCache() {
+	private DomCache getDomCache() {
 		if (domCache == null)
 			domCache = new DomCache();
 		return domCache;
@@ -348,8 +349,8 @@ public class XmlService implements IXmlService {
 
 		private static final long serialVersionUID = 1L;
 
-		private Map<String, String> prefix2uri = new HashMap<String, String>();
-		private Map<String, String> uri2prefix = new HashMap<String, String>();
+		private Map<String, String> prefix2uri = new HashMap<>();
+		private Map<String, String> uri2prefix = new HashMap<>();
 		
 		public CwmNamespaceContext() {
 			putNamespacePair("dtb", "http://www.daisy.org/z3986/2005/dtbook/");
@@ -357,7 +358,7 @@ public class XmlService implements IXmlService {
 			putNamespacePair(XMLConstants.DEFAULT_NS_PREFIX, "http://www.w3.org/1999/xhtml");
 		}
 		
-		protected void putNamespacePair (String prefix, String uri) {
+		private void putNamespacePair (String prefix, String uri) {
 			prefix2uri.put(prefix, uri);
 			uri2prefix.put(uri, prefix);
 		}
@@ -378,9 +379,8 @@ public class XmlService implements IXmlService {
 		}
 
 		@Override
-		public Iterator<Void> getPrefixes(String arg0) {
-			log.error("Called unimplemented function getPrefixes");
-			return null;
+		public Iterator<String> getPrefixes(String uri) {
+			return Iterators.singletonIterator(getPrefix(uri));
 		}
 	}
 
