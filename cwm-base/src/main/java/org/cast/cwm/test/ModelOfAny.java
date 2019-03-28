@@ -39,7 +39,7 @@ public class ModelOfAny<T> extends BaseMatcher<IModel<T>> {
 	public boolean matches(Object item) {
 		if (!(item instanceof IModel))
 			return false;
-		Matcher<?> instanceOfMatcher = new InstanceOf(object);
+		InstanceOf instanceOfMatcher = new InstanceOf(object);
 		return instanceOfMatcher.matches(((IModel<T>) item).getObject());
 	}
 

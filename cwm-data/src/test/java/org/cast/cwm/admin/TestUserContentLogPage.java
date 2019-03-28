@@ -79,11 +79,10 @@ public class TestUserContentLogPage extends CwmDataTestCase {
 		tester.assertComponent("table:body:rows:1:cells:1:cell", Label.class);
 		WebMarkupContainer w = ((WebMarkupContainer)tester.getComponentFromLastRenderedPage("table:body:rows"));
 		assertEquals("Table should only have one row", 1, w.size());
-		
 	}
 	
-	public IModel<List<Site>> getMockSiteList() {
-		return (IModel<List<Site>>) () -> new ArrayList<Site>();
+	private IModel<List<Site>> getMockSiteList() {
+		return (IModel<List<Site>>) () -> new ArrayList<>();
 	}
 	
 
@@ -101,7 +100,7 @@ public class TestUserContentLogPage extends CwmDataTestCase {
 			AuditDataProvider<UserContent,DefaultRevisionEntity> mockProvider = mock(AuditDataProvider.class);
 			when(mockProvider.size()).thenReturn(1L);
 			when(mockProvider.model(any(AuditTriple.class))).thenCallRealMethod(); // wraps argument in a model.
-			doReturn(getMockDataIterator()).when(mockProvider).iterator(anyInt(), anyInt());
+			doReturn(getMockDataIterator()).when(mockProvider).iterator(anyLong(), anyLong());
 			return mockProvider;
 		}
 
@@ -130,9 +129,10 @@ public class TestUserContentLogPage extends CwmDataTestCase {
 			when(revisionEntity.getId()).thenReturn(1);
 			when(revisionEntity.getRevisionDate()).thenReturn(new Date());
 
-			AuditTriple<UserContent,DefaultRevisionEntity> triple = new AuditTriple<UserContent, DefaultRevisionEntity>(userContent, revisionEntity, RevisionType.ADD);
+			AuditTriple<UserContent,DefaultRevisionEntity> triple
+					= new AuditTriple<>(userContent, revisionEntity, RevisionType.ADD);
 			
-			ArrayList<AuditTriple<UserContent,DefaultRevisionEntity>> list = new ArrayList<AuditTriple<UserContent,DefaultRevisionEntity>>(1);
+			ArrayList<AuditTriple<UserContent,DefaultRevisionEntity>> list = new ArrayList<>(1);
 			list.add(triple);
 			return list.iterator();
 		}
