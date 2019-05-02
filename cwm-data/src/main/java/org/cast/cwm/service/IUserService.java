@@ -29,6 +29,7 @@ import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
 import org.cast.cwm.service.UserService.LoginData;
 
+import java.time.Duration;
 import java.util.List;
 
 public interface IUserService {
@@ -74,7 +75,12 @@ public interface IUserService {
 	 */
 	void onUserUpdated(IModel<User> mUser, Component trigger);
 
-	void generateSecurityToken(IModel<User> mUser);
+	/**
+	 * Generate a random securityToken for the user.
+	 * If a duration is given, will fill in the expiry time that interval from now.
+	 * @param validDuration amount of time, starting now, that the token should be considered valid.
+	 */
+	void generateSecurityToken(IModel<User> mUser, Duration validDuration);
 
 	IModel<List<User>> getAllUsers();
 

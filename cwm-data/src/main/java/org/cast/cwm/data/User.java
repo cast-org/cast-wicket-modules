@@ -36,6 +36,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -116,6 +118,11 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	 * This is for operations like registering via email or recovering a lost password.
 	 */
 	protected String securityToken;
+
+	/**
+	 * If set, securityToken is only valid until this Date.
+	 */
+	protected Date securityTokenExpires;
 	
 	public User() { /* No Arg Constructor for DataStore */ }
 	
@@ -233,9 +240,34 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	
 	/**
 	 * Fill in the securityToken field with a long random string.
+	 * If a duration is given, will fill in the expiry time that interval from now.
+	 * @param validDuration amount of time, starting now, that the token should be considered valid.
 	 */
-	public void generateSecurityToken() {
-		securityToken = RandomStringUtils.random(12, true, true);
+	public void generateSecurityToken(Duration validDuration) {
+		securityToken = RandomStringUtils.random(20, true, true);
+		if (validDuration != null)
+			securityTokenExpires = Date.from(ZonedDateTime.now().plus(validDuration).toInstant());
+	}
+
+	/**
+	 * Remove (invalidate) any existing security token.
+	 */
+	public void removeSecurityToken() {
+		securityToken = null;
+		securityTokenExpires = null;
+	}
+
+	/**
+	 * Check whether a given string is a valid security token for the user.
+	 * @param token string to be checked against the user's token
+	 * @return true if the user has a token, it hasn't expired, and it matches the string
+	 */
+	public boolean checkSecurityToken(String token) {
+		boolean expired = securityTokenExpires != null && securityTokenExpires.before(new Date());
+		return (!expired
+			&& !Strings.isEmpty(token)
+			&& !Strings.isEmpty(securityToken)
+			&& token.equals(securityToken));
 	}
 
 }

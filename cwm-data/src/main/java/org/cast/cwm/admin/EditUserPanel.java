@@ -46,6 +46,7 @@ import org.cast.cwm.data.validator.UniqueUserFieldValidator.Field;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -409,9 +410,10 @@ public class EditUserPanel extends Panel {
 			User user = model.getObject();
 			
 			// For Initial User Creation
+			// Expects that user will need to validate their account using security token valid for 24h.
 			if (user.isTransient()) {
 				user.setCreateDate(new Date());
-				user.generateSecurityToken();
+				user.generateSecurityToken(Duration.ofHours(24));
 				if (user.getSubjectId() == null)
 					user.setSubjectId(user.getUsername());
 			}	

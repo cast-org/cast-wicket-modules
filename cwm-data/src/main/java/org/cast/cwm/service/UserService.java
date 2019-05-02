@@ -40,6 +40,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -95,8 +96,8 @@ public class UserService implements IUserService {
 	 * @see org.cast.cwm.service.IUserService#generateSecurityToken(org.apache.wicket.model.IModel)
 	 */
 	@Override
-	public void generateSecurityToken(IModel<User> mUser) {
-		mUser.getObject().generateSecurityToken();
+	public void generateSecurityToken(IModel<User> mUser, Duration validDuration) {
+		mUser.getObject().generateSecurityToken(validDuration);
 		cwmService.flushChanges();
 	}
 
