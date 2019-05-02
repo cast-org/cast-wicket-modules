@@ -66,13 +66,18 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 	@Getter
 	private long pageViewEventId = -1;
 
-	private final TimingInformationReceiver timingInformationReceiver;
+	private final AbstractDefaultAjaxBehavior timingInformationReceiver;
 
 	public LoggedWebPage (PageParameters parameters) {
 		super(parameters);
 
-		timingInformationReceiver = new TimingInformationReceiver();
-		add(timingInformationReceiver);
+		timingInformationReceiver = makeTimingInformationReceiver();
+		if (timingInformationReceiver != null)
+			add(timingInformationReceiver);
+	}
+
+	protected TimingInformationReceiver makeTimingInformationReceiver() {
+		return new TimingInformationReceiver();
 	}
 
 	@Override
