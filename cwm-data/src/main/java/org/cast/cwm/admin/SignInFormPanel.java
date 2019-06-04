@@ -32,18 +32,22 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.cast.cwm.CwmApplication;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.components.BrowserInfoGatheringForm;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.component.FeedbackBorder;
+import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.service.IEventService;
-import org.cwm.db.service.IModelProvider;
 
 /**
  * A simple Sign-In form for authenticating users.
  * Also will gather extended client info as part of the form submit; {@see BrowserInfoGatheringForm}
+ * Usernames can be considered case-sensitive or not depending on {@link CwmApplication#usernamesCaseSensitive}.
+ * Passwords are always case sensitive.
+ *
  * @author jbrookover
  *
  */
@@ -87,11 +91,16 @@ public class SignInFormPanel extends Panel {
 
 			boolean loginSessionExists = false;
 
+			String username = SignInFormPanel.this.username.getModelObject();
+			if (getApplication() instanceof CwmApplication) {
+				if (!((CwmApplication) getApplication()).isUsernamesCaseSensitive())
+					username = username.toLowerCase();
+			}
 			if (session.isSignedIn()) {
 				if (session.getUser() == null) {
 					log.error("Session logged in as null user");
 					session.signOut();
-				} else if (session.getUser().getUsername().equals(username.getModelObject())) {
+				} else if (session.getUser().getUsername().equals(username)) {
 					log.warn("Already logged in as same user; ignoring login attempt!");
 					loginSessionExists = true;
 				} else {
@@ -100,8 +109,8 @@ public class SignInFormPanel extends Panel {
 				}
 			}
 
-			if (!session.signIn(username.getModelObject(), password.getModelObject())) {
-				log.warn("Login failed, username {}", username.getModelObject());
+			if (!session.signIn(username, password.getModelObject())) {
+				log.warn("Login failed, username {}", username);
 				error(getLocalizer().getString("signInFailed", this, "Invalid username and/or password."));
 				if (loginSessionExists)
 					session.signOut();

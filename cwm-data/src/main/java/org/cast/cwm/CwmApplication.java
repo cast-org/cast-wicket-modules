@@ -29,6 +29,7 @@ import com.google.inject.Module;
 import com.google.inject.Scopes;
 import de.agilecoders.wicket.webjars.WicketWebjars;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.databinder.auth.hib.AuthDataApplication;
 import net.databinder.hib.Databinder;
@@ -53,6 +54,8 @@ import org.cast.cwm.figuration.service.FigurationService;
 import org.cast.cwm.figuration.service.IFigurationService;
 import org.cast.cwm.service.*;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -109,6 +112,9 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	private ICwmSessionService cwmSessionService;
 	
 	private LoginSessionCloser loginSessionCloser;
+
+	@Getter @Setter
+	private boolean usernamesCaseSensitive = true;
 
     // A few things that need to get set up before regular init().
 	@Override
@@ -268,6 +274,16 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	public Class<User> getUserClass() {
 		return org.cast.cwm.data.User.class;
 	}
+
+	@Override
+	public User getUser(String username) {
+		SimpleExpression condition = Restrictions.eq("username", username);
+		if (!usernamesCaseSensitive)
+			condition = condition.ignoreCase();
+		return (User) Databinder.getHibernateSession().createCriteria(getUserClass())
+				.add(condition)
+				.uniqueResult();
+	}
 	
 	/**
 	 * Return the home page for a particular user Role.
@@ -346,8 +362,7 @@ public abstract class CwmApplication extends AuthDataApplication<User> {
 	
 	@Override
 	public Class<? extends WebPage> getSignInPageClass() {
-		// TODO: Create a base login page
-		throw new IllegalStateException("Way too many things go wrong without Cast's custom login.");
+		throw new IllegalStateException("No login page defined");
 	}
 	
 	@Override
