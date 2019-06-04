@@ -32,7 +32,7 @@ import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
 import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.User;
-import org.cwm.db.service.IDBService;
+import org.cast.cwm.db.service.IDBService;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;

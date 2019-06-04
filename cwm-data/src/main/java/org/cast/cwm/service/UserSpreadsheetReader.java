@@ -36,8 +36,8 @@ import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
-import org.cwm.db.service.IDBService;
-import org.cwm.db.service.IModelProvider;
+import org.cast.cwm.db.service.IDBService;
+import org.cast.cwm.db.service.IModelProvider;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 

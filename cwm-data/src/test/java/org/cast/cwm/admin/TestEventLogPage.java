@@ -26,11 +26,11 @@ import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.Site;
+import org.cast.cwm.db.service.IModelProvider;
+import org.cast.cwm.db.service.SimpleModelProvider;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
-import org.cwm.db.service.IModelProvider;
-import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
 import java.util.Collections;

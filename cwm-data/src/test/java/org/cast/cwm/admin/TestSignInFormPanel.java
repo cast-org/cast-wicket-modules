@@ -27,12 +27,12 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.util.tester.FormTester;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.User;
+import org.cast.cwm.db.service.IModelProvider;
+import org.cast.cwm.db.service.SimpleModelProvider;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestApplication;
 import org.cast.cwm.test.CwmDataTestCase;
-import org.cwm.db.service.IModelProvider;
-import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
 import java.util.Map;

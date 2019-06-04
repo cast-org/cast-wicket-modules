@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cwm.db.service;
+package org.cast.cwm.db.service;
 
 import com.google.inject.ImplementedBy;
 import net.databinder.hib.SessionUnit;

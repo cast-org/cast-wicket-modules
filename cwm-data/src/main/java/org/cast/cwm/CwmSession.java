@@ -33,8 +33,8 @@ import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
+import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.service.IEventService;
-import org.cwm.db.service.IModelProvider;
 
 import java.util.Date;
 

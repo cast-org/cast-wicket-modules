@@ -30,8 +30,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Site;
+import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.service.ISiteService;
-import org.cwm.db.service.IModelProvider;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;

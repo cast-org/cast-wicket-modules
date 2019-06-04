@@ -17,21 +17,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cwm.db.service;
+package org.cast.cwm.db.service;
 
+import com.google.inject.ImplementedBy;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 
 import java.io.Serializable;
 
-public class SimpleModelProvider implements IModelProvider {
+@ImplementedBy(HibernateObjectModelProvider.class)
+public interface IModelProvider {
 
-	public <T extends Serializable> IModel<T> modelOf(T object) {
-		return Model.of(object);
-	}
-
-	public <T extends Serializable> IModel<T> emptyModel(Class<T> clazz) {
-		return new Model<T>();
-	}
+	<T extends Serializable> IModel<T> modelOf(T object);
+	<T extends Serializable> IModel<T> emptyModel(Class<T> clazz);
 
 }

@@ -20,7 +20,7 @@
 package net.databinder.models;
 
 import org.apache.wicket.model.IModel;
-import org.cwm.db.service.IModelProvider;
+import org.cast.cwm.db.service.IModelProvider;
 
 import java.io.Serializable;
 import java.util.ArrayList;

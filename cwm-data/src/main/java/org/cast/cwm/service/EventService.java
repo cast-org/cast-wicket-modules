@@ -37,7 +37,7 @@ import org.cast.cwm.IEventType;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.component.IEventDataContributor;
-import org.cwm.db.service.IModelProvider;
+import org.cast.cwm.db.service.IModelProvider;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;

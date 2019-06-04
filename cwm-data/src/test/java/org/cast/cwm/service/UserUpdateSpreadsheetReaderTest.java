@@ -23,14 +23,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.wicket.model.Model;
 import org.cast.cwm.data.Role;
 import org.cast.cwm.data.User;
+import org.cast.cwm.db.service.IDBService;
+import org.cast.cwm.db.service.IModelProvider;
+import org.cast.cwm.db.service.SimpleModelProvider;
 import org.cast.cwm.test.CwmDataInjectionTestHelper;
 import org.cast.cwm.test.CwmDataTestCase;
-import org.cwm.db.service.IDBService;
-import org.cwm.db.service.IModelProvider;
-import org.cwm.db.service.SimpleModelProvider;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static org.mockito.Matchers.eq;

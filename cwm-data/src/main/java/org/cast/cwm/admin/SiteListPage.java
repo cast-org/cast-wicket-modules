@@ -31,12 +31,12 @@ import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
+import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.figuration.hideable.ConfirmationModal;
 import org.cast.cwm.figuration.hideable.FigurationTriggerBehavior;
 import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ISiteService;
-import org.cwm.db.service.IModelProvider;
 
 /**
  * Page for viewing sites and their associated periods.  Links generated for edit site, edit
