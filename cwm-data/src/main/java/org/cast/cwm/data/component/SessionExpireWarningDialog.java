@@ -131,7 +131,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 		return String.format("SessionExpireWarning.setNextCheck(%d);", seconds);
 	}
 
-	private void onWarning(AjaxRequestTarget target) {
+	protected void onWarning(AjaxRequestTarget target) {
 		log.debug("Sending inactive warning to user");
 		target.appendJavaScript(nextCheckJavascript(cwmSessionService.timeToTimeout()));
 		target.appendJavaScript("SessionExpireWarning.warning();");
