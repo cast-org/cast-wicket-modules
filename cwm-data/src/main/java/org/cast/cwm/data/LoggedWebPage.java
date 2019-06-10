@@ -35,6 +35,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.component.IEventDataContributor;
+import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
@@ -62,6 +63,9 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 
 	@Inject
 	private ICwmService cwmService;
+
+	@Inject
+	private IDBService dbService;
 
 	@Getter
 	private long pageViewEventId = -1;
@@ -151,7 +155,7 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 			if (id != pageViewEventId)
 				log.warn("Got id {}, but expecting {}", id, pageViewEventId);
 			long loadTime = params.getParameterValue("loadTime").toLong();
-			IModel<Event> mEvent = cwmService.getById(Event.class, id);
+			IModel<Event> mEvent = dbService.getById(Event.class, id);
 			if (mEvent != null && mEvent.getObject() != null) {
 				mEvent.getObject().setLoadTime(loadTime);
 				log.trace("Timing information received: loadTime={}; added to event {}", loadTime, id);
@@ -166,7 +170,7 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 							Long eventId = Long.valueOf(info[0]);
 							Long duration = Long.valueOf(info[1]);
 							Long inactiveDuration = Long.valueOf(info[2]);
-							IModel<Event> mEndingEvent = cwmService.getById(Event.class, eventId);
+							IModel<Event> mEndingEvent = dbService.getById(Event.class, eventId);
 							if (mEndingEvent != null && mEndingEvent.getObject() != null) {
 								Event event = mEndingEvent.getObject();
 								Date endTime = new Date(event.getStartTime().getTime() + duration);
@@ -184,7 +188,7 @@ public abstract class LoggedWebPage<E extends Event> extends WebPage implements 
 				}
 
 			}
-			cwmService.flushChanges();
+			dbService.flushChanges();
 		}
 	}
 

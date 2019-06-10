@@ -26,6 +26,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.cast.cwm.CwmSession;
 import org.cast.cwm.IEventType;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;

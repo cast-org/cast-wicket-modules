@@ -37,6 +37,7 @@ import org.cast.cwm.IEventType;
 import org.cast.cwm.data.Event;
 import org.cast.cwm.data.LoginSession;
 import org.cast.cwm.data.component.IEventDataContributor;
+import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.db.service.IModelProvider;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -55,7 +56,7 @@ import java.util.Date;
 public abstract class EventService implements IEventService {
 
 	@Inject
-	private ICwmService cwmService;
+	private IDBService dbService;
 
 	@Inject
 	private ICwmSessionService cwmSessionService;
@@ -101,8 +102,8 @@ public abstract class EventService implements IEventService {
 		if (triggeringComponent != null)
 			event.setComponentPath(triggeringComponent.getPageRelativePath());
 		event.setDefaultValues();
-		cwmService.save(event);
-		cwmService.flushChanges();
+		dbService.save(event);
+		dbService.flushChanges();
 		if (log.isTraceEnabled()) {
 			// When tracing, build and output a complete description of the event.
 			log.trace("Saved event: {}", ReflectionToStringBuilder.reflectionToString(event), ToStringStyle.MULTI_LINE_STYLE);
@@ -211,7 +212,7 @@ public abstract class EventService implements IEventService {
 		}
 		Databinder.getHibernateSession().save(loginSession);
 
-		cwmService.flushChanges();
+		dbService.flushChanges();
 		
 		// register loginSession with Wicket session
 		CwmSession.get().setLoginSessionModel(new HibernateObjectModel<LoginSession>(loginSession));
@@ -239,7 +240,7 @@ public abstract class EventService implements IEventService {
 			log.debug("Logout user {}", ls.getUser().getUsername());
 			Date now = new Date();
 			closeLoginSession(ls, now);
-			cwmService.flushChanges();
+			dbService.flushChanges();
 			
 			sesLength = "Session length=" + (now.getTime()-ls.getStartTime().getTime())/1000 + "s";
 			

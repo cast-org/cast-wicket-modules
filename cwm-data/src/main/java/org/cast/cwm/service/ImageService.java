@@ -33,6 +33,7 @@ import org.apache.wicket.request.resource.IResource;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
+import org.cast.cwm.db.service.IDBService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,9 @@ public class ImageService {
 	
 	@Inject
 	private ICwmService cwmService;
+
+	@Inject
+	private IDBService dbService;
 
 	protected static Map<ScaledImageKey, ScaledImage> scaledImageCache;
 	protected static final int MAX_SCALED_ENTRIES = 1000;
@@ -225,7 +229,7 @@ public class ImageService {
 		
 		if (key.getKey() instanceof Long) {
 			Long datastoreId = (Long) key.getKey();
-			BinaryFileData data = cwmService.getById(BinaryFileData.class, datastoreId).getObject();
+			BinaryFileData data = dbService.getById(BinaryFileData.class, datastoreId).getObject();
 			thumb = new ScaledImage(resizeToBufferedImage(data.getData(), key.getWidth(), key.getHeight()));
 			try {
 				thumb.setType(Sanselan.getImageInfo(data.getData()).getFormat().extension.toLowerCase());
@@ -268,7 +272,7 @@ public class ImageService {
 	}
 	
 	public ScaledImageResourceReference getResourceReference(Long datastoreId, Integer maxWidth, Integer maxHeight) {
-		BinaryFileData data = cwmService.getById(BinaryFileData.class, datastoreId).getObject();
+		BinaryFileData data = dbService.getById(BinaryFileData.class, datastoreId).getObject();
 		String name = datastoreId.toString() + "_" + (data == null ? "unknown.png" : data.getName());
 		return getResourceReference(name, datastoreId, maxWidth, maxHeight);
 		

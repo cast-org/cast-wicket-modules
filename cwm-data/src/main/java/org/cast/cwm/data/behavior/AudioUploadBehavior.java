@@ -34,7 +34,7 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.TextRequestHandler;
 import org.cast.cwm.data.BinaryFileData;
 import org.cast.cwm.data.UserContent;
-import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.db.service.IDBService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
@@ -51,7 +51,7 @@ import java.util.List;
 public class AudioUploadBehavior<T extends UserContent> extends AbstractAjaxBehavior {
 
     @Inject
-    ICwmService cwmService;
+    private IDBService dbService;
 
     private IModel<T> mContent;
 
@@ -77,7 +77,7 @@ public class AudioUploadBehavior<T extends UserContent> extends AbstractAjaxBeha
                         // Note, recorder reports audio/mp3 mime type, but audio/mpeg is more standard
                         BinaryFileData bfd = new BinaryFileData("audio data", "audio/mpeg", data);
                         mContent.getObject().setPrimaryFile(bfd);
-                        cwmService.flushChanges();
+                        dbService.flushChanges();
                         saved = true;
                     } else {
                         log.error("Uploaded audio data does not start with expected prefix");

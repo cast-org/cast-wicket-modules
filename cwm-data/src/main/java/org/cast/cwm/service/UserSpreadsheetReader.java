@@ -290,7 +290,7 @@ public class UserSpreadsheetReader implements Serializable, ISpreadsheetReader {
 			userService.onUserCreated(mUser, null);
 		}
 
-		cwmService.flushChanges();
+		dbService.flushChanges();
 	}
 
 	protected User createUserObject(CSVRecord record) {

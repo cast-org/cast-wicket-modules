@@ -31,11 +31,11 @@ import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
+import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.figuration.hideable.ConfirmationModal;
 import org.cast.cwm.figuration.hideable.FigurationTriggerBehavior;
 import org.cast.cwm.service.IAdminPageService;
-import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.service.ISiteService;
 
 /**
@@ -47,9 +47,9 @@ import org.cast.cwm.service.ISiteService;
 public class SiteListPage extends AdminPage {
 
 	private DataView<Site> siteList;
-	
+
 	@Inject
-	private ICwmService cwmService;
+	private IDBService dbService;
 	
 	@Inject
 	private ISiteService siteService;
@@ -87,7 +87,7 @@ public class SiteListPage extends AdminPage {
 
 					@Override
 					protected boolean onConfirm(AjaxRequestTarget target) {
-						cwmService.delete(getModel());
+						dbService.delete(getModel());
 						target.add(SiteListPage.this);
 						return true;
 					}

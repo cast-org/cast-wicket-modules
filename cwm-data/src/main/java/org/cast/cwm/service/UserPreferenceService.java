@@ -26,6 +26,7 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.UserPreference;
 import org.cast.cwm.data.UserPreferenceBoolean;
 import org.cast.cwm.data.UserPreferenceString;
+import org.cast.cwm.db.service.IDBService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -42,7 +43,10 @@ public class UserPreferenceService implements IUserPreferenceService {
 
 	@Inject
 	private ICwmService cwmService;
-	
+
+	@Inject
+	private IDBService dbService;
+
 	protected UserPreferenceService() { /* Protected Constructor - use injection */
 	}
 		
@@ -60,7 +64,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 		} else {			
 			userPreference.setBooleanValue(booleanValue);
 		}
-		cwmService.flushChanges();
+		dbService.flushChanges();
 		
 	}
 	
@@ -98,7 +102,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 			session.update(userPreference);
 		}
 
-		cwmService.flushChanges();
+		dbService.flushChanges();
 	}
 
 	@Override

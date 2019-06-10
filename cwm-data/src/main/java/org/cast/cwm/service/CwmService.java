@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.service;
 
+import com.google.inject.Inject;
 import de.agilecoders.wicket.webjars.request.resource.WebjarsJavaScriptResourceReference;
 import net.databinder.hib.Databinder;
 import net.databinder.models.hib.HibernateObjectModel;
@@ -26,21 +27,19 @@ import org.apache.wicket.model.IChainingModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
 import org.cast.cwm.data.Initialization;
-import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.init.IDatabaseInitializer;
+import org.cast.cwm.db.data.PersistedObject;
+import org.cast.cwm.db.service.IDBService;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
 
 public class CwmService implements ICwmService {
 
-	private static final Logger log = LoggerFactory.getLogger(CwmService.class);
+	@Inject
+	private IDBService dbService;
 	
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ICwmService#confirmDatastoreModel(org.apache.wicket.model.IModel)
@@ -50,77 +49,6 @@ public class CwmService implements ICwmService {
 		if ((objectModel instanceof IChainingModel && !(((IChainingModel<? extends PersistedObject>) objectModel).getChainedModel() instanceof HibernateObjectModel))
 				&& !(objectModel instanceof HibernateObjectModel))
 			throw new IllegalStateException("This Service class expects HibernateObjectModels.");
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#getById(java.lang.Class, long)
-	 */
-	@Override
-	public <T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id) {
-		return new HibernateObjectModel<T>(clazz, id);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#save(org.cast.cwm.data.PersistedObject)
-	 */
-	@Override
-	public void save(PersistedObject object) {
-		Databinder.getHibernateSession().save(object);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#delete(org.apache.wicket.model.IModel)
-	 */
-	@Override
-	public void delete(IModel<? extends PersistedObject> objectModel) {
-		confirmDatastoreModel(objectModel);
-		Databinder.getHibernateSession().delete(objectModel.getObject());
-		flushChanges();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#delete(org.cast.cwm.data.PersistedObject)
-	 */
-	@Override
-	public void delete(PersistedObject object) {
-		Databinder.getHibernateSession().delete(object);
-		flushChanges();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#flushChanges()
-	 */
-	@Override
-	public void flushChanges() {
-		flushChanges(false);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.cast.cwm.service.ICwmService#flushChanges(boolean)
-	 */
-	@Override
-	public void flushChanges(boolean catchErrors) {
-		
-		Session session = Databinder.getHibernateSession();
-		try {
-			session.flush(); // Modified from example in DataForm
-			session.getTransaction().commit();
-			
-		} catch (HibernateException ex) {
-			session.getTransaction().rollback();
-			if (catchErrors) {
-				// Note: Hibernate Logging will often print the stack trace anyways
-				log.info("Ignored exception during commit: {}", ex.getMessage());
-			} else {
-				throw ex;
-			}
-		} catch (Exception ex) {
-			session.getTransaction().rollback();
-			log.error("Can't ignore exception: {}", ex);
-			ex.printStackTrace(System.err);
-		} finally {
-			session.beginTransaction();
-		}
 	}
 
 	/* (non-Javadoc)
@@ -143,7 +71,7 @@ public class CwmService implements ICwmService {
 		init.setName(izer.getName());
 		init.setRunDate(new Date());
 		Databinder.getHibernateSession().save(init);
-		flushChanges();
+		dbService.flushChanges();
 	}
 
 	@Override

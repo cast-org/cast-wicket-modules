@@ -32,7 +32,7 @@ import org.apache.wicket.util.string.StringValueConversionException;
 import org.apache.wicket.util.time.Duration;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.db.service.IDBService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
@@ -53,8 +53,8 @@ import java.io.ByteArrayInputStream;
 public class UploadedFileResource extends AbstractResource {
 
 	@Inject
-	private ICwmService cwmService;
-	
+	private IDBService dbService;
+
 	public UploadedFileResource() {
 		super();
 		Injector.get().inject(this);
@@ -72,7 +72,7 @@ public class UploadedFileResource extends AbstractResource {
 					"Invalid id in request [id=" + attributes.getParameters().get("id")+ "]");
 		}
 
-		IModel<BinaryFileData> mBfd = cwmService.getById(BinaryFileData.class, id);
+		IModel<BinaryFileData> mBfd = dbService.getById(BinaryFileData.class, id);
 		if (mBfd == null || mBfd.getObject() == null)
 			throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
 					"Data not found [id=" + id + "]");

@@ -22,6 +22,7 @@ package org.cast.cwm.data;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;

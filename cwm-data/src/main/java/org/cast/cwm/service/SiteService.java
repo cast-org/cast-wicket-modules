@@ -30,6 +30,7 @@ import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.PeriodCriteriaBuilder;
 import org.cast.cwm.data.component.HibernateEditPeriodForm;
+import org.cast.cwm.db.service.IDBService;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -42,6 +43,9 @@ public class SiteService implements ISiteService {
 
 	@Inject
 	private ICwmService cwmService;
+
+	@Inject
+	private IDBService dbService;
 
 	// Site specific methods
 	
@@ -132,9 +136,9 @@ public class SiteService implements ISiteService {
 		newPeriod.setName(defaultName);
 		newPeriod.setClassId(defaultName);
 		newPeriod.setSite(newSite);
-		cwmService.save(newSite);
-		cwmService.save(newPeriod);
-		cwmService.flushChanges();
+		dbService.save(newSite);
+		dbService.save(newPeriod);
+		dbService.flushChanges();
 		return new HibernateObjectModel<Period>(newPeriod);
 	}
 
@@ -191,7 +195,7 @@ public class SiteService implements ISiteService {
 			u.getPeriods().remove(p);
 		Databinder.getHibernateSession().delete(p);
 		
-		cwmService.flushChanges();
+		dbService.flushChanges();
 	}
 
 	/* (non-Javadoc)

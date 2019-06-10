@@ -36,6 +36,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.cast.cwm.CwmApplication;
 import org.cast.cwm.data.LoginSession;
+import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.figuration.hideable.FigurationModal;
 import org.cast.cwm.figuration.hideable.FigurationModalBasicHeader;
 import org.cast.cwm.service.ICwmService;
@@ -80,6 +81,9 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 	
 	@Inject
 	private ICwmService cwmService;
+
+	@Inject
+	private IDBService dbService;
 
 	@Inject
 	private ICwmSessionService cwmSessionService;
@@ -148,7 +152,7 @@ public class SessionExpireWarningDialog extends FigurationModal<Void> implements
 		LoginSession loginSession = cwmSessionService.getLoginSession();
 		if (loginSession != null) {
 			eventService.forceCloseLoginSession(loginSession, "[timeout]");
-			cwmService.flushChanges();
+			dbService.flushChanges();
 			cwmSessionService.setLoginSessionModel(null);
 			cwmSessionService.signOut();
 		}

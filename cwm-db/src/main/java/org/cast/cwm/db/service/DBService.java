@@ -21,9 +21,15 @@ package org.cast.cwm.db.service;
 
 import net.databinder.hib.Databinder;
 import net.databinder.hib.SessionUnit;
+import net.databinder.models.hib.HibernateObjectModel;
+import org.apache.wicket.model.IModel;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.proxy.HibernateProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
@@ -38,6 +44,8 @@ import java.io.Serializable;
  *
  */
 public class DBService implements IDBService {
+
+	private static final Logger log = LoggerFactory.getLogger(DBService.class);
 
 	public DBService() {
 	}
@@ -55,6 +63,67 @@ public class DBService implements IDBService {
 	@Override
 	public Serializable save(Object persistableObject) {
 		return getHibernateSession().save(persistableObject);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#getById(java.lang.Class, long)
+	 */
+	@Override
+	public <T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id) {
+		return new HibernateObjectModel<>(clazz, id);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#delete(org.apache.wicket.model.IModel)
+	 */
+	@Override
+	public void delete(IModel<?> objectModel) {
+		delete(objectModel.getObject());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#delete(org.cast.cwm.db.data.PersistedObject)
+	 */
+	@Override
+	public void delete(Object object) {
+		Databinder.getHibernateSession().delete(object);
+		flushChanges();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#flushChanges()
+	 */
+	@Override
+	public void flushChanges() {
+		flushChanges(false);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ICwmService#flushChanges(boolean)
+	 */
+	@Override
+	public void flushChanges(boolean catchErrors) {
+
+		Session session = Databinder.getHibernateSession();
+		try {
+			session.flush(); // Modified from example in DataForm
+			session.getTransaction().commit();
+
+		} catch (HibernateException ex) {
+			session.getTransaction().rollback();
+			if (catchErrors) {
+				// Note: Hibernate Logging will often print the stack trace anyways
+				log.info("Ignored exception during commit: {}", ex.getMessage());
+			} else {
+				throw ex;
+			}
+		} catch (Exception ex) {
+			session.getTransaction().rollback();
+			log.error("Can't ignore exception: {}", ex.getMessage());
+			ex.printStackTrace(System.err);
+		} finally {
+			session.beginTransaction();
+		}
 	}
 
 	@Override

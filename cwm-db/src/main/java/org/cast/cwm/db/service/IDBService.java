@@ -21,6 +21,8 @@ package org.cast.cwm.db.service;
 
 import com.google.inject.ImplementedBy;
 import net.databinder.hib.SessionUnit;
+import org.apache.wicket.model.IModel;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.Session;
 
 import java.io.Serializable;
@@ -48,13 +50,59 @@ public interface IDBService {
 	 */
 	public Object ensureHibernateSession(SessionUnit unit);
 
-	/**
-	 * Persist the given object into the database.
-	 *
-	 * @param persistableObject an object mapped to a database class
-	 * @return the saved object.  An identifier will have been generated.
-	 */
-	public Serializable save(Object persistableObject);
+    /**
+     * Persist the given object into the database.
+     *
+     * @param persistableObject an object mapped to a database class
+     * @return the saved object.  An identifier will have been generated.
+     */
+    public Serializable save(Object persistableObject);
+
+    /**
+     * Look up a datastore object by its ID.  This method is implemented using
+     * the underlying datastore system.
+     *
+     * @param clazz type of the object (subclass of PersistedObject)
+     * @param id database ID of the object
+     */
+    <T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id);
+
+    /**
+     * Delete an object from the datastore.
+     *
+     * @param objectModel model of object to delete
+     */
+    void delete(IModel<?> objectModel);
+
+    /**
+     * Delete an object from the datastore.
+     *
+     * @param object to delete
+     */
+    void delete(Object object);
+
+    /**
+     * Flush changes to the datastore.  Essentially, this commits the previous
+     * transaction and starts a new transaction.  This should be run at the end of
+     * any Service method that is making changes to the datastore.
+     */
+    void flushChanges();
+
+    /**
+     * <p>
+     * Flush changes to the datastore.  Essentially, this commits the previous
+     * transaction and starts a new transaction.  This should be run at the end of
+     * any Service method that is making changes to the datastore.
+     * </p>
+     *
+     * <p>
+     * If catchErrors is true, the commit will be run in a <em>try</em> block
+     * and any exceptions will be ignored.
+     * </p>
+     *
+     * @param catchErrors true to ignore exceptions
+     */
+    void flushChanges(boolean catchErrors);
 
 	/**
 	 * Take an object that might be a Hibernate proxy, initialize lazy values and unwrap it from the proxy.

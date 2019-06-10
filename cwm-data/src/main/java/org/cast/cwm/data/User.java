@@ -26,6 +26,7 @@ import net.databinder.auth.data.DataUser;
 import net.databinder.auth.data.hib.BasicPassword;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.wicket.util.string.Strings;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.Index;

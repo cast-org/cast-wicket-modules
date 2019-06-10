@@ -36,6 +36,7 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.models.UserListModel;
+import org.cast.cwm.db.service.IDBService;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -57,7 +58,7 @@ import java.util.List;
 public class UserService implements IUserService {
 
 	@Inject
-	private ICwmService cwmService;
+	private IDBService dbService;
 
 	/**
 	 * Return the class to be used for Users.
@@ -89,7 +90,7 @@ public class UserService implements IUserService {
 	public void confirmUser(User user) {
 		user.setValid(true);
 		user.setSecurityToken(null);
-		cwmService.flushChanges();
+		dbService.flushChanges();
 	}
 	
 	/* (non-Javadoc)
@@ -98,7 +99,7 @@ public class UserService implements IUserService {
 	@Override
 	public void generateSecurityToken(IModel<User> mUser, Duration validDuration) {
 		mUser.getObject().generateSecurityToken(validDuration);
-		cwmService.flushChanges();
+		dbService.flushChanges();
 	}
 
 	/* (non-Javadoc)

@@ -21,8 +21,8 @@ package org.cast.cwm.service;
 
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.cast.cwm.data.PersistedObject;
 import org.cast.cwm.data.init.IDatabaseInitializer;
+import org.cast.cwm.db.data.PersistedObject;
 
 import java.util.List;
 
@@ -35,60 +35,6 @@ public interface ICwmService {
 	 * @param objectModel model to check
 	 */
 	void confirmDatastoreModel(IModel<? extends PersistedObject> objectModel);
-
-	/**
-	 * Look up a datastore object by its ID.  This method is implemented using
-	 * the underlying datastore system.
-	 *
-	 * @param clazz type of the object (subclass of PersistedObject)
-	 * @param id database ID of the object
-	 */
-	<T extends PersistedObject> IModel<T> getById(Class<T> clazz, long id);
-
-	/**
-	 * Add a {@link PersistedObject} to the datastore.
-	 * Does not take a model as parameter because you usually won't have one for a
-	 * brand new object.
-	 * @param object object to make persistent
-	 */
-	void save(PersistedObject object);
-
-	/**
-	 * Delete a {@link PersistedObject} from the datastore.
-	 * 
-	 * @param objectModel model of object to delete
-	 */
-	void delete(IModel<? extends PersistedObject> objectModel);
-	
-	/**
-	 * Delete a {@link PersistedObject} from the datastore.
-	 * 
-	 * @param object to delete
-	 */
-	void delete(PersistedObject object);
-
-	/**
-	 * Flush changes to the datastore.  Essentially, this commits the previous
-	 * transaction and starts a new transaction.  This should be run at the end of
-	 * any Service method that is making changes to the datastore.
-	 */
-	void flushChanges();
-
-	/**
-	 * <p>
-	 * Flush changes to the datastore.  Essentially, this commits the previous
-	 * transaction and starts a new transaction.  This should be run at the end of
-	 * any Service method that is making changes to the datastore.
-	 * </p>
-	 * 
-	 * <p>
-	 * If catchErrors is true, the commit will be run in a <em>try</em> block
-	 * and any exceptions will be ignored.
-	 * </p>
-	 * 
-	 * @param catchErrors true to ignore exceptions
-	 */
-	void flushChanges(boolean catchErrors);
 
 	/**
 	 * Return a list of all distinct initializers that have been run.

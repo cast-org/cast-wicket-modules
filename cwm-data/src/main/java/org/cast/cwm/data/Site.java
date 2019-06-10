@@ -25,6 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.wicket.markup.html.list.ListView;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.*;

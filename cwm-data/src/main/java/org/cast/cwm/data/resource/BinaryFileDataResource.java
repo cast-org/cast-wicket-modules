@@ -26,7 +26,7 @@ import org.apache.wicket.request.http.flow.AbortWithHttpErrorCodeException;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.util.time.Time;
 import org.cast.cwm.data.BinaryFileData;
-import org.cast.cwm.service.ICwmService;
+import org.cast.cwm.db.service.IDBService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,9 +36,8 @@ import javax.servlet.http.HttpServletResponse;
  * TODO: reconcile this with the almost-identical UploadedFileResource
  */
 public class BinaryFileDataResource extends AbstractResource {
-
 	@Inject
-	private ICwmService cwmService;
+	private IDBService dbService;
 
 	@Getter
 	protected Long id;
@@ -60,7 +59,7 @@ public class BinaryFileDataResource extends AbstractResource {
 	protected ResourceResponse newResourceResponse(final Attributes attributes) {
 		final ResourceResponse response = new ResourceResponse();
 
-		bfd = cwmService.getById(BinaryFileData.class, id).getObject();
+		bfd = dbService.getById(BinaryFileData.class, id).getObject();
 		if (bfd == null)
     		throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND, "Data not found [id=" + id + "]");
 		

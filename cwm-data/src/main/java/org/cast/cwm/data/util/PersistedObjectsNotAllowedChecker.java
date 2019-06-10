@@ -20,7 +20,7 @@
 package org.cast.cwm.data.util;
 
 import org.apache.wicket.core.util.objects.checker.IObjectChecker;
-import org.cast.cwm.data.PersistedObject;
+import org.cast.cwm.db.data.PersistedObject;
 
 import java.util.List;
 

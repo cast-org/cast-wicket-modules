@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.wicket.Component;
 import org.cast.cwm.data.User;
+import org.cast.cwm.db.service.IDBService;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class UserUpdateSpreadsheetReader extends UserSpreadsheetReader {
 	private IUserService userService;
 
 	@Inject
-	private ICwmService cwmService;
+	private IDBService dbService;
 
 	String keyField = "username";
 
@@ -159,7 +160,7 @@ public class UserUpdateSpreadsheetReader extends UserSpreadsheetReader {
 			populateUserObject(potentialUser.getUser().getObject(), potentialUser.getCsvRecord());
 			userService.onUserUpdated(potentialUser.getUser(), triggerComponent);
 		}
-		cwmService.flushChanges();
+		dbService.flushChanges();
 	}
 
 }

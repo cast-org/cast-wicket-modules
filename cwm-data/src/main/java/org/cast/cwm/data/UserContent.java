@@ -25,6 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.util.string.Strings;
+import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.*;

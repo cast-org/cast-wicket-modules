@@ -24,6 +24,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.WicketTester;
 import org.cast.cwm.data.BinaryFileData;
+import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.service.ICwmService;
 import org.cast.cwm.test.CwmTestApplication;
 import org.junit.Before;
@@ -45,6 +46,8 @@ public class UploadedFileResourceTest {
 	
 	private ICwmService cwmService;
 
+	private IDBService dbService;
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Before
 	public void setUp() {
@@ -55,8 +58,11 @@ public class UploadedFileResourceTest {
 		IModel<BinaryFileData> mSampleBFD = Model.of(sampleBFD);
 
 		cwmService = mock(ICwmService.class);
-		when(cwmService.getById(BinaryFileData.class, 1L)).thenReturn(mSampleBFD);
 		injectionMap.put(ICwmService.class, cwmService);
+
+		dbService = mock(IDBService.class);
+		when(dbService.getById(BinaryFileData.class, 1L)).thenReturn(mSampleBFD);
+		injectionMap.put(IDBService.class, dbService);
 
 		CwmTestApplication application = new CwmTestApplication(injectionMap);
 		tester = new WicketTester(application);
@@ -68,7 +74,7 @@ public class UploadedFileResourceTest {
 		tester.startResourceReference(new UploadedFileResourceReference(), pp);
 		//tester.dumpPage();
 		
-		verify(cwmService).getById(BinaryFileData.class, 1L);
+		verify(dbService).getById(BinaryFileData.class, 1L);
 		tester.assertContains("^abc$");
 		assertEquals("Content type is not correct", "text/plain", tester.getLastResponse().getContentType());
 		assertEquals("Wrong content disposition", "inline", tester.getContentDispositionFromResponseHeader());
