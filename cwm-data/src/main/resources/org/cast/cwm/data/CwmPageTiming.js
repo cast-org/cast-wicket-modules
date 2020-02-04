@@ -17,6 +17,9 @@ CwmPageTiming = {};
 CwmPageTiming.startInactiveTime = null;
 CwmPageTiming.totalInactiveTime = 0;
 CwmPageTiming.pageBlocked = false;
+CwmPageTiming.lastSeenAwakeTime = null;
+CwmPageTiming.awakeCheckInterval = 5000;  // Check for awakeness every 5 seconds
+CwmPageTiming.awakeCheckTimer = null;
 
 /**
  * Call to initiate time tracking of this page.
@@ -43,6 +46,9 @@ CwmPageTiming.trackPage = function(eventId, url) {
         log.warn("Browser doesn't support focus checking; hidden time won't be reported.")
     }
 
+    // Interval timer to monitor laptop going to sleep.
+    CwmPageTiming.awakeCheckTimer = setInterval(CwmPageTiming.checkAwakeness, CwmPageTiming.awakeCheckInterval);
+
     var loadTime = null;
     var endPageInfo = "";
     var itemsSent = [];
@@ -59,7 +65,7 @@ CwmPageTiming.trackPage = function(eventId, url) {
         localStorage['pageStartTime.' + eventId] = currentTime;
 
         // Gather up any saved end times from previous pages.
-        // endPageInfo variable will get zero or more  "id=duration;" items
+        // endPageInfo variable will get zero or more  "id=duration=inactiveDuration;" items
         for (var i = 0; i < localStorage.length; i++) {
             var key = localStorage.key(i);
             var match = key.match('pageEndTime.(.*)');
@@ -87,6 +93,31 @@ CwmPageTiming.trackPage = function(eventId, url) {
     CwmPageTiming.sendData(url, data, itemsSent);
 };
 
+CwmPageTiming.checkAwakeness = function() {
+    let now = Date.now();
+    let lastAwake = CwmPageTiming.lastSeenAwakeTime;
+    CwmPageTiming.lastSeenAwakeTime = now;
+    log.debug("LastAwake was ", CwmPageTiming.fmt(lastAwake), "; setting to ", CwmPageTiming.fmt(now));
+    if (lastAwake === null || now-lastAwake < CwmPageTiming.awakeCheckInterval*2) {
+        // Looks like we're getting regular pings, no action needed
+        log.debug("ping ... looks like we're still awake at ", CwmPageTiming.fmt(now),
+            " blocked? ", CwmPageTiming.pageBlocked, "; focused? ", document.hasFocus());
+            //"; ping gap=", lastAwake ? (now-lastAwake)+"ms" : "n/a");
+    } else {
+        // Last awake time was too long ago, record preceding interval as having been asleep.
+        log.debug("Computer woke up from sleep that started around " + CwmPageTiming.fmt(lastAwake));
+        if (CwmPageTiming.startInactiveTime === null) {
+            //   do we need this?:  || CwmPageTiming.startInactiveTime > lastAwake
+            CwmPageTiming.startInactiveTime = lastAwake; // might want to add a fraction of interval
+            log.debug("Set startInactiveTime to ", CwmPageTiming.fmt(lastAwake));
+        } else {
+            log.debug("startInactiveTime is already set to ", CwmPageTiming.fmt(CwmPageTiming.startInactiveTime),
+                " so not resetting to ", CwmPageTiming.fmt(lastAwake));
+        }
+        CwmPageTiming.handleFocusChange();
+    }
+};
+
 
 CwmPageTiming.blocked = function(isBlocked) {
     CwmPageTiming.pageBlocked = isBlocked;
@@ -101,8 +132,17 @@ CwmPageTiming.handleFocusChange = function() {
         // Page is either blocked or blurred.  Record start of inactive time if this is new.
         if (CwmPageTiming.startInactiveTime === null) {
             CwmPageTiming.startInactiveTime = Date.now();
-            log.debug("Window went inactive at ", CwmPageTiming.startInactiveTime, " with cumulative ", CwmPageTiming.totalInactiveTime);
+            log.debug("Window went inactive at ", CwmPageTiming.fmt(CwmPageTiming.startInactiveTime),
+                " with cumulative ", CwmPageTiming.totalInactiveTime/1000, "s");
         }
+    }
+};
+
+CwmPageTiming.fmt = function(unixtime) {
+    if (unixtime) {
+        return new Date(unixtime).toLocaleTimeString();
+    } else {
+        return "null";
     }
 };
 
@@ -110,17 +150,18 @@ CwmPageTiming.recordInactiveTime = function() {
     if (CwmPageTiming.startInactiveTime !== null) {
         var now = Date.now();
         CwmPageTiming.totalInactiveTime += (now - CwmPageTiming.startInactiveTime);
-        log.debug("Window reactivated. Was inactive from ", CwmPageTiming.startInactiveTime, " to ", now);
-        log.debug("Cumulative inactive time = ", CwmPageTiming.totalInactiveTime);
+        log.debug("Window reactivated. Was inactive from ", CwmPageTiming.fmt(CwmPageTiming.startInactiveTime),
+            " to ", CwmPageTiming.fmt(now));
+        log.debug("Cumulative inactive time = ", CwmPageTiming.totalInactiveTime/1000, "s");
         CwmPageTiming.startInactiveTime = null;
     }
 };
 
-// Called in page's onbeforeunload event:
+// Called in page's "pagehide" event:
 // saves a timestamp to local storage as the page gets unloaded
 CwmPageTiming.saveEndTime = function(eventId) {
     if (!localStorage['pageEndTime.' + eventId]) {
-        log.debug("Saving end time for page: ", Date.now());
+        log.debug("Saving end time for page: ", CwmPageTiming.fmt(Date.now()));
         localStorage['pageEndTime.' + eventId] = Date.now();
         CwmPageTiming.recordInactiveTime();
         localStorage['pageInactiveTime.' + eventId] = CwmPageTiming.totalInactiveTime;

@@ -62,14 +62,16 @@ var SessionExpireWarning = {
             var now = new Date().getTime();
             if (now > SessionExpireWarning.nextCheckTime) {
                 log.debug("Checking...");
-                SessionExpireWarning.nextCheckTime = null;
                 $('#' + SessionExpireWarning.dialogId).trigger(SessionExpireWarning.checkEventName);
+                // Leave nextCheckTime as it is - it will be reset by the server to an appropriate value.
+                // If we don't get a server response, network is probably disconnected, will re-try on every tick.
             } else {
                 log.debug("Remaining until check: ",
                     Math.ceil((SessionExpireWarning.nextCheckTime - now)/1000), "s");
             }
         } else {
-            log.error("SessionExpireWarning error - no next check time");
+            // This should not happen
+            log.warn("SessionExpireWarning - no next check time");
         }
     },
 
