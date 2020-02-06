@@ -55,6 +55,7 @@ public class EventLoggingBehavior extends AjaxEventBehavior {
 	/**
 	 * The event code.
 	 */
+	@Getter @Setter
 	private String eventCode;
 	
 	/**
