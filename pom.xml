@@ -64,18 +64,8 @@
 
     <repositories>
         <repository>
-            <id>WicketStuff</id>
-            <name>WicketStuff</name>
-            <url>https://oss.sonatype.org/content/repositories/releases</url>
-        </repository>
-        <repository>
             <id>CAST</id>
             <url>http://comp.cast.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>MVNSearch</id>
-            <name>MVNSearch</name>
-            <url>http://www.mvnsearch.org/maven2</url>
         </repository>
     </repositories>
     
