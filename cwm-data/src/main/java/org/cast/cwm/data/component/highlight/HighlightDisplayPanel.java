@@ -19,14 +19,10 @@
  */
 package org.cast.cwm.data.component.highlight;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderContributor;
@@ -55,7 +51,9 @@ import org.cast.cwm.service.IHighlightService;
 import org.cast.cwm.service.IResponseService;
 import org.cast.cwm.service.IUserPreferenceService;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A panel that outputs several hidden input fields for each registered highlighter.  These
@@ -182,7 +180,7 @@ public class HighlightDisplayPanel extends Panel implements IHeaderContributor {
 		// FIXME: used to refer to, but not supply, a CSS file.  That's not really helpful.
 		// Caller should supply any necessary CSS.
 		// response.renderCSSReference(UrlUtils.rewriteToContextRelative("css/highlight.css", RequestCycle.get().getRequest()));
-		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "rangy-core-1.2.3.js"));
+		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "rangy-core.js"));
 		response.renderJavaScriptReference(new PackageResourceReference(HighlightDisplayPanel.class, "new-highlight.js"));
 		
 		response.renderOnDomReadyJavaScript(getHighlighterInitScript()); 
