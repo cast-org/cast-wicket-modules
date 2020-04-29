@@ -22,6 +22,7 @@ package org.cast.cwm.service;
 import com.google.inject.Inject;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.wicket.Component;
+import org.apache.wicket.model.IModel;
 import org.cast.cwm.data.User;
 
 import java.util.Map;
@@ -67,13 +68,35 @@ public class UserUpdateSpreadsheetReader extends UserSpreadsheetReader {
 
 	@Override
 	protected User createUserObject(CSVRecord record) {
-		User user;
+		User origUser;
 		if (keyField.equals("username")) {
-			user = userService.getByUsername(get(record, "username")).getObject();
+			origUser = userService.getByUsername(get(record, "username")).getObject();
 		} else {
-			user = userService.getBySubjectId(get(record, "subjectid")).getObject();
+			origUser = userService.getBySubjectId(get(record, "subjectid")).getObject();
 		}
+		if (origUser == null)
+			return null;
+		// We don't want to touch the origUser, since any changes could get flushed to the DB.
+		// So, make a copy with no ID.
+		User user = new User();
+		user.setUsername(origUser.getUsername());
+		user.setSubjectId(origUser.getSubjectId());
+		user.setRole(origUser.getRole());
+		user.setPeriods(origUser.getPeriods());
+		user.setFirstName(origUser.getFirstName());
+		user.setLastName(origUser.getLastName());
+		user.setEmail(origUser.getEmail());
+		user.setPermission(origUser.isPermission());
 		return user;
+	}
+
+	// When ready to save, need to switch to the actual users rather than the copies.
+	protected IModel<User> lookupRealUser(User user) {
+		if (keyField.equals("username")) {
+			return userService.getByUsername(user.getUsername());
+		} else {
+			return userService.getBySubjectId(user.getSubjectId());
+		}
 	}
 
 	@Override
@@ -133,15 +156,20 @@ public class UserUpdateSpreadsheetReader extends UserSpreadsheetReader {
 		// Check database for duplicate subjectId (if subjectId is not the key field)
 		if (!keyField.equals("subjectid")) {
 			User other = userService.getBySubjectId(user.getSubjectId()).getObject();
-			if (other != null && !other.equals(user))
+			if (other != null && !other.getUsername().equals(user.getUsername()))
 				messages += "SubjectId " + user.getSubjectId() + " already exists in database.\n";
 		}
 
 		// Check database for duplicate email addresses when an email address exists
 		if (user.getEmail() != null) {
 			User other = userService.getByEmail(user.getEmail()).getObject();
-			if (other != null && !other.equals(user))
-				messages += "Email " + user.getEmail() + " already exists in database.\n";
+			if (other != null) {
+				boolean isSameUser = keyField.equals("username")
+						? other.getUsername().equals(user.getUsername())
+						: other.getSubjectId().equals(user.getSubjectId());
+				if (!isSameUser)
+					messages += "Email " + user.getEmail() + " already exists in database.\n";
+			}
 		}
 
 		// Check uploaded user list for duplicate username, subjectId, "Full Name"
@@ -156,6 +184,7 @@ public class UserUpdateSpreadsheetReader extends UserSpreadsheetReader {
 		// Need to reapply them (and anyway, User might have changed in the DB since
 		// the previous page view, so it's not unreasonable).
 		for(PotentialUserSave potentialUser : potentialUsers) {
+			potentialUser.setUser(lookupRealUser(potentialUser.getUser().getObject()));
 			populateUserObject(potentialUser.getUser().getObject(), potentialUser.getCsvRecord());
 			userService.onUserUpdated(potentialUser.getUser(), triggerComponent);
 		}
