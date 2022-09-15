@@ -6,12 +6,12 @@
         <artifactId>cwm-parent</artifactId>
         <version>8.0.3.figuration4-SNAPSHOT</version>
     </parent>
-    
+
     <artifactId>cwm-data</artifactId>
     <name>cwm-data</name>
 
     <description>Wicket Module providing basic data objects and utilities.</description>
-	
+
     <dependencies>
         <dependency>
             <groupId>org.cast.cwm</groupId>
@@ -72,8 +72,8 @@
  	  		<artifactId>sanselan</artifactId>
  	  	</dependency>
  	  	<dependency>
- 	  		<groupId>javax.mail</groupId>
- 	  		<artifactId>mail</artifactId>
+ 	  		<groupId>com.sun.mail</groupId>
+ 	  		<artifactId>javax.mail</artifactId>
  	  	</dependency>
  	  	<dependency>
  	  		<groupId>org.hibernate</groupId>
