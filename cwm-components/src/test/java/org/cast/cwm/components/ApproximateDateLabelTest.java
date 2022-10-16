@@ -39,7 +39,7 @@ public class ApproximateDateLabelTest extends WicketTestCase {
 
 	@Test
 	public void snapshotTest() throws Exception {
-		tester.startComponentInPage(new ApproximateDateLabel("id", new Date(1000)));
+		tester.startComponentInPage(new ApproximateDateLabel("id", new Date(765950515000L)));
 		tester.assertResultPage(getClass(),"snapshot/ApproximateDateLabel.html");
 	}
 
