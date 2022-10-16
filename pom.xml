@@ -7,18 +7,18 @@
     <name>CWM parent project</name>
     <version>7.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
-    
+
     <url>http://github.com/cast-org/cast-wicket-modules</url>
     <description>Parent project for the CAST Wicket Modules.
     This POM contains basic metadata and dependencies so they are always
     consistent across the various modules.</description>
     <inceptionYear>2011</inceptionYear>
-    
+
     <organization>
         <name>CAST, Inc.</name>
-        <url>http://cast.org</url>
+        <url>https://cast.org</url>
     </organization>
-    
+
     <licenses>
         <license>
             <name>GNU Affero General Public License</name>
@@ -26,19 +26,19 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <issueManagement>
         <system>Github</system>
-        <url>http://github.com/cast-org/cast-wicket-modules/issues</url>
+        <url>https://github.com/cast-org/cast-wicket-modules/issues</url>
     </issueManagement>
-    
+
     <scm>
-        <url>http://github.com/cast-org/cast-wicket-modules/source</url>
+        <url>https://github.com/cast-org/cast-wicket-modules/source</url>
         <connection>scm:git:git://cast-org/cast-wicket-modules.git</connection>
         <developerConnection>scm:git:git@github.com:cast-org/cast-wicket-modules.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
-    
+
     <distributionManagement>
         <repository>
             <id>CAST</id>
@@ -46,7 +46,7 @@
         </repository>
         <!-- todo: site -->
     </distributionManagement>
-    
+
     <modules>
         <module>cwm-base</module>
         <module>cwm-components</module>
@@ -62,10 +62,10 @@
     <repositories>
         <repository>
             <id>CAST</id>
-            <url>http://comp.cast.org/maven2/</url>
+            <url>https://maven.cast.org/maven2/</url>
         </repository>
     </repositories>
-    
+
     <dependencyManagement>
         <dependencies>
             <!-- CAST -->
@@ -140,13 +140,13 @@
                 <artifactId>jta</artifactId>
                 <version>1.1</version>
             </dependency>
-            
+
             <!-- APACHE -->
             <dependency>
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-core</artifactId>
                 <version>${wicket.version}</version>
-            </dependency>	  	
+            </dependency>
             <dependency>
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-extensions</artifactId>
@@ -156,7 +156,7 @@
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-auth-roles</artifactId>
                 <version>${wicket.version}</version>
-            </dependency>	  	
+            </dependency>
             <dependency>
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-devutils</artifactId>
@@ -166,13 +166,13 @@
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-datetime</artifactId>
                 <version>${wicket.version}</version>
-            </dependency>	  	
+            </dependency>
             <dependency>
             	<groupId>org.apache.wicket</groupId>
             	<artifactId>wicket-guice</artifactId>
             	<version>${wicket.version}</version>
             </dependency>
-            
+
             <dependency>
             	<groupId>org.wicketstuff</groupId>
             	<artifactId>wicketstuff-jslibraries</artifactId>
@@ -327,9 +327,9 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>               
+                <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.0</version>
-                <configuration>                
+                <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
@@ -388,7 +388,7 @@
                 <artifactId>wagon-ssh-external</artifactId>
                 <version>1.0</version>
             </extension>
-        </extensions> 
+        </extensions>
 
         <resources>
             <resource>
@@ -419,7 +419,7 @@
             </testResource>
         </testResources>
     </build>
-  
+
     <properties>
         <wicket.version>7.16.0</wicket.version>
         <wicketstuff.version>7.16.0</wicketstuff.version>
@@ -429,5 +429,5 @@
         <project.test.sourceEncoding>UTF-8</project.test.sourceEncoding>
         <copyright.year>2020</copyright.year>
     </properties>
-  
+
 </project>
