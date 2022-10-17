@@ -8,7 +8,7 @@
     <version>7.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <url>http://github.com/cast-org/cast-wicket-modules</url>
+    <url>https://github.com/cast-org/cast-wicket-modules</url>
     <description>Parent project for the CAST Wicket Modules.
     This POM contains basic metadata and dependencies so they are always
     consistent across the various modules.</description>
@@ -37,14 +37,13 @@
         <connection>scm:git:git://cast-org/cast-wicket-modules.git</connection>
         <developerConnection>scm:git:git@github.com:cast-org/cast-wicket-modules.git</developerConnection>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <repository>
             <id>CAST</id>
-            <url>scpexe://comp.cast.org/var/www/html/maven2</url>
+            <url>https://maven2.cast.org/releases</url>
         </repository>
-        <!-- todo: site -->
     </distributionManagement>
 
     <modules>
@@ -62,7 +61,7 @@
     <repositories>
         <repository>
             <id>CAST</id>
-            <url>https://maven.cast.org/maven2/</url>
+            <url>https://maven2.cast.org/releases</url>
         </repository>
     </repositories>
 
