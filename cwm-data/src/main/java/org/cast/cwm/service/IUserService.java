@@ -90,6 +90,8 @@ public interface IUserService {
 
 	IModel<User> getBySubjectId(String subjectId);
 
+	IModel<User> getByLtiId(String ltiId);
+
 	IModel<User> getByEmail(String email);
 
 	// gets both valid and invalid users

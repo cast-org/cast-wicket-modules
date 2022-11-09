@@ -153,7 +153,14 @@ public class UserService implements IUserService {
 		c.setSubjectId(subjectId);
 		return new HibernateObjectModel<User>(User.class, c);
 	}
-	
+
+	@Override
+	public IModel<User> getByLtiId (String ltiId) {
+		UserCriteriaBuilder c = new UserCriteriaBuilder();
+		c.setLtiId(ltiId);
+		return new HibernateObjectModel<User>(User.class, c);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.IUserService#getByEmail(java.lang.String)
 	 */

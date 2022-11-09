@@ -92,7 +92,12 @@ public class SiteService implements ISiteService {
 	public IModel<Site> getSiteById(Long id) {
 		return new HibernateObjectModel<Site>(Site.class, id);
 	}
-	
+
+	public IModel<Site> getSiteByLtiId(String ltiId) {
+		return new HibernateObjectModel<Site>(Site.class,
+				new BasicCacheableCriteriaBuilder(Restrictions.eq("ltiId", ltiId)));
+	}
+
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ISiteService#getSiteByName(java.lang.String)
 	 */

@@ -67,7 +67,13 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 
 	@Column(unique=true)
 	protected String subjectId;
-	
+
+	/**
+	 * Identifier for LTI reference.
+	 */
+	@Column(unique = true)
+	protected String ltiId;
+
 	@Column(nullable=false, columnDefinition="boolean default false")
 	protected boolean permission = false;
 	

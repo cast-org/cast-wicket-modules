@@ -71,7 +71,13 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 */
 	@Column(unique = true, nullable = false)
 	private String classId;
-	
+
+	/**
+	 * Identifier for LTI reference.
+	 */
+	@Column(unique = true)
+	protected String ltiId;
+
 	@ManyToMany(mappedBy="periods")
 	@SortNatural
 	private SortedSet<User> users = new TreeSet<User>();

@@ -62,6 +62,7 @@ public class UserCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<
 	private String lastName;
 	private String email;
 	private String subjectId;
+	private String ltiId;
 	private IModel<? extends Period> period;
 	private IModel<? extends Collection<Site>> sites;
 	private ISortState<String> sortState = new SingleSortState<String>();
@@ -100,6 +101,8 @@ public class UserCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<
 			criteria.add(Restrictions.eq("email", email).ignoreCase());
 		if (subjectId != null)
 			criteria.add(Restrictions.eq("subjectId", subjectId).ignoreCase());
+		if (ltiId != null)
+			criteria.add(Restrictions.eq("ltiId", ltiId).ignoreCase());
 		if (firstName != null)
 			criteria.add(Restrictions.eq("firstName", firstName).ignoreCase());
 		if (lastName != null)
