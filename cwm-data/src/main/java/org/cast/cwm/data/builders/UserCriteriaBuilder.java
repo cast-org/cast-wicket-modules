@@ -102,7 +102,7 @@ public class UserCriteriaBuilder implements ICriteriaBuilder, ISortStateLocator<
 		if (subjectId != null)
 			criteria.add(Restrictions.eq("subjectId", subjectId).ignoreCase());
 		if (ltiId != null)
-			criteria.add(Restrictions.eq("ltiId", ltiId).ignoreCase());
+			criteria.add(Restrictions.eq("ltiId", ltiId));
 		if (firstName != null)
 			criteria.add(Restrictions.eq("firstName", firstName).ignoreCase());
 		if (lastName != null)
