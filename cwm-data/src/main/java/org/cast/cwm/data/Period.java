@@ -52,17 +52,17 @@ import java.util.TreeSet;
 @Setter
 @ToString(of={"id", "name", "site"})
 public class Period extends PersistedObject implements Comparable<Period> {
-  
+
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id @GeneratedValue(generator = "my_generator")
-	@Setter(AccessLevel.NONE) 
+	@Setter(AccessLevel.NONE)
 	private Long id;
-	
+
 	@NaturalId(mutable=true)
 	@ManyToOne(optional=false)
 	private Site site;
-	
+
 	@NaturalId(mutable=true)
 	private String name;
 
@@ -71,13 +71,20 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	 */
 	@Column(unique = true, nullable = false)
 	private String classId;
-	
+
+	/**
+	 * Identifier for LTI reference.
+	 * This should be set to a combination of the LMS guid and the Course guid, to assure uniqueness.
+	 */
+	@Column(unique = true)
+	protected String ltiId;
+
 	@ManyToMany(mappedBy="periods")
 	@SortNatural
 	private SortedSet<User> users = new TreeSet<User>();
-	
+
 	public Period() { /* No Arg Constructor for the datastore */ }
-	
+
 	/**
 	 * Get a set of users in this period, filtered by
 	 * a specific role.
@@ -94,12 +101,12 @@ public class Period extends PersistedObject implements Comparable<Period> {
 			if (user.hasRole(role))
 				filteredUsers.add(user);
 		}
-		return filteredUsers;		
+		return filteredUsers;
 	}
 
 	/**
 	 * Periods are sorted alphabetically by name within a site.
-	 * This function is careful to avoid NPEs and avoids returning 0 for two 
+	 * This function is careful to avoid NPEs and avoids returning 0 for two
 	 * Periods that have different IDs.
 	 * @param other Period to compare to
 	 */

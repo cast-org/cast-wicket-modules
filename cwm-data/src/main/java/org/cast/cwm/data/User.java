@@ -43,9 +43,9 @@ import java.util.*;
 
 /**
  * A person who uses the application.  Almost all persistent data in the application
- * is, in some way, linked to a User account.  Usernames must be unique across the 
+ * is, in some way, linked to a User account.  Usernames must be unique across the
  * application.
- * 
+ *
  * @author jbrookover
  *
  */
@@ -55,22 +55,29 @@ import java.util.*;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @GenericGenerator(name="my_generator", strategy = "org.cast.cwm.CwmIdGenerator")
-@Getter 
+@Getter
 @Setter
 public class User extends PersistedObject implements Serializable, DataUser, Comparable<User> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id @GeneratedValue(generator = "my_generator")
-	@Setter(AccessLevel.NONE) 
+	@Setter(AccessLevel.NONE)
 	private Long id;
 
 	@Column(unique=true)
 	protected String subjectId;
-	
+
+	/**
+	 * Identifier for LTI reference.
+	 * This should be set to a combination of the LMS's guid and the user's guid, to assure uniqueness.
+	 */
+	@Column(unique = true)
+	protected String ltiId;
+
 	@Column(nullable=false, columnDefinition="boolean default false")
 	protected boolean permission = false;
-	
+
 	@Column(unique=true, nullable=false)
 	@Index(name="person_username_idx")
 	//@NaturalId(mutable=true)  TODO:Investigate
@@ -83,7 +90,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	@Index(name="people_role_idx")
 	@Enumerated(EnumType.STRING)
 	protected Role role;
-	
+
 	@ManyToMany
 	@JoinTable(
 			name="perioduser",
@@ -95,9 +102,9 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	/**
 	 * A "valid" user can log in and generally use the features of the application.
 	 * You may set valid to false if the user should be hidden in lists, prevented from logging in, etc.
-	 * 
-	 * This is false by default.  EditUserPanel, which should be used to create users has a 
-	 * setAutoConfirm method that will allow you to automatically create valid users. 
+	 *
+	 * This is false by default.  EditUserPanel, which should be used to create users has a
+	 * setAutoConfirm method that will allow you to automatically create valid users.
 	 */
 	@Column(nullable=false)
 	protected boolean valid = false;
@@ -105,15 +112,15 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	protected String firstName;
 
 	protected String lastName;
-	
+
 	@Column(unique=true)
 	protected String email;
-	
+
 	/**
 	 * Record of when this user account was created.
 	 */
 	protected Date createDate;
-	
+
 	/**
 	 * Used to store a token (generally a long random string) that can be used in lieu of or in addition to a password.
 	 * This is for operations like registering via email or recovering a lost password.
@@ -124,9 +131,9 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	 * If set, securityToken is only valid until this Date.
 	 */
 	protected Date securityTokenExpires;
-	
+
 	public User() { /* No Arg Constructor for DataStore */ }
-	
+
 	public User(Role role) {
 		this.role = role;
 	}
@@ -139,11 +146,11 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	public boolean hasRole(String roleString) {
 		return hasRole(Role.forRoleString(roleString));
 	}
-	
+
 	public boolean isGuest() {
 		return role == Role.GUEST;
 	}
-	
+
 	/**
 	 * Should we expect this user to have connections to specific Periods?
 	 * By default students, teachers, and researchers do, but apps may override this.
@@ -152,7 +159,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 	public boolean usesPeriods() {
 		return (role!=Role.ADMIN && role!=Role.GUEST);
 	}
-	
+
 	public String getFullName() {
 		if (!Strings.isEmpty(firstName) && !Strings.isEmpty(lastName)) {
 			return firstName + " " + lastName;
@@ -166,7 +173,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 			return username;
 		}
 	}
-	
+
 	public String getSortName() {
 		if (!Strings.isEmpty(firstName) && !Strings.isEmpty(lastName)) {
 			return lastName + ", " + firstName;
@@ -180,7 +187,7 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 			return username;
 		}
 	}
-	
+
 	public List<Period> getPeriodsAsList() {
 		return new ArrayList<Period>(getPeriods());
 	}
@@ -200,16 +207,16 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		else
 			return null;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getFullName();
 	}
-	
+
 	@Override
 	public int compareTo(User o) {
 		if (o == null)
-			return 1;		
+			return 1;
 		return getSortName().compareTo(o.getSortName());
 	}
 
@@ -230,15 +237,15 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 		}
 		return false;
 	}
-	
+
 	/** Set password to a string value.  The string will be converted to a hashed value before saving.
-	 * 
+	 *
 	 * @param password cleartext password
 	 */
 	public void setPassword(String password) {
 		this.password = new BasicPassword(password);
 	}
-	
+
 	/**
 	 * Fill in the securityToken field with a long random string.
 	 * If a duration is given, will fill in the expiry time that interval from now.

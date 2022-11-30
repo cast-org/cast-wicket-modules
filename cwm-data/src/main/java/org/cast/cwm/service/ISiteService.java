@@ -44,6 +44,8 @@ public interface ISiteService {
 
 	IModel<Site> getSiteById(Long id);
 
+	IModel<Site> getSiteByLtiId(String ltiId);
+
 	IModel<Site> getSiteByName(String name);
 
 	Class<? extends Period> getPeriodClass();
