@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.cast.cwm</groupId>
         <artifactId>cwm-parent</artifactId>
-        <version>8.0.3.figuration4-SNAPSHOT</version>
+        <version>8.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>cwm-glossary</artifactId>
@@ -23,5 +23,5 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-  
+
 </project>

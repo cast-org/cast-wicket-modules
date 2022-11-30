@@ -4,9 +4,9 @@
     <parent>
         <groupId>org.cast.cwm</groupId>
         <artifactId>cwm-parent</artifactId>
-        <version>8.0.3.figuration4-SNAPSHOT</version>
+        <version>8.0.4-SNAPSHOT</version>
     </parent>
-    
+
 	<artifactId>cwm-xml</artifactId>
 	<name>cwm-xml</name>
 
@@ -53,7 +53,7 @@
 			<artifactId>ehcache</artifactId>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<resources>
 			<resource>

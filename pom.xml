@@ -5,7 +5,7 @@
     <groupId>org.cast.cwm</groupId>
     <artifactId>cwm-parent</artifactId>
     <name>CWM parent project</name>
-    <version>8.0.3.figuration4-SNAPSHOT</version>
+    <version>8.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <url>http://github.com/cast-org/cast-wicket-modules</url>
@@ -16,24 +16,24 @@
 
     <organization>
         <name>CAST, Inc.</name>
-        <url>http://cast.org</url>
+        <url>https://www.cast.org</url>
     </organization>
 
     <licenses>
         <license>
             <name>GNU Affero General Public License</name>
-            <url>http://www.gnu.org/licenses/agpl.txt</url>
+            <url>https://www.gnu.org/licenses/agpl.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <issueManagement>
         <system>Github</system>
-        <url>http://github.com/cast-org/cast-wicket-modules/issues</url>
+        <url>https://github.com/cast-org/cast-wicket-modules/issues</url>
     </issueManagement>
 
     <scm>
-        <url>http://github.com/cast-org/cast-wicket-modules/source</url>
+        <url>https://github.com/cast-org/cast-wicket-modules/source</url>
         <connection>scm:git:git://cast-org/cast-wicket-modules.git</connection>
         <developerConnection>scm:git:git@github.com:cast-org/cast-wicket-modules.git</developerConnection>
       <tag>HEAD</tag>
@@ -62,7 +62,7 @@
     <repositories>
         <repository>
             <id>CAST</id>
-            <url>http://comp.cast.org/maven2/</url>
+            <url>https://maven2.cast.org/releases</url>
         </repository>
     </repositories>
 

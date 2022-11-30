@@ -4,7 +4,7 @@
   <parent>
       <groupId>org.cast.cwm</groupId>
       <artifactId>cwm-parent</artifactId>
-      <version>8.0.3.figuration4-SNAPSHOT</version>
+      <version>8.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>cwm-base</artifactId>
@@ -22,11 +22,11 @@
       <dependency>
           <groupId>org.apache.wicket</groupId>
           <artifactId>wicket-core</artifactId>
-      </dependency>	  	
+      </dependency>
       <dependency>
           <groupId>org.apache.wicket</groupId>
           <artifactId>wicket-auth-roles</artifactId>
-      </dependency>	  	
+      </dependency>
       <dependency>
       	<groupId>org.apache.wicket</groupId>
       	<artifactId>wicket-devutils</artifactId>
@@ -59,5 +59,5 @@
           </plugin>
       </plugins>
   </reporting>
-  
+
 </project>
