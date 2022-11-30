@@ -25,7 +25,7 @@ import org.apache.wicket.markup.head.*;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.resource.UrlResourceReference;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,18 +35,21 @@ import java.util.List;
  */
 public class FigurationService implements IFigurationService {
 
-	private static final String FIGURATION_DEFAULT_VERSION = "3.0.4";
+	private static final String FIGURATION_DEFAULT_VERSION = "4.0.0-alpha.6";
+	private static final String POPPER_DEFAULT_VERSION = "1.15.0";
 
 	@Getter
 	private final String figurationVersion;
 
+	@Getter
+    private String popperVersion;
+
 	/**
 	 * Default constructor.
 	 * Will set the library to use the default Figuration version.
-	 * @see #FIGURATION_DEFAULT_VERSION
 	 */
 	public FigurationService () {
-		this(FIGURATION_DEFAULT_VERSION);
+		this(FIGURATION_DEFAULT_VERSION, POPPER_DEFAULT_VERSION);
 	}
 
 	/**
@@ -58,24 +61,32 @@ public class FigurationService implements IFigurationService {
 	 *
 	 * Alternatively, subclass FigurationService and change its default.
 	 */
-	public FigurationService (String version) {
+	public FigurationService (String figurationVersion, String popperVersion) {
 		super();
-		figurationVersion = version;
+		this.figurationVersion = figurationVersion;
+		this.popperVersion = popperVersion;
 	}
 
 	@Override
 	public JavaScriptHeaderItem makeJavaScriptReferenceHeaderItem(String version) {
-		return JavaScriptHeaderItem.forReference(
+	    // Figuration has two dependencies.
+        JavaScriptReferenceHeaderItem jqueryLibrary = JavaScriptHeaderItem.forReference(
+                Application.get().getJavaScriptLibrarySettings().getJQueryReference());
+
+        JavaScriptReferenceHeaderItem popperLibrary = JavaScriptHeaderItem.forReference(
+                new UrlResourceReference(Url.parse(
+                        String.format("https://cdn.jsdelivr.net/npm/popper.js@%s/dist/umd/popper.min.js",
+                                popperVersion))));
+
+        return JavaScriptHeaderItem.forReference(
 				new UrlResourceReference(Url.parse(
 						String.format("https://cdn.jsdelivr.net/npm/figuration@%s/dist/js/figuration.min.js",
 								version))) {
 					@Override
 					public List<HeaderItem> getDependencies() {
-						List<HeaderItem> dependencies = new LinkedList<>();
-						dependencies.add(
-								JavaScriptHeaderItem.forReference(
-										Application.get().getJavaScriptLibrarySettings().getJQueryReference()));
-						return dependencies;
+                        return Arrays.asList(
+                                jqueryLibrary,
+                                popperLibrary);
 					}
 				});
 	}
