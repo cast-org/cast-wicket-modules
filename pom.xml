@@ -42,9 +42,8 @@
     <distributionManagement>
         <repository>
             <id>CAST</id>
-            <url>scpexe://comp.cast.org/var/www/html/maven2</url>
+            <url>https://maven2.cast.org/releases</url>
         </repository>
-        <!-- todo: site -->
     </distributionManagement>
 
     <modules>
