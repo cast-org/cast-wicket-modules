@@ -70,9 +70,8 @@ public class User extends PersistedObject implements Serializable, DataUser, Com
 
 	/**
 	 * Identifier for LTI reference.
-	 * This should be set to a combination of the LMS's guid and the user's guid, to assure uniqueness.
 	 */
-	@Column(unique = true)
+	@Column(unique=false)
 	protected String ltiId;
 
 	@Column(nullable=false, columnDefinition="boolean default false")

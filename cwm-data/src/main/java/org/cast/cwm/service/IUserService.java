@@ -23,10 +23,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.cast.cwm.admin.EditUserPanel;
-import org.cast.cwm.data.LoginSession;
-import org.cast.cwm.data.Period;
-import org.cast.cwm.data.Role;
-import org.cast.cwm.data.User;
+import org.cast.cwm.data.*;
 import org.cast.cwm.service.UserService.LoginData;
 
 import java.time.Duration;
@@ -90,7 +87,7 @@ public interface IUserService {
 
 	IModel<User> getBySubjectId(String subjectId);
 
-	IModel<User> getByLtiId(String ltiId);
+	IModel<User> getBySiteAndLtiId(Site site, String ltiId);
 
 	IModel<User> getByEmail(String email);
 

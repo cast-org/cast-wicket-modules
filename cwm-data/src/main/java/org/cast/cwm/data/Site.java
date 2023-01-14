@@ -69,12 +69,6 @@ public class Site extends PersistedObject implements Comparable<Site> {
 	@Column(unique = true, nullable = false)
 	private String siteId;
 
-	/**
-	 * Identifier for LTI reference.
-	 */
-	@Column(unique = true)
-	protected String ltiId;
-	
 	private String location;
 	
 	@Column(name="language", columnDefinition="CHAR(2)", nullable=false)

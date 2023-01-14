@@ -29,10 +29,8 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDat
 import org.apache.wicket.extensions.markup.html.repeater.util.SingleSortState;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.model.IModel;
-import org.cast.cwm.data.LoginSession;
-import org.cast.cwm.data.Period;
-import org.cast.cwm.data.Role;
-import org.cast.cwm.data.User;
+import org.apache.wicket.model.Model;
+import org.cast.cwm.data.*;
 import org.cast.cwm.data.builders.LoginSessionCriteriaBuilder;
 import org.cast.cwm.data.builders.UserCriteriaBuilder;
 import org.cast.cwm.data.models.UserListModel;
@@ -42,6 +40,7 @@ import org.hibernate.Session;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -155,8 +154,9 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public IModel<User> getByLtiId (String ltiId) {
+	public IModel<User> getBySiteAndLtiId(Site site, String ltiId) {
 		UserCriteriaBuilder c = new UserCriteriaBuilder();
+		c.setSites(Model.of(Collections.singletonList(site)));
 		c.setLtiId(ltiId);
 		return new HibernateObjectModel<User>(User.class, c);
 	}
