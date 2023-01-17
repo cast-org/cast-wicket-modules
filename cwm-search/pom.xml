@@ -14,7 +14,7 @@
   	</dependency>
   	<dependency>
   		<groupId>org.hibernate</groupId>
-  		<artifactId>hibernate-search</artifactId>
+  		<artifactId>hibernate-search-orm</artifactId>
   	</dependency>
   	<dependency>
   		<groupId>org.projectlombok</groupId>
