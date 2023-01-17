@@ -54,6 +54,7 @@
 	    <module>cwm-db</module>
         <module>cwm-figuration</module>
         <module>cwm-glossary</module>
+        <module>cwm-lti</module>
         <module>cwm-search</module>
         <module>cwm-xml</module>
     </modules>

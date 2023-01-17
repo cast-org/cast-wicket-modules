@@ -25,12 +25,14 @@ import net.databinder.models.hib.*;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.data.LtiPlatform;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.PeriodCriteriaBuilder;
 import org.cast.cwm.data.component.HibernateEditPeriodForm;
 import org.cast.cwm.db.service.IDBService;
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -93,11 +95,6 @@ public class SiteService implements ISiteService {
 		return new HibernateObjectModel<Site>(Site.class, id);
 	}
 
-	public IModel<Site> getSiteByLtiId(String ltiId) {
-		return new HibernateObjectModel<Site>(Site.class,
-				new BasicCacheableCriteriaBuilder(Restrictions.eq("ltiId", ltiId)));
-	}
-
 	/* (non-Javadoc)
 	 * @see org.cast.cwm.service.ISiteService#getSiteByName(java.lang.String)
 	 */
@@ -106,7 +103,15 @@ public class SiteService implements ISiteService {
 		return new HibernateObjectModel<Site>(Site.class,
 				new BasicCacheableCriteriaBuilder(Restrictions.eq("name", name)));
 	}
-	
+
+	@Override
+	public IModel<LtiPlatform> getPlatformByIssuerAndClientId(String issuer, String clientId) {
+		return new HibernateObjectModel<>(LtiPlatform.class,
+				new BasicCacheableCriteriaBuilder(
+						Restrictions.eq("issuer", issuer),
+						Restrictions.eq("clientId", clientId))
+				);
+	}
 
 	// Period specific methods
 	

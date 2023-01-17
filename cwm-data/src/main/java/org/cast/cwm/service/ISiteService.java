@@ -22,6 +22,7 @@ package org.cast.cwm.service;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
+import org.cast.cwm.data.LtiPlatform;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
@@ -44,9 +45,9 @@ public interface ISiteService {
 
 	IModel<Site> getSiteById(Long id);
 
-	IModel<Site> getSiteByLtiId(String ltiId);
-
 	IModel<Site> getSiteByName(String name);
+
+	IModel<LtiPlatform> getPlatformByIssuerAndClientId(String issuer, String clientId);
 
 	Class<? extends Period> getPeriodClass();
 

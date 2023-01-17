@@ -74,9 +74,8 @@ public class Period extends PersistedObject implements Comparable<Period> {
 
 	/**
 	 * Identifier for LTI reference.
-	 * This should be set to a combination of the LMS guid and the Course guid, to assure uniqueness.
 	 */
-	@Column(unique = true)
+	@Column(unique = false)
 	protected String ltiId;
 
 	@ManyToMany(mappedBy="periods")
