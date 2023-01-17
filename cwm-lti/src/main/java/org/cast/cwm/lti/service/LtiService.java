@@ -197,6 +197,7 @@ public class LtiService implements ILtiService {
             period = new Period();
             period.setLtiId(ltiId);
             period.setClassId("lti-" + ltiId);
+            period.setSite(site);
             site.getPeriods().add(period);
         }
         period.setName(context.get("title").getAsString());
