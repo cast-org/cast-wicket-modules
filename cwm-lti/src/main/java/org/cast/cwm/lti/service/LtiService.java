@@ -32,7 +32,7 @@ import org.cast.cwm.CwmSession;
 import org.cast.cwm.data.*;
 import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.db.service.IModelProvider;
-import org.cast.cwm.lti.ILtiResourceHandler;
+import org.cast.cwm.lti.ILtiResourceProvider;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
@@ -140,7 +140,7 @@ public class LtiService implements ILtiService {
     private IModelProvider modelProvider;
 
     @Inject
-    private ILtiResourceHandler hooks;
+    private ILtiResourceProvider resourceProvider;
 
     @Override
     public String onLaunch(LtiPlatform platform, JsonObject payload) {
@@ -156,7 +156,7 @@ public class LtiService implements ILtiService {
             case MESSAGE_TYPE_RESOURCE_REQUEST:
                 JsonObject custom = payload.getAsJsonObject(CUSTOM);
 
-                return hooks.onResourceRequested(custom);
+                return resourceProvider.onResourceRequested(custom);
             case MESSAGE_TYPE_LINKING_REQUEST:
                 JsonObject deepLinkingSettings = payload.getAsJsonObject(LINKING_SETTINGS);
                 DeepLinkingState state = new DeepLinkingState();
@@ -281,7 +281,7 @@ public class LtiService implements ILtiService {
             item.addProperty("url", url);
             JsonObject custom = new JsonObject();
             item.add("custom", custom);
-            hooks.configureDeepLinkResource(resource, item, custom);
+            resourceProvider.configureDeepLinkResource(resource, item, custom);
             items.add(item);
         }
 
