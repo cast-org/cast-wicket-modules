@@ -219,6 +219,17 @@ public class SiteService implements ISiteService {
 		return new HibernateObjectModel<Period>(Period.class, pcb);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodByName(java.lang.String)
+	 */
+	@Override
+	public IModel<Period> getPeriodBySiteAndLtiId(Site site, String ltiId) {
+		PeriodCriteriaBuilder pcb = new PeriodCriteriaBuilder();
+		pcb.setSite(site);
+		pcb.setLtiId(ltiId);
+		return new HibernateObjectModel<Period>(Period.class, pcb);
+	}
+
 	@Override
 	public void onPeriodCreated(IModel<? extends Period> mPeriod) {
 		// Does nothing by default

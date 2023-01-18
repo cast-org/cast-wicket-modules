@@ -39,6 +39,7 @@ public class PeriodCriteriaBuilder implements ICriteriaBuilder {
 	
 	private String name = null;
 	private Site site = null;
+	private String ltiId = null;
 	private Integer maxResults = null;	
 
 	public PeriodCriteriaBuilder() {
@@ -51,6 +52,8 @@ public class PeriodCriteriaBuilder implements ICriteriaBuilder {
 			criteria.add(Restrictions.eq("name", name));
 		if (site != null)
 			criteria.add(Restrictions.eq("site", site));
+		if (ltiId != null)
+			criteria.add(Restrictions.eq("ltiId", ltiId));
 		if (maxResults != null)
 			criteria.setMaxResults(maxResults);
 		criteria.setCacheable(true);
@@ -61,5 +64,4 @@ public class PeriodCriteriaBuilder implements ICriteriaBuilder {
 		buildUnordered(criteria);
 		criteria.addOrder(Order.asc("name"));
 	}
-
 }

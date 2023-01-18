@@ -33,6 +33,7 @@ import org.cast.cwm.data.*;
 import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.lti.ILtiResourceProvider;
+import org.cast.cwm.lti.util.LockByKey;
 import org.cast.cwm.service.IEventService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
@@ -142,6 +143,8 @@ public class LtiService implements ILtiService {
     @Inject
     private ILtiResourceProvider resourceProvider;
 
+    private LockByKey locks = new LockByKey();
+
     @Override
     public String onLaunch(LtiPlatform platform, JsonObject payload) {
 
@@ -190,47 +193,43 @@ public class LtiService implements ILtiService {
         JsonObject context = payload.getAsJsonObject(CONTEXT);
         String ltiId = getLtiId(context.get("id"));
 
-        Period period = null;
-        for (Period candidate : site.getPeriods()) {
-            if (ltiId.equals(candidate.getLtiId())) {
-                period = candidate;
-                break;
+        return locks.locked(ltiId, () -> {
+            Period period = siteService.getPeriodBySiteAndLtiId(site, ltiId).getObject();
+            if (period == null) {
+                period = siteService.newPeriod();
+                period.setLtiId(ltiId);
+                period.setClassId("lti-" + ltiId);
+                period.setSite(site);
             }
-        }
-        if (period == null) {
-            period = siteService.newPeriod();
-            period.setLtiId(ltiId);
-            period.setClassId("lti-" + ltiId);
-            period.setSite(site);
-            site.getPeriods().add(period);
-            dbService.save(site);
-        }
-        period.setName(context.get("title").getAsString());
-
-        return period;
+            period.setName(context.get("title").getAsString());
+            dbService.save(period);
+            return period;
+        });
     }
 
     private User initUser(JsonObject payload, Site site, Period period) {
         String ltiId = getLtiId(payload.get("sub"));
-        User user = userService.getBySiteAndLtiId(site, ltiId).getObject();
-        if (user == null) {
-            user = userService.newUser();
-            user.setCreateDate(new Date());
-            user.setValid(true);
-            user.setPassword(UUID.randomUUID().toString());
-            user.setUsername(UUID.randomUUID().toString());
-            user.setSubjectId(UUID.randomUUID().toString());
-            user.setLtiId(ltiId);
-        }
-        user.setFirstName(payload.get("given_name").getAsString());
-        user.setLastName(payload.get("family_name").getAsString());
-        user.setRole(mapRole(payload));
-        if (!user.getPeriods().contains(period)) {
-            user.getPeriods().add(period);
-        }
-        dbService.save(user);
 
-        return user;
+        return locks.locked(ltiId, () -> {
+            User user = userService.getBySiteAndLtiId(site, ltiId).getObject();
+            if (user == null) {
+                user = userService.newUser();
+                user.setCreateDate(new Date());
+                user.setValid(true);
+                user.setPassword(UUID.randomUUID().toString());
+                user.setUsername(UUID.randomUUID().toString());
+                user.setSubjectId(UUID.randomUUID().toString());
+                user.setLtiId(ltiId);
+            }
+            user.setFirstName(payload.get("given_name").getAsString());
+            user.setLastName(payload.get("family_name").getAsString());
+            user.setRole(mapRole(payload));
+            if (!user.getPeriods().contains(period)) {
+                user.getPeriods().add(period);
+            }
+            dbService.save(user);
+            return user;
+        });
     }
 
     private Role mapRole(JsonObject payload) {
