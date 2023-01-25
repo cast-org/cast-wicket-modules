@@ -74,6 +74,12 @@ public class LtiService implements ILtiService {
 
     // for MESSAGE_TYPE_LINKING_REQUEST
     //
+    // "https://purl.imsglobal.org/spec/lti/claim/deployment_id":"07940580-b309-415e-a37c-914d387c1150"
+    //
+    private static final String DEPLOYMENT_ID = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
+
+    // for MESSAGE_TYPE_LINKING_REQUEST
+    //
     // "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings": {
     //   "accept_types": [
     //     "link",
@@ -165,6 +171,7 @@ public class LtiService implements ILtiService {
                 DeepLinkingState state = new DeepLinkingState();
                 state.iss = payload.get("iss").getAsString();
                 state.aud = payload.get("aud").getAsString();
+                state.deploymentId = payload.get(DEPLOYMENT_ID).getAsString();
                 state.returnUrl = deepLinkingSettings.get("deep_link_return_url").getAsString();
                 state.data = deepLinkingSettings.get("data").getAsString();
                 CwmSession.get().setMetaData(LINKING_STATE_ATTRIBUTE, state);
@@ -264,24 +271,29 @@ public class LtiService implements ILtiService {
         JsonObject payload = new JsonObject();
         payload.addProperty("iss", state.aud);
         payload.addProperty("aud", state.iss);
+        payload.addProperty(DEPLOYMENT_ID, state.deploymentId);
         payload.addProperty("https://purl.imsglobal.org/spec/lti-dl/claim/data", state.data);
         payload.addProperty("https://purl.imsglobal.org/spec/lti/claim/version", "1.3.0");
-        payload.addProperty("https://purl.imsglobal.org/spec/lti/claim/deployment_id", "1");
         payload.addProperty("nonce", UUID.randomUUID().toString());
         payload.addProperty(MESSAGE_TYPE, MESSAGE_TYPE_LINKING_RESPONSE);
 
-        JsonArray items = new JsonArray();
-        payload.add(LINKING_CONTENT_ITEMS, items);
+        JsonArray contentItems = new JsonArray();
+        payload.add(LINKING_CONTENT_ITEMS, contentItems);
 
         String url = RequestCycle.get().getUrlRenderer().renderFullUrl( Url.parse("/lti/launch"));
         for (Object resource : resources) {
-            JsonObject item = new JsonObject();
-            item.addProperty("type", "ltiResourceLink");
-            item.addProperty("url", url);
+            JsonObject resourceLink = new JsonObject();
+            resourceLink.addProperty("type", "ltiResourceLink");
+            resourceLink.addProperty("url", url);
             JsonObject custom = new JsonObject();
-            item.add("custom", custom);
-            resourceProvider.configureDeepLinkResource(resource, item, custom);
-            items.add(item);
+            resourceLink.add("custom", custom);
+            resourceProvider.configureDeepLinkResource(resource, resourceLink, custom);
+            contentItems.add(resourceLink);
+
+            // always create a line item
+            JsonObject lineItem = new JsonObject();
+            lineItem.addProperty("scoreMaximum", 100);
+            resourceLink.add("lineItem", lineItem);
         }
 
         Response response = new Response();
@@ -303,6 +315,7 @@ public class LtiService implements ILtiService {
 
         String iss;
         String aud;
+        String deploymentId;
         String data;
         String returnUrl;
     }
