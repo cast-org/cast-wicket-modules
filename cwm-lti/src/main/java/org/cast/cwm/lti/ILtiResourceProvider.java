@@ -40,6 +40,15 @@ public interface ILtiResourceProvider<T> {
     String onResourceRequested(JsonObject custom);
 
     /**
+     * Deep Linking was requested.
+     *
+     * @return url to deep linking page, by default "/lti/linking"
+     */
+    default String onDeepLinkingRequested() {
+        return "/lti/linking";
+    }
+
+    /**
      * Configure a deep-link response for a single resource:
      * <pre>
      *   {

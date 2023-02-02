@@ -46,9 +46,6 @@ import java.util.UUID;
 @Slf4j
 public class LtiService implements ILtiService {
 
-    private static final MetaDataKey<DeepLinkingState> LINKING_STATE_ATTRIBUTE = new MetaDataKey<DeepLinkingState>() {
-    };
-
     private static final String PLATFORM = "https://purl.imsglobal.org/spec/lti/claim/tool_platform";
 
     private static final String MESSAGE_TYPE = "https://purl.imsglobal.org/spec/lti/claim/message_type";
@@ -56,71 +53,90 @@ public class LtiService implements ILtiService {
     private static final String MESSAGE_TYPE_LINKING_REQUEST = "LtiDeepLinkingRequest";
     private static final String MESSAGE_TYPE_LINKING_RESPONSE = "LtiDeepLinkingResponse";
 
-    // for MESSAGE_TYPE_RESOURCE_REQUEST
-    //
-    // "https://purl.imsglobal.org/spec/lti/claim/resource_link": {
-    //   "id": "74126",
-    //   "title": "Local test",
-    //   "description": "local test"
-    // }
+    /**
+     * for MESSAGE_TYPE_RESOURCE_REQUEST
+     *
+     * "https://purl.imsglobal.org/spec/lti/claim/resource_link": {
+     *   "id": "74126",
+     *   "title": "Local test",
+     *   "description": "local test"
+     * }
+     */
     private static final String RESOURCE_LINK = "https://purl.imsglobal.org/spec/lti/claim/resource_link";
 
-    // for MESSAGE_TYPE_RESOURCE_REQUEST
-    //
-    // "https://purl.imsglobal.org/spec/lti/claim/custom": {
-    //   "challenge": 42
-    // }
+    /**
+     * for MESSAGE_TYPE_RESOURCE_REQUEST
+     *
+     * "https://purl.imsglobal.org/spec/lti/claim/custom": {
+     *   "challenge": 42
+     * }
+     */
     private static final String CUSTOM = "https://purl.imsglobal.org/spec/lti/claim/custom";
 
-    // for MESSAGE_TYPE_LINKING_REQUEST
-    //
-    // "https://purl.imsglobal.org/spec/lti/claim/deployment_id":"07940580-b309-415e-a37c-914d387c1150"
-    //
+    /**
+     * for MESSAGE_TYPE_RESOURCE_REQUEST
+     *
+     * "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint": {
+     *   "lineitems": "https://lti-ri.imsglobal.org/platforms/3662/contexts/54505/line_items",
+     *   "lineitem": "https://lti-ri.imsglobal.org/platforms/3662/contexts/54505/line_items/51426"
+     * }
+     */
+    private static final String ENDPOINT = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
+
+    /**
+     * for MESSAGE_TYPE_LINKING_REQUEST
+     *
+     * "https://purl.imsglobal.org/spec/lti/claim/deployment_id":"07940580-b309-415e-a37c-914d387c1150"
+     */
     private static final String DEPLOYMENT_ID = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
 
-    // for MESSAGE_TYPE_LINKING_REQUEST
-    //
-    // "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings": {
-    //   "accept_types": [
-    //     "link",
-    //     "file",
-    //     "html",
-    //     "ltiResourceLink",
-    //     "image"
-    //   ],
-    //   "accept_media_types": "image/*,text/html",
-    //   "accept_presentation_document_targets": [
-    //     "iframe",
-    //     "window",
-    //     "embed"
-    //   ],
-    //   "accept_multiple": true,
-    //   "auto_create": true,
-    //   "title": "This is the default title",
-    //   "text": "This is the default text",
-    //   "data": "Some random opaque data that MUST be sent back",
-    //   "deep_link_return_url": "https://lti-ri.imsglobal.org/platforms/3662/contexts/54505/deep_links"
-    // }
+    /**
+     * for MESSAGE_TYPE_LINKING_REQUEST
+     *
+     * "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings": {
+     *   "accept_types": [
+     *     "link",
+     *     "file",
+     *     "html",
+     *     "ltiResourceLink",
+     *     "image"
+     *   ],
+     *   "accept_media_types": "image/*,text/html",
+     *   "accept_presentation_document_targets": [
+     *     "iframe",
+     *     "window",
+     *     "embed"
+     *   ],
+     *   "accept_multiple": true,
+     *   "auto_create": true,
+     *   "title": "This is the default title",
+     *   "text": "This is the default text",
+     *   "data": "Some random opaque data that MUST be sent back",
+     *   "deep_link_return_url": "https://lti-ri.imsglobal.org/platforms/3662/contexts/54505/deep_links"
+     * }
+     */
     private static final String LINKING_SETTINGS = "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings";
 
-    // for MESSAGE_TYPE_LINKING_RESPONSE
-    // "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": [
-    //   {
-    //     "type": "ltiResourceLink",
-    //     "title": "My Home Page",
-    //     "url": "https://something.example.com/page.html",
-    //     "icon": {
-    //       "url": "https://lti.example.com/image.jpg",
-    //       "width": 100,
-    //       "height": 100
-    //     },
-    //     "thumbnail": {
-    //       "url": "https://lti.example.com/thumb.jpg",
-    //       "width": 90,
-    //       "height": 90
-    //     }
-    //   }
-    // ]
+    /**
+     * for MESSAGE_TYPE_LINKING_RESPONSE
+     * "https://purl.imsglobal.org/spec/lti-dl/claim/content_items": [
+     *   {
+     *     "type": "ltiResourceLink",
+     *     "title": "My Home Page",
+     *     "url": "https://something.example.com/page.html",
+     *     "icon": {
+     *       "url": "https://lti.example.com/image.jpg",
+     *       "width": 100,
+     *       "height": 100
+     *     },
+     *     "thumbnail": {
+     *       "url": "https://lti.example.com/thumb.jpg",
+     *       "width": 90,
+     *       "height": 90
+     *     }
+     *   }
+     * ]
+     */
     private static final String LINKING_CONTENT_ITEMS = "https://purl.imsglobal.org/spec/lti-dl/claim/content_items";
 
     private static final String ROLES = "https://purl.imsglobal.org/spec/lti/claim/roles";
@@ -165,6 +181,15 @@ public class LtiService implements ILtiService {
             case MESSAGE_TYPE_RESOURCE_REQUEST:
                 JsonObject custom = payload.getAsJsonObject(CUSTOM);
 
+                JsonObject endpoint = payload.getAsJsonObject(ENDPOINT);
+                if (endpoint != null) {
+                    JsonElement lineItem = endpoint.get("lineitem");
+                    if (lineItem != null) {
+                        ResourceState state = new ResourceState();
+                        state.lineItem = lineItem.getAsString();
+                        CwmSession.get().setMetaData(ResourceState.ATTRIBUTE, state);
+                    }
+                }
                 return resourceProvider.onResourceRequested(custom);
             case MESSAGE_TYPE_LINKING_REQUEST:
                 JsonObject deepLinkingSettings = payload.getAsJsonObject(LINKING_SETTINGS);
@@ -174,8 +199,8 @@ public class LtiService implements ILtiService {
                 state.deploymentId = payload.get(DEPLOYMENT_ID).getAsString();
                 state.returnUrl = deepLinkingSettings.get("deep_link_return_url").getAsString();
                 state.data = deepLinkingSettings.get("data").getAsString();
-                CwmSession.get().setMetaData(LINKING_STATE_ATTRIBUTE, state);
-                return "/lti/linking";
+                CwmSession.get().setMetaData(DeepLinkingState.ATTRIBUTE, state);
+                return resourceProvider.onDeepLinkingRequested();
         }
         throw new IllegalArgumentException(String.format("unrecognized message type '%s'", messageType));
     }
@@ -266,7 +291,7 @@ public class LtiService implements ILtiService {
     @Override
     public Response createDeepLinkingResponse(List<?> resources) {
 
-        DeepLinkingState state = getLinkingState();
+        DeepLinkingState state = getState(DeepLinkingState.ATTRIBUTE);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("iss", state.aud);
@@ -297,26 +322,35 @@ public class LtiService implements ILtiService {
         }
 
         Response response = new Response();
-        response.url = getLinkingState().returnUrl;
+        response.url = state.returnUrl;
         response.payload = payload;
 
         return response;
     }
 
-    private DeepLinkingState getLinkingState() {
-        DeepLinkingState state = CwmSession.get().getMetaData(LINKING_STATE_ATTRIBUTE);
+    private <T extends Serializable> T getState(MetaDataKey<T> key) {
+        T state = CwmSession.get().getMetaData(key);
         if (state == null) {
-            throw new IllegalStateException("no linking state");
+            throw new IllegalStateException("no state found");
         }
         return state;
     }
 
     private static class DeepLinkingState implements Serializable {
+        private static final MetaDataKey<DeepLinkingState> ATTRIBUTE = new MetaDataKey<DeepLinkingState>() {
+        };
 
         String iss;
         String aud;
         String deploymentId;
         String data;
         String returnUrl;
+    }
+
+    private static class ResourceState implements Serializable {
+        private static final MetaDataKey<ResourceState> ATTRIBUTE = new MetaDataKey<ResourceState>() {
+        };
+
+        String lineItem;
     }
 }
