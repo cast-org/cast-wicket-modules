@@ -34,6 +34,7 @@ import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.lti.ILtiResourceHandler;
 import org.cast.cwm.service.IEventService;
+import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
 
 import java.io.Serializable;
@@ -127,6 +128,9 @@ public class LtiService implements ILtiService {
     private IUserService userService;
 
     @Inject
+    private ISiteService siteService;
+
+    @Inject
     private IEventService eventService;
 
     @Inject
@@ -194,7 +198,7 @@ public class LtiService implements ILtiService {
             }
         }
         if (period == null) {
-            period = new Period();
+            period = siteService.newPeriod();
             period.setLtiId(ltiId);
             period.setClassId("lti-" + ltiId);
             period.setSite(site);
