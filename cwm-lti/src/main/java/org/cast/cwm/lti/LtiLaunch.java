@@ -19,6 +19,7 @@
  */
 package org.cast.cwm.lti;
 
+import com.google.common.base.Strings;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.injection.Injector;
@@ -51,8 +52,14 @@ public class LtiLaunch implements IRequestHandler {
         Injector.get().inject(this);
 
         IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
+        log.debug("Request parameters in LTI Launch: {}", params.getParameterNames());
 
         idToken = params.getParameterValue("id_token").toString();
+        if (Strings.isNullOrEmpty(idToken)) {
+            log.error("id_token is empty, won't be able to validate");
+        } else {
+            log.debug("id_token: {}", idToken);
+        }
         state = params.getParameterValue("state").toString();
     }
 
