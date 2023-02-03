@@ -34,6 +34,8 @@ import org.cast.cwm.data.LtiPlatform;
 import org.cast.cwm.lti.service.ILtiService;
 import org.cast.cwm.service.ISiteService;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,10 +81,15 @@ public class LtiInitiation implements IRequestHandler {
         WebResponse response = (WebResponse)requestCycle.getResponse();
 
         LtiPlatform platform = siteService.getPlatformByIssuerAndClientId(iss, clientId).getObject();
+        if (platform == null) {
+            log.warn("No LTI platform found for issuer {} and clientId {}", iss, clientId);
+            response.sendError(HttpsURLConnection.HTTP_UNAUTHORIZED, "Unknown LTI issuer and client ID");
+            return;
+        }
         if (ltiDeploymentId != null) {
             if (!platform.getDeploymentId().equals(ltiDeploymentId)) {
-                log.info("invalid deoyment id {}", ltiDeploymentId);
-                response.sendError(400, "invalid payload");
+                log.warn("invalid deployment id {}; expected {}", ltiDeploymentId, platform.getDeploymentId());
+                response.sendError(HttpsURLConnection.HTTP_BAD_REQUEST, "invalid payload");
                 return;
             }
         }
@@ -103,7 +110,7 @@ public class LtiInitiation implements IRequestHandler {
         map.put("nonce", newNonce());
 
         map.forEach(url::addQueryParameter);
-
+        log.debug("LTI initiation from known client; sending redirect to {}", url.toString(Url.StringMode.FULL));
         response.sendRedirect(url.toString(Url.StringMode.FULL));
     }
 

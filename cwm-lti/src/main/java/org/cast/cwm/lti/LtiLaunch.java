@@ -54,8 +54,6 @@ public class LtiLaunch implements IRequestHandler {
 
         idToken = params.getParameterValue("id_token").toString();
         state = params.getParameterValue("state").toString();
-
-        Injector.get().inject(this);
     }
 
     @Override
@@ -67,12 +65,14 @@ public class LtiLaunch implements IRequestHandler {
             result = validationService.validate(idToken);
         } catch (Exception e) {
             log.info("invalid token {}", e.getMessage());
+            e.printStackTrace();
             response.sendError(401, "invalid token");
             return;
         }
 
-        if (log.isInfoEnabled()) {
-            log.info(new GsonBuilder().setPrettyPrinting().create().toJson(result.payload));
+        if (log.isDebugEnabled()) {
+            log.info("Successfully validated LTI request: {}",
+                    new GsonBuilder().setPrettyPrinting().create().toJson(result.payload));
         }
 
         LtiInitiation.checkNonce(result.payload.get("nonce").getAsString());
@@ -86,6 +86,7 @@ public class LtiLaunch implements IRequestHandler {
             return;
         }
 
+        log.debug("LTI Launch successful, redirecting to {}", redirect);
         response.sendRedirect(redirect);
     }
 }
