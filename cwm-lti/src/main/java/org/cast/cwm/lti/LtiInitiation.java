@@ -21,7 +21,6 @@ package org.cast.cwm.lti;
 
 import com.google.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.IRequestCycle;
 import org.apache.wicket.request.IRequestHandler;
@@ -35,11 +34,8 @@ import org.cast.cwm.lti.service.ILtiService;
 import org.cast.cwm.service.ISiteService;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Handler the initiation of a LTI request (preflight).
@@ -47,8 +43,7 @@ import java.util.UUID;
 @Slf4j
 public class LtiInitiation implements IRequestHandler {
 
-    private static final MetaDataKey<String> NONCE = new MetaDataKey<String>() {
-    };
+    private static Set<String> nonces = new HashSet<>();
 
     @Inject
     private ISiteService siteService;
@@ -116,17 +111,18 @@ public class LtiInitiation implements IRequestHandler {
 
     private static String newNonce() {
         String nonce = UUID.randomUUID().toString();
-        CwmSession.get().setMetaData(NONCE, nonce);
+        log.debug("Created and stored nonce {} for session {}", nonce, CwmSession.get().getId());
+        nonces.add(nonce);
         return nonce;
     }
 
     public static void checkNonce(String nonce) {
-        String knownNonce = CwmSession.get().getMetaData(NONCE);
-        if (knownNonce == null) {
-            throw new IllegalStateException("no nonce");
-        }
-        if (!knownNonce.equals(nonce)) {
-            throw new IllegalArgumentException(String.format("wrong nonce '%s'", nonce));
+        if (nonces.contains(nonce)) {
+            log.debug("Found existing nonce {} for session {}", nonce, CwmSession.get().getId());
+            nonces.remove(nonce);
+        } else {
+            throw new IllegalArgumentException(String.format("wrong nonce '%s'. Expecting one of %s. Session is %s",
+                    nonce, nonces, CwmSession.get().getId()));
         }
     }
 }
