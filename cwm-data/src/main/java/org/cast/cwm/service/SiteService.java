@@ -113,6 +113,14 @@ public class SiteService implements ISiteService {
 				);
 	}
 
+	@Override
+	public IModel<LtiPlatform> getPlatformBySite(IModel<Site> mSite) {
+		return new HibernateObjectModel<>(LtiPlatform.class,
+				new BasicCacheableCriteriaBuilder(
+						ModelRestrictions.eq("site", mSite))
+		);
+	}
+
 	// Period specific methods
 	
 	/* (non-Javadoc)

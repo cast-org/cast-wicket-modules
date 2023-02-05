@@ -48,6 +48,7 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
+import org.cast.cwm.data.LtiPlatform;
 import org.cast.cwm.data.Period;
 import org.cast.cwm.data.Site;
 import org.cast.cwm.data.User;
@@ -78,6 +79,8 @@ public class SiteInfoPage extends AdminPage {
 	private static final Logger log = LoggerFactory.getLogger(SiteInfoPage.class);
 
 	private IModel<Site> mSite = null;
+
+	private IModel<LtiPlatform> mLtiPlatform = null;
 	
 	@Inject
 	private ISiteService siteService;
@@ -94,6 +97,8 @@ public class SiteInfoPage extends AdminPage {
 		if (siteId != null && mSite.getObject() == null)
 			throw new RestartResponseAtInterceptPageException(adminPageService.getSiteListPage());
 
+		mLtiPlatform = siteService.getPlatformBySite(mSite);
+
 		// Breadcrumb link
 		add(adminPageService.getSiteListPageLink("siteList"));
 
@@ -107,6 +112,38 @@ public class SiteInfoPage extends AdminPage {
 		}));
 
 		add(new SiteForm("form", mSite));
+
+		WebMarkupContainer ltiPlaformContainer = new WebMarkupContainer("ltiPlatform") {
+			@Override
+			protected void onConfigure() {
+				super.onConfigure();
+
+				setVisible(!mSite.getObject().isTransient());
+			}
+		};
+		add(ltiPlaformContainer);
+
+		ltiPlaformContainer.add(new LtiPlaformForm("form", mLtiPlatform) {
+			@Override
+			protected void onConfigure() {
+				super.onConfigure();
+
+				setVisible(!mSite.getObject().isTransient() && mLtiPlatform.getObject() != null);
+			}
+		});
+		ltiPlaformContainer.add(new Link<Void>("create") {
+			@Override
+			protected void onConfigure() {
+				super.onConfigure();
+
+				setVisible(!mSite.getObject().isTransient() && mLtiPlatform.getObject() == null);
+			}
+
+			@Override
+			public void onClick() {
+				mLtiPlatform.setObject(new LtiPlatform(mSite.getObject()));
+			}
+		});
 
 		// List Existing Periods
 		ListView<Period> list = new ListView<Period>("periodList", new PropertyModel<List<Period>>(mSite, "periodsAsSortedReadOnlyList")) {
@@ -232,6 +269,47 @@ public class SiteInfoPage extends AdminPage {
 			super.onSubmit();
 			info("Site '" + getModelObject().getName() + "' " + message);
 		}		
+	}
+
+	private class LtiPlaformForm extends DataForm<LtiPlatform> {
+
+		public LtiPlaformForm(String id, IModel<LtiPlatform> mLtiPlatform) {
+			super(id, (HibernateObjectModel<LtiPlatform>) mLtiPlatform);
+
+			// Feedback (errors and status update)
+			add(new FeedbackPanel("feedback", new ContainerFeedbackMessageFilter(this)));
+
+			TextField<String> issuer = new TextField<String>("issuer");
+			issuer.setRequired(true);
+			add(new FormComponentContainer("issuerEnclosure", issuer).setLabel("Issuer:"));
+
+			TextField<String> cliendId = new TextField<String>("clientId");
+			cliendId.setRequired(true);
+			add(new FormComponentContainer("clientIdEnclosure", cliendId).setLabel("Client ID:"));
+
+			TextField<String> publicJwksUrl = new TextField<String>("publicJwksUrl");
+			publicJwksUrl.setRequired(true);
+			add(new FormComponentContainer("publicJwksUrlEnclosure", publicJwksUrl).setLabel("Public JWKS URL:"));
+
+			TextField<String> oidcAuthRequestUrl = new TextField<String>("oidcAuthRequestUrl");
+			oidcAuthRequestUrl.setRequired(true);
+			add(new FormComponentContainer("oidcAuthRequestUrlEnclosure", oidcAuthRequestUrl).setLabel("OIDC Auth Request URL:"));
+
+			TextField<String> oAuth2TokenUrl = new TextField<String>("oAuth2TokenUrl");
+			oAuth2TokenUrl.setRequired(true);
+			add(new FormComponentContainer("oAuth2TokenUrlEnclosure", oAuth2TokenUrl).setLabel("OAuth 2 Token URL:"));
+
+			TextField<String> deploymentId = new TextField<String>("deploymentId");
+			deploymentId.setRequired(true);
+			add(new FormComponentContainer("deploymentIdEnclosure", deploymentId).setLabel("Deployment ID:"));
+		}
+
+		@Override
+		protected void onSubmit() {
+			String message = getModelObject().isTransient() ? "Saved." : "Updated.";
+			super.onSubmit();
+			info("LTI Platform " + message);
+		}
 	}
 
 	/**

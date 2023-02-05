@@ -43,7 +43,49 @@
 			</div>
 		</fieldset>
 	</form>
-	
+
+	<div wicket:id="ltiPlatform">
+		<h2>LTI Platform</h2>
+
+		<fieldset>
+			<form wicket:id="form">
+				<div wicket:id="issuerEnclosure">
+					<input wicket:id="issuer" type="text" size="40" />
+				</div>
+
+				<div wicket:id="clientIdEnclosure">
+					<input wicket:id="clientId" type="text" size="20" />
+				</div>
+
+				<div wicket:id="publicJwksUrlEnclosure">
+					<input wicket:id="publicJwksUrl" type="text" size="60" />
+				</div>
+
+				<div wicket:id="oidcAuthRequestUrlEnclosure">
+					<input wicket:id="oidcAuthRequestUrl" type="text" size="60" />
+				</div>
+
+				<div wicket:id="oAuth2TokenUrlEnclosure">
+					<input wicket:id="oAuth2TokenUrl" type="text" size="60" />
+				</div>
+
+				<div wicket:id="deploymentIdEnclosure">
+					<input wicket:id="deploymentId" type="text" size="20" />
+				</div>
+
+				<div class="formRow">
+					<div class="inputItem">
+						<input type="submit" value="save" name="save"/>
+					</div>
+				</div>
+				<div class="formRow">
+					<div wicket:id="feedback" class="inputItem"></div>
+				</div>
+			</form>
+		</fieldset>
+		<a href="#" wicket:id="create">Create LTI Platform</a>
+	</div>
+
 	<wicket:enclosure child="createNewPeriod">
 		 <h2>Current Periods:</h2>
 		 <ul>

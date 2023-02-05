@@ -90,4 +90,8 @@ public class LtiPlatform extends PersistedObject implements Serializable {
      * Identifier of the specific deployment within the clientId.
      */
     private String deploymentId;
+
+    public LtiPlatform(Site site) {
+        this.site = site;
+    }
 }
