@@ -28,7 +28,7 @@ import org.cast.cwm.lti.service.*;
 /**
  * Module for all services related to LTI.
  * <p>
- * Has to be configured for the application with a {@link ILtiResourceHandler}  via:
+ * Has to be configured for the application with a {@link ILtiResourceProvider} via:
  * <pre>
  *   modules.add(new LtiModule(resourceHandler));
  * </pre>
@@ -36,11 +36,11 @@ import org.cast.cwm.lti.service.*;
 @RequiredArgsConstructor
 public class LtiModule implements Module {
 
-    private final ILtiResourceHandler handler;
+    private final ILtiResourceProvider provider;
 
     @Override
     public void configure(Binder binder) {
-        binder.bind(ILtiResourceHandler.class).toProvider(() -> handler).in(Scopes.SINGLETON);
+        binder.bind(ILtiResourceProvider.class).toProvider(() -> provider).in(Scopes.SINGLETON);
 
         binder.bind(ILtiService.class).to(LtiService.class).in(Scopes.SINGLETON);
         binder.bind(IJwtValidationService.class).to(JwtValidationService.class).in(Scopes.SINGLETON);

@@ -113,6 +113,14 @@ public class SiteService implements ISiteService {
 				);
 	}
 
+	@Override
+	public IModel<LtiPlatform> getPlatformBySite(IModel<Site> mSite) {
+		return new HibernateObjectModel<>(LtiPlatform.class,
+				new BasicCacheableCriteriaBuilder(
+						ModelRestrictions.eq("site", mSite))
+		);
+	}
+
 	// Period specific methods
 	
 	/* (non-Javadoc)
@@ -216,6 +224,17 @@ public class SiteService implements ISiteService {
 		PeriodCriteriaBuilder pcb = new PeriodCriteriaBuilder();
 		pcb.setName(name);
 		pcb.setMaxResults(1);
+		return new HibernateObjectModel<Period>(Period.class, pcb);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cast.cwm.service.ISiteService#getPeriodByName(java.lang.String)
+	 */
+	@Override
+	public IModel<Period> getPeriodBySiteAndLtiId(Site site, String ltiId) {
+		PeriodCriteriaBuilder pcb = new PeriodCriteriaBuilder();
+		pcb.setSite(site);
+		pcb.setLtiId(ltiId);
 		return new HibernateObjectModel<Period>(Period.class, pcb);
 	}
 

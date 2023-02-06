@@ -82,7 +82,13 @@ public class LtiLaunch implements IRequestHandler {
                     new GsonBuilder().setPrettyPrinting().create().toJson(result.payload));
         }
 
-        LtiInitiation.checkNonce(result.payload.get("nonce").getAsString());
+        try {
+            LtiInitiation.checkNonce(result.payload.get("nonce").getAsString());
+        } catch (Exception e) {
+            log.info("check nonce: {}", e.getMessage(), e);
+            response.sendError(401, "invalid nonce");
+            return;
+        }
 
         String redirect;
         try {

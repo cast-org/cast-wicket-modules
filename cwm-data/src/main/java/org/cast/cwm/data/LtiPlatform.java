@@ -82,7 +82,16 @@ public class LtiPlatform extends PersistedObject implements Serializable {
     private String oidcAuthRequestUrl;
 
     /**
+     * The URL of the platform's OAuth 2 token issuer, used for LTI service calls.
+     */
+    private String oAuth2TokenUrl;
+
+    /**
      * Identifier of the specific deployment within the clientId.
      */
     private String deploymentId;
-};
+
+    public LtiPlatform(Site site) {
+        this.site = site;
+    }
+}

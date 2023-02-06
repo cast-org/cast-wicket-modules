@@ -103,4 +103,7 @@ public interface ISiteService {
 	 */
 	void onPeriodEdited(IModel<? extends Period> mPeriod);
 
+	IModel<Period> getPeriodBySiteAndLtiId(Site site, String ltiId);
+
+	IModel<LtiPlatform> getPlatformBySite(IModel<Site> mSite);
 }
