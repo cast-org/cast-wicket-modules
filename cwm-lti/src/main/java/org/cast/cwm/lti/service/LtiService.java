@@ -163,7 +163,9 @@ public class LtiService implements ILtiService {
                 state.iss = payload.get("iss").getAsString();
                 state.aud = payload.get("aud").getAsString();
                 state.returnUrl = deepLinkingSettings.get("deep_link_return_url").getAsString();
-                state.data = deepLinkingSettings.get("data").getAsString();
+                if (deepLinkingSettings.get("data") != null) {
+                    state.data = deepLinkingSettings.get("data").getAsString();
+                }
                 CwmSession.get().setMetaData(LINKING_STATE_ATTRIBUTE, state);
                 return "/lti/linking";
         }
@@ -265,7 +267,9 @@ public class LtiService implements ILtiService {
         JsonObject payload = new JsonObject();
         payload.addProperty("iss", state.aud);
         payload.addProperty("aud", state.iss);
-        payload.addProperty("https://purl.imsglobal.org/spec/lti-dl/claim/data", state.data);
+        if (state.data != null) {
+            payload.addProperty("https://purl.imsglobal.org/spec/lti-dl/claim/data", state.data);
+        }
         payload.addProperty("https://purl.imsglobal.org/spec/lti/claim/version", "1.3.0");
         payload.addProperty("https://purl.imsglobal.org/spec/lti/claim/deployment_id", "1");
         payload.addProperty("nonce", UUID.randomUUID().toString());
