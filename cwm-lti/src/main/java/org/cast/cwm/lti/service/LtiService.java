@@ -39,6 +39,8 @@ import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.IUserService;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -304,6 +306,11 @@ public class LtiService implements ILtiService {
         }
         payload.addProperty("https://purl.imsglobal.org/spec/lti/claim/version", "1.3.0");
         payload.addProperty("nonce", UUID.randomUUID().toString());
+
+        // issued_at and expires are mandatory
+        Instant now = Instant.now();
+        payload.addProperty("iat", now.getEpochSecond());
+        payload.addProperty("exp", now.plusSeconds(60*60).getEpochSecond());
         payload.addProperty(MESSAGE_TYPE, MESSAGE_TYPE_LINKING_RESPONSE);
 
         JsonArray contentItems = new JsonArray();
