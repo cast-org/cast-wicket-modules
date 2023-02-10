@@ -54,29 +54,29 @@ public class JwtValidationService implements IJwtValidationService {
     private JsonParser parser = new JsonParser();
 
     @Override
-    public Result validate(String token) {
-        Result entry = new Result();
+    public Validated validate(String token) {
+        Validated validated = new Validated();
 
         JWTClaimsSet claims;
         try {
-            ConfigurableJWTProcessor<Result> jwtProcessor = new DefaultJWTProcessor<>();
+            ConfigurableJWTProcessor<Validated> jwtProcessor = new DefaultJWTProcessor<>();
             jwtProcessor.setJWTClaimsSetAwareJWSKeySelector(new KeySelector());
 
-            claims = jwtProcessor.process(token, entry);
+            claims = jwtProcessor.process(token, validated);
         } catch (Exception e) {
             throw new IllegalStateException("JWT validation failure", e);
         }
 
-        entry.payload = (JsonObject) parser.parse(claims.toPayload().toString());
-        return entry;
+        validated.payload = (JsonObject) parser.parse(claims.toPayload().toString());
+        return validated;
     }
 
-    private class KeySelector implements JWTClaimsSetAwareJWSKeySelector<Result> {
+    private class KeySelector implements JWTClaimsSetAwareJWSKeySelector<Validated> {
 
         private ConcurrentMap<String, JWKSource<SecurityContext>> keyByIssuer = new ConcurrentHashMap<>();
 
         @Override
-        public List<? extends Key> selectKeys(JWSHeader header, JWTClaimsSet claimsSet, Result entry) throws KeySourceException {
+        public List<? extends Key> selectKeys(JWSHeader header, JWTClaimsSet claimsSet, Validated entry) throws KeySourceException {
 
             String issuer = claimsSet.getIssuer();
             String clientId = claimsSet.getAudience().get(0);

@@ -63,6 +63,11 @@ public class LtiRequestMapper extends AbstractMapper {
 
     @Override
     public Url mapHandler(IRequestHandler requestHandler) {
+        if (requestHandler instanceof LtiInitiation) {
+            return Url.parse("lti/initiate");
+        } else if (requestHandler instanceof LtiLaunch) {
+            return Url.parse("lti/launch");
+        }
         return null;
     }
 }
