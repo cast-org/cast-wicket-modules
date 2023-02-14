@@ -48,7 +48,7 @@ public class LtiLaunch implements IRequestHandler {
     private final String idToken;
     private final String state;
 
-    LtiLaunch() {
+    public LtiLaunch() {
         Injector.get().inject(this);
 
         IRequestParameters params = RequestCycle.get().getRequest().getRequestParameters();
@@ -67,9 +67,9 @@ public class LtiLaunch implements IRequestHandler {
     public void respond(IRequestCycle requestCycle) {
         WebResponse response = (WebResponse)requestCycle.getResponse();
 
-        IJwtValidationService.Result result;
+        IJwtValidationService.Validated validated;
         try {
-            result = validationService.validate(idToken);
+            validated = validationService.validate(idToken);
         } catch (Exception e) {
             log.info("invalid token {}", e.getMessage());
             e.printStackTrace();
@@ -79,11 +79,11 @@ public class LtiLaunch implements IRequestHandler {
 
         if (log.isDebugEnabled()) {
             log.info("Successfully validated LTI request: {}",
-                    new GsonBuilder().setPrettyPrinting().create().toJson(result.payload));
+                    new GsonBuilder().setPrettyPrinting().create().toJson(validated.payload));
         }
 
         try {
-            LtiInitiation.checkNonce(result.payload.get("nonce").getAsString());
+            LtiInitiation.checkNonce(validated.payload.get("nonce").getAsString());
         } catch (Exception e) {
             log.info("check nonce: {}", e.getMessage(), e);
             response.sendError(401, "invalid nonce");
@@ -92,7 +92,7 @@ public class LtiLaunch implements IRequestHandler {
 
         String redirect;
         try {
-            redirect = ltiService.onLaunch(result.platform, result.payload);
+            redirect = ltiService.onLaunch(validated.platform, validated.payload);
         } catch (Exception e) {
             log.info("invalid payload {}", e.getMessage(), e);
             response.sendError(400, "invalid payload");

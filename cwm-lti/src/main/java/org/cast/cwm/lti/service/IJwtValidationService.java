@@ -31,12 +31,12 @@ public interface IJwtValidationService {
      * @param token
      * @return validation result
      */
-    Result validate(String token);
+    Validated validate(String token);
 
     /**
      * Result of validation.
      */
-    class Result implements SecurityContext {
+    class Validated implements SecurityContext {
         /**
          * The launching platform.
          */

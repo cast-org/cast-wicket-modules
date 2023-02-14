@@ -28,6 +28,9 @@ import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.cast.cwm.lti.LtiLaunch;
 import org.cast.cwm.lti.service.IJwtSigningService;
 import org.cast.cwm.lti.service.ILtiService;
 
@@ -62,10 +65,12 @@ public class LinkingResponder extends Panel {
 
     public void respond(AjaxRequestTarget target, List<?> resources) {
 
-        ILtiService.Response response = ltiService.createDeepLinkingResponse(resources);
+        String launchUrl = getRequestCycle().getUrlRenderer().renderFullUrl(Url.parse(urlFor(new LtiLaunch())));
+
+        ILtiService.Request request = ltiService.respondDeepLinking(launchUrl, resources);
 
         if (log.isInfoEnabled()) {
-            log.info(new GsonBuilder().setPrettyPrinting().create().toJson(response.payload));
+            log.info(new GsonBuilder().setPrettyPrinting().create().toJson(request.payload));
         }
 
         this.form.add(new Behavior() {
@@ -76,7 +81,7 @@ public class LinkingResponder extends Panel {
 
             @Override
             public void onComponentTag(Component component, ComponentTag tag) {
-                tag.put("action", response.url);
+                tag.put("action", request.url);
             }
         });
 
@@ -88,7 +93,7 @@ public class LinkingResponder extends Panel {
 
             @Override
             public void onComponentTag(Component component, ComponentTag tag) {
-                tag.put("value", signingService.sign(response.payload));
+                tag.put("value", signingService.sign(request.payload));
             }
         });
 

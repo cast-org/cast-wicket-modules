@@ -20,6 +20,7 @@
 package org.cast.cwm.lti.service;
 
 import com.google.gson.JsonObject;
+import lombok.AllArgsConstructor;
 import org.cast.cwm.data.LtiPlatform;
 
 import java.util.List;
@@ -42,14 +43,30 @@ public interface ILtiService {
      * Create a response for deep linking of resources.
      *
      * @param resources resources to deep link to
-     * @return payload
+     * @return response
      */
-    Response createDeepLinkingResponse(List<?> resources);
+    Request respondDeepLinking(String launchUrl, List<?> resources);
 
-    class Response {
+    /**
+     * Create a response for a score of a resource.
+     *
+     * @param resource
+     * @return response
+     *
+     * @link https://canvas.instructure.com/doc/api/score.html#method.lti/ims/scores.create
+     */
+    Request giveScore(Object resource);
 
-        public String url;
+    /**
+     * A request to a {@link LtiPlatform}.
+     */
+    @AllArgsConstructor
+    class Request {
 
-        public JsonObject payload;
+        public final LtiPlatform platform;
+
+        public final String url;
+
+        public final JsonObject payload;
     }
 }
