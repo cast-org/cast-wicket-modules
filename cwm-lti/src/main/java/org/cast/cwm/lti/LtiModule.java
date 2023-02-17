@@ -45,5 +45,6 @@ public class LtiModule implements Module {
         binder.bind(ILtiService.class).to(LtiService.class).in(Scopes.SINGLETON);
         binder.bind(IJwtValidationService.class).to(JwtValidationService.class).in(Scopes.SINGLETON);
         binder.bind(IJwtSigningService.class).to(JwtSigningService.class).in(Scopes.SINGLETON);
+        binder.bind(ILtiSender.class).to(LtiSender.class).in(Scopes.SINGLETON);
     }
 }

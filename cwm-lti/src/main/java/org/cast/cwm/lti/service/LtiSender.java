@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cast.cwm.lti;
+package org.cast.cwm.lti.service;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -31,24 +31,20 @@ import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.apache.wicket.injection.Injector;
 import org.cast.cwm.data.LtiPlatform;
-import org.cast.cwm.lti.service.IJwtSigningService;
-import org.cast.cwm.lti.service.ILtiService;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- *
  */
 @Slf4j
-public class LtiSender<T> {
-
-    private static final String SCORES_SUFFIX = "/scores";
+public class LtiSender extends Thread implements ILtiSender {
 
     @Inject
     private ILtiService ltiService;
@@ -56,12 +52,59 @@ public class LtiSender<T> {
     @Inject
     private IJwtSigningService signingService;
 
+    private BlockingQueue<ILtiService.Request> queue = new LinkedBlockingQueue<>();
+
     private CloseableHttpClient httpClient = HttpClients.createDefault();
 
     private JsonParser parser = new JsonParser();
 
     public LtiSender() {
-        Injector.get().inject(this);
+        setDaemon(true);
+    }
+
+    @Override
+    public void run() {
+
+        try {
+            do {
+                ILtiService.Request request = queue.take(); // block until a message is ready to go.
+                deliver(request);
+            } while (!this.isInterrupted());
+        } catch (InterruptedException e) {
+            // when interrupted, shuts down.
+        }
+        log.warn("EmailSender thread Interrupted, exiting");
+    }
+
+    public <R> void sendScore(R resourceResponse) {
+
+        ILtiService.Request request;
+        try {
+            request = ltiService.giveScore(resourceResponse);
+        } catch (IllegalStateException ex) {
+            log.warn("could not send score, no resource state available");
+            return;
+        }
+
+        queue.add(request);
+
+        if (!this.isAlive()) {
+            this.start();
+        }
+    }
+
+    private void deliver(ILtiService.Request request) {
+
+        try {
+            log.debug("delivering");
+            String token = createToken(request.platform);
+
+            String json = new GsonBuilder().setPrettyPrinting().create().toJson(request.payload);
+
+            send(request.url, token, json);
+        } catch (IOException ex) {
+            log.error("deliver failed", ex);
+        }
     }
 
     /**
@@ -78,8 +121,8 @@ public class LtiSender<T> {
         payload.addProperty("exp", now.plusSeconds(60*60).getEpochSecond());
         payload.addProperty("jti", UUID.randomUUID().toString());
 
-        if (log.isInfoEnabled()) {
-            log.info(new GsonBuilder().setPrettyPrinting().create().toJson(payload));
+        if (log.isDebugEnabled()) {
+            log.debug("creating token {}", new GsonBuilder().setPrettyPrinting().create().toJson(payload));
         }
 
         String clientAssertion = signingService.sign(payload);
@@ -97,11 +140,16 @@ public class LtiSender<T> {
                 .build();
 
         String body = httpClient.execute(post, this::handleResponse);
+
+        log.debug("created token {}", body);
+
         JsonObject json = (JsonObject) parser.parse(body);
         return json.get("access_token").getAsString();
     }
 
     protected void send(String url, String token, String content) throws IOException {
+        log.debug("sending {}", content);
+
         ClassicHttpRequest post = ClassicRequestBuilder
                 .post(url)
                 .addHeader("Authorization", "Bearer " + token)
@@ -109,39 +157,21 @@ public class LtiSender<T> {
                 .build();
 
         httpClient.execute(post, this::handleResponse);
+
+        log.debug("sent");
     }
 
-    public void sendScore(T resource) {
-
-        ILtiService.Request request;
-        try {
-            request = ltiService.giveScore(resource);
-        } catch (IllegalStateException ex) {
-            log.warn("could not send score, no resource state available");
-            return;
-        }
-
-        String json = new GsonBuilder().setPrettyPrinting().create().toJson(request.payload);
-        if (log.isInfoEnabled()) {
-            log.info(json);
-        }
-
-        try {
-            String token = createToken(request.platform);
-            log.debug("created token");
-
-            send(request.url + SCORES_SUFFIX, token, json);
-            log.debug("sent score");
-        } catch (IOException ex) {
-            log.warn("could not send score", ex);
-        }
-    }
-
+    /**
+     * Handles the response. Any code not {@link HttpStatus#SC_CREATED} or {@link HttpStatus#SC_OK}
+     * is considered a failure.
+     *
+     * @param response
+     */
     private String handleResponse(ClassicHttpResponse response) throws IOException, ParseException {
-        log.debug("requested token {}", response.getCode());
+        log.debug("handling response {}", response.getCode());
 
         String body = EntityUtils.toString(response.getEntity());
-        if (response.getCode() != HttpStatus.SC_CREATED) {
+        if (response.getCode() != HttpStatus.SC_CREATED && response.getCode() != HttpStatus.SC_OK) {
             log.error("request failed", body);
             throw new IOException("request failed " + response.getCode());
         }
