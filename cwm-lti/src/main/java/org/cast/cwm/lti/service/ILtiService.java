@@ -43,19 +43,19 @@ public interface ILtiService {
      * Create a response for deep linking of resources.
      *
      * @param resources resources to deep link to
-     * @return response
+     * @return request
      */
-    Request respondDeepLinking(String launchUrl, List<?> resources);
+    <T> Request respondDeepLinking(String launchUrl, List<T> resources);
 
     /**
      * Create a response for a score of a resource.
      *
-     * @param resource
-     * @return response
+     * @param resourceResponse
+     * @return request
      *
      * @link https://canvas.instructure.com/doc/api/score.html#method.lti/ims/scores.create
      */
-    Request giveScore(Object resource);
+    <R> Request giveScore(R resourceResponse);
 
     /**
      * A request to a {@link LtiPlatform}.

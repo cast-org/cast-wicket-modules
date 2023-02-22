@@ -32,6 +32,7 @@ import org.cast.cwm.data.*;
 import org.cast.cwm.db.service.IDBService;
 import org.cast.cwm.db.service.IModelProvider;
 import org.cast.cwm.lti.ILtiResourceProvider;
+import org.cast.cwm.lti.data.Score;
 import org.cast.cwm.lti.util.LockByKey;
 import org.cast.cwm.service.ICwmSessionService;
 import org.cast.cwm.service.IEventService;
@@ -66,7 +67,9 @@ public class LtiService implements ILtiService {
 
     private static final String CLAIM_CONTEXT = "https://purl.imsglobal.org/spec/lti/claim/context";
 
-    public static final float SCORE_MAXIMUM = 1.0f;
+    private static final float SCORE_MAXIMUM = 1.0f;
+    private static final String SCORE_SUFFIX = "/scores";
+
 
     @Inject
     private ICwmSessionService sessionService;
@@ -218,7 +221,7 @@ public class LtiService implements ILtiService {
     }
 
     @Override
-    public Request respondDeepLinking(String launchUrl, List<?> resources) {
+    public <T> Request respondDeepLinking(String launchUrl, List<T> resources) {
 
         DeepLinkingState state = getState(DeepLinkingState.ATTRIBUTE);
 
@@ -263,7 +266,7 @@ public class LtiService implements ILtiService {
         return new Request(platform.getObject(), state.returnUrl, payload);
     }
 
-    public Request giveScore(Object resource) {
+    public <R> Request giveScore(R resourceResponse) {
 
         ResourceState state = getState(ResourceState.ATTRIBUTE);
         if (state.lineItemUrl == null) {
@@ -281,14 +284,14 @@ public class LtiService implements ILtiService {
         }
         payload.addProperty("userId", user.getLtiId());
 
-        ILtiResourceProvider.Score score = resourceProvider.getScore(resource);
+        Score score = resourceProvider.getScore(resourceResponse);
         payload.addProperty("scoreMaximum", SCORE_MAXIMUM);
         payload.addProperty("scoreGiven", score.scoreGiven);
         payload.addProperty("comment", score.comment);
         payload.addProperty("activityProgress", score.activityProgress.name());
         payload.addProperty("gradingProgress", score.gradingProgress.name());
 
-        return new Request(platform.getObject(), state.lineItemUrl, payload);
+        return new Request(platform.getObject(), state.lineItemUrl + SCORE_SUFFIX, payload);
     }
 
     private <T extends Serializable> T getState(MetaDataKey<T> key) {

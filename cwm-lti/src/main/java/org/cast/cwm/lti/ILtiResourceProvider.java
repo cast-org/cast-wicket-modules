@@ -20,14 +20,15 @@
 package org.cast.cwm.lti;
 
 import com.google.gson.JsonObject;
-import lombok.AllArgsConstructor;
+import org.cast.cwm.lti.data.Score;
 
 /**
  * Provider for application-specific resources to an LTI platform.
  *
  * @param <T> type of resource
+ * @param <R> type of resource response
  */
-public interface ILtiResourceProvider<T> {
+public interface ILtiResourceProvider<T, R> {
 
     /**
      * A resource was requested:
@@ -66,37 +67,10 @@ public interface ILtiResourceProvider<T> {
     void configureDeepLinkResource(T resource, JsonObject item, JsonObject custom);
 
     /**
-     * Get a score of a resource.
+     * Get a score of a resource response.
      *
-     * @param resource
+     * @param resourceResponse
      * @return score
      */
-    default Score getScore(T resource) {
-        return new Score(1.0f, "", ActivityProgress.Initialized, GradingProgress.NotReady);
-    }
-
-    @AllArgsConstructor
-    class Score {
-
-        public final float scoreGiven;
-        public String comment;
-        public final ActivityProgress activityProgress;
-        public final GradingProgress gradingProgress;
-    }
-
-    enum ActivityProgress {
-        Initialized,
-        Started,
-        InProgress,
-        Submitted,
-        Completed
-    }
-
-    enum GradingProgress {
-        FullyGraded,
-        Pending,
-        PendingManual,
-        Failed,
-        NotReady
-    }
+    Score getScore(R resourceResponse);
 }
