@@ -31,17 +31,21 @@ import com.nimbusds.jose.jwk.KeyConverter;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.jwk.source.RemoteJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jose.proc.SimpleSecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.nimbusds.jwt.proc.JWTClaimsSetAwareJWSKeySelector;
 import lombok.extern.slf4j.Slf4j;
+import org.cast.cwm.data.LtiPlatform;
 import org.cast.cwm.service.ISiteService;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Key;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -54,49 +58,58 @@ public class JwtValidationService implements IJwtValidationService {
     private JsonParser parser = new JsonParser();
 
     @Override
-    public Validated validate(String token) {
-        Validated validated = new Validated();
-
+    public JsonObject validate(String token) {
         JWTClaimsSet claims;
         try {
-            ConfigurableJWTProcessor<Validated> jwtProcessor = new DefaultJWTProcessor<>();
+            ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
             jwtProcessor.setJWTClaimsSetAwareJWSKeySelector(new KeySelector());
 
-            claims = jwtProcessor.process(token, validated);
+            claims = jwtProcessor.process(token, new SimpleSecurityContext());
         } catch (Exception e) {
             throw new IllegalStateException("JWT validation failure", e);
         }
 
-        validated.payload = (JsonObject) parser.parse(claims.toPayload().toString());
-        return validated;
+        return (JsonObject) parser.parse(claims.toPayload().toString());
     }
 
-    private class KeySelector implements JWTClaimsSetAwareJWSKeySelector<Validated> {
+    private class KeySelector implements JWTClaimsSetAwareJWSKeySelector<SecurityContext> {
 
-        private ConcurrentMap<String, JWKSource<SecurityContext>> keyByIssuer = new ConcurrentHashMap<>();
+        private ConcurrentMap<String, JWKSource<SecurityContext>> jwkSetCache = new ConcurrentHashMap<>();
 
         @Override
-        public List<? extends Key> selectKeys(JWSHeader header, JWTClaimsSet claimsSet, Validated entry) throws KeySourceException {
+        public List<? extends Key> selectKeys(JWSHeader header, JWTClaimsSet claimsSet, SecurityContext context) throws KeySourceException {
 
-            String issuer = claimsSet.getIssuer();
-            String clientId = claimsSet.getAudience().get(0);
+            final String issuer = claimsSet.getIssuer();
+            final String clientId = claimsSet.getAudience().get(0);
 
-            JWKSource<SecurityContext> source = keyByIssuer.computeIfAbsent(issuer + clientId, x -> {
-                entry.platform = siteService.getPlatformByIssuerAndClientId(issuer, clientId).getObject();
-
-                String publicJwksUrl = entry.platform.getPublicJwksUrl();
+            JWKSource<SecurityContext> source = jwkSetCache.computeIfAbsent(issuer + clientId, x -> {
+                String publicJwksUrl = getJwkSetUrl(issuer, clientId);
 
                 try {
                     return new RemoteJWKSet<>(new URL(publicJwksUrl));
                 } catch (MalformedURLException ex) {
-                    throw new IllegalStateException(String.format("public jwks url is invalid ''", publicJwksUrl), ex);
+                    throw new IllegalStateException(String.format("jwks url is invalid '%s'", publicJwksUrl), ex);
                 }
             });
 
             // note: the matcher selects the correct key based on the kid
             JWKMatcher matcher = JWKMatcher.forJWSHeader(header);
-            List<JWK> matches = source.get(new JWKSelector(matcher), entry);
+            List<JWK> matches = source.get(new JWKSelector(matcher), context);
             return KeyConverter.toJavaKeys(matches);
         }
+    }
+
+    private String getJwkSetUrl(String issuer, String clientId) {
+        for (LtiPlatform platform : siteService.listPlatforms().getObject()) {
+            if (Objects.equals(platform.getIssuer(), issuer) &&
+                    Objects.equals(platform.getClientId(), clientId)) {
+                // note: multiple platforms could use the same issuer and clientId,
+                // while differing in the deploymentId only - we take the first
+                // jwkSet that is available (which should be identical for all of them)
+                return platform.getPublicJwksUrl();
+            }
+        }
+        // no platform has a jwkSet for the given issuer and clientId
+        throw new IllegalStateException(String.format("no jwks url for issuer %s clientId %s", issuer, clientId));
     }
 }

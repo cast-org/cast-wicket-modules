@@ -32,7 +32,6 @@ import org.cast.cwm.data.User;
 import org.cast.cwm.data.builders.PeriodCriteriaBuilder;
 import org.cast.cwm.data.component.HibernateEditPeriodForm;
 import org.cast.cwm.db.service.IDBService;
-import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -105,12 +104,18 @@ public class SiteService implements ISiteService {
 	}
 
 	@Override
-	public IModel<LtiPlatform> getPlatformByIssuerAndClientId(String issuer, String clientId) {
+	public IModel<LtiPlatform> getPlatformByIssuerClientIdDeploymentId(String issuer, String clientId, String deploymentId) {
 		return new HibernateObjectModel<>(LtiPlatform.class,
 				new BasicCacheableCriteriaBuilder(
 						Restrictions.eq("issuer", issuer),
-						Restrictions.eq("clientId", clientId))
+						Restrictions.eq("clientId", clientId),
+						Restrictions.eq("deploymentId", deploymentId))
 				);
+	}
+
+	@Override
+	public IModel<List<LtiPlatform>> listPlatforms() {
+		return new HibernateListModel<LtiPlatform>(LtiPlatform.class);
 	}
 
 	@Override
