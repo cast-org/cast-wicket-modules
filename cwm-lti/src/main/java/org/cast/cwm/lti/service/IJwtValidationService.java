@@ -29,22 +29,7 @@ public interface IJwtValidationService {
      * Validate token.
      *
      * @param token
-     * @return validation result
+     * @return validated payload
      */
-    Validated validate(String token);
-
-    /**
-     * Result of validation.
-     */
-    class Validated implements SecurityContext {
-        /**
-         * The launching platform.
-         */
-        public LtiPlatform platform;
-
-        /**
-         * The validated payload.
-         */
-        public JsonObject payload;
-    }
+    JsonObject validate(String token);
 }

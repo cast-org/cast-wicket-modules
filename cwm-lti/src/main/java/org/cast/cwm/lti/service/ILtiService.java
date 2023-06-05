@@ -33,11 +33,10 @@ public interface ILtiService {
     /**
      * Handle the launch of a resource.
      *
-     * @param platform the launching platform
      * @param payload the payload of the LTI request
      * @return redirect url
      */
-    String onLaunch(LtiPlatform platform, JsonObject payload);
+    String onLaunch(JsonObject payload);
 
     /**
      * Create a response for deep linking of resources.

@@ -21,6 +21,7 @@ package org.cast.cwm.lti;
 
 import com.google.common.base.Strings;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.IRequestCycle;
@@ -67,35 +68,35 @@ public class LtiLaunch implements IRequestHandler {
     public void respond(IRequestCycle requestCycle) {
         WebResponse response = (WebResponse)requestCycle.getResponse();
 
-        IJwtValidationService.Validated validated;
+        JsonObject validated;
         try {
             validated = validationService.validate(idToken);
         } catch (Exception e) {
-            log.info("invalid token {}", e.getMessage());
+            log.info("invalid id token {}", e.getMessage());
             e.printStackTrace();
-            response.sendError(401, "invalid token");
+            response.sendError(401, "LTI launch: invalid id token");
             return;
         }
 
         if (log.isDebugEnabled()) {
             log.info("Successfully validated LTI request: {}",
-                    new GsonBuilder().setPrettyPrinting().create().toJson(validated.payload));
+                    new GsonBuilder().setPrettyPrinting().create().toJson(validated));
         }
 
         try {
-            LtiInitiation.checkNonce(validated.payload.get("nonce").getAsString());
+            LtiInitiation.checkNonce(validated.get("nonce").getAsString());
         } catch (Exception e) {
             log.info("check nonce: {}", e.getMessage(), e);
-            response.sendError(401, "invalid nonce");
+            response.sendError(401, "LTI launch: invalid nonce");
             return;
         }
 
         String redirect;
         try {
-            redirect = ltiService.onLaunch(validated.platform, validated.payload);
+            redirect = ltiService.onLaunch(validated);
         } catch (Exception e) {
             log.info("invalid payload {}", e.getMessage(), e);
-            response.sendError(400, "invalid payload");
+            response.sendError(400, "LTI launch: invalid payload");
             return;
         }
 

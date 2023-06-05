@@ -95,7 +95,17 @@ public class LtiService implements ILtiService {
     private LockByKey locks = new LockByKey();
 
     @Override
-    public String onLaunch(LtiPlatform platform, JsonObject payload) {
+    public String onLaunch(JsonObject payload) {
+
+        String iss = payload.get("iss").getAsString();
+        String aud = payload.get("aud").getAsString();
+        String deploymentId = payload.get(CLAIM_DEPLOYMENT_ID).getAsString();
+
+        LtiPlatform platform = siteService.getPlatformByIssuerClientIdDeploymentId(iss, aud, deploymentId).getObject();
+        if (platform == null) {
+            throw new IllegalArgumentException(String.format("unknown platform '%s', '%s', '%s'",
+                    iss, aud, deploymentId));
+        }
 
         Site site = platform.getSite();
         Period period = initPeriod(payload, site);
@@ -107,8 +117,9 @@ public class LtiService implements ILtiService {
         switch (messageType) {
             case MESSAGE_TYPE_RESOURCE_REQUEST:
                 ResourceState resourceState = new ResourceState();
-                resourceState.iss = payload.get("iss").getAsString();
-                resourceState.aud = payload.get("aud").getAsString();
+                resourceState.iss = iss;
+                resourceState.aud = aud;
+                resourceState.deploymentId = deploymentId;
                 CwmSession.get().setMetaData(ResourceState.ATTRIBUTE, resourceState);
 
                 JsonObject endpoint = payload.getAsJsonObject(CLAIM_ENDPOINT);
@@ -124,9 +135,9 @@ public class LtiService implements ILtiService {
             case MESSAGE_TYPE_LINKING_REQUEST:
                 JsonObject deepLinkingSettings = payload.getAsJsonObject(CLAIM_DEEP_LINKING_SETTINGS);
                 DeepLinkingState deepLinkingState = new DeepLinkingState();
-                deepLinkingState.iss = payload.get("iss").getAsString();
-                deepLinkingState.aud = payload.get("aud").getAsString();
-                deepLinkingState.deploymentId = payload.get(CLAIM_DEPLOYMENT_ID).getAsString();
+                deepLinkingState.iss = iss;
+                deepLinkingState.aud = aud;
+                deepLinkingState.deploymentId = deploymentId;
                 deepLinkingState.returnUrl = deepLinkingSettings.get("deep_link_return_url").getAsString();
                 if (deepLinkingSettings.get("data") != null) {
                     deepLinkingState.data = deepLinkingSettings.get("data").getAsString();
@@ -225,7 +236,7 @@ public class LtiService implements ILtiService {
 
         DeepLinkingState state = getState(DeepLinkingState.ATTRIBUTE);
 
-        IModel<LtiPlatform> platform = siteService.getPlatformByIssuerAndClientId(state.iss, state.aud);
+        IModel<LtiPlatform> platform = siteService.getPlatformByIssuerClientIdDeploymentId(state.iss, state.aud, state.deploymentId);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("iss", state.aud);
@@ -273,7 +284,7 @@ public class LtiService implements ILtiService {
             throw new IllegalStateException("no line item url present");
         }
 
-        IModel<LtiPlatform> platform = siteService.getPlatformByIssuerAndClientId(state.iss, state.aud);
+        IModel<LtiPlatform> platform = siteService.getPlatformByIssuerClientIdDeploymentId(state.iss, state.aud, state.deploymentId);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("timestamp", Instant.now().toString());
@@ -319,6 +330,7 @@ public class LtiService implements ILtiService {
 
         String iss;
         String aud;
+        public String deploymentId;
         String lineItemUrl;
     }
 }

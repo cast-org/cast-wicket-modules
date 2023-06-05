@@ -47,7 +47,7 @@ public interface ISiteService {
 
 	IModel<Site> getSiteByName(String name);
 
-	IModel<LtiPlatform> getPlatformByIssuerAndClientId(String issuer, String clientId);
+	IModel<LtiPlatform> getPlatformByIssuerClientIdDeploymentId(String issuer, String clientId, String deploymentId);
 
 	Class<? extends Period> getPeriodClass();
 
@@ -104,6 +104,8 @@ public interface ISiteService {
 	void onPeriodEdited(IModel<? extends Period> mPeriod);
 
 	IModel<Period> getPeriodBySiteAndLtiId(Site site, String ltiId);
+
+	IModel<List<LtiPlatform>> listPlatforms();
 
 	IModel<LtiPlatform> getPlatformBySite(IModel<Site> mSite);
 }

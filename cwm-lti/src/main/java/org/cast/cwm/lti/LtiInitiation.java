@@ -75,18 +75,11 @@ public class LtiInitiation implements IRequestHandler {
     public void respond(IRequestCycle requestCycle) {
         WebResponse response = (WebResponse)requestCycle.getResponse();
 
-        LtiPlatform platform = siteService.getPlatformByIssuerAndClientId(iss, clientId).getObject();
+        LtiPlatform platform = siteService.getPlatformByIssuerClientIdDeploymentId(iss, clientId, ltiDeploymentId).getObject();
         if (platform == null) {
-            log.warn("No LTI platform found for issuer {} and clientId {}", iss, clientId);
-            response.sendError(HttpsURLConnection.HTTP_UNAUTHORIZED, "Unknown LTI issuer and client ID");
+            log.warn("No LTI platform found for issuer {}, clientId {}, ltiDeploymentId {}", iss, clientId, ltiDeploymentId);
+            response.sendError(HttpsURLConnection.HTTP_UNAUTHORIZED, "LTI initiation: unknown iss, client_id, lti_deployment_id");
             return;
-        }
-        if (ltiDeploymentId != null) {
-            if (!platform.getDeploymentId().equals(ltiDeploymentId)) {
-                log.warn("invalid deployment id {}; expected {}", ltiDeploymentId, platform.getDeploymentId());
-                response.sendError(HttpsURLConnection.HTTP_BAD_REQUEST, "invalid payload");
-                return;
-            }
         }
 
         Url url = Url.parse(platform.getOidcAuthRequestUrl(), StandardCharsets.UTF_8, true);
