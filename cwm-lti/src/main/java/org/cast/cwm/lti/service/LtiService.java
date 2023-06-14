@@ -51,7 +51,7 @@ public class LtiService implements ILtiService {
     private static final String CLAIM_MESSAGE_TYPE = "https://purl.imsglobal.org/spec/lti/claim/message_type";
     private static final String CLAIM_CUSTOM = "https://purl.imsglobal.org/spec/lti/claim/custom";
     private static final String CLAIM_ENDPOINT = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint";
-    private static final String CLAIM_DEPLOYMENT_ID = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
+    public static final String CLAIM_DEPLOYMENT_ID = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
     private static final String CLAIM_DEEP_LINKING_SETTINGS = "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings";
     private static final String CLAIM_LINKING_CONTENT_ITEMS = "https://purl.imsglobal.org/spec/lti-dl/claim/content_items";
     private static final String CLAIM_ROLES = "https://purl.imsglobal.org/spec/lti/claim/roles";

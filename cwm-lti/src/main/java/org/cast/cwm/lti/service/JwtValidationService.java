@@ -37,15 +37,15 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.nimbusds.jwt.proc.JWTClaimsSetAwareJWSKeySelector;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.wicket.util.string.Strings;
 import org.cast.cwm.data.LtiPlatform;
 import org.cast.cwm.service.ISiteService;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Key;
-import java.util.Collections;
+import java.text.ParseException;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -81,9 +81,10 @@ public class JwtValidationService implements IJwtValidationService {
 
             final String issuer = claimsSet.getIssuer();
             final String clientId = claimsSet.getAudience().get(0);
+            final String deploymentId = getDeploymentId(claimsSet);
 
-            JWKSource<SecurityContext> source = jwkSetCache.computeIfAbsent(issuer + clientId, x -> {
-                String publicJwksUrl = getJwkSetUrl(issuer, clientId);
+            JWKSource<SecurityContext> source = jwkSetCache.computeIfAbsent(key(issuer, clientId, deploymentId), x -> {
+                String publicJwksUrl = getJwkSetUrl(issuer, clientId, deploymentId);
 
                 try {
                     return new RemoteJWKSet<>(new URL(publicJwksUrl));
@@ -97,19 +98,34 @@ public class JwtValidationService implements IJwtValidationService {
             List<JWK> matches = source.get(new JWKSelector(matcher), context);
             return KeyConverter.toJavaKeys(matches);
         }
-    }
 
-    private String getJwkSetUrl(String issuer, String clientId) {
-        for (LtiPlatform platform : siteService.listPlatforms().getObject()) {
-            if (Objects.equals(platform.getIssuer(), issuer) &&
-                    Objects.equals(platform.getClientId(), clientId)) {
-                // note: multiple platforms could use the same issuer and clientId,
-                // while differing in the deploymentId only - we take the first
-                // jwkSet that is available (which should be identical for all of them)
-                return platform.getPublicJwksUrl();
+        private String key(String issuer, String clientId, String deploymentId) {
+            return issuer + ':' + clientId + ':' + deploymentId;
+        }
+
+        private String getDeploymentId(JWTClaimsSet claimsSet) {
+            try {
+                return claimsSet.getStringClaim(LtiService.CLAIM_DEPLOYMENT_ID);
+            } catch (ParseException e) {
+                log.debug("no deployment_id in token");
+                return null;
             }
         }
-        // no platform has a jwkSet for the given issuer and clientId
-        throw new IllegalStateException(String.format("no jwks url for issuer %s clientId %s", issuer, clientId));
+    }
+
+    private String getJwkSetUrl(String issuer, String clientId, String deploymentId) {
+        LtiPlatform platform = siteService.getPlatformByIssuerClientIdDeploymentId(issuer, clientId, deploymentId).getObject();
+        if (platform == null) {
+            // no platform has a jwkSet for the given issuer and clientId
+            throw new IllegalStateException(String.format("no jwks url for issuer %s clientId %s", issuer, clientId));
+        }
+
+        String url = platform.getPublicJwksUrl();
+        if (Strings.isEmpty(url)) {
+            // platform has no jwkSet
+            throw new IllegalStateException(String.format("no jwks url for platform %s", platform.getId()));
+        }
+
+        return url;
     }
 }
