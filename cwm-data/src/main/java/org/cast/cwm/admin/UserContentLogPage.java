@@ -146,10 +146,11 @@ public class UserContentLogPage extends LogPage {
 					IModel<AuditTriple<UserContent, DefaultRevisionEntity>> rowModel) {
 				UserContent uc = rowModel.getObject().getEntity();
 				if (!rowModel.getObject().getType().equals(RevisionType.DEL)) {
-					if (uc.getDataType().name().equals("TEXT"))
+					if (uc.getDataType() != null && uc.getDataType().name().equals("TEXT")) {
 						item.add(new Label(componentId, new PropertyModel<String>(rowModel, "entity.text")));
-					else
-						item.add(new ContentLinkPanel(componentId, rowModel.getObject().getEntity().getId(), rowModel.getObject().getInfo().getId()));					
+					} else {
+						item.add(new ContentLinkPanel(componentId, rowModel.getObject().getEntity().getId(), rowModel.getObject().getInfo().getId()));
+					}
 				}
 				else {
 					item.add(new EmptyPanel(componentId));										
