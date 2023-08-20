@@ -23,10 +23,7 @@ import lombok.*;
 import org.cast.cwm.db.data.PersistedObject;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -47,6 +44,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Getter
 @GenericGenerator(name="lti_platform_generator", strategy = "org.cast.cwm.CwmIdGenerator")
+@Table(indexes={
+        @Index(columnList="issuer, clientId, deploymentId", unique=true),
+})
 public class LtiPlatform extends PersistedObject implements Serializable {
 
     @Id

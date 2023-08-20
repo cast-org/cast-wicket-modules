@@ -62,6 +62,7 @@ import org.cast.cwm.service.IAdminPageService;
 import org.cast.cwm.service.ISiteService;
 import org.cast.cwm.service.ISpreadsheetReader;
 import org.cast.cwm.service.UserSpreadsheetReader.PotentialUserSave;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -306,9 +307,16 @@ public class SiteInfoPage extends AdminPage {
 
 		@Override
 		protected void onSubmit() {
-			String message = getModelObject().isTransient() ? "Saved." : "Updated.";
-			super.onSubmit();
-			info("LTI Platform " + message);
+			try {
+				String message = getModelObject().isTransient() ? "Saved." : "Updated.";
+
+				super.onSubmit();
+
+				info("LTI Platform " + message);
+			} catch (ConstraintViolationException e) {
+				error("Issuer, ClientID and Deployment ID are already configured for other site!");
+				getHibernateSession().getTransaction().rollback();
+			}
 		}
 	}
 
