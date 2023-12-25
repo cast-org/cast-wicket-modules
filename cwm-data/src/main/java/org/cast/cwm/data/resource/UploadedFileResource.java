@@ -88,6 +88,7 @@ public class UploadedFileResource extends AbstractResource {
 				throw new AbortWithHttpErrorCodeException(HttpServletResponse.SC_NOT_FOUND,
 						"Data not found [id=" + id + "]");
 
+			response.setFileName(bfd.getName());
 			response.setContentType(bfd.getMimeType());
 			response.setContentLength(data.length);
 			response.setContentDisposition(ContentDisposition.INLINE);
