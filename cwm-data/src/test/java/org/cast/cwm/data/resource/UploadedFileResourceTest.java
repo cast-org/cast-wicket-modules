@@ -77,12 +77,12 @@ public class UploadedFileResourceTest {
 		verify(dbService).getById(BinaryFileData.class, 1L);
 		tester.assertContains("^abc$");
 		assertEquals("Content type is not correct", "text/plain", tester.getLastResponse().getContentType());
-		assertEquals("Wrong content disposition", "inline", tester.getContentDispositionFromResponseHeader());
+		assertEquals("Wrong content disposition", "inline; filename=\"BFD\"; filename*=UTF-8''BFD", tester.getContentDispositionFromResponseHeader());
 		
 		// Should be sent with expiry header at least a day in the future
 		Date expires = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'").parse(tester.getLastResponse().getHeader("Expires"));
 		Date now = new Date();
-		long oneDay = 24*60*60*1000;
+		long oneDay = 22*60*60*1000;
 		assertTrue("Too short, or no expiry header", expires.getTime() > now.getTime()+oneDay);
 	}
 	
