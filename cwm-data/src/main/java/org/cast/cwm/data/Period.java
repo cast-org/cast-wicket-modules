@@ -59,11 +59,9 @@ public class Period extends PersistedObject implements Comparable<Period> {
 	@Setter(AccessLevel.NONE)
 	private Long id;
 
-	@NaturalId(mutable=true)
 	@ManyToOne(optional=false)
 	private Site site;
 
-	@NaturalId(mutable=true)
 	private String name;
 
 	/**
