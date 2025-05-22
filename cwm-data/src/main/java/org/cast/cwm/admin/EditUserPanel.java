@@ -296,7 +296,7 @@ public class EditUserPanel extends Panel {
 			// Username
 			TextField<String> username = new TextField<String>("username");
 			username.setRequired(true);
-			username.add(StringValidator.lengthBetween(1, 32));
+			username.add(StringValidator.lengthBetween(1, 36));
 			username.add(new PatternValidator("[\\w.-]+"));
 			username.add(new UniqueUserFieldValidator(getModel(), Field.USERNAME));	
 			
@@ -325,7 +325,7 @@ public class EditUserPanel extends Panel {
 			// Subject ID (for Research)
 			TextField<String> subjectId = new TextField<String>("subjectId");
 			subjectId.setRequired(true);
-			subjectId.add(StringValidator.lengthBetween(1, 32));
+			subjectId.add(StringValidator.lengthBetween(1, 36));
 			subjectId.add(new UniqueUserFieldValidator(getModel(), Field.SUBJECTID));
 			
 			FormComponentContainer subjectIdContainer = new FormComponentContainer("subjectIdEnclosure", subjectId).setLabel("Subject ID:");
